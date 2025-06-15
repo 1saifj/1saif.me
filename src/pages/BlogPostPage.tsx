@@ -758,7 +758,7 @@ export const BlogPostPage: React.FC = () => {
               <div className="relative flex items-start space-x-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 ring-4 ring-white/20 shadow-xl">
                   <img 
-                    src="/31359390.jpeg" 
+                    src="/sj_image.jpeg" 
                     alt="Saif Aljanahi - Full-Stack Software Engineer"
                     className="w-full h-full object-cover"
                     loading="lazy"

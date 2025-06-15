@@ -17,7 +17,7 @@ interface SEOHeadProps {
 const SEOHead: React.FC<SEOHeadProps> = ({
   title = 'Saif Aljanahi - Full-Stack Engineer',
   description = 'Professional portfolio of Saif Aljanahi, Full-Stack Engineer specializing in Golang, Python, and Flutter development. Experienced in building scalable web applications and mobile solutions.',
-  image = '/31359390.jpeg',
+  image = '/sj_image.jpeg',
   url = 'https://1saif.me',
   type = 'website',
   author = 'Saif Aljanahi',

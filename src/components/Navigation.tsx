@@ -66,16 +66,24 @@ export const Navigation: React.FC = () => {
           {isHomePage ? (
             <button 
               onClick={handleLogoClick}
-              className="text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="flex items-center hover:opacity-80 transition-opacity"
             >
-              SA
+              <img 
+                src="/sj.png" 
+                alt="Saif Aljanahi Logo" 
+                className="w-10 h-10 rounded-full object-cover"
+              />
             </button>
           ) : (
             <Link 
               to="/"
-              className="text-2xl font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="flex items-center hover:opacity-80 transition-opacity"
             >
-              SA
+              <img 
+                src="/sj.png" 
+                alt="Saif Aljanahi Logo" 
+                className="w-10 h-10 rounded-full object-cover"
+              />
             </Link>
           )}
 

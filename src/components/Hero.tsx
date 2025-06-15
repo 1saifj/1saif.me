@@ -47,7 +47,7 @@ export const Hero: React.FC = () => {
           {/* Profile Image */}
           <div className="w-40 h-40 mx-auto mb-8 rounded-full overflow-hidden shadow-2xl ring-4 ring-white/20 dark:ring-white/10 hover:ring-white/40 dark:hover:ring-white/20 transition-all duration-300">
             <img 
-              src="/31359390.jpeg" 
+              src="/sj_image.jpeg" 
               alt="Saif Aljanahi - Full-Stack Software Engineer specializing in Golang, Python, and Flutter development"
               className="w-full h-full object-cover object-center"
               loading="eager"
