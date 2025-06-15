@@ -1,0 +1,50 @@
+import React, { useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { HomePage } from './pages/HomePage'
+import { BlogPost } from './pages/BlogPost'
+import { BlogListingPage } from './pages/BlogListingPage'
+import { ProjectPage } from './pages/ProjectPage'
+import { ConfirmSubscriptionPage } from './pages/ConfirmSubscriptionPage'
+import { UnsubscribePage } from './pages/UnsubscribePage'
+import { PrivacyPolicy } from './pages/PrivacyPolicy'
+import { PWAInstallPrompt } from './components/PWAInstallPrompt'
+import { SkipLink } from './components/SkipLink'
+import { useAnalytics } from './hooks/useAnalytics'
+
+function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
+  const location = useLocation()
+  const { trackPageView } = useAnalytics()
+
+  useEffect(() => {
+    trackPageView({
+      page_title: document.title,
+      page_location: window.location.href
+    })
+  }, [location, trackPageView])
+
+  return <>{children}</>
+}
+
+function App() {
+  return (
+    <Router>
+      <AnalyticsWrapper>
+        <SkipLink />
+        <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/blog" element={<BlogListingPage />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/project/:slug" element={<ProjectPage />} />
+            <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
+            <Route path="/unsubscribe" element={<UnsubscribePage />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+          </Routes>
+          <PWAInstallPrompt />
+        </div>
+      </AnalyticsWrapper>
+    </Router>
+  )
+}
+
+export default App
