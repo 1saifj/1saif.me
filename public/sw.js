@@ -3,7 +3,7 @@ const urlsToCache = [
   '/',
   '/static/js/bundle.js',
   '/static/css/main.css',
-  '/31359390.jpeg',
+  '/sj_image.jpeg',
   '/favicon.ico',
   '/manifest.json'
 ]

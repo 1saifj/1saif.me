@@ -13,7 +13,11 @@
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:all": "npm run test && npm run test:e2e"
+    "test:all": "npm run test && npm run test:e2e",
+    "build:production": "npm run build",
+    "build:ci": "npm install --legacy-peer-deps && npm run build",
+    "deploy:preview": "npm run build:production && echo 'Build complete! Upload dist/ folder to Cloudflare Pages'",
+    "analyze": "npm run build && npx vite-bundle-analyzer dist/stats.html"
   },
   "dependencies": {
     "@emailjs/browser": "^4.3.3",
@@ -31,6 +35,7 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@eslint/js": "^9.9.1",
     "@playwright/test": "^1.53.0",
+    "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -42,6 +47,7 @@
     "@vitest/ui": "^3.2.3",
     "autoprefixer": "^10.4.18",
     "buffer": "^6.0.3",
+    "esbuild": "^0.25.5",
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",

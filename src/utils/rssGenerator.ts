@@ -45,7 +45,7 @@ export const generateRSSFeed = (posts: BlogPost[], siteUrl: string = 'https://sa
     <category>Programming</category>
     <ttl>60</ttl>
     <image>
-      <url>${siteUrl}/31359390.jpeg</url>
+      <url>${siteUrl}/sj_image.jpeg</url>
       <title>Saif Aljanahi</title>
       <link>${siteUrl}</link>
       <width>144</width>

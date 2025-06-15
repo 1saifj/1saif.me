@@ -157,12 +157,12 @@
       },
       {
         "id": "13",
-        "title": "Production Deployment Setup",
-        "description": "Configure production hosting and deployment",
-        "details": "Set up CI/CD pipeline, configure hosting on Netlify or Vercel, implement custom domain with SSL, set up performance monitoring, and configure error tracking.",
-        "status": "pending",
+        "title": "Cloudflare Pages Deployment Setup",
+        "description": "Configure production hosting and deployment on Cloudflare Pages",
+        "details": "**Cloudflare Pages Configuration:**\n- Create Cloudflare Pages project with GitHub integration\n- Configure build settings for Vite (npm run build, dist output)\n- Set up automatic deployments on git push\n- Configure preview deployments for pull requests\n\n**Domain & SSL Setup:**\n- Custom domain configuration (if applicable)\n- Automatic SSL certificate provisioning\n- DNS configuration for optimal performance\n\n**Performance Optimization:**\n- Cloudflare CDN configuration\n- Cache headers optimization\n- Compression settings (Brotli/Gzip)\n- Image optimization settings\n\n**Environment & Security:**\n- Environment variables configuration\n- Security headers setup (CSP, HSTS, etc.)\n- Analytics integration preparation\n- Error tracking setup preparation\n\n**Build Optimization:**\n- Vite build configuration for Cloudflare\n- Asset optimization for CDN delivery\n- Service worker configuration for PWA",
+        "status": "in-progress",
         "priority": "high",
-        "testStrategy": "Test deployment pipeline with staging environment. Verify SSL certificate and domain configuration.",
+        "testStrategy": "Test deployment pipeline with staging environment. Verify SSL certificate and domain configuration. Test Cloudflare CDN performance and caching.",
         "dependencies": [
           "3",
           "7",

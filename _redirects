@@ -1,0 +1,15 @@
+# Cloudflare Pages Redirects Configuration
+# SPA Routing - Redirect all non-file requests to index.html
+/*    /index.html   200
+
+# Force HTTPS (if needed)
+# http://example.com/*  https://example.com/:splat  301!
+
+# Redirect old URLs (if any)
+# /old-path  /new-path  301
+
+# Blog redirects for SEO
+/blog/*  /blog/:splat  200
+
+# API redirects (if needed in future)
+# /api/*  /.netlify/functions/:splat  200 
