@@ -14,6 +14,10 @@ echo "📦 Using npm for package management..."
 # Install dependencies with npm
 npm install --legacy-peer-deps --no-audit --no-fund
 
+# Update browserslist database to avoid warnings
+echo "🔄 Updating browserslist database..."
+npx update-browserslist-db@latest || echo "⚠️ Browserslist update failed, continuing..."
+
 # Build the project
 echo "🔨 Building project..."
 npm run build

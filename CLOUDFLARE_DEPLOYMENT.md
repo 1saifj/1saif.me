@@ -37,7 +37,7 @@ This guide will help you deploy the Saif Aljanahi Portfolio to Cloudflare Pages.
 3. **Configure build settings:**
    ```
    Framework preset: Vite
-   Build command: npm run build:ci
+   Build command: ./build.sh
    Build output directory: dist
    Root directory: / (leave empty)
    ```
@@ -47,6 +47,7 @@ This guide will help you deploy the Saif Aljanahi Portfolio to Cloudflare Pages.
    ```
    NODE_VERSION=18
    NPM_FLAGS=--legacy-peer-deps
+   SKIP_DEPENDENCY_INSTALL=true
    ```
 
 ## Step 3: Advanced Configuration
@@ -84,6 +85,12 @@ VITE_GISCUS_CATEGORY_ID=your_category_id
 
 The following files are already configured for optimal performance:
 
+### `build.sh` script:
+- Forces npm usage (prevents yarn conflicts)
+- Removes yarn.lock files automatically
+- Installs dependencies with legacy peer deps
+- Runs the production build
+
 ### `_headers` file:
 - Security headers (CSP, HSTS, etc.)
 - Cache control for static assets
@@ -97,6 +104,11 @@ The following files are already configured for optimal performance:
 - Cloudflare Pages configuration
 - Build settings
 - Environment variables template
+
+### Package manager configuration:
+- `package.json` specifies npm as package manager
+- `.npmrc` configures npm with legacy peer deps
+- `.yarnrc.yml` disables yarn usage
 
 ## Step 6: Deployment Process
 
@@ -123,23 +135,34 @@ After deployment, verify:
 
 ### Common Issues:
 
-1. **Build fails with dependency errors:**
+1. **Build fails with yarn/lockfile errors:**
+   ```
+   Error: The lockfile would have been modified by this install
+   ```
+   **Solution:** The project includes a `build.sh` script that forces npm usage and removes yarn.lock conflicts. Make sure to use `./build.sh` as the build command.
+
+2. **Build fails with dependency errors:**
    ```bash
-   # Solution: Use legacy peer deps
+   # Solution: Use legacy peer deps (already configured in build.sh)
    npm install --legacy-peer-deps
    ```
 
-2. **404 errors on page refresh:**
+3. **404 errors on page refresh:**
    - Ensure `_redirects` file is in the root directory
    - Check SPA routing configuration
 
-3. **Environment variables not working:**
+4. **Environment variables not working:**
    - Verify variables are prefixed with `VITE_`
    - Check they're set in Cloudflare Pages dashboard
 
-4. **Slow build times:**
+5. **Slow build times:**
    - Enable build caching in Cloudflare Pages
    - Optimize dependencies
+
+6. **Package manager conflicts:**
+   - The project includes `packageManager: "npm@10.0.0"` in package.json
+   - `.yarnrc.yml` file disables yarn
+   - `build.sh` script ensures npm is used
 
 ### Build Commands for Different Scenarios:
 
