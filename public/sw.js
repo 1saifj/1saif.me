@@ -1,11 +1,9 @@
-const CACHE_NAME = 'saif-aljanahi-portfolio-v1'
+const CACHE_NAME = 'saif-aljanahi-portfolio-v2'
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/sj_image.jpeg',
-  '/favicon.ico',
-  '/manifest.json'
+  '/sj.png',
+  '/manifest.json',
+  '/robots.txt'
 ]
 
 // Install event
@@ -13,18 +11,48 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        return cache.addAll(urlsToCache)
+        // Cache files individually to handle failures gracefully
+        return Promise.allSettled(
+          urlsToCache.map(url => 
+            cache.add(url).catch(error => {
+              console.log('Failed to cache:', url, error)
+              return null
+            })
+          )
+        )
+      })
+      .then(() => {
+        console.log('Service worker installed successfully')
+        self.skipWaiting()
       })
   )
 })
 
 // Fetch event
 self.addEventListener('fetch', event => {
+  // Skip non-GET requests and external URLs
+  if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
+    return
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request)
+        // Return cached version if available
+        if (response) {
+          return response
+        }
+        
+        // Fetch from network with error handling
+        return fetch(event.request).catch(error => {
+          console.log('Fetch failed for:', event.request.url, error)
+          // Return a fallback response for navigation requests
+          if (event.request.mode === 'navigate') {
+            return caches.match('/')
+          }
+          // For other requests, just fail silently
+          return new Response('', { status: 404 })
+        })
       })
   )
 })

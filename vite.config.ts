@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 import { resolve } from 'path';
 
 // https://vitejs.dev/config/
@@ -8,21 +7,14 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src')
+      '@': resolve(__dirname, './src'),
     }
   },
   define: {
     global: 'globalThis',
   },
   optimizeDeps: {
-    exclude: ['lucide-react'],
-    esbuildOptions: {
-      plugins: [
-        NodeGlobalsPolyfillPlugin({
-          buffer: true,
-        }),
-      ],
-    },
+    exclude: [],
   },
   build: {
     rollupOptions: {
@@ -32,7 +24,6 @@ export default defineConfig({
           router: ['react-router-dom'],
           icons: ['lucide-react'],
           email: ['@emailjs/browser'],
-          markdown: ['gray-matter'],
           prism: ['prismjs']
         },
         // Optimize for Cloudflare Pages CDN
@@ -52,23 +43,19 @@ export default defineConfig({
         entryFileNames: 'assets/js/[name]-[hash].js'
       }
     },
-    sourcemap: false, // Disable sourcemaps for production
+    sourcemap: false,
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
+        drop_console: false,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn']
       },
       mangle: {
         safari10: true
       }
     },
-    // Optimize chunk size for better caching
     chunkSizeWarningLimit: 1000,
-    // Enable CSS code splitting
     cssCodeSplit: true,
-    // Optimize assets
     assetsInlineLimit: 4096
   },
   server: {
