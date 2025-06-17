@@ -522,10 +522,6 @@ export const Projects: React.FC = () => {
 
                             <div className="lg:w-48 flex flex-col items-end space-y-4">
                               <div className="flex items-center space-x-4 text-slate-400">
-                                <button className="flex items-center space-x-1 hover:text-red-400 transition-colors">
-                                  <Heart className="w-4 h-4" />
-                                  <span className="text-sm">12</span>
-                                </button>
                                 <button className="flex items-center space-x-1 hover:text-blue-400 transition-colors">
                                   <Share2 className="w-4 h-4" />
                                 </button>
