@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, ExternalLink, Github, Wrench, Calendar, Code, Globe, ChevronRight, Home, Star, Users, Zap, Shield, Database, Layers } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Github, Wrench, Calendar, Code, Globe, ChevronRight, Home, Star, Users, Zap, Shield, Database, Layers, Lock, Building2 } from 'lucide-react'
 import { projects as projectFiles } from '../utils/contentLoader'
-import { projectSchema, Language } from '../schemas/projectSchema'
+import { projectSchema, Language, SourceType } from '../schemas/projectSchema'
 import { findContentBySlug } from '../utils/slugUtils'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 
@@ -28,6 +28,13 @@ const languageLabels: Record<Language, string> = {
   haskell: 'Haskell',
   go: 'Go',
   ocaml: 'OCaml'
+}
+
+// Source type configuration
+const sourceTypeConfig: Record<SourceType, { icon: React.ReactNode, label: string, color: string }> = {
+  'open-source': { icon: <Globe className="w-4 h-4" />, label: 'Open Source', color: 'from-green-500 to-emerald-600' },
+  'private': { icon: <Lock className="w-4 h-4" />, label: 'Private', color: 'from-orange-500 to-red-600' },
+  'company': { icon: <Building2 className="w-4 h-4" />, label: 'Company', color: 'from-purple-500 to-indigo-600' }
 }
 
 export const ProjectPage: React.FC = () => {
@@ -102,7 +109,9 @@ export const ProjectPage: React.FC = () => {
       description: projectFile.frontmatter.description,
       url: projectFile.frontmatter.url,
       language: projectFile.frontmatter.language,
-      wip: projectFile.frontmatter.wip || false
+      wip: projectFile.frontmatter.wip || false,
+      isPrivate: projectFile.frontmatter.isPrivate || false,
+      sourceType: projectFile.frontmatter.sourceType || 'open-source'
     })
   } catch (error) {
     return (
@@ -171,10 +180,14 @@ export const ProjectPage: React.FC = () => {
         <div className="container mx-auto px-6 max-w-6xl relative">
           <div className="text-center mb-12">
             {/* Project Badge */}
-            <div className="inline-flex items-center space-x-4 mb-8">
+            <div className="inline-flex items-center space-x-4 mb-8 flex-wrap justify-center">
               <div className={`flex items-center space-x-3 bg-gradient-to-r ${languageColors[project.language]} text-white px-6 py-3 rounded-full shadow-xl backdrop-blur-sm border border-white/20`}>
                 {languageIcons[project.language]}
                 <span className="font-semibold">{languageLabels[project.language]}</span>
+              </div>
+              <div className={`flex items-center space-x-3 bg-gradient-to-r ${sourceTypeConfig[project.sourceType].color} text-white px-6 py-3 rounded-full shadow-xl backdrop-blur-sm border border-white/20`}>
+                {sourceTypeConfig[project.sourceType].icon}
+                <span className="font-semibold">{sourceTypeConfig[project.sourceType].label}</span>
               </div>
               {project.wip && (
                 <div className="flex items-center space-x-2 bg-yellow-500/20 text-yellow-300 px-4 py-2 rounded-full backdrop-blur-sm border border-yellow-500/30">
@@ -198,28 +211,39 @@ export const ProjectPage: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center space-x-4 bg-white text-slate-900 px-10 py-5 rounded-2xl hover:bg-slate-100 transition-all duration-300 font-bold shadow-2xl hover:shadow-3xl hover:scale-105 text-lg"
-                aria-label={`View ${project.name} source code on GitHub`}
-              >
-                <Github className="w-6 h-6 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <span>View Source Code</span>
-                <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-              </a>
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center space-x-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-5 rounded-2xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 font-bold shadow-2xl hover:shadow-3xl hover:scale-105 text-lg"
-                aria-label={`Visit ${project.name} live demo`}
-              >
-                <Globe className="w-6 h-6 group-hover:scale-110 transition-transform" aria-hidden="true" />
-                <span>Live Demo</span>
-                <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-              </a>
+              {(project.sourceType === 'open-source' && !project.isPrivate) ? (
+                <>
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center space-x-4 bg-white text-slate-900 px-10 py-5 rounded-2xl hover:bg-slate-100 transition-all duration-300 font-bold shadow-2xl hover:shadow-3xl hover:scale-105 text-lg"
+                    aria-label={`View ${project.name} source code on GitHub`}
+                  >
+                    <Github className="w-6 h-6 group-hover:scale-110 transition-transform" aria-hidden="true" />
+                    <span>View Source Code</span>
+                    <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                  </a>
+                  {project.url && (
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex items-center space-x-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-5 rounded-2xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 font-bold shadow-2xl hover:shadow-3xl hover:scale-105 text-lg"
+                      aria-label={`Visit ${project.name} live demo`}
+                    >
+                      <Globe className="w-6 h-6 group-hover:scale-110 transition-transform" aria-hidden="true" />
+                      <span>Live Demo</span>
+                      <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                    </a>
+                  )}
+                </>
+              ) : (
+                <div className="group inline-flex items-center space-x-4 bg-gray-500 text-gray-200 px-10 py-5 rounded-2xl cursor-not-allowed opacity-75 font-bold shadow-2xl text-lg">
+                  <Lock className="w-6 h-6" aria-hidden="true" />
+                  <span>Source Code Unavailable</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -295,23 +319,37 @@ export const ProjectPage: React.FC = () => {
                       Quick Links
                     </h3>
                     <div className="space-y-4">
-                      <a
-                        href={project.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group flex items-center justify-between p-4 bg-white hover:bg-slate-50 rounded-xl transition-all duration-200 shadow-sm border border-slate-100 hover:shadow-md hover:scale-105"
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div className="bg-slate-100 group-hover:bg-slate-200 rounded-lg p-3 transition-colors">
-                            <Github className="w-6 h-6 text-slate-600" />
+                      {(project.sourceType === 'open-source' && !project.isPrivate) ? (
+                        <a
+                          href={project.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center justify-between p-4 bg-white hover:bg-slate-50 rounded-xl transition-all duration-200 shadow-sm border border-slate-100 hover:shadow-md hover:scale-105"
+                        >
+                          <div className="flex items-center space-x-4">
+                            <div className="bg-slate-100 group-hover:bg-slate-200 rounded-lg p-3 transition-colors">
+                              <Github className="w-6 h-6 text-slate-600" />
+                            </div>
+                            <div>
+                              <span className="font-semibold text-slate-900 block">Source Code</span>
+                              <span className="text-slate-500 text-sm">View on GitHub</span>
+                            </div>
                           </div>
-                          <div>
-                            <span className="font-semibold text-slate-900 block">Source Code</span>
-                            <span className="text-slate-500 text-sm">View on GitHub</span>
+                          <ExternalLink className="w-5 h-5 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-1 transition-all" />
+                        </a>
+                      ) : (
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200 opacity-75">
+                          <div className="flex items-center space-x-4">
+                            <div className="bg-gray-200 rounded-lg p-3">
+                              <Lock className="w-6 h-6 text-gray-500" />
+                            </div>
+                            <div>
+                              <span className="font-semibold text-gray-600 block">Source Code</span>
+                              <span className="text-gray-500 text-sm">{project.sourceType === 'company' ? 'Company Project' : 'Private Repository'}</span>
+                            </div>
                           </div>
                         </div>
-                        <ExternalLink className="w-5 h-5 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-1 transition-all" />
-                      </a>
+                      )}
                     </div>
                   </div>
 

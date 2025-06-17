@@ -5,6 +5,8 @@ description: Frontend development projects focusing on user experience, responsi
 url: https://github.com/1saifj/morabaa-frontend
 language: typescript
 wip: false
+isPrivate: true
+sourceType: private
 ---
 
 # Morabaa Software Solutions Frontend Projects

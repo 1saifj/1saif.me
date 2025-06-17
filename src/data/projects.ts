@@ -10,7 +10,9 @@ export const projects: Project[] = projectFiles
         description: project.frontmatter.description,
         url: project.frontmatter.url,
         language: project.frontmatter.language,
-        wip: project.frontmatter.wip || false
+        wip: project.frontmatter.wip || false,
+        isPrivate: project.frontmatter.isPrivate || false,
+        sourceType: project.frontmatter.sourceType || 'open-source'
       })
     } catch (error) {
       console.warn(`Failed to parse project: ${project.slug}`, error)
