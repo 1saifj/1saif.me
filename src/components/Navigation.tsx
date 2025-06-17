@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Rss } from 'lucide-react'
+import { Menu, X, Rss, Search } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
+import SearchBox from './SearchBox'
 import { publishedBlogs } from '../data/blogs'
 import { downloadRSSFeed } from '../utils/rssGenerator'
 
 export const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const location = useLocation()
   const isHomePage = location.pathname === '/'
 
@@ -21,6 +23,22 @@ export const Navigation: React.FC = () => {
       return () => window.removeEventListener('scroll', handleScroll)
     }
   }, [isHomePage])
+
+  // Global keyboard shortcut for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setIsSearchOpen(true)
+      }
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const navLinks = [
     { href: '#about', label: 'About' },
@@ -109,6 +127,15 @@ export const Navigation: React.FC = () => {
               )
             ))}
             
+            {/* Search Button */}
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              title="Search (⌘K)"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+            
             {/* RSS Feed Button */}
             <button
               onClick={handleRSSDownload}
@@ -124,6 +151,13 @@ export const Navigation: React.FC = () => {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-4">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              title="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
             <ThemeToggle />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -159,6 +193,14 @@ export const Navigation: React.FC = () => {
               ))}
               
               <button
+                onClick={() => setIsSearchOpen(true)}
+                className="flex items-center space-x-2 w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
+              >
+                <Search className="w-4 h-4" />
+                <span>Search (⌘K)</span>
+              </button>
+              
+              <button
                 onClick={handleRSSDownload}
                 className="flex items-center space-x-2 w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
               >
@@ -169,6 +211,12 @@ export const Navigation: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Search Box */}
+      <SearchBox 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+      />
     </nav>
   )
 }

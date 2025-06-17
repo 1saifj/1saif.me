@@ -10,10 +10,12 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { SkipLink } from './components/SkipLink'
 import { useAnalytics } from './hooks/useAnalytics'
+import Clarity from '@microsoft/clarity'
 
 function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const { trackPageView } = useAnalytics()
+  Clarity.init('s10i1oa5td');
 
   useEffect(() => {
     trackPageView({

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Code2, Database, Globe, Zap, Shield, Users, Award, TrendingUp, Target } from 'lucide-react'
+import { Code2, Database, Shield, Users, Globe, Zap } from 'lucide-react'
 
 export const About: React.FC = () => {
   const skills = [
@@ -35,33 +35,6 @@ export const About: React.FC = () => {
     }
   ]
 
-  const achievements = [
-    {
-      icon: TrendingUp,
-      metric: "$1M+",
-      label: "Monthly Transactions Processed",
-      description: "Built secure payment systems handling high-volume financial transactions"
-    },
-    {
-      icon: Target,
-      metric: "99.9%",
-      label: "System Uptime Achieved",
-      description: "Optimized backend performance with sub-200ms API response times"
-    },
-    {
-      icon: Users,
-      metric: "10,000+",
-      label: "Concurrent Users Supported",
-      description: "Architected scalable systems supporting thousands of simultaneous users"
-    },
-    {
-      icon: Award,
-      metric: "15+",
-      label: "Projects Delivered",
-      description: "Completed full-stack applications with 100% client satisfaction rate"
-    }
-  ]
-
   return (
     <section className="py-20 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <div className="container mx-auto px-6">
@@ -75,20 +48,6 @@ export const About: React.FC = () => {
               Specialized in <strong>Golang backend development</strong>, <strong>financial technology</strong>, and 
               <strong>scalable architecture</strong> with a proven track record of leading high-performance teams.
             </p>
-          </div>
-
-          {/* Key Achievements Section */}
-          <div className="grid md:grid-cols-4 gap-6 mb-16">
-            {achievements.map((achievement, index) => (
-              <div key={index} className="text-center bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 border border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-xl hover:scale-105">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg mb-4">
-                  <achievement.icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{achievement.metric}</div>
-                <div className="font-semibold text-slate-900 dark:text-white mb-2">{achievement.label}</div>
-                <div className="text-sm text-slate-600 dark:text-slate-300">{achievement.description}</div>
-              </div>
-            ))}
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-start mb-16">

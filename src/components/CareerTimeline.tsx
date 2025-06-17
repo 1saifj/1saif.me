@@ -1,5 +1,5 @@
 import React from 'react'
-import { Calendar, MapPin, Building, Users, TrendingUp, Award } from 'lucide-react'
+import { Calendar, MapPin, Building, Users, TrendingUp, Award, GraduationCap } from 'lucide-react'
 
 interface TimelineItem {
   id: string
@@ -7,89 +7,115 @@ interface TimelineItem {
   company: string
   location: string
   period: string
-  description: string[]
+  description: string
+  responsibilities: string[]
+  leadership?: string[]
   technologies: string[]
-  achievements: string[]
-  type: 'work' | 'education' | 'freelance'
+  achievements?: string[]
+  type: 'work' | 'education'
 }
 
 export const CareerTimeline: React.FC = () => {
   const timelineItems: TimelineItem[] = [
     {
-      id: '4',
-      title: 'Software Engineer (Backend Team Lead)',
-      company: 'AlQaseh',
-      location: 'An Najaf, Iraq',
-      period: 'September 2022 - Present',
-      description: [
-        'Leading backend development team for financial transaction systems',
-        'Architecting scalable microservices using Golang and clean architecture',
-        'Implementing secure payment processing with PCI DSS compliance'
+      id: '1',
+      title: 'Assistant Engineer - Software Development & Graduate Services',
+      company: 'University of Kufa',
+      location: 'Najaf, Iraq',
+      period: 'April 2023 – Present',
+      description: 'Dual-role combining software development with graduate employment services',
+      responsibilities: [
+        'Developed comprehensive graduate tracking platform for monitoring career outcomes',
+        'Created Information Bank Smart App for university contests and competitions',
+        'Built internal web applications for lab scheduling, inventory, and reporting using Django and React',
+        'Provided technical support in Electronic and Communications Engineering laboratories'
       ],
-      technologies: ['Golang', 'PostgreSQL', 'Docker', 'Kubernetes', 'gRPC', 'Redis'],
-      achievements: [
-        'Improved system performance by 40% through optimization',
-        'Led team of 5 developers in delivering critical features',
-        'Implemented security protocols resulting in zero security incidents',
-        'Processed $1M+ in monthly transactions with 99.9% uptime'
+      leadership: [
+        'Mentored three agile student teams (3 members each) on Transportation Management System project',
+        'Guided Git workflow, Go microservice patterns, and agile delivery to optimize campus bus routes',
+        'Web Team: Introduced React and modern web development best practices',
+        'Backend Team: Trained students on relational database design and C# REST API implementation',
+        'Mobile Team: Coached UI/UX principles and Flutter development for cross-platform deployment'
       ],
-      type: 'work'
-    },
-    {
-      id: '3',
-      title: 'Full Stack Developer',
-      company: 'NRCM',
-      location: 'An Najaf, Iraq',
-      period: 'April 2022 - September 2022',
-      description: [
-        'Developed healthcare management systems with Django and React',
-        'Collaborated with medical professionals to create user-friendly interfaces',
-        'Optimized database queries reducing response times by 60%'
-      ],
-      technologies: ['Django', 'React', 'PostgreSQL', 'Docker', 'REST APIs'],
-      achievements: [
-        'Delivered patient management system serving 10,000+ users',
-        'Reduced system response time by 60% through optimization',
-        'Achieved 99.5% system uptime during critical operations'
-      ],
+      technologies: ['Go', 'Django', 'React', 'PostgreSQL', 'Docker', 'C#', 'Flutter'],
       type: 'work'
     },
     {
       id: '2',
-      title: 'Freelance Developer',
-      company: 'Independent',
-      location: 'Remote',
-      period: 'January 2021 - April 2022',
-      description: [
-        'Built custom web applications for international clients',
-        'Specialized in e-commerce platforms and business automation',
-        'Delivered projects across multiple technology stacks'
+      title: 'Software Engineer / Backend Team Lead',
+      company: 'Al Qaseh for Financial Solutions and Electronic Payment',
+      location: 'Najaf, Iraq',
+      period: 'August 2022 – June 1, 2025',
+      description: 'Building secure financial infrastructure for digital payment systems',
+      responsibilities: [
+        'Specialized in backend development using Golang and PostgreSQL with strong focus on security and system robustness',
+        'Designed and maintained Go-based REST/gRPC microservices with PostgreSQL and Redis backends',
+        'Implemented encryption, JWT/mTLS authentication, RBAC, and PCI-DSS compliant 3-D Secure payment flows',
+        'Delivered 10+ projects including business portal for merchants and consumer mobile app'
       ],
-      technologies: ['Python', 'JavaScript', 'React', 'Django', 'AWS', 'Stripe'],
-      achievements: [
-        'Successfully delivered 15+ projects to satisfied clients',
-        'Built e-commerce platforms generating $100K+ in client revenue',
-        'Maintained 5-star rating across all freelance platforms'
+      leadership: [
+        'Led cross-functional backend squad of 3 developers for 10 months (October 2023 - July 2024)',
+        'Instituted pull-request reviews, issue triage, and sprint retrospectives',
+        'Drove secure API design, Golang best practices, and PostgreSQL optimization',
+        'Coordinated with mobile and web teams to align API contracts and release schedules'
       ],
-      type: 'freelance'
+      technologies: ['Go', 'PostgreSQL', 'Redis', 'gRPC', 'JWT', 'mTLS', 'PCI-DSS'],
+      type: 'work'
     },
     {
-      id: '1',
-      title: 'Bachelor of Engineering in Software Engineering',
+      id: '3',
+      title: 'Web Developer',
+      company: 'Morabaa Software Solutions',
+      location: 'Najaf, Iraq',
+      period: 'January 2022 – July 2022',
+      description: 'Frontend and full-stack web development with focus on user experience',
+      responsibilities: [
+        'Developed responsive web applications with focus on user experience and brand consistency',
+        'Built reusable component library that cut UI build time by 30% for subsequent projects',
+        'Ensured mobile-friendly layouts balancing functionality with aesthetic design'
+      ],
+      technologies: ['React', 'JavaScript', 'CSS3', 'HTML5', 'Responsive Design'],
+      type: 'work'
+    },
+    {
+      id: '4',
+      title: 'Frontend Developer',
+      company: 'Al-Aaml',
+      location: 'Najaf, Iraq',
+      period: 'August 2021 – October 2021',
+      description: 'Frontend development focusing on user interface design and implementation',
+      responsibilities: [
+        'Frontend development focusing on user interface design and implementation'
+      ],
+      technologies: ['JavaScript', 'CSS3', 'HTML5', 'UI/UX Design'],
+      type: 'work'
+    },
+    {
+      id: '5',
+      title: 'Bachelor of Science in Electronic & Communications Engineering',
       company: 'University of Kufa',
-      location: 'An Najaf, Iraq',
-      period: '2018 - 2022',
-      description: [
-        'Focused on software architecture, algorithms, and system design',
-        'Completed thesis on distributed systems and microservices',
-        'Active in programming competitions and tech communities'
+      location: 'Najaf, Iraq',
+      period: 'March 2017 – July 2021',
+      description: 'GPA: 81.256/100 | Ranked 3rd in Class',
+      responsibilities: [
+        'Graduation Project: Real-time Classification of Falls and Activities of Daily Living Using a CNN-LSTM Network',
+        'Achieved A+ grade focusing on AI and deep learning applications'
       ],
-      technologies: ['Java', 'C++', 'Python', 'Database Design', 'Software Architecture'],
-      achievements: [
-        'Graduated with Honors (GPA: 3.8/4.0)',
-        'Led final year project on distributed chat application',
-        'Won university programming competition (2021)'
+      technologies: ['AI', 'Deep Learning', 'CNN-LSTM', 'Python', 'Machine Learning'],
+      type: 'education'
+    },
+    {
+      id: '6',
+      title: 'Diploma in Computer Techniques Engineering',
+      company: 'Najaf Technical Institute, Al-Furat Al-Awsat Technical University',
+      location: 'Najaf, Iraq',
+      period: 'October 2015 – June 2017',
+      description: 'GPA: 87.85/100 | Valedictorian (Ranked 1st)',
+      responsibilities: [
+        'Graduation Project: Smart Home System Using IoT Intelligent Control',
+        'Designed sensor-driven automation using ESP8266 and Node-RED'
       ],
+      technologies: ['IoT', 'ESP8266', 'Node-RED', 'Automation', 'Sensors'],
       type: 'education'
     }
   ]
@@ -99,9 +125,7 @@ export const CareerTimeline: React.FC = () => {
       case 'work':
         return Building
       case 'education':
-        return Award
-      case 'freelance':
-        return Users
+        return GraduationCap
       default:
         return Building
     }
@@ -113,8 +137,6 @@ export const CareerTimeline: React.FC = () => {
         return 'from-blue-600 to-cyan-600'
       case 'education':
         return 'from-purple-600 to-pink-600'
-      case 'freelance':
-        return 'from-green-600 to-emerald-600'
       default:
         return 'from-blue-600 to-cyan-600'
     }
@@ -173,32 +195,41 @@ export const CareerTimeline: React.FC = () => {
                           <span>{item.period}</span>
                         </div>
                       </div>
+                      {item.description && (
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 italic">
+                          {item.description}
+                        </p>
+                      )}
                     </div>
 
-                    {/* Description */}
+                    {/* Responsibilities */}
                     <div className="mb-4">
+                      <h5 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center space-x-2">
+                        <TrendingUp className="w-4 h-4" />
+                        <span>{item.type === 'education' ? 'Academic Highlights' : 'Key Responsibilities'}</span>
+                      </h5>
                       <ul className="space-y-2">
-                        {item.description.map((desc, i) => (
+                        {item.responsibilities.map((resp, i) => (
                           <li key={i} className="text-slate-700 dark:text-slate-300 flex items-start space-x-2">
                             <div className="w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                            <span>{desc}</span>
+                            <span className="text-sm">{resp}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    {/* Achievements */}
-                    {item.achievements.length > 0 && (
+                    {/* Leadership (only for work items with leadership) */}
+                    {item.leadership && item.leadership.length > 0 && (
                       <div className="mb-4">
                         <h5 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center space-x-2">
-                          <TrendingUp className="w-4 h-4" />
-                          <span>Key Achievements</span>
+                          <Users className="w-4 h-4" />
+                          <span>Leadership & Mentoring</span>
                         </h5>
                         <ul className="space-y-1">
-                          {item.achievements.map((achievement, i) => (
+                          {item.leadership.map((leader, i) => (
                             <li key={i} className="text-sm text-slate-600 dark:text-slate-400 flex items-start space-x-2">
                               <Award className="w-3 h-3 text-green-600 dark:text-green-400 mt-1 flex-shrink-0" />
-                              <span>{achievement}</span>
+                              <span>{leader}</span>
                             </li>
                           ))}
                         </ul>
@@ -207,14 +238,12 @@ export const CareerTimeline: React.FC = () => {
 
                     {/* Technologies */}
                     <div>
-                      <h5 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                        Technologies Used
-                      </h5>
+                      <h5 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Technologies</h5>
                       <div className="flex flex-wrap gap-2">
-                        {item.technologies.map((tech) => (
+                        {item.technologies.map((tech, i) => (
                           <span
-                            key={tech}
-                            className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium"
+                            key={i}
+                            className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full font-medium"
                           >
                             {tech}
                           </span>
@@ -229,27 +258,7 @@ export const CareerTimeline: React.FC = () => {
         </div>
       </div>
 
-      {/* Summary Stats */}
-      <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-700">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">3+</div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">Years Experience</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">15+</div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">Projects Delivered</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">$1M+</div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">Transactions Processed</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-1">10K+</div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">Users Served</div>
-          </div>
-        </div>
-      </div>
+
     </div>
   )
 } 

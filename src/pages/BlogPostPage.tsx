@@ -742,9 +742,44 @@ export const BlogPostPage: React.FC = () => {
 
           {/* Main Content */}
           <main className="lg:col-span-4">
-            <article className="article-content p-8 md:p-12">
+            <article className="article-content p-8 md:p-12 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
               <div 
-                className="article-prose max-w-none"
+                className="
+                  article-prose max-w-none text-slate-700 dark:text-slate-300 leading-relaxed
+                  [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:text-slate-900 [&>h1]:dark:text-white [&>h1]:mb-6 [&>h1]:mt-8 [&>h1]:leading-tight
+                  [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-slate-900 [&>h2]:dark:text-white [&>h2]:mb-4 [&>h2]:mt-8 [&>h2]:leading-tight [&>h2]:border-b [&>h2]:border-slate-200 [&>h2]:dark:border-slate-700 [&>h2]:pb-2
+                  [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:text-slate-900 [&>h3]:dark:text-white [&>h3]:mb-4 [&>h3]:mt-6 [&>h3]:leading-tight
+                  [&>h4]:text-lg [&>h4]:font-semibold [&>h4]:text-slate-900 [&>h4]:dark:text-white [&>h4]:mb-3 [&>h4]:mt-4
+                  [&>h5]:text-base [&>h5]:font-semibold [&>h5]:text-slate-900 [&>h5]:dark:text-white [&>h5]:mb-2 [&>h5]:mt-3
+                  [&>h6]:text-sm [&>h6]:font-semibold [&>h6]:text-slate-600 [&>h6]:dark:text-slate-400 [&>h6]:mb-2 [&>h6]:mt-3
+                  
+                  [&>p]:mb-6 [&>p]:leading-relaxed [&>p]:text-slate-700 [&>p]:dark:text-slate-300
+                  
+                  [&>ul]:mb-6 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:space-y-2 [&>ul]:text-slate-700 [&>ul]:dark:text-slate-300
+                  [&>ol]:mb-6 [&>ol]:list-decimal [&>ol]:list-inside [&>ol]:space-y-2 [&>ol]:text-slate-700 [&>ol]:dark:text-slate-300
+                  [&>li]:leading-relaxed
+                  
+                  [&>blockquote]:border-l-4 [&>blockquote]:border-blue-500 [&>blockquote]:bg-blue-50 [&>blockquote]:dark:bg-blue-900/20 [&>blockquote]:p-4 [&>blockquote]:my-6 [&>blockquote]:italic [&>blockquote]:text-slate-600 [&>blockquote]:dark:text-slate-400
+                  
+                  [&>pre]:bg-slate-900 [&>pre]:dark:bg-slate-800 [&>pre]:text-green-400 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:mb-6 [&>pre]:overflow-x-auto [&>pre]:text-sm [&>pre]:leading-relaxed [&>pre]:border [&>pre]:border-slate-200 [&>pre]:dark:border-slate-700
+                  [&>code]:bg-slate-100 [&>code]:dark:bg-slate-800 [&>code]:px-2 [&>code]:py-1 [&>code]:rounded [&>code]:text-sm [&>code]:font-mono [&>code]:text-red-600 [&>code]:dark:text-red-400
+                  [&>pre_code]:bg-transparent [&>pre_code]:text-green-400 [&>pre_code]:p-0
+                  
+                  [&>table]:w-full [&>table]:mb-6 [&>table]:border-collapse [&>table]:border [&>table]:border-slate-300 [&>table]:dark:border-slate-600
+                  [&>table_th]:bg-slate-100 [&>table_th]:dark:bg-slate-800 [&>table_th]:p-3 [&>table_th]:text-left [&>table_th]:font-semibold [&>table_th]:border [&>table_th]:border-slate-300 [&>table_th]:dark:border-slate-600
+                  [&>table_td]:p-3 [&>table_td]:border [&>table_td]:border-slate-300 [&>table_td]:dark:border-slate-600
+                  
+                  [&>a]:text-blue-600 [&>a]:dark:text-blue-400 [&>a]:underline [&>a]:hover:text-blue-800 [&>a]:dark:hover:text-blue-300 [&>a]:transition-colors
+                  
+                  [&>strong]:font-bold [&>strong]:text-slate-900 [&>strong]:dark:text-white
+                  [&>em]:italic [&>em]:text-slate-700 [&>em]:dark:text-slate-300
+                  
+                  [&>hr]:my-8 [&>hr]:border-slate-300 [&>hr]:dark:border-slate-600
+                  
+                  [&>img]:max-w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:my-6 [&>img]:shadow-lg [&>img]:mx-auto
+                  
+                  [&>.highlight]:bg-yellow-100 [&>.highlight]:dark:bg-yellow-900/30 [&>.highlight]:px-1 [&>.highlight]:rounded
+                "
                 dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(article.content) }}
               />
             </article>
