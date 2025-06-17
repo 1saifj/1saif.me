@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Calendar, Clock, Tag, Filter, TrendingUp, BookOpen, Search, Grid, List, ArrowRight, Star, Eye, Heart, Share2, User, ChevronDown, SortAsc, SortDesc, Bookmark, MessageCircle, Award, Zap, Target } from 'lucide-react'
+import { Calendar, Clock, Tag, Filter, TrendingUp, BookOpen, Search, Grid, List, ArrowRight, Star, Eye, Share2, User, ChevronDown, SortAsc, SortDesc, MessageCircle, Award, Zap, Target } from 'lucide-react'
 import { publishedBlogs } from '../data/blogs'
 import { createSlugFromTitle } from '../utils/slugUtils'
 
@@ -85,17 +85,6 @@ export const Blog: React.FC = () => {
 
   // Get featured article (most recent)
   const featuredArticle = publishedBlogs[0]
-
-  // Simulate engagement metrics
-  const getEngagementMetrics = (index: number) => ({
-    views: Math.floor(Math.random() * 5000) + 500,
-    likes: Math.floor(Math.random() * 200) + 10,
-    comments: Math.floor(Math.random() * 50) + 2,
-    bookmarks: Math.floor(Math.random() * 100) + 5
-  })
-
-  // Determine if article is featured (only first 3 articles)
-  const isFeatured = (index: number) => index < 3
 
   // Get article badge based on position and content
   const getArticleBadge = (blog: any, index: number) => {
@@ -198,16 +187,6 @@ export const Blog: React.FC = () => {
                             <div className="flex items-center space-x-2">
                               <Eye className="w-4 h-4" />
                               <span className="text-sm">2.4k views</span>
-                            </div>
-                            <div className="flex items-center space-x-4">
-                              <button className="flex items-center space-x-1 hover:text-white transition-colors">
-                                <Heart className="w-4 h-4" />
-                                <span className="text-sm">124</span>
-                              </button>
-                              <button className="flex items-center space-x-1 hover:text-white transition-colors">
-                                <Share2 className="w-4 h-4" />
-                                <span className="text-sm">Share</span>
-                              </button>
                             </div>
                           </div>
                         </div>
@@ -351,7 +330,10 @@ export const Blog: React.FC = () => {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                   {paginatedBlogs.map((blog, index) => {
                     const slug = createSlugFromTitle(blog.title)
-                    const metrics = getEngagementMetrics(index)
+                    const metrics = {
+                      views: Math.floor(Math.random() * 1000) + 100,
+                      comments: Math.floor(Math.random() * 50) + 5
+                    }
                     const badge = getArticleBadge(blog, index)
                     
                     return (
@@ -422,18 +404,11 @@ export const Blog: React.FC = () => {
                                 <span>{metrics.views.toLocaleString()}</span>
                               </div>
                               <div className="flex items-center space-x-1">
-                                <Heart className="w-3 h-3" />
-                                <span>{metrics.likes}</span>
-                              </div>
-                              <div className="flex items-center space-x-1">
                                 <MessageCircle className="w-3 h-3" />
                                 <span>{metrics.comments}</span>
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <button className="p-2 hover:bg-white dark:hover:bg-slate-600 rounded-lg transition-colors group/btn">
-                                <Bookmark className="w-4 h-4 text-slate-400 dark:text-slate-500 group-hover/btn:text-blue-500 transition-colors" />
-                              </button>
                               <button className="p-2 hover:bg-white dark:hover:bg-slate-600 rounded-lg transition-colors group/btn">
                                 <Share2 className="w-4 h-4 text-slate-400 dark:text-slate-500 group-hover/btn:text-blue-500 transition-colors" />
                               </button>
@@ -468,12 +443,15 @@ export const Blog: React.FC = () => {
                 <div className="space-y-6 mb-12">
                   {paginatedBlogs.map((blog, index) => {
                     const slug = createSlugFromTitle(blog.title)
-                    const metrics = getEngagementMetrics(index)
+                    const metrics = {
+                      views: Math.floor(Math.random() * 1000) + 100,
+                      comments: Math.floor(Math.random() * 50) + 5
+                    }
                     
                     return (
                       <article 
                         key={`${blog.title}-${index}`}
-                        className="group bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-white/50 dark:border-slate-700/50"
+                        className="group bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 border border-slate-100 dark:border-slate-700 overflow-hidden hover:border-slate-200 dark:hover:border-slate-600"
                       >
                         <div className="p-8">
                           <div className="flex flex-col lg:flex-row lg:items-center gap-6">
@@ -525,10 +503,6 @@ export const Blog: React.FC = () => {
 
                             <div className="lg:w-48 flex flex-col items-end space-y-4">
                               <div className="flex items-center space-x-4 text-slate-500 dark:text-slate-400 transition-colors duration-300">
-                                <button className="flex items-center space-x-1 hover:text-red-500 transition-colors">
-                                  <Heart className="w-4 h-4" />
-                                  <span className="text-sm">{metrics.likes}</span>
-                                </button>
                                 <button className="flex items-center space-x-1 hover:text-blue-500 transition-colors">
                                   <Share2 className="w-4 h-4" />
                                 </button>

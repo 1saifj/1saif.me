@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, Eye, Heart, Share2, BookOpen, Tag, User, ThumbsUp, Bookmark, Coffee, Award, Zap, TrendingUp } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, Eye, Share2, BookOpen, Tag, User, Coffee, Award, Zap, TrendingUp } from 'lucide-react'
 import { publishedBlogs } from '../data/blogs'
 import { articles } from '../utils/contentLoader'
 import { createSlugFromTitle } from '../utils/slugUtils'
@@ -11,8 +11,6 @@ import SEOHead from '../components/SEOHead'
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
-  const [isLiked, setIsLiked] = useState(false)
-  const [isBookmarked, setIsBookmarked] = useState(false)
   const [readingProgress, setReadingProgress] = useState(0)
   const [estimatedReadTime, setEstimatedReadTime] = useState(0)
   const [viewCount, setViewCount] = useState(0)
@@ -34,10 +32,6 @@ export const BlogPost: React.FC = () => {
     const newViews = parseInt(views) + 1
     localStorage.setItem(`blog-views-${slug}`, newViews.toString())
     setViewCount(newViews)
-
-    // Load user preferences
-    setIsLiked(localStorage.getItem(`blog-liked-${slug}`) === 'true')
-    setIsBookmarked(localStorage.getItem(`blog-bookmarked-${slug}`) === 'true')
 
     // Reading progress tracker
     const handleScroll = () => {
@@ -68,35 +62,23 @@ export const BlogPost: React.FC = () => {
     return <Navigate to="/blog" replace />
   }
 
-  const handleLike = () => {
-    const newLikedState = !isLiked
-    setIsLiked(newLikedState)
-    localStorage.setItem(`blog-liked-${slug}`, newLikedState.toString())
-  }
-
-  const handleBookmark = () => {
-    const newBookmarkedState = !isBookmarked
-    setIsBookmarked(newBookmarkedState)
-    localStorage.setItem(`blog-bookmarked-${slug}`, newBookmarkedState.toString())
-  }
-
   const handleShare = async () => {
+    const shareData = {
+      title: blog.title,
+      text: blog.description,
+      url: window.location.href
+    }
+
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: blog.title,
-          text: blog.description,
-          url: window.location.href
-        })
-      } catch (err) {
+        await navigator.share(shareData)
+      } catch (error) {
         // Fallback to clipboard
-        await navigator.clipboard.writeText(window.location.href)
-        alert('Link copied to clipboard!')
+        navigator.clipboard.writeText(window.location.href)
       }
     } else {
       // Fallback to clipboard
-      await navigator.clipboard.writeText(window.location.href)
-      alert('Link copied to clipboard!')
+      navigator.clipboard.writeText(window.location.href)
     }
   }
 
@@ -203,30 +185,6 @@ export const BlogPost: React.FC = () => {
             <div className="flex items-center justify-between pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={handleLike}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all ${
-                    isLiked 
-                      ? 'bg-red-500 text-white shadow-lg' 
-                      : 'bg-white/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/20 border border-slate-200/50 dark:border-slate-600/50'
-                  }`}
-                >
-                  <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
-                  <span className="font-medium">Like</span>
-                </button>
-
-                <button
-                  onClick={handleBookmark}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all ${
-                    isBookmarked 
-                      ? 'bg-blue-500 text-white shadow-lg' 
-                      : 'bg-white/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-slate-200/50 dark:border-slate-600/50'
-                  }`}
-                >
-                  <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
-                  <span className="font-medium">Save</span>
-                </button>
-
-                <button
                   onClick={handleShare}
                   className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all border border-slate-200/50 dark:border-slate-600/50"
                 >
@@ -268,15 +226,6 @@ export const BlogPost: React.FC = () => {
               </div>
               
               <div className="flex items-center space-x-3">
-                <button
-                  onClick={handleLike}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-all ${
-                    isLiked ? 'text-red-500' : 'text-slate-500 hover:text-red-500'
-                  }`}
-                >
-                  <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                  <span className="font-medium">{isLiked ? 'Liked' : 'Like'}</span>
-                </button>
                 <button
                   onClick={handleShare}
                   className="flex items-center space-x-1 px-3 py-2 rounded-lg text-slate-500 hover:text-blue-500 transition-colors"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ExternalLink, Github, Filter, Wrench, Eye, Star, Code, Search, Grid, List, ArrowRight, Calendar, Users, Zap, ChevronDown, Heart, Share2, Lock, Building2, Globe } from 'lucide-react'
+import { ExternalLink, Github, Filter, Wrench, Eye, Star, Code, Search, Grid, List, ArrowRight, Calendar, Users, Zap, ChevronDown, Share2, Lock, Building2, Globe } from 'lucide-react'
 import { projects } from '../data/projects'
 import { Language, SourceType } from '../schemas/projectSchema'
 import { createSlugFromTitle } from '../utils/slugUtils'
@@ -239,11 +239,7 @@ export const Projects: React.FC = () => {
                             </div>
                           </div>
                           <div className="flex items-center space-x-4">
-                            <button className="flex items-center space-x-1 hover:text-white transition-colors">
-                              <Heart className="w-4 h-4" />
-                              <span className="text-sm">Like</span>
-                            </button>
-                            <button className="flex items-center space-x-1 hover:text-white transition-colors">
+                            <button className="flex items-center space-x-1 px-3 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors">
                               <Share2 className="w-4 h-4" />
                               <span className="text-sm">Share</span>
                             </button>

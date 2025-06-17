@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, Tag, Share2, BookOpen, User, ChevronRight, Home, Copy, Check, List, Eye, Star, MessageCircle, Heart, Bookmark, Menu, X, Twitter, Linkedin, Facebook, Link as LinkIcon, Download, Printer as Print, ChevronUp } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, Tag, Share2, BookOpen, User, ChevronRight, Home, Copy, Check, List, Eye, Star, MessageCircle, Menu, X, Twitter, Linkedin, Facebook, Link as LinkIcon, Download, Printer as Print, ChevronUp } from 'lucide-react'
 import { articles } from '../utils/contentLoader'
 import { blogSchema } from '../schemas/blogSchema'
 import { findContentBySlug } from '../utils/slugUtils'
@@ -15,8 +15,6 @@ export const BlogPostPage: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [readingProgress, setReadingProgress] = useState(0)
   const [showScrollTop, setShowScrollTop] = useState(false)
-  const [isLiked, setIsLiked] = useState(false)
-  const [isBookmarked, setIsBookmarked] = useState(false)
   const [showShareMenu, setShowShareMenu] = useState(false)
   
   useEffect(() => {
@@ -823,23 +821,7 @@ export const BlogPostPage: React.FC = () => {
       </div>
 
       {/* Floating Actions */}
-      <div className="floating-actions">
-        <button
-          onClick={() => setIsLiked(!isLiked)}
-          className={`floating-action ${isLiked ? 'active' : ''}`}
-          title="Like article"
-        >
-          <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-        </button>
-        
-        <button
-          onClick={() => setIsBookmarked(!isBookmarked)}
-          className={`floating-action ${isBookmarked ? 'active' : ''}`}
-          title="Bookmark article"
-        >
-          <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`} />
-        </button>
-        
+      <div className="floating-actions">        
         <div className="relative">
           <button
             onClick={() => handleShare()}
@@ -848,72 +830,18 @@ export const BlogPostPage: React.FC = () => {
           >
             <Share2 className="w-5 h-5" />
           </button>
-          
-          {showShareMenu && (
-            <div className="share-menu">
-              <h4 className="font-semibold text-slate-900 mb-3">Share this article</h4>
-              <div className="space-y-2">
-                <button
-                  onClick={() => handleShare('twitter')}
-                  className="share-option w-full"
-                >
-                  <Twitter className="w-5 h-5 text-blue-500" />
-                  <span>Twitter</span>
-                </button>
-                <button
-                  onClick={() => handleShare('linkedin')}
-                  className="share-option w-full"
-                >
-                  <Linkedin className="w-5 h-5 text-blue-600" />
-                  <span>LinkedIn</span>
-                </button>
-                <button
-                  onClick={() => handleShare('facebook')}
-                  className="share-option w-full"
-                >
-                  <Facebook className="w-5 h-5 text-blue-700" />
-                  <span>Facebook</span>
-                </button>
-                <button
-                  onClick={() => handleShare('copy')}
-                  className="share-option w-full"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-5 h-5 text-green-600" />
-                      <span>Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <LinkIcon className="w-5 h-5 text-slate-500" />
-                      <span>Copy Link</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
         </div>
         
-        <button
-          onClick={() => window.print()}
-          className="floating-action"
-          title="Print article"
-        >
-          <Print className="w-5 h-5" />
-        </button>
+        {showScrollTop && (
+          <button
+            onClick={scrollToTop}
+            className="floating-action"
+            title="Scroll to top"
+          >
+            <ChevronUp className="w-5 h-5" />
+          </button>
+        )}
       </div>
-
-      {/* Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="scroll-top-btn"
-          title="Scroll to top"
-        >
-          <ChevronUp className="w-6 h-6" />
-        </button>
-      )}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Calendar, Clock, Filter, TrendingUp, BookOpen, Search, Grid, List, ArrowRight, Star, Eye, Heart, ChevronDown, Award, Zap, Target } from 'lucide-react'
+import { Calendar, Clock, Filter, TrendingUp, BookOpen, Search, Grid, List, ArrowRight, Star, Eye, ChevronDown, Award, Zap, Target } from 'lucide-react'
 import { publishedBlogs } from '../data/blogs'
 import { createSlugFromTitle } from '../utils/slugUtils'
 
@@ -80,14 +80,6 @@ export const BlogListing: React.FC = () => {
       setIsLoading(false)
     }, 300)
   }
-
-  // Simulate engagement metrics
-  const getEngagementMetrics = (index: number) => ({
-    views: Math.floor(Math.random() * 5000) + 500,
-    likes: Math.floor(Math.random() * 200) + 10,
-    comments: Math.floor(Math.random() * 50) + 2,
-    bookmarks: Math.floor(Math.random() * 100) + 5
-  })
 
   // Get article badge based on position and content
   const getArticleBadge = (blog: any, index: number) => {
@@ -284,7 +276,10 @@ export const BlogListing: React.FC = () => {
                 : 'grid-cols-1'
             }`}>
               {paginatedBlogs.map((blog, index) => {
-                const metrics = getEngagementMetrics(index)
+                const metrics = {
+                  views: Math.floor(Math.random() * 1000) + 100,
+                  comments: Math.floor(Math.random() * 50) + 5
+                }
                 const badge = getArticleBadge(blog, index)
                 const BadgeIcon = badge.icon
 
@@ -306,10 +301,6 @@ export const BlogListing: React.FC = () => {
                           <div className="flex items-center space-x-1">
                             <Eye className="w-4 h-4" />
                             <span className="text-xs">{metrics.views}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Heart className="w-4 h-4" />
-                            <span className="text-xs">{metrics.likes}</span>
                           </div>
                         </div>
                       </div>
