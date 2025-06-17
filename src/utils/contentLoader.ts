@@ -17,11 +17,43 @@ function parseFrontmatter(content: string): { data: Record<string, any>, content
   const data: Record<string, any> = {};
   
   // Parse YAML-like frontmatter
-  frontmatterStr.split('\n').forEach(line => {
+  const lines = frontmatterStr.split('\n');
+  let i = 0;
+  
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    if (!line || line.startsWith('#')) {
+      i++;
+      continue;
+    }
+    
     const colonIndex = line.indexOf(':');
     if (colonIndex > 0) {
       const key = line.substring(0, colonIndex).trim();
       let value = line.substring(colonIndex + 1).trim();
+      
+      // Check if this is an array (value is empty and next lines are indented with -)
+      if (!value && i + 1 < lines.length && lines[i + 1].trim().startsWith('-')) {
+        const arrayItems: string[] = [];
+        i++;
+        
+        // Parse array items
+        while (i < lines.length && lines[i].trim().startsWith('-')) {
+          let arrayValue = lines[i].trim().substring(1).trim();
+          
+          // Remove quotes if present
+          if ((arrayValue.startsWith('"') && arrayValue.endsWith('"')) || 
+              (arrayValue.startsWith("'") && arrayValue.endsWith("'"))) {
+            arrayValue = arrayValue.slice(1, -1);
+          }
+          
+          arrayItems.push(arrayValue);
+          i++;
+        }
+        
+        data[key] = arrayItems;
+        continue;
+      }
       
       // Remove quotes if present
       if ((value.startsWith('"') && value.endsWith('"')) || 
@@ -40,7 +72,9 @@ function parseFrontmatter(content: string): { data: Record<string, any>, content
         data[key] = value;
       }
     }
-  });
+    
+    i++;
+  }
   
   return { data, content: markdownContent };
 }
