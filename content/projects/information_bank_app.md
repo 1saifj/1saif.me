@@ -5,6 +5,8 @@ description: Intelligent application system for University of Kufa contests and 
 url: https://github.com/1saifj/information-bank-app
 language: typescript
 wip: false
+isPrivate: true
+sourceType: company
 ---
 
 # Information Bank Smart App

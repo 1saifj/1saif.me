@@ -5,6 +5,8 @@ description: Comprehensive graduate monitoring system for University of Kufa to 
 url: https://github.com/1saifj/kufa-grad-tracking
 language: typescript
 wip: false
+isPrivate: false
+sourceType: open-source
 ---
 
 # Kufa Grad Tracking Platform

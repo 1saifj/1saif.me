@@ -5,6 +5,8 @@ description: Frontend development work focusing on modern web technologies and u
 url: https://github.com/1saifj/al-aaml-frontend
 language: typescript
 wip: false
+isPrivate: true
+sourceType: company
 ---
 
 # Al-Aaml Frontend Development

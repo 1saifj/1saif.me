@@ -5,6 +5,8 @@ description: Enterprise-grade backend system for financial solutions with emphas
 url: https://github.com/1saifj/al-qaseh-backend
 language: go
 wip: false
+isPrivate: true
+sourceType: company
 ---
 
 # Al Qaseh Financial Backend System
