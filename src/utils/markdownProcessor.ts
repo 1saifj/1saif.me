@@ -35,11 +35,11 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
         return {
           ...block,
           replacement: `
-            <div class="code-block-container relative group my-6 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+            <div class="code-block-container relative group my-4 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
               <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
                 <span class="text-sm font-medium text-slate-600">${languageLabel}</span>
                 <button 
-                  onclick="copyToClipboard('${codeId}')" 
+                  data-copy-target="${codeId}" 
                   class="copy-button text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded border transition-all duration-200 opacity-70 group-hover:opacity-100"
                   title="Copy code"
                 >
@@ -47,7 +47,7 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
                 </button>
               </div>
               <div class="code-content relative">
-                <div id="${codeId}" class="syntax-highlighted-code">${highlightedCode}</div>
+                <div id="${codeId}" class="syntax-highlighted-code [&>pre]:m-0 [&>pre]:p-4">${highlightedCode}</div>
               </div>
             </div>
           `.trim()
@@ -59,11 +59,11 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
         return {
           ...block,
           replacement: `
-            <div class="code-block-container relative group my-6 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+            <div class="code-block-container relative group my-4 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
               <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
                 <span class="text-sm font-medium text-slate-600">${languageLabel}</span>
                 <button 
-                  onclick="copyToClipboard('fallback-${Math.random().toString(36).substr(2, 9)}')" 
+                  data-copy-target="fallback-${Math.random().toString(36).substr(2, 9)}" 
                   class="copy-button text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded border transition-all duration-200 opacity-70 group-hover:opacity-100"
                   title="Copy code"
                 >
@@ -71,7 +71,7 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
                 </button>
               </div>
               <div class="code-content relative">
-                <pre class="p-4 bg-slate-900 text-slate-100 overflow-x-auto"><code>${escapedCode}</code></pre>
+                <pre class="m-0 p-4 bg-slate-900 text-slate-100 overflow-x-auto"><code>${escapedCode}</code></pre>
               </div>
             </div>
           `.trim()
@@ -87,7 +87,15 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
       html = html.slice(0, block.index) + block.replacement + html.slice(block.index + block.match.length)
     })
 
-  // Step 3: Continue with other markdown processing
+  // Step 3: Protect Shiki code blocks from further processing
+  const protectedBlocks: { placeholder: string; content: string }[] = []
+  html = html.replace(/<div class="code-block-container[\s\S]*?<\/div>/g, (match) => {
+    const placeholder = `___PROTECTED_BLOCK_${protectedBlocks.length}___`
+    protectedBlocks.push({ placeholder, content: match })
+    return placeholder
+  })
+
+  // Step 4: Continue with other markdown processing
   html = html
     // Enhanced tables with professional styling
     .replace(/\|(.+)\|\n\|[-\s|:]+\|\n((?:\|.+\|\n?)*)/g, (match, header, rows) => {
@@ -156,32 +164,12 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
     .replace(/<p class="text-slate-700 leading-relaxed mb-4">(\s*<(?:h[1-6]|div|blockquote|ul|ol|table))/g, '$1')
     .replace(/(<\/(?:h[1-6]|div|blockquote|ul|ol|table)>\s*)<\/p>/g, '$1')
 
+  // Step 5: Restore protected code blocks
+  protectedBlocks.forEach(({ placeholder, content }) => {
+    html = html.replace(placeholder, content)
+  })
+
   return html
 }
 
-// Add copy functionality script
-if (typeof window !== 'undefined') {
-  (window as any).copyCodeToClipboard = (codeId: string) => {
-    const codeElement = document.getElementById(codeId)
-    if (codeElement) {
-      const text = codeElement.textContent || ''
-      navigator.clipboard.writeText(text).then(() => {
-        // Show success feedback
-        const button = codeElement.closest('.code-block-container')?.querySelector('.copy-btn')
-        if (button) {
-          const originalText = button.innerHTML
-          button.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg><span>Copied!</span>`
-          button.classList.add('bg-green-600', 'hover:bg-green-700')
-          button.classList.remove('bg-slate-600', 'hover:bg-slate-500')
-          setTimeout(() => {
-            button.innerHTML = originalText
-            button.classList.remove('bg-green-600', 'hover:bg-green-700')
-            button.classList.add('bg-slate-600', 'hover:bg-slate-500')
-          }, 2000)
-        }
-      })
-    }
-  }
-}
+// Copy functionality is now handled via event delegation in BlogPost component
