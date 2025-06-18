@@ -5,6 +5,8 @@ import { articles } from '../utils/contentLoader'
 import { blogSchema } from '../schemas/blogSchema'
 import { findContentBySlug } from '../utils/slugUtils'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
+import ContentRecommendations from '../components/ContentRecommendations'
+import AIContentEnhancer from '../components/AIContentEnhancer'
 
 export const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -783,6 +785,20 @@ export const BlogPostPage: React.FC = () => {
                 dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(article.content) }}
               />
             </article>
+
+            {/* AI Content Enhancement */}
+            <AIContentEnhancer 
+              content={article.content}
+              title={article.frontmatter.title || ''}
+              existingTags={article.frontmatter.tags || []}
+              className="mb-12"
+            />
+
+            {/* AI-Powered Content Recommendations */}
+            <ContentRecommendations
+              currentSlug={slug!}
+              className="mb-12"
+            />
 
             {/* Author Bio */}
             <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 rounded-3xl p-8 text-white shadow-2xl mb-12 relative overflow-hidden">
