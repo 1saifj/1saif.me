@@ -1,20 +1,23 @@
 import Prism from 'prismjs'
 import 'prismjs/themes/prism-tomorrow.css'
 
-// Import core languages first to ensure proper dependencies
+// Manual initialization to avoid dependency conflicts
+Prism.manual = true
+
+// Core language definitions - load these first
 import 'prismjs/components/prism-core'
 import 'prismjs/components/prism-clike'
-
-// Import comprehensive language definitions in order of dependencies
-import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-markup'
+import 'prismjs/components/prism-css'
 import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-rust'
-import 'prismjs/components/prism-go'
-import 'prismjs/components/prism-haskell'
-import 'prismjs/components/prism-ocaml'
+
+// Now load languages that depend on the core ones
+import 'prismjs/components/prism-json'
+import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-jsx'
 import 'prismjs/components/prism-tsx'
-import 'prismjs/components/prism-json'
+
+// Load other languages
 import 'prismjs/components/prism-bash'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-yaml'
@@ -30,7 +33,10 @@ import 'prismjs/components/prism-swift'
 import 'prismjs/components/prism-kotlin'
 import 'prismjs/components/prism-scala'
 import 'prismjs/components/prism-dart'
-import 'prismjs/components/prism-css'
+import 'prismjs/components/prism-rust'
+import 'prismjs/components/prism-go'
+import 'prismjs/components/prism-haskell'
+import 'prismjs/components/prism-ocaml'
 import 'prismjs/components/prism-scss'
 import 'prismjs/components/prism-less'
 import 'prismjs/components/prism-stylus'
@@ -42,53 +48,6 @@ import 'prismjs/components/prism-ini'
 import 'prismjs/components/prism-toml'
 import 'prismjs/components/prism-graphql'
 import 'prismjs/components/prism-regex'
-
-// Initialize language checker after imports
-const initializeLanguages = () => {
-  // Only initialize manual Go if it's not already loaded and clike is available
-  if ((!Prism.languages.go || typeof Prism.languages.go !== 'object') && 
-      Prism.languages.clike && typeof Prism.languages.clike === 'object') {
-    
-    console.warn('Go language not properly loaded, attempting manual initialization')
-    
-    try {
-      // Manual Go language definition as fallback - only if clike is available
-      Prism.languages.go = {
-        'comment': [
-          {
-            pattern: /(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,
-            lookbehind: true,
-            greedy: true
-          },
-          {
-            pattern: /(^|[^\\:])\/\/.*/,
-            lookbehind: true,
-            greedy: true
-          }
-        ],
-        'string': {
-          pattern: /(^|[^\\])"(?:\\.|[^"\\])*"/,
-          lookbehind: true,
-          greedy: true
-        },
-        'keyword': /\b(?:break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var)\b/,
-        'boolean': /\b(?:_|true|false|iota|nil)\b/,
-        'number': /(?:\b0x[a-f\d]+|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[-+]?\d+)?)i?/i,
-        'operator': /[*\/%^!=]=?|\+[=+]?|-[=-]?|\|[=|]?|&(?:=|&|\^=?)?|>(?:>=?|=)?|<(?:<=?|=|-)?|:=|\.\.\./,
-        'builtin': /\b(?:bool|byte|complex(?:64|128)|error|float(?:32|64)|rune|string|u?int(?:8|16|32|64)?|uintptr|append|cap|close|complex|copy|delete|imag|len|make|new|panic|print(?:ln)?|real|recover)\b/,
-        'punctuation': /[{}[\];(),.:]/
-      }
-      console.log('Manual Go language definition created successfully')
-    } catch (error) {
-      console.warn('Failed to create manual Go language definition:', error)
-    }
-  } else if (!Prism.languages.clike) {
-    console.warn('clike language not available, cannot initialize Go language')
-  }
-}
-
-// Initialize languages on module load
-initializeLanguages()
 
 // Comprehensive language mapping for common aliases
 const languageMap: Record<string, string> = {
@@ -130,6 +89,51 @@ const isLanguageAvailable = (language: string): boolean => {
   }
 }
 
+// Create fallback language definitions for common cases
+const ensureFallbackLanguages = () => {
+  // Ensure Go language is available
+  if (!isLanguageAvailable('go')) {
+    try {
+      Prism.languages.go = {
+        'comment': [
+          {
+            pattern: /(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,
+            lookbehind: true,
+            greedy: true
+          },
+          {
+            pattern: /(^|[^\\:])\/\/.*/,
+            lookbehind: true,
+            greedy: true
+          }
+        ],
+        'string': {
+          pattern: /(^|[^\\])"(?:\\.|[^"\\])*"/,
+          lookbehind: true,
+          greedy: true
+        },
+        'keyword': /\b(?:break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var)\b/,
+        'boolean': /\b(?:_|true|false|iota|nil)\b/,
+        'number': /(?:\b0x[a-f\d]+|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[-+]?\d+)?)i?/i,
+        'operator': /[*\/%^!=]=?|\+[=+]?|-[=-]?|\|[=|]?|&(?:=|&|\^=?)?|>(?:>=?|=)?|<(?:<=?|=|-)?|:=|\.\.\./,
+        'builtin': /\b(?:bool|byte|complex(?:64|128)|error|float(?:32|64)|rune|string|u?int(?:8|16|32|64)?|uintptr|append|cap|close|complex|copy|delete|imag|len|make|new|panic|print(?:ln)?|real|recover)\b/,
+        'punctuation': /[{}[\];(),.:]/
+      }
+      console.log('Fallback Go language definition created')
+    } catch (error) {
+      console.warn('Failed to create fallback Go language definition:', error)
+    }
+  }
+
+  // Ensure text/plain language is available as ultimate fallback
+  if (!isLanguageAvailable('text')) {
+    Prism.languages.text = {}
+  }
+}
+
+// Initialize fallback languages after a short delay to ensure all imports are loaded
+setTimeout(ensureFallbackLanguages, 100)
+
 // Function to safely highlight code with robust error handling
 export const highlightCode = (code: string, language: string = ''): string => {
   if (!code.trim()) return code
@@ -137,19 +141,9 @@ export const highlightCode = (code: string, language: string = ''): string => {
   // Normalize language name
   const normalizedLang = languageMap[language.toLowerCase()] || language.toLowerCase()
   
-  // Special handling for Go language
-  if (normalizedLang === 'go') {
-    // Ensure Go language is properly initialized
-    if (!isLanguageAvailable('go')) {
-      console.warn('Go language not available, reinitializing...')
-      initializeLanguages()
-    }
-  }
-  
   // Enhanced safety check with language availability verification
   if (!normalizedLang || !isLanguageAvailable(normalizedLang)) {
     console.warn(`Language '${language}' (normalized: '${normalizedLang}') is not available.`)
-    console.warn('Available languages:', Object.keys(Prism.languages))
     return `<pre class="language-text"><code class="text-slate-300">${escapeHtml(code)}</code></pre>`
   }
 
