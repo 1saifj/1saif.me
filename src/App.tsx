@@ -9,7 +9,8 @@ import { UnsubscribePage } from './pages/UnsubscribePage'
 import { PrivacyPolicy } from './pages/PrivacyPolicy'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { SkipLink } from './components/SkipLink'
-import { useAnalytics } from './hooks/useAnalytics'
+import AnalyticsProvider, { useAnalytics } from './components/Analytics'
+import PerformanceMonitor from './components/PerformanceMonitor'
 import Clarity from '@microsoft/clarity'
 
 function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
@@ -18,10 +19,7 @@ function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
   Clarity.init('s10i1oa5td');
 
   useEffect(() => {
-    trackPageView({
-      page_title: document.title,
-      page_location: window.location.href
-    })
+    trackPageView(location.pathname, document.title)
   }, [location, trackPageView])
 
   return <>{children}</>
@@ -30,21 +28,24 @@ function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <Router>
-      <AnalyticsWrapper>
-        <SkipLink />
-        <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/blog" element={<BlogListingPage />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/project/:slug" element={<ProjectPage />} />
-            <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
-            <Route path="/unsubscribe" element={<UnsubscribePage />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-          </Routes>
-          <PWAInstallPrompt />
-        </div>
-      </AnalyticsWrapper>
+      <AnalyticsProvider>
+        <AnalyticsWrapper>
+          <SkipLink />
+          <PerformanceMonitor />
+          <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/blog" element={<BlogListingPage />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/project/:slug" element={<ProjectPage />} />
+              <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
+              <Route path="/unsubscribe" element={<UnsubscribePage />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+            </Routes>
+            <PWAInstallPrompt />
+          </div>
+        </AnalyticsWrapper>
+      </AnalyticsProvider>
     </Router>
   )
 }
