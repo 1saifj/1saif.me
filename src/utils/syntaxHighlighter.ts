@@ -1,7 +1,7 @@
 import Prism from 'prismjs'
 import 'prismjs/themes/prism-tomorrow.css'
 
-// Import core languages first
+// Import core languages first to ensure proper dependencies
 import 'prismjs/components/prism-core'
 import 'prismjs/components/prism-clike'
 
@@ -43,28 +43,47 @@ import 'prismjs/components/prism-toml'
 import 'prismjs/components/prism-graphql'
 import 'prismjs/components/prism-regex'
 
-// Ensure Prism is initialized with proper manual configuration
-Prism.manual = true
-
 // Initialize language checker after imports
 const initializeLanguages = () => {
-  // Force re-initialization of Go language if it's not properly loaded
-  if (!Prism.languages.go || typeof Prism.languages.go !== 'object') {
+  // Only initialize manual Go if it's not already loaded and clike is available
+  if ((!Prism.languages.go || typeof Prism.languages.go !== 'object') && 
+      Prism.languages.clike && typeof Prism.languages.clike === 'object') {
+    
     console.warn('Go language not properly loaded, attempting manual initialization')
     
-    // Manual Go language definition as fallback
-    Prism.languages.go = Prism.languages.extend('clike', {
-      'string': {
-        pattern: /(^|[^\\])"(?:\\.|[^"\\])*"/,
-        lookbehind: true,
-        greedy: true
-      },
-      'keyword': /\b(?:break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var)\b/,
-      'boolean': /\b(?:_|true|false|iota|nil)\b/,
-      'number': /(?:\b0x[a-f\d]+|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[-+]?\d+)?)i?/i,
-      'operator': /[*\/%^!=]=?|\+[=+]?|-[=-]?|\|[=|]?|&(?:=|&|\^=?)?|>(?:>=?|=)?|<(?:<=?|=|-)?|:=|\.\.\./,
-      'builtin': /\b(?:bool|byte|complex(?:64|128)|error|float(?:32|64)|rune|string|u?int(?:8|16|32|64)?|uintptr|append|cap|close|complex|copy|delete|imag|len|make|new|panic|print(?:ln)?|real|recover)\b/
-    })
+    try {
+      // Manual Go language definition as fallback - only if clike is available
+      Prism.languages.go = {
+        'comment': [
+          {
+            pattern: /(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,
+            lookbehind: true,
+            greedy: true
+          },
+          {
+            pattern: /(^|[^\\:])\/\/.*/,
+            lookbehind: true,
+            greedy: true
+          }
+        ],
+        'string': {
+          pattern: /(^|[^\\])"(?:\\.|[^"\\])*"/,
+          lookbehind: true,
+          greedy: true
+        },
+        'keyword': /\b(?:break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var)\b/,
+        'boolean': /\b(?:_|true|false|iota|nil)\b/,
+        'number': /(?:\b0x[a-f\d]+|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[-+]?\d+)?)i?/i,
+        'operator': /[*\/%^!=]=?|\+[=+]?|-[=-]?|\|[=|]?|&(?:=|&|\^=?)?|>(?:>=?|=)?|<(?:<=?|=|-)?|:=|\.\.\./,
+        'builtin': /\b(?:bool|byte|complex(?:64|128)|error|float(?:32|64)|rune|string|u?int(?:8|16|32|64)?|uintptr|append|cap|close|complex|copy|delete|imag|len|make|new|panic|print(?:ln)?|real|recover)\b/,
+        'punctuation': /[{}[\];(),.:]/
+      }
+      console.log('Manual Go language definition created successfully')
+    } catch (error) {
+      console.warn('Failed to create manual Go language definition:', error)
+    }
+  } else if (!Prism.languages.clike) {
+    console.warn('clike language not available, cannot initialize Go language')
   }
 }
 
