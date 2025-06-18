@@ -35,7 +35,7 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
         return {
           ...block,
           replacement: `
-            <div class="code-block-container relative group my-4 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+            <div class="code-block-container relative group my-2 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
               <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
                 <span class="text-sm font-medium text-slate-600">${languageLabel}</span>
                 <button 
@@ -47,7 +47,7 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
                 </button>
               </div>
               <div class="code-content relative">
-                <div id="${codeId}" class="syntax-highlighted-code [&>pre]:m-0 [&>pre]:p-4">${highlightedCode}</div>
+                <div id="${codeId}" class="syntax-highlighted-code [&>pre]:!m-0 [&>pre]:!p-4 [&>pre]:block [&>pre]:w-full">${highlightedCode}</div>
               </div>
             </div>
           `.trim()
@@ -59,7 +59,7 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
         return {
           ...block,
           replacement: `
-            <div class="code-block-container relative group my-4 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+            <div class="code-block-container relative group my-2 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
               <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
                 <span class="text-sm font-medium text-slate-600">${languageLabel}</span>
                 <button 

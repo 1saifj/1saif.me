@@ -92,4 +92,17 @@
   .backface-hidden {
     backface-visibility: hidden;
   }
+  
+  /* Shiki code block reset */
+  .syntax-highlighted-code pre {
+    margin: 0 !important;
+    padding: 1rem !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+  
+  .syntax-highlighted-code pre code {
+    padding: 0 !important;
+    background: transparent !important;
+  }
 }
