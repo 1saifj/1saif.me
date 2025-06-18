@@ -30,4 +30,12 @@ dev-debug.log
 node_modules/
 # Environment variables
 .vscode
-# OS specific
+# OS specific.env
+.env
+.roomodes
+.windsurfrules
+.specstory
+.roo
+.cursor
+.taskmaster
+.vscode
