@@ -1,109 +1,100 @@
 {
-  "name": "Saif Aljanahi Portfolio",
-  "short_name": "SaifPortfolio",
-  "description": "Professional portfolio of Saif Aljanahi - Full-Stack Engineer specializing in Golang, Python, and Flutter development",
+  "name": "Saif Ali Fatlawi - Software Engineer",
+  "short_name": "Saif Portfolio",
+  "description": "Full-stack software engineer specializing in Golang, TypeScript, and modern web technologies. Explore my projects, blog posts, and professional experience.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#1e40af",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
   "orientation": "portrait-primary",
-  "categories": ["portfolio", "developer", "engineer"],
+  "scope": "/",
   "lang": "en",
-  "dir": "ltr",
+  "categories": ["productivity", "business", "technology"],
   "icons": [
     {
-      "src": "/sj.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/sj.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/sj.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/sj.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/sj.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/sj.png",
+      "src": "/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/sj.png",
-      "sizes": "384x384",
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/sj.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable any"
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
     }
   ],
   "screenshots": [
     {
-      "src": "/screenshots/desktop-home.png",
+      "src": "/screenshot-desktop.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Home page of Saif Aljanahi Portfolio"
+      "label": "Desktop view of Saif's portfolio"
     },
     {
-      "src": "/screenshots/mobile-home.png",
-      "sizes": "390x844",
+      "src": "/screenshot-mobile.png",
+      "sizes": "375x812",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Home page on mobile"
+      "label": "Mobile view of Saif's portfolio"
     }
   ],
   "shortcuts": [
     {
-      "name": "Portfolio Projects",
-      "short_name": "Projects",
-      "description": "View my latest projects",
-      "url": "/projects",
-      "icons": [{ "src": "/sj.png", "sizes": "96x96" }]
+      "name": "View Blog",
+      "short_name": "Blog",
+      "description": "Read latest blog posts about software development",
+      "url": "/blog",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
-      "name": "Blog Articles",
-      "short_name": "Blog",
-      "description": "Read my technical articles",
-      "url": "/blog",
-      "icons": [{ "src": "/sj.png", "sizes": "96x96" }]
+      "name": "View Projects",
+      "short_name": "Projects",
+      "description": "Explore my development projects",
+      "url": "/projects",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Contact Me",
       "short_name": "Contact",
-      "description": "Get in touch",
+      "description": "Get in touch for opportunities",
       "url": "/contact",
-      "icons": [{ "src": "/sj.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
-  "related_applications": [
-    {
-      "platform": "web",
-      "url": "https://1saif.me"
-    }
-  ],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }
