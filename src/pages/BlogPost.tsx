@@ -277,6 +277,7 @@ export const BlogPost: React.FC = () => {
           <RelatedPosts 
             currentPostTitle={blog.title}
             currentPostTags={blog.tags}
+            currentPostDescription={blog.description}
             maxPosts={3}
           />
 

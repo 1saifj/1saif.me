@@ -61,13 +61,21 @@ function parseFrontmatter(content: string): { data: Record<string, any>, content
         value = value.slice(1, -1);
       }
       
-      // Try to parse as number or boolean
+      // Try to parse as number, boolean, or date
       if (value === 'true') {
         data[key] = true;
       } else if (value === 'false') {
         data[key] = false;
       } else if (!isNaN(Number(value)) && value !== '') {
         data[key] = Number(value);
+      } else if (key === 'createdAt' || key === 'updatedAt') {
+        // Convert date strings to timestamps
+        const date = new Date(value);
+        if (!isNaN(date.getTime())) {
+          data[key] = date.getTime();
+        } else {
+          data[key] = Date.now(); // fallback to current timestamp
+        }
       } else {
         data[key] = value;
       }
@@ -97,9 +105,19 @@ function processMarkdownFiles(modules: Record<string, string>): ContentFile[] {
     const { data: frontmatter, content: markdownContent } = parseFrontmatter(content)
     const slug = path.split('/').pop()?.replace('.md', '') || ''
     
+    // Add defaults for missing required fields
+    const processedFrontmatter = {
+      title: slug.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      description: 'No description available',
+      createdAt: Date.now(),
+      draft: false,
+      tags: [],
+      ...frontmatter
+    }
+    
     return {
       slug,
-      frontmatter,
+      frontmatter: processedFrontmatter,
       content: markdownContent
     }
   })
