@@ -11,7 +11,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Saif Ali Fatlawi - Software Engineer',
+        name: 'Saif Ali Aljanahi - Software Engineer',
         short_name: 'Saif Portfolio',
         description: 'Full-stack software engineer specializing in Golang, TypeScript, and modern web technologies.',
         theme_color: '#2563eb',

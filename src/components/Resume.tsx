@@ -128,7 +128,7 @@ export const Resume: React.FC = () => {
   const publications = [
     {
       title: "Real-time Classification of Various Types of Falls and Activities of Daily Living Based on a CNN-LSTM Network",
-      authors: "Al-Majdi K., Al-Musawi R.S.H., Ali A.H., Fatlawi S.A., & Mezaal Y.S.",
+      authors: "Al-Majdi K., Al-Musawi R.S.H., Ali A.H., Aljanahi S.A., & Mezaal Y.S.",
       journal: "Periodicals of Engineering and Natural Sciences",
       details: "9(3): 958-969, 2021"
     }
