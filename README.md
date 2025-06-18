@@ -1,4 +1,4 @@
-# 🚀 Saif Ali Fatlawi - Modern Portfolio Website
+# 🚀 Saif Ali Aljanahi - Modern Portfolio Website
 
 A cutting-edge portfolio website built with **React 18**, **TypeScript**, and **Vite**, featuring advanced user experience enhancements, **AI-powered content generation**, and professional development practices.
 
@@ -345,11 +345,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 **Contact**
 
-**Saif Ali Fatlawi**
+**Saif Ali Aljanahi**
 - 🌐 Website: [saif.me](https://saif.me)
-- 📧 Email: [saif@example.com](mailto:saif@example.com)
-- 💼 LinkedIn: [linkedin.com/in/saif-fatlawi](https://linkedin.com/in/saif-fatlawi)
-- 🐱 GitHub: [github.com/saif-fatlawi](https://github.com/saif-fatlawi)
+- 📧 Email: [saifalialjanahi@gmail.com](mailto:saifalialjanahi@gmail.com)
+- 💼 LinkedIn: [linkedin.com/in/1saifj](https://linkedin.com/in/1saifj)
+- 🐱 GitHub: [github.com/1saifj](https://github.com/1saifj)
 
 ---
 
@@ -360,5 +360,5 @@ If you found this project helpful, please consider giving it a ⭐ on GitHub!
 ---
 
 <div align="center">
-  <strong>Built with ❤️ and 🤖 AI by Saif Ali Fatlawi</strong>
+  <strong>Built with ❤️ and 🤖 AI by Saif Ali Aljanahi</strong>
 </div>
