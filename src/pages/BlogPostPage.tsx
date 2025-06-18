@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, Navigate } from 'react-router-dom'
 import { ArrowLeft, Calendar, Clock, Tag, Share2, BookOpen, User, ChevronRight, Home, Copy, Check, List, Eye, Star, MessageCircle, Menu, X, Twitter, Linkedin, Facebook, Link as LinkIcon, Download, Printer as Print, ChevronUp } from 'lucide-react'
 import { articles } from '../utils/contentLoader'
 import { blogSchema } from '../schemas/blogSchema'
@@ -7,6 +7,11 @@ import { findContentBySlug } from '../utils/slugUtils'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import ContentRecommendations from '../components/ContentRecommendations'
 import AIContentEnhancer from '../components/AIContentEnhancer'
+import { createSlugFromTitle } from '../utils/slugUtils'
+import { RelatedPosts } from '../components/RelatedPosts'
+import { GiscusComments } from '../components/GiscusComments'
+import { ArticleStructuredData } from '../components/StructuredData'
+import SEOHead from '../components/SEOHead'
 
 export const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -18,6 +23,9 @@ export const BlogPostPage: React.FC = () => {
   const [readingProgress, setReadingProgress] = useState(0)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [showShareMenu, setShowShareMenu] = useState(false)
+  const [estimatedReadTime, setEstimatedReadTime] = useState(0)
+  const [viewCount, setViewCount] = useState(0)
+  const [htmlContent, setHtmlContent] = useState<string>('')
   
   useEffect(() => {
     const handleScroll = () => {
@@ -445,6 +453,20 @@ export const BlogPostPage: React.FC = () => {
 
   const article = findContentBySlug(articles, slug)
   
+  // Convert markdown to HTML when content changes
+  useEffect(() => {
+    if (article?.content) {
+      convertMarkdownToHtml(article.content)
+        .then(html => {
+          setHtmlContent(html)
+        })
+        .catch(error => {
+          console.error('Failed to convert markdown:', error)
+          setHtmlContent('<p>Error loading content</p>')
+        })
+    }
+  }, [article])
+  
   if (!article) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
@@ -782,7 +804,7 @@ export const BlogPostPage: React.FC = () => {
                   
                   [&>.highlight]:bg-yellow-100 [&>.highlight]:dark:bg-yellow-900/30 [&>.highlight]:px-1 [&>.highlight]:rounded
                 "
-                dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(article.content) }}
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
               />
             </article>
 

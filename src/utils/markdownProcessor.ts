@@ -1,70 +1,94 @@
 import { highlightCode, getLanguageLabel } from './syntaxHighlighter'
 
-export const convertMarkdownToHtml = (markdown: string): string => {
-  return markdown
-    // Enhanced Headers with better styling, IDs, and table of contents support
-    .replace(/^#### (.*$)/gim, (match, title) => {
-      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-      return `<h4 id="${id}" class="text-xl font-bold text-slate-900 mb-3 mt-8 pb-2 border-b border-slate-100 scroll-mt-24 hover:text-blue-600 transition-colors cursor-pointer">${title}</h4>`
+export const convertMarkdownToHtml = async (markdown: string): Promise<string> => {
+  // Step 1: Convert basic markdown elements
+  let html = markdown
+    // Convert headers (with improved styling)
+    .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold text-slate-800 mt-8 mb-4 pb-2 border-b border-slate-200">$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold text-slate-800 mt-10 mb-6 pb-3 border-b-2 border-blue-100">$1</h2>')
+    .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold text-slate-900 mt-12 mb-8 pb-4 border-b-2 border-blue-200">$1</h1>')
+
+  // Step 2: Process code blocks asynchronously
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
+  const codeBlocks: Array<{ match: string; language: string; code: string; index: number }> = []
+  
+  let match
+  while ((match = codeBlockRegex.exec(html)) !== null) {
+    codeBlocks.push({
+      match: match[0],
+      language: match[1] || 'text',
+      code: match[2].trim(),
+      index: match.index
     })
-    .replace(/^### (.*$)/gim, (match, title) => {
-      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-      return `<h3 id="${id}" class="text-2xl font-bold text-slate-900 mb-4 mt-10 pb-2 border-b border-slate-200 scroll-mt-24 hover:text-blue-600 transition-colors cursor-pointer">${title}</h3>`
-    })
-    .replace(/^## (.*$)/gim, (match, title) => {
-      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-      return `<h2 id="${id}" class="text-3xl font-bold text-slate-900 mb-6 mt-12 pb-3 border-b-2 border-slate-300 scroll-mt-24 hover:text-blue-600 transition-colors cursor-pointer">${title}</h2>`
-    })
-    .replace(/^# (.*$)/gim, (match, title) => {
-      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-      return `<h1 id="${id}" class="text-4xl font-bold text-slate-900 mb-8 mt-16 pb-4 border-b-2 border-slate-400 scroll-mt-24 hover:text-blue-600 transition-colors cursor-pointer">${title}</h1>`
-    })
-    
-    // Enhanced code blocks with professional syntax highlighting and copy functionality
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, language, code) => {
-      const lang = language || 'text'
-      const languageLabel = getLanguageLabel(lang)
-      let highlightedCode: string
+  }
+
+  // Process all code blocks in parallel
+  const processedCodeBlocks = await Promise.all(
+    codeBlocks.map(async (block) => {
+      const { language, code } = block
+      const languageLabel = getLanguageLabel(language)
       
       try {
-        highlightedCode = highlightCode(code.trim(), lang)
-      } catch (error) {
-        console.warn(`Failed to process code block for language: ${lang}`, error)
-        // Fallback to plain text if highlighting fails
-        highlightedCode = `<pre class="language-text"><code class="text-slate-300">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`
-      }
-      
-      const codeId = Math.random().toString(36).substr(2, 9)
-      
-      return `<div class="code-block-container my-8 not-prose group">
-        <div class="code-block-header bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 px-6 py-4 flex items-center justify-between rounded-t-xl border-b border-slate-600 shadow-lg">
-          <div class="flex items-center space-x-3">
-            <div class="flex space-x-2">
-              <div class="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div>
-              <div class="w-3 h-3 rounded-full bg-yellow-500 shadow-sm"></div>
-              <div class="w-3 h-3 rounded-full bg-green-500 shadow-sm"></div>
+        const highlightedCode = await highlightCode(code, language)
+        const codeId = Math.random().toString(36).substr(2, 9)
+        
+        return {
+          ...block,
+          replacement: `
+            <div class="code-block-container relative group my-6 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+              <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
+                <span class="text-sm font-medium text-slate-600">${languageLabel}</span>
+                <button 
+                  onclick="copyToClipboard('${codeId}')" 
+                  class="copy-button text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded border transition-all duration-200 opacity-70 group-hover:opacity-100"
+                  title="Copy code"
+                >
+                  Copy
+                </button>
+              </div>
+              <div class="code-content relative">
+                <div id="${codeId}" class="syntax-highlighted-code">${highlightedCode}</div>
+              </div>
             </div>
-            <span class="text-slate-200 text-sm font-semibold tracking-wide ml-4">${languageLabel}</span>
-          </div>
-          <button 
-            onclick="copyCodeToClipboard('${codeId}')" 
-            class="copy-btn opacity-0 group-hover:opacity-100 transition-all duration-200 bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg text-xs font-medium flex items-center space-x-2 shadow-lg hover:shadow-xl hover:scale-105"
-            title="Copy code to clipboard"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-            </svg>
-            <span>Copy</span>
-          </button>
-        </div>
-        <div class="code-block-content bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-b-xl overflow-hidden shadow-2xl border border-slate-700">
-          <div class="p-6 overflow-x-auto">
-            <pre id="${codeId}" class="text-sm leading-relaxed font-mono">${highlightedCode.replace(/<pre[^>]*>/, '').replace(/<\/pre>$/, '')}</pre>
-          </div>
-        </div>
-      </div>`
+          `.trim()
+        }
+      } catch (error) {
+        console.warn(`Failed to process code block for language: ${language}`, error)
+        // Fallback to plain text with basic styling
+        const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        return {
+          ...block,
+          replacement: `
+            <div class="code-block-container relative group my-6 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+              <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
+                <span class="text-sm font-medium text-slate-600">${languageLabel}</span>
+                <button 
+                  onclick="copyToClipboard('fallback-${Math.random().toString(36).substr(2, 9)}')" 
+                  class="copy-button text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded border transition-all duration-200 opacity-70 group-hover:opacity-100"
+                  title="Copy code"
+                >
+                  Copy
+                </button>
+              </div>
+              <div class="code-content relative">
+                <pre class="p-4 bg-slate-900 text-slate-100 overflow-x-auto"><code>${escapedCode}</code></pre>
+              </div>
+            </div>
+          `.trim()
+        }
+      }
     })
-    
+  )
+
+  // Replace code blocks in reverse order to maintain correct indices
+  processedCodeBlocks
+    .sort((a, b) => b.index - a.index)
+    .forEach(block => {
+      html = html.slice(0, block.index) + block.replacement + html.slice(block.index + block.match.length)
+    })
+
+  // Step 3: Continue with other markdown processing
+  html = html
     // Enhanced tables with professional styling
     .replace(/\|(.+)\|\n\|[-\s|:]+\|\n((?:\|.+\|\n?)*)/g, (match, header, rows) => {
       const headerCells = header.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell)
@@ -82,52 +106,57 @@ export const convertMarkdownToHtml = (markdown: string): string => {
         </tr>`
       ).join('')
       
-      return `<div class="table-container my-8 not-prose overflow-hidden rounded-xl shadow-lg border border-slate-200">
-        <div class="overflow-x-auto">
+      return `
+        <div class="table-container my-6 overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
           <table class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-gradient-to-r from-slate-100 to-slate-50">
+            <thead class="bg-slate-50">
               <tr>${headerHtml}</tr>
             </thead>
-            <tbody class="divide-y divide-slate-200">
-              ${rowsHtml}
-            </tbody>
+            <tbody class="bg-white divide-y divide-slate-200">${rowsHtml}</tbody>
           </table>
         </div>
-      </div>`
+      `
     })
-    
-    // Enhanced inline code with better styling
-    .replace(/`([^`]+)`/g, '<code class="inline-code bg-gradient-to-r from-slate-100 to-slate-50 text-slate-800 px-2 py-1 rounded-md text-sm font-mono border border-slate-200 shadow-sm not-prose font-semibold">$1</code>')
-    
-    // Enhanced text formatting
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900 bg-yellow-100 px-1 rounded">$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em class="italic text-slate-700 font-medium">$1</em>')
-    
-    // Enhanced links with better styling
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:text-blue-500 underline decoration-2 underline-offset-2 hover:decoration-blue-500 transition-all duration-200 font-semibold hover:bg-blue-50 px-1 rounded" target="_blank" rel="noopener noreferrer">$1 <svg class="inline w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>')
-    
-    // Enhanced blockquotes with better styling
-    .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-blue-500 pl-6 py-4 my-6 bg-gradient-to-r from-blue-50 to-cyan-50 text-slate-700 italic rounded-r-lg shadow-md not-prose relative"><div class="absolute top-2 left-2 text-blue-400 opacity-50 text-2xl">"</div>$1</blockquote>')
-    
-    // Enhanced lists with better styling
-    .replace(/^\* (.*$)/gim, '<li class="text-slate-700 mb-3 flex items-start"><span class="text-blue-500 mr-3 mt-1">•</span><span>$1</span></li>')
-    .replace(/^- (.*$)/gim, '<li class="text-slate-700 mb-3 flex items-start"><span class="text-blue-500 mr-3 mt-1">•</span><span>$1</span></li>')
-    .replace(/^\d+\. (.*$)/gim, '<li class="text-slate-700 mb-3 flex items-start"><span class="text-blue-500 mr-3 mt-1 font-semibold">•</span><span>$1</span></li>')
-    
-    // Process paragraphs with enhanced styling
-    .split('\n\n')
-    .map(paragraph => {
-      if (paragraph.trim() === '') return ''
-      if (paragraph.includes('<h1') || paragraph.includes('<h2') || paragraph.includes('<h3') || paragraph.includes('<h4') ||
-          paragraph.includes('<div class="code-block-container') || paragraph.includes('<blockquote') ||
-          paragraph.includes('<li') || paragraph.includes('<div class="table-container')) {
-        return paragraph
-      }
-      return `<p class="text-slate-700 leading-relaxed mb-6 text-lg tracking-wide">${paragraph.replace(/\n/g, '<br>')}</p>`
+
+    // Enhanced links with better styling and security
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
+      const isExternal = url.startsWith('http') || url.startsWith('https')
+      const securityAttrs = isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''
+      const styling = isExternal 
+        ? 'text-blue-600 hover:text-blue-800 underline decoration-2 underline-offset-2 hover:decoration-blue-300 transition-all duration-200'
+        : 'text-blue-600 hover:text-blue-800 underline decoration-2 underline-offset-2 hover:decoration-blue-300 transition-all duration-200'
+      
+      return `<a href="${url}" class="${styling}" ${securityAttrs}>${text}</a>`
     })
-    .join('')
-    // Wrap lists in proper ul tags with enhanced styling
-    .replace(/(<li class="text-slate-700 mb-3 flex items-start">.*?<\/li>)/gs, '<ul class="list-none mb-8 space-y-2 ml-0 not-prose bg-white rounded-lg p-6 shadow-sm border border-slate-100">$1</ul>')
+
+    // Enhanced lists with improved spacing and styling
+    .replace(/^\* (.+$)/gm, '<li class="text-slate-700 leading-relaxed mb-2 ml-6 relative"><span class="absolute -left-6 text-blue-500 font-bold">•</span>$1</li>')
+    .replace(/^(\d+)\. (.+$)/gm, '<li class="text-slate-700 leading-relaxed mb-2 ml-8 relative"><span class="absolute -left-8 text-blue-600 font-semibold">$1.</span>$2</li>')
+
+    // Text formatting with subtle styling improvements
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-bold text-slate-800">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em class="italic text-slate-700">$1</em>')
+    .replace(/`([^`]+)`/g, '<code class="bg-slate-100 text-slate-800 px-2 py-1 rounded text-sm font-mono border">$1</code>')
+
+    // Enhanced blockquotes with modern styling
+    .replace(/^> (.+$)/gm, '<blockquote class="border-l-4 border-blue-400 pl-6 py-2 my-4 bg-blue-50 text-slate-700 italic rounded-r-lg">$1</blockquote>')
+
+    // Convert line breaks while preserving structure
+    .replace(/\n\n/g, '</p><p class="text-slate-700 leading-relaxed mb-4">')
+    .replace(/\n/g, '<br>')
+
+  // Wrap content in paragraph tags with proper styling
+  html = `<div class="prose prose-slate max-w-none">
+    <p class="text-slate-700 leading-relaxed mb-4">${html}</p>
+  </div>`
+
+  // Clean up any empty paragraphs and malformed tags
+  html = html
+    .replace(/<p class="text-slate-700 leading-relaxed mb-4"><\/p>/g, '')
+    .replace(/<p class="text-slate-700 leading-relaxed mb-4">(\s*<(?:h[1-6]|div|blockquote|ul|ol|table))/g, '$1')
+    .replace(/(<\/(?:h[1-6]|div|blockquote|ul|ol|table)>\s*)<\/p>/g, '$1')
+
+  return html
 }
 
 // Add copy functionality script

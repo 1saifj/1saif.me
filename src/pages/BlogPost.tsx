@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { ArrowLeft, Calendar, Clock, Eye, Share2, BookOpen, Tag, User, Coffee, Award, Zap, TrendingUp } from 'lucide-react'
 import { publishedBlogs } from '../data/blogs'
@@ -15,6 +15,7 @@ export const BlogPost: React.FC = () => {
   const [readingProgress, setReadingProgress] = useState(0)
   const [estimatedReadTime, setEstimatedReadTime] = useState(0)
   const [viewCount, setViewCount] = useState(0)
+  const [htmlContent, setHtmlContent] = useState<string>('')
 
   // Find the blog post and its content
   const blog = publishedBlogs.find(b => createSlugFromTitle(b.title) === slug)
@@ -58,6 +59,20 @@ export const BlogPost: React.FC = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [blog, slug])
+
+  // Convert markdown to HTML when content changes
+  useEffect(() => {
+    if (articleContent?.content) {
+      convertMarkdownToHtml(articleContent.content)
+        .then(html => {
+          setHtmlContent(html)
+        })
+        .catch(error => {
+          console.error('Failed to convert markdown:', error)
+          setHtmlContent('<p>Error loading content</p>')
+        })
+    }
+  }, [articleContent])
 
   if (!blog) {
     return <Navigate to="/blog" replace />
@@ -244,7 +259,7 @@ export const BlogPost: React.FC = () => {
                 
                 [&>.highlight]:bg-yellow-100 [&>.highlight]:dark:bg-yellow-900/30 [&>.highlight]:px-1 [&>.highlight]:rounded
               "
-              dangerouslySetInnerHTML={{ __html: articleContent ? convertMarkdownToHtml(articleContent.content) : '' }}
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
           </article>
 
@@ -277,7 +292,6 @@ export const BlogPost: React.FC = () => {
           <RelatedPosts 
             currentPostTitle={blog.title}
             currentPostTags={blog.tags}
-            currentPostDescription={blog.description}
             maxPosts={3}
           />
 
