@@ -24,7 +24,16 @@ export const convertMarkdownToHtml = (markdown: string): string => {
     .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, language, code) => {
       const lang = language || 'text'
       const languageLabel = getLanguageLabel(lang)
-      const highlightedCode = highlightCode(code.trim(), lang)
+      let highlightedCode: string
+      
+      try {
+        highlightedCode = highlightCode(code.trim(), lang)
+      } catch (error) {
+        console.warn(`Failed to process code block for language: ${lang}`, error)
+        // Fallback to plain text if highlighting fails
+        highlightedCode = `<pre class="language-text"><code class="text-slate-300">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`
+      }
+      
       const codeId = Math.random().toString(36).substr(2, 9)
       
       return `<div class="code-block-container my-8 not-prose group">
@@ -58,18 +67,18 @@ export const convertMarkdownToHtml = (markdown: string): string => {
     
     // Enhanced tables with professional styling
     .replace(/\|(.+)\|\n\|[-\s|:]+\|\n((?:\|.+\|\n?)*)/g, (match, header, rows) => {
-      const headerCells = header.split('|').map(cell => cell.trim()).filter(cell => cell)
-      const rowData = rows.trim().split('\n').map(row => 
-        row.split('|').map(cell => cell.trim()).filter(cell => cell)
+      const headerCells = header.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell)
+      const rowData = rows.trim().split('\n').map((row: string) => 
+        row.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell)
       )
       
-      const headerHtml = headerCells.map(cell => 
+      const headerHtml = headerCells.map((cell: string) => 
         `<th class="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase tracking-wider border-b-2 border-slate-300 bg-slate-50">${cell}</th>`
       ).join('')
       
-      const rowsHtml = rowData.map((row, index) => 
+      const rowsHtml = rowData.map((row: string[], index: number) => 
         `<tr class="${index % 2 === 0 ? 'bg-white' : 'bg-slate-50'} hover:bg-blue-50 transition-colors duration-150">
-          ${row.map(cell => `<td class="px-6 py-4 text-sm text-slate-700 border-b border-slate-200">${cell}</td>`).join('')}
+          ${row.map((cell: string) => `<td class="px-6 py-4 text-sm text-slate-700 border-b border-slate-200">${cell}</td>`).join('')}
         </tr>`
       ).join('')
       
