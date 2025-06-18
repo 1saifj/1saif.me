@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Sparkles, Tag, Clock, Key, Target, RefreshCw, Check, AlertCircle } from 'lucide-react'
+import { Sparkles, Tag, Key, Target, RefreshCw, Check, AlertCircle } from 'lucide-react'
 import { useAIContent } from '../services/aiContentService'
 
 interface AIContentEnhancerProps {
