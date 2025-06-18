@@ -17,14 +17,13 @@ export const GiscusComments: React.FC<GiscusCommentsProps> = ({ postSlug, postTi
           Join the conversation using your GitHub account. Comments are powered by GitHub Discussions.
         </p>
       </div>
-      
       <Giscus
         id="comments"
-        repo="your-username/1saif.me" // You'll need to update this with your actual repo
-        repoId="your-repo-id" // You'll get this from GitHub
+        repo="1saifj/1saif.me" // You'll need to update this with your actual repo
+        repoId="R_kgDOO8JSGw" // You'll get this from GitHub
         category="General"
-        categoryId="your-category-id" // You'll get this from GitHub
-        mapping="specific"
+        categoryId="DIC_kwDOO8JSG84CrpY7" // You'll get this from GitHub
+        mapping="pathname"
         term={postSlug}
         reactionsEnabled="0"
         emitMetadata="0"
