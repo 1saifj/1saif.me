@@ -1,7 +1,11 @@
 import Prism from 'prismjs'
 import 'prismjs/themes/prism-tomorrow.css'
 
-// Import comprehensive language definitions
+// Import core languages first
+import 'prismjs/components/prism-core'
+import 'prismjs/components/prism-clike'
+
+// Import comprehensive language definitions in order of dependencies
 import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-javascript'
 import 'prismjs/components/prism-rust'
@@ -39,6 +43,34 @@ import 'prismjs/components/prism-toml'
 import 'prismjs/components/prism-graphql'
 import 'prismjs/components/prism-regex'
 
+// Ensure Prism is initialized with proper manual configuration
+Prism.manual = true
+
+// Initialize language checker after imports
+const initializeLanguages = () => {
+  // Force re-initialization of Go language if it's not properly loaded
+  if (!Prism.languages.go || typeof Prism.languages.go !== 'object') {
+    console.warn('Go language not properly loaded, attempting manual initialization')
+    
+    // Manual Go language definition as fallback
+    Prism.languages.go = Prism.languages.extend('clike', {
+      'string': {
+        pattern: /(^|[^\\])"(?:\\.|[^"\\])*"/,
+        lookbehind: true,
+        greedy: true
+      },
+      'keyword': /\b(?:break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var)\b/,
+      'boolean': /\b(?:_|true|false|iota|nil)\b/,
+      'number': /(?:\b0x[a-f\d]+|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[-+]?\d+)?)i?/i,
+      'operator': /[*\/%^!=]=?|\+[=+]?|-[=-]?|\|[=|]?|&(?:=|&|\^=?)?|>(?:>=?|=)?|<(?:<=?|=|-)?|:=|\.\.\./,
+      'builtin': /\b(?:bool|byte|complex(?:64|128)|error|float(?:32|64)|rune|string|u?int(?:8|16|32|64)?|uintptr|append|cap|close|complex|copy|delete|imag|len|make|new|panic|print(?:ln)?|real|recover)\b/
+    })
+  }
+}
+
+// Initialize languages on module load
+initializeLanguages()
+
 // Comprehensive language mapping for common aliases
 const languageMap: Record<string, string> = {
   'ts': 'typescript',
@@ -64,26 +96,56 @@ const languageMap: Record<string, string> = {
   'gql': 'graphql',
   'html': 'markup',
   'xml': 'markup',
-  'svg': 'markup'
+  'svg': 'markup',
+  'golang': 'go'
 }
 
+// Function to safely check if a language is available
+const isLanguageAvailable = (language: string): boolean => {
+  try {
+    const langDef = Prism.languages[language]
+    return !!(langDef && typeof langDef === 'object')
+  } catch (error) {
+    console.warn(`Error checking language availability for: ${language}`, error)
+    return false
+  }
+}
+
+// Function to safely highlight code with robust error handling
 export const highlightCode = (code: string, language: string = ''): string => {
   if (!code.trim()) return code
 
   // Normalize language name
   const normalizedLang = languageMap[language.toLowerCase()] || language.toLowerCase()
   
-  // Check if language is supported
-  if (!normalizedLang || !Prism.languages[normalizedLang]) {
-    // Fallback to plain text with basic formatting
+  // Special handling for Go language
+  if (normalizedLang === 'go') {
+    // Ensure Go language is properly initialized
+    if (!isLanguageAvailable('go')) {
+      console.warn('Go language not available, reinitializing...')
+      initializeLanguages()
+    }
+  }
+  
+  // Enhanced safety check with language availability verification
+  if (!normalizedLang || !isLanguageAvailable(normalizedLang)) {
+    console.warn(`Language '${language}' (normalized: '${normalizedLang}') is not available.`)
+    console.warn('Available languages:', Object.keys(Prism.languages))
     return `<pre class="language-text"><code class="text-slate-300">${escapeHtml(code)}</code></pre>`
   }
 
   try {
-    const highlighted = Prism.highlight(code, Prism.languages[normalizedLang], normalizedLang)
+    // Additional safety check before highlighting
+    const languageGrammar = Prism.languages[normalizedLang]
+    if (!languageGrammar || typeof languageGrammar !== 'object') {
+      throw new Error(`Invalid language grammar for: ${normalizedLang}`)
+    }
+
+    const highlighted = Prism.highlight(code, languageGrammar, normalizedLang)
     return `<pre class="language-${normalizedLang}"><code class="language-${normalizedLang}">${highlighted}</code></pre>`
   } catch (error) {
     console.warn(`Failed to highlight code for language: ${normalizedLang}`, error)
+    console.warn('Falling back to plain text highlighting')
     return `<pre class="language-text"><code class="text-slate-300">${escapeHtml(code)}</code></pre>`
   }
 }
@@ -137,4 +199,42 @@ export const getLanguageLabel = (language: string): string => {
   
   const normalizedLang = languageMap[language.toLowerCase()] || language.toLowerCase()
   return labels[normalizedLang] || language.toUpperCase()
+}
+
+// Debug function to log available languages (useful for development)
+export const logAvailableLanguages = (): void => {
+  console.log('Available Prism languages:', Object.keys(Prism.languages))
+}
+
+// Test function to verify Go language specifically
+export const testGoLanguage = (): void => {
+  console.log('Testing Go language support...')
+  console.log('Go language available:', isLanguageAvailable('go'))
+  console.log('Go language object:', Prism.languages.go)
+  
+  if (Prism.languages.go) {
+    console.log('Go language properties:', Object.keys(Prism.languages.go))
+  }
+  
+  // Test a simple Go code snippet
+  const testCode = `package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}`
+  
+  try {
+    const result = highlightCode(testCode, 'go')
+    console.log('Go highlighting test successful:', result.length > 0)
+  } catch (error) {
+    console.error('Go highlighting test failed:', error)
+  }
+}
+
+// Make test functions available globally for debugging
+if (typeof window !== 'undefined') {
+  (window as any).testGoLanguage = testGoLanguage;
+  (window as any).logAvailableLanguages = logAvailableLanguages
 }
