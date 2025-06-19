@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 
 interface AnalyticsEvent {
   action: string
@@ -99,9 +100,11 @@ interface AnalyticsProviderProps {
 }
 
 export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }) => {
+  const location = useLocation()
+
   useEffect(() => {
     // Track initial page load
-    analytics.trackPageView(window.location.pathname, document.title)
+    analytics.trackPageView(location.pathname, document.title)
 
     // Track time spent on page
     let startTime = Date.now()
@@ -114,7 +117,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
         analytics.trackEvent({
           action: 'time_on_page',
           category: 'engagement',
-          label: window.location.pathname,
+          label: location.pathname,
           value: Math.round(timeSpent / 1000) // seconds
         })
       } else {
@@ -136,7 +139,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
           analytics.trackEvent({
             action: 'scroll_depth',
             category: 'engagement',
-            label: window.location.pathname,
+            label: location.pathname,
             value: maxScroll
           })
         }
@@ -159,12 +162,23 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     window.addEventListener('scroll', handleScroll, { passive: true })
     document.addEventListener('click', handleExternalClick)
 
+    // Track page views for SPA navigation
+    useEffect(() => {
+      // Track page view in Cloudflare Analytics
+      if (window.cloudflare?.beam) {
+        window.cloudflare.beam.track('pageview', {
+          path: location.pathname,
+          title: document.title
+        })
+      }
+    }, [location])
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('scroll', handleScroll)
       document.removeEventListener('click', handleExternalClick)
     }
-  }, [])
+  }, [location])
 
   return <>{children}</>
 }
@@ -182,4 +196,93 @@ export const useAnalytics = () => {
   }
 }
 
-export default AnalyticsProvider 
+export default AnalyticsProvider
+
+// Cloudflare Analytics interface
+declare global {
+  interface Window {
+    cloudflare?: {
+      beam?: {
+        track: (eventName: string, data?: Record<string, any>) => void
+      }
+    }
+  }
+}
+
+// Custom event tracking helper
+export const trackEvent = (eventName: string, data?: Record<string, any>) => {
+  // Cloudflare Analytics custom events
+  if (window.cloudflare?.beam) {
+    window.cloudflare.beam.track(eventName, data)
+  }
+
+  // Log to console in development
+  if (import.meta.env.DEV) {
+    console.log('Analytics Event:', eventName, data)
+  }
+}
+
+// Predefined event trackers
+export const analyticsEvents = {
+  // Newsletter events
+  newsletterSubscription: (email: string, template: string) => {
+    trackEvent('newsletter_subscription', {
+      template,
+      timestamp: new Date().toISOString()
+    })
+  },
+
+  // Portfolio events
+  projectView: (projectId: string, projectTitle: string) => {
+    trackEvent('project_view', {
+      project_id: projectId,
+      project_title: projectTitle
+    })
+  },
+
+  // Blog events
+  blogPostView: (postId: string, postTitle: string) => {
+    trackEvent('blog_post_view', {
+      post_id: postId,
+      post_title: postTitle
+    })
+  },
+
+  // Contact events
+  contactFormSubmit: (source: string) => {
+    trackEvent('contact_form_submit', {
+      source,
+      timestamp: new Date().toISOString()
+    })
+  },
+
+  // Download events
+  resumeDownload: () => {
+    trackEvent('resume_download', {
+      timestamp: new Date().toISOString()
+    })
+  },
+
+  // Social media clicks
+  socialMediaClick: (platform: string, location: string) => {
+    trackEvent('social_media_click', {
+      platform,
+      location
+    })
+  },
+
+  // Newsletter template events
+  templatePreview: (templateName: string) => {
+    trackEvent('template_preview', {
+      template_name: templateName
+    })
+  },
+
+  // Search events
+  searchQuery: (query: string, resultsCount: number) => {
+    trackEvent('search_query', {
+      query,
+      results_count: resultsCount
+    })
+  }
+} 

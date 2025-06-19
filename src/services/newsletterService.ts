@@ -16,6 +16,7 @@ import {
   getCountFromServer
 } from 'firebase/firestore';
 import { firestore as db } from '../firebase';
+import { analyticsEvents } from '../components/Analytics';
 
 // Cloudflare Worker endpoint for email functions
 const WORKER_URL = 'https://cloudflare-worker.1saifj.workers.dev';
@@ -174,14 +175,17 @@ export const subscriberService = {
             metadata: metadata || {},
           });
 
-          await emailService.sendConfirmationEmail(email, confirmationToken);
-          await this.trackEvent('subscription', email, { source: metadata?.referrer });
+                await emailService.sendConfirmationEmail(email, confirmationToken);
+      await this.trackEvent('subscription', email, { source: metadata?.referrer });
+      
+      // Track with Cloudflare Analytics
+      analyticsEvents.newsletterSubscription(email, 'default');
 
-          return { 
-            success: true, 
-            message: 'Please check your email to confirm your subscription.', 
-            requiresConfirmation: true 
-          };
+      return { 
+        success: true, 
+        message: 'Please check your email to confirm your subscription.', 
+        requiresConfirmation: true 
+      };
         }
       }
 
