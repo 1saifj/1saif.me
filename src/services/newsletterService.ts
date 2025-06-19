@@ -445,12 +445,12 @@ export const analyticsService = {
     }
   },
 
-  async getEvents(limit: number = 100): Promise<AnalyticsEvent[]> {
+  async getEvents(limitCount: number = 100): Promise<AnalyticsEvent[]> {
     try {
       const q = query(
         collection(db, 'analytics'),
         orderBy('timestamp', 'desc'),
-        limit(limit)
+        limit(limitCount)
       );
       
       const querySnapshot = await getDocs(q);

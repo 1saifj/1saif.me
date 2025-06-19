@@ -29,8 +29,8 @@
 	 */
 	"vars": { 
 		"WEBSITE_DOMAIN": "https://1saif.me",
-		"FROM_EMAIL": "noreply@1saif.me", 
-		"FROM_NAME": "Saif Al-Janahi",
+		"FROM_EMAIL": "newsletter@mailtrap.club", 
+		"FROM_NAME": "Saif Al-Janahi Newsletter",
 		"FIREBASE_PROJECT_ID": "portfolio-58276"
 	},
 	/**

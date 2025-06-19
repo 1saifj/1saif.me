@@ -4,6 +4,12 @@
  * Handles subscription confirmations, welcome emails, and newsletter sending
  */
 
+// Cloudflare Worker types
+interface ExecutionContext {
+  waitUntil(promise: Promise<any>): void;
+  passThroughOnException(): void;
+}
+
 // Environment variables interface
 interface Env {
   MAILTRAP_USERNAME: string;
@@ -506,6 +512,7 @@ export default {
             
             totalSent++;
           } catch (error) {
+            const subscriber = result.document.fields;
             console.error('Error sending to', subscriber.email?.stringValue, ':', error);
             errors++;
           }
@@ -549,7 +556,7 @@ export default {
       console.error('Worker error:', error);
       return new Response(JSON.stringify({ 
         error: 'Internal server error',
-        message: error.message 
+        message: error instanceof Error ? error.message : 'Unknown error'
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
