@@ -31,7 +31,7 @@
 		"WEBSITE_DOMAIN": "https://1saif.me",
 		"FROM_EMAIL": "noreply@1saif.me", 
 		"FROM_NAME": "Saif Al-Janahi",
-		"FIREBASE_PROJECT_ID": "saif-me-newsletter"
+		"FIREBASE_PROJECT_ID": "portfolio-58276"
 	},
 	/**
 	 * Note: Use secrets to store sensitive data.
