@@ -42,7 +42,7 @@ export const Navigation: React.FC = () => {
 
   const navLinks = [
     { href: '#about', label: 'About' },
-    { href: '#resume', label: 'Resume' },
+    { href: '/resume', label: 'Resume', isRoute: true },
     { href: '#skills', label: 'Skills' },
     { href: '#projects', label: 'Projects' },
     { href: '#blog', label: 'Blog' },
@@ -50,21 +50,29 @@ export const Navigation: React.FC = () => {
     { href: '#contact', label: 'Contact' }
   ]
 
-  const scrollToSection = (href: string) => {
-    if (isHomePage) {
-      const element = document.querySelector(href)
+  const handleNavigation = (link: { href: string; label: string; isRoute?: boolean }) => {
+    if (link.isRoute) {
+      // Navigate to route
+      window.location.href = link.href
+    } else if (isHomePage) {
+      // Scroll to section on homepage
+      const element = document.querySelector(link.href)
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' })
       }
     } else {
-      window.location.href = `/${href}`
+      // Navigate to homepage with section hash
+      window.location.href = `/${link.href}`
     }
     setIsMobileMenuOpen(false)
   }
 
   const handleLogoClick = () => {
     if (isHomePage) {
-      scrollToSection('#home')
+      const element = document.querySelector('#home')
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' })
+      }
     }
   }
 
@@ -108,10 +116,18 @@ export const Navigation: React.FC = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map(link => (
-              isHomePage ? (
+              link.isRoute ? (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ) : isHomePage ? (
                 <button
                   key={link.href}
-                  onClick={() => scrollToSection(link.href)}
+                  onClick={() => handleNavigation(link)}
                   className="text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
                 >
                   {link.label}
@@ -173,10 +189,19 @@ export const Navigation: React.FC = () => {
           <div className="md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800">
             <div className="py-4 space-y-2">
               {navLinks.map(link => (
-                isHomePage ? (
+                link.isRoute ? (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className="block w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ) : isHomePage ? (
                   <button
                     key={link.href}
-                    onClick={() => scrollToSection(link.href)}
+                    onClick={() => handleNavigation(link)}
                     className="block w-full text-left px-4 py-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
                   >
                     {link.label}

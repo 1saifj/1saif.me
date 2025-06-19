@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Calendar, Clock, Filter, TrendingUp, BookOpen, Search, Grid, List, ArrowRight, Star, Eye, ChevronDown, Award, Zap, Target } from 'lucide-react'
+import { Calendar, Clock, Filter, TrendingUp, BookOpen, Search, Grid, List, ArrowRight, Star, ChevronDown, Award, Zap, Target, Tag } from 'lucide-react'
 import { publishedBlogs } from '../data/blogs'
 import { createSlugFromTitle } from '../utils/slugUtils'
 
@@ -272,90 +272,83 @@ export const BlogListing: React.FC = () => {
           ) : (
             <div className={`grid gap-8 ${
               viewMode === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-stretch' 
                 : 'grid-cols-1'
             }`}>
               {paginatedBlogs.map((blog, index) => {
-                const metrics = {
-                  views: Math.floor(Math.random() * 1000) + 100,
-                  comments: Math.floor(Math.random() * 50) + 5
-                }
                 const badge = getArticleBadge(blog, index)
                 const BadgeIcon = badge.icon
 
                 return (
                   <article 
                     key={blog.title}
-                    className={`group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/20 dark:border-slate-700/50 hover:scale-105 ${
-                      viewMode === 'list' ? 'flex items-center' : ''
+                    className={`group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/20 dark:border-slate-700/50 hover:scale-105 flex flex-col ${
+                      viewMode === 'list' ? 'sm:flex-row' : 'h-full'
                     }`}
                   >
-                    <div className={`p-6 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-                      {/* Article Badge */}
+                    <div className={`p-6 flex flex-col flex-1`}>
                       <div className="flex items-center justify-between mb-4">
                         <div className={`inline-flex items-center space-x-2 bg-gradient-to-r ${badge.color} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg`}>
                           <BadgeIcon className="w-3 h-3" />
                           <span>{badge.text}</span>
                         </div>
-                        <div className="flex items-center space-x-3 text-slate-400">
-                          <div className="flex items-center space-x-1">
-                            <Eye className="w-4 h-4" />
-                            <span className="text-xs">{metrics.views}</span>
-                          </div>
-                        </div>
                       </div>
 
-                      {/* Article Content */}
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
-                        {blog.title}
-                      </h3>
-                      
-                      <p className="text-slate-600 dark:text-slate-300 mb-4 line-clamp-3 leading-relaxed">
-                        {blog.description}
-                      </p>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                          {blog.title}
+                        </h3>
+                        
+                        <p className="text-slate-600 dark:text-slate-300 mb-4 line-clamp-3 leading-relaxed min-h-[4.875rem]">
+                          {blog.description || 'No description available.'}
+                        </p>
+                      </div>
 
-                      {/* Tags */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {blog.tags.slice(0, 3).map(tag => (
-                          <button
-                            key={tag}
-                            onClick={() => handleFilterChange(tag)}
-                            className="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full text-xs hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                      <div className="mt-auto">
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {blog.tags.slice(0, 3).map(tag => (
+                            <button
+                              key={tag}
+                              onClick={() => handleFilterChange(tag)}
+                              className="inline-flex items-center px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full text-xs hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            >
+                              <Tag className="w-3 h-3 mr-1.5" />
+                              <span>{tag}</span>
+                            </button>
+                          ))}
+                          {blog.tags.length > 3 && (
+                            <span className="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-full text-xs">
+                              +{blog.tags.length - 3} more
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-700">
+                          <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mb-4">
+                            <div className="flex items-center space-x-4">
+                              <div className="flex items-center space-x-1">
+                                <Calendar className="w-4 h-4" />
+                                <time dateTime={new Date(blog.createdAt).toISOString()}>
+                                  {formatDate(blog.createdAt)}
+                                </time>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <Clock className="w-4 h-4" />
+                                <span>{estimateReadTime(blog.description)} min read</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <Link
+                            to={`/blog/${createSlugFromTitle(blog.title)}`}
+                            className="group/link w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                           >
-                            #{tag}
-                          </button>
-                        ))}
-                        {blog.tags.length > 3 && (
-                          <span className="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-full text-xs">
-                            +{blog.tags.length - 3} more
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Meta Information */}
-                      <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mb-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <time dateTime={new Date(blog.createdAt).toISOString()}>
-                              {formatDate(blog.createdAt)}
-                            </time>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{estimateReadTime(blog.description)} min read</span>
-                          </div>
+                            <BookOpen className="w-5 h-5" />
+                            <span>Read Article</span>
+                            <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                          </Link>
                         </div>
                       </div>
-
-                      {/* Read More Link */}
-                      <Link 
-                        to={`/blog/${createSlugFromTitle(blog.title)}`}
-                        className="group/link inline-flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
-                      >
-                        <span>Read Article</span>
-                        <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                      </Link>
                     </div>
                   </article>
                 )

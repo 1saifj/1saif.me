@@ -98,7 +98,7 @@ As Backend Team Lead (10 months), I successfully:
 - Mentored junior developers and conducted technical interviews
 - Coordinated with frontend, DevOps, and QA teams for seamless integration
 
-Currently serving as Senior Software Engineer, continuing to:
+Currently serving as Software Engineer, continuing to:
 - Architect new features and system improvements
 - Maintain system security and performance standards
 - Contribute to technical decision-making and strategic planning
@@ -126,5 +126,5 @@ Currently serving as Senior Software Engineer, continuing to:
 
 **September 2022 - Present**
 - 10 months as Backend Team Lead (Sep 2022 - Jun 2023)
-- 14+ months as Senior Software Engineer (Jul 2023 - Present)
+- 14+ months as Software Engineer (Jul 2023 - Present)
 - Total impact: 2+ years of continuous system evolution and team leadership

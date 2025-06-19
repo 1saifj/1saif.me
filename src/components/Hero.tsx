@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { ChevronDown, Github, Linkedin, Mail, Phone } from 'lucide-react'
+import { ChevronDown, Github, Linkedin, Mail, Phone, FileText } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const titles = [
   "Full-Stack Engineer",
@@ -67,11 +68,22 @@ export const Hero: React.FC = () => {
             </h2>
           </div>
           
-          <p className="text-xl text-gray-300 dark:text-gray-200 mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-300 dark:text-gray-200 mb-10 max-w-2xl mx-auto leading-relaxed">
             Transforming complex business requirements into scalable, secure software solutions using 
             <strong className="text-white"> Golang</strong>, <strong className="text-white">Python</strong>, 
             <strong className="text-white"> Flutter</strong>, and <strong className="text-white">Clean Architecture</strong> principles.
           </p>
+          
+          {/* Resume Button */}
+          <div className="mb-10">
+            <Link 
+              to="/resume"
+              className="group inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 transform"
+            >
+              <FileText className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
+              <span>View Resume</span>
+            </Link>
+          </div>
           
           {/* Contact Info */}
           <div className="grid md:grid-cols-2 gap-4 mb-12 max-w-2xl mx-auto">
