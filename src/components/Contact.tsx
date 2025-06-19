@@ -1,5 +1,5 @@
 import React from 'react'
-import { Mail, MapPin, Phone, Github, Linkedin, MessageCircle, Calendar, Coffee, Video } from 'lucide-react'
+import { Mail, MapPin, Phone, Github, Linkedin, MessageCircle, Calendar, Coffee, Video, Clock } from 'lucide-react'
 import { ContactForm } from './ContactForm'
 import { Newsletter } from './Newsletter'
 
@@ -85,16 +85,14 @@ export const Contact: React.FC = () => {
             </div>
 
             <div className="group bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
-              <div className="flex flex-col items-center text-center">
-                <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-xl p-3 mb-4">
-                  <Calendar className="w-6 h-6 text-white" />
+              <div className="flex items-start space-x-4">
+                <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-full shadow-lg">
+                  <Clock className="w-6 h-6" />
                 </div>
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Availability</h3>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Available Now
-                  </p>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Availability</h3>
+                  <p className="text-slate-600 dark:text-slate-300">Working Hours: 9:00 AM - 5:00 PM</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Baghdad, East Africa Time (GMT+3)</p>
                 </div>
               </div>
             </div>

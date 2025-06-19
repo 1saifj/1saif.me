@@ -89,8 +89,6 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           icons: ['lucide-react'],
-          email: ['@emailjs/browser'],
-          prism: ['prismjs']
         },
         // Optimize for Cloudflare Pages CDN
         assetFileNames: (assetInfo) => {

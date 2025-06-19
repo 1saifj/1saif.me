@@ -22,9 +22,9 @@
     "analyze": "npm run build && npx vite-bundle-analyzer dist/stats.html"
   },
   "dependencies": {
-    "@emailjs/browser": "^4.3.3",
     "@giscus/react": "^3.1.0",
     "@microsoft/clarity": "^1.0.0",
+    "firebase": "^11.9.1",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -42,7 +42,6 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.0.1",
-    "@types/prismjs": "^1.26.3",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-legacy": "^6.1.1",
