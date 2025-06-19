@@ -6,13 +6,11 @@
 
 // Environment variables interface
 interface Env {
-  MAILTRAP_USERNAME: string;
-  MAILTRAP_PASSWORD: string;
+  MAILTRAP_TOKEN: string;
   WEBSITE_DOMAIN: string;
   FROM_EMAIL: string;
   FROM_NAME: string;
   FIREBASE_PROJECT_ID: string;
-  FIREBASE_API_KEY: string;
 }
 
 // Request body interfaces
@@ -257,27 +255,41 @@ Saif Al-Janahi
 // Email sending function using Mailtrap
 async function sendEmail(to: string, subject: string, html: string, text: string, env: Env): Promise<boolean> {
 	try {
+		console.log('Attempting to send email to:', to);
+		console.log('Using FROM_EMAIL:', env.FROM_EMAIL);
+		console.log('Using FROM_NAME:', env.FROM_NAME);
+		console.log('Mailtrap token exists:', !!env.MAILTRAP_TOKEN);
+		
+		const requestBody = {
+			from: {
+				email: env.FROM_EMAIL,
+				name: env.FROM_NAME,
+			},
+			to: [{ email: to }],
+			subject,
+			html,
+			text,
+		};
+		
+		console.log('Request body:', JSON.stringify(requestBody, null, 2));
+		
 		const response = await fetch('https://send.api.mailtrap.io/api/send', {
 			method: 'POST',
 			headers: {
-				'Authorization': `Bearer ${env.MAILTRAP_PASSWORD}`,
+				'Authorization': `Bearer ${env.MAILTRAP_TOKEN}`,
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({
-				from: {
-					email: env.FROM_EMAIL,
-					name: env.FROM_NAME,
-				},
-				to: [{ email: to }],
-				subject,
-				html,
-				text,
-			}),
+			body: JSON.stringify(requestBody),
 		});
 
+		console.log('Response status:', response.status);
+		console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+		
+		const responseText = await response.text();
+		console.log('Response body:', responseText);
+
 		if (!response.ok) {
-			const errorText = await response.text();
-			console.error('Mailtrap API error:', response.status, errorText);
+			console.error('Mailtrap API error:', response.status, responseText);
 			return false;
 		}
 
@@ -318,6 +330,62 @@ export default {
 						...corsHeaders,
 					},
 				});
+			}
+
+			// Test Mailtrap token endpoint
+			if (path === '/test-mailtrap' && request.method === 'GET') {
+				try {
+					console.log('Testing Mailtrap API...');
+					console.log('Token exists:', !!env.MAILTRAP_TOKEN);
+					console.log('FROM_EMAIL:', env.FROM_EMAIL);
+					
+					const response = await fetch('https://send.api.mailtrap.io/api/send', {
+						method: 'POST',
+						headers: {
+							'Authorization': `Bearer ${env.MAILTRAP_TOKEN}`,
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							from: {
+								email: env.FROM_EMAIL,
+								name: env.FROM_NAME,
+							},
+							to: [{ email: "hello@saifj.me" }],
+							subject: "Test Email from Cloudflare Worker",
+							html: "<p>This is a test email from your newsletter system</p>",
+							text: "This is a test email from your newsletter system",
+						}),
+					});
+
+					const responseText = await response.text();
+					console.log('Mailtrap response status:', response.status);
+					console.log('Mailtrap response body:', responseText);
+
+					return new Response(JSON.stringify({
+						status: response.status,
+						response: responseText,
+						tokenExists: !!env.MAILTRAP_TOKEN,
+						fromEmail: env.FROM_EMAIL,
+						success: response.ok
+					}), {
+						status: 200,
+						headers: {
+							'Content-Type': 'application/json',
+							...corsHeaders,
+						},
+					});
+				} catch (error) {
+					return new Response(JSON.stringify({
+						error: 'Test failed',
+						message: error instanceof Error ? error.message : 'Unknown error'
+					}), {
+						status: 500,
+						headers: {
+							'Content-Type': 'application/json',
+							...corsHeaders,
+						},
+					});
+				}
 			}
 
 			      // Send confirmation email
