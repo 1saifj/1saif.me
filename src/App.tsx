@@ -4,6 +4,7 @@ import { HomePage } from './pages/HomePage'
 import { BlogPost } from './pages/BlogPost'
 import { BlogListingPage } from './pages/BlogListingPage'
 import { ProjectPage } from './pages/ProjectPage'
+import { ResumePage } from './pages/ResumePage'
 import { ConfirmSubscriptionPage } from './pages/ConfirmSubscriptionPage'
 import { UnsubscribePage } from './pages/UnsubscribePage'
 import { PrivacyPolicy } from './pages/PrivacyPolicy'
@@ -38,6 +39,7 @@ function App() {
               <Route path="/blog" element={<BlogListingPage />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/project/:slug" element={<ProjectPage />} />
+              <Route path="/resume" element={<ResumePage />} />
               <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
               <Route path="/unsubscribe" element={<UnsubscribePage />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />

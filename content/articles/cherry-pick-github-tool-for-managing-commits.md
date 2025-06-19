@@ -1,4 +1,3 @@
-
 ---
 title: "Cherry-Pick: A Useful GitHub Tool for Managing Commits"
 description: "Learn how to use the cherry-pick feature in GitHub Desktop to efficiently manage commits across branches."

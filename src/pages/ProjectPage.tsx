@@ -40,6 +40,7 @@ const sourceTypeConfig: Record<SourceType, { icon: React.ReactNode, label: strin
 export const ProjectPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const [isScrolled, setIsScrolled] = useState(false)
+  const [contentHtml, setContentHtml] = useState<string>('')
   
   useEffect(() => {
     const handleScroll = () => {
@@ -49,6 +50,17 @@ export const ProjectPage: React.FC = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    const processContent = async () => {
+      const projectFile = findContentBySlug(projectFiles, slug || '')
+      if (projectFile?.content) {
+        const html = await convertMarkdownToHtml(projectFile.content)
+        setContentHtml(html)
+      }
+    }
+    processContent()
+  }, [slug])
   
   if (!slug) {
     return (
@@ -397,7 +409,7 @@ export const ProjectPage: React.FC = () => {
                       prose-ul:list-disc prose-ol:list-decimal prose-ul:pl-8 prose-ol:pl-8
                       prose-li:text-slate-700 prose-li:mb-3 prose-li:leading-relaxed
                       prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-8 prose-blockquote:py-4 prose-blockquote:bg-blue-50 prose-blockquote:rounded-r-xl prose-blockquote:shadow-sm"
-                    dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(projectFile.content) }}
+                    dangerouslySetInnerHTML={{ __html: contentHtml }}
                   />
                 </div>
               )}
@@ -415,9 +427,9 @@ export const ProjectPage: React.FC = () => {
             </Link>
             
             <div className="text-slate-300 text-center">
-              <p className="text-lg">Interested in this project? 
+              <p className="text-lg">Want to discuss this project or explore collaboration? 
                 <a href="mailto:saifalialjanahi@gmail.com" className="text-blue-400 hover:text-blue-300 font-semibold ml-2 underline decoration-2 underline-offset-4">
-                  Get in touch
+                  Let's connect
                 </a>
               </p>
             </div>

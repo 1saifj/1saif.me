@@ -44,7 +44,7 @@ export const About: React.FC = () => {
               About Saif Aljanahi
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-300 max-w-4xl mx-auto leading-relaxed transition-colors duration-300">
-              <strong>Senior Full-Stack Engineer</strong> with 3+ years of experience building enterprise-grade systems. 
+              <strong>Full-Stack Engineer</strong> with 3+ years of experience building enterprise-grade systems. 
               Specialized in <strong>Golang backend development</strong>, <strong>financial technology</strong>, and 
               <strong>scalable architecture</strong> with a proven track record of leading high-performance teams.
             </p>
@@ -55,7 +55,7 @@ export const About: React.FC = () => {
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 transition-colors duration-300">Professional Journey</h3>
               <div className="space-y-4 text-slate-600 dark:text-slate-300 leading-relaxed transition-colors duration-300">
                 <p>
-                  As a <strong className="text-slate-900 dark:text-white">Senior Full-Stack Engineer</strong> with deep expertise in 
+                  As a <strong className="text-slate-900 dark:text-white">Full-Stack Engineer</strong> with deep expertise in 
                   <strong className="text-slate-900 dark:text-white"> Golang</strong>, <strong className="text-slate-900 dark:text-white">TypeScript</strong>, 
                   and <strong className="text-slate-900 dark:text-white">Clean Architecture</strong>, I specialize in building mission-critical 
                   financial systems that process millions of dollars in transactions while maintaining the highest security standards.
@@ -69,7 +69,7 @@ export const About: React.FC = () => {
                 <p>
                   Currently serving as <strong className="text-slate-900 dark:text-white">Backend Team Lead at AlQaseh</strong>, I architect and maintain 
                   enterprise-grade financial systems while mentoring junior developers and driving technical innovation. My passion for 
-                  <strong className="text-slate-900 dark:text-white"> performance optimization</strong> and <strong className="text-slate-900 dark:text-white">scalable architecture</strong> 
+                  <strong className="text-slate-900 dark:text-white"> performance optimization</strong> and <strong className="text-slate-900 dark:text-white"> scalable architecture</strong> 
                   has resulted in systems that serve thousands of concurrent users with sub-200ms response times.
                 </p>
               </div>
@@ -109,52 +109,7 @@ export const About: React.FC = () => {
             </div>
           </div>
 
-          {/* Technology Stack Showcase */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-700">
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 text-center">Technology Stack</h3>
-            <div className="grid md:grid-cols-4 gap-6">
-              <div>
-                <h4 className="font-semibold text-slate-900 dark:text-white mb-3">Backend</h4>
-                <div className="flex flex-wrap gap-2">
-                  {['Golang', 'Node.js', 'PostgreSQL', 'Redis'].map(tech => (
-                    <span key={tech} className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs rounded-full">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-900 dark:text-white mb-3">Frontend</h4>
-                <div className="flex flex-wrap gap-2">
-                  {['React', 'TypeScript', 'Next.js', 'Tailwind'].map(tech => (
-                    <span key={tech} className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-900 dark:text-white mb-3">DevOps</h4>
-                <div className="flex flex-wrap gap-2">
-                  {['Docker', 'Kubernetes', 'AWS', 'GitHub Actions'].map(tech => (
-                    <span key={tech} className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 text-xs rounded-full">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-900 dark:text-white mb-3">Tools</h4>
-                <div className="flex flex-wrap gap-2">
-                  {['Git', 'Prometheus', 'Grafana', 'SonarQube'].map(tech => (
-                    <span key={tech} className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 text-xs rounded-full">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </section>

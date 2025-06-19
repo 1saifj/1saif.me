@@ -2,7 +2,7 @@ import React from 'react'
 import { Navigation } from '../components/Navigation'
 import { Hero } from '../components/Hero'
 import { About } from '../components/About'
-import { Resume } from '../components/Resume'
+
 import { Skills } from '../components/Skills'
 import { Projects } from '../components/Projects'
 import { Research } from '../components/Research'
@@ -25,9 +25,7 @@ export const HomePage: React.FC = () => {
         <section id="about" aria-labelledby="about-heading">
           <About />
         </section>
-        <section id="resume" aria-labelledby="resume-heading">
-          <Resume />
-        </section>
+
         <section id="skills" aria-labelledby="skills-heading">
           <Skills />
         </section>

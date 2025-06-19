@@ -43,7 +43,7 @@ This represents my initial professional frontend development experience, where I
 
 ## Professional Growth
 
-This role served as a crucial stepping stone in my development career, providing the foundational experience that enabled progression to more senior roles and backend development expertise.
+This role served as a crucial stepping stone in my development career, providing the foundational experience that enabled progression to more advanced roles and backend development expertise.
 
 ## Impact
 
