@@ -29,20 +29,14 @@ import type {
   AnalyticsMetrics,
   PaginatedResult
 } from '../firebase'
-import { getFunctions, httpsCallable } from 'firebase/functions'
+// Firebase Functions removed - using direct client-side approach
 
 // Collection references
 const SUBSCRIBERS_COLLECTION = 'subscribers'
 const ANALYTICS_COLLECTION = 'analytics'
 const SETTINGS_COLLECTION = 'settings'
 
-// Add Firebase Functions setup
-const functions = getFunctions(app)
-
-// Cloud Functions
-const sendConfirmationEmail = httpsCallable(functions, 'sendConfirmationEmail')
-const sendWelcomeEmail = httpsCallable(functions, 'sendWelcomeEmail')
-const sendUnsubscribeConfirmation = httpsCallable(functions, 'sendUnsubscribeConfirmation')
+// Firebase Functions removed - email handling will be done via Cloudflare Workers
 
 /**
  * Newsletter Service Class
