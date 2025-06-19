@@ -3,8 +3,10 @@ import {
   GradientHeroNewsletter, 
   MinimalistCardNewsletter, 
   FeatureRichNewsletter, 
-  CompactInlineNewsletter 
+  CompactInlineNewsletter,
+  AnimatedInteractiveNewsletter
 } from './NewsletterTemplates'
+import { ModernGlassNewsletter } from './ModernGlassNewsletter'
 import { Sparkles, Layout, Palette, Code } from 'lucide-react'
 
 export const TemplateComparison: React.FC = () => {
@@ -55,6 +57,22 @@ export const TemplateComparison: React.FC = () => {
       component: CompactInlineNewsletter,
       features: ['Space efficient', 'Inline friendly', 'Quick signup', 'Sidebar ready'],
       bestFor: 'Blog sidebars, inline content, space-constrained areas'
+    },
+    {
+      key: 'animated-interactive',
+      name: 'Animated Interactive',
+      description: 'Dynamic template with floating elements and hover effects',
+      component: AnimatedInteractiveNewsletter,
+      features: ['Floating animations', 'Interactive hover', 'Modern dynamics', 'Engaging UX'],
+      bestFor: 'Creative agencies, design studios, interactive brands'
+    },
+    {
+      key: 'modern-glass',
+      name: 'Modern Glass',
+      description: 'Glassmorphism design with mouse tracking and premium aesthetics',
+      component: ModernGlassNewsletter,
+      features: ['Glassmorphism effect', 'Mouse tracking', 'Premium aesthetics', 'Interactive background'],
+      bestFor: 'Luxury brands, premium services, cutting-edge tech companies'
     }
   ]
 
