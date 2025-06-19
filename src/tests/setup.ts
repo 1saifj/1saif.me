@@ -20,10 +20,6 @@ global.emailjs = {
 // Mock environment variables for tests
 Object.defineProperty(import.meta, 'env', {
   value: {
-    VITE_EMAILJS_SERVICE_ID: 'test_service_id',
-    VITE_EMAILJS_TEMPLATE_ID: 'test_template_id',
-    VITE_EMAILJS_NEWSLETTER_TEMPLATE_ID: 'test_newsletter_template_id',
-    VITE_EMAILJS_PUBLIC_KEY: 'test_public_key',
     VITE_SITE_URL: 'https://test.example.com',
     VITE_SITE_NAME: 'Test Portfolio',
     VITE_SITE_DESCRIPTION: 'Test description',

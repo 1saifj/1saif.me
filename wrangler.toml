@@ -13,9 +13,6 @@ watch_dir = "src"
 
 # Environment variables (set these in Cloudflare Pages dashboard)
 [env.production.vars]
-# VITE_EMAILJS_SERVICE_ID = ""
-# VITE_EMAILJS_TEMPLATE_ID = ""
-# VITE_EMAILJS_PUBLIC_KEY = ""
 # VITE_GISCUS_REPO = ""
 # VITE_GISCUS_REPO_ID = ""
 # VITE_GISCUS_CATEGORY = ""
