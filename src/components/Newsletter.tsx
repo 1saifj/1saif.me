@@ -14,12 +14,22 @@ export const Newsletter: React.FC = () => {
   const [isConfigured, setIsConfigured] = useState(false)
 
   useEffect(() => {
-    // Load real stats
-    const realStats = emailService.getStats()
-    setStats({
-      confirmedSubscribers: realStats.confirmedSubscribers || 1247,
-      totalSubscribers: realStats.totalSubscribers || 1350
-    })
+    // Initialize email service and load real stats
+    const loadStats = async () => {
+      try {
+        await emailService.refreshStats()
+        const realStats = emailService.getStats()
+        setStats({
+          confirmedSubscribers: realStats.confirmedSubscribers || 1247,
+          totalSubscribers: realStats.totalSubscribers || 1350
+        })
+      } catch (error) {
+        console.error('Failed to load newsletter stats:', error)
+        // Keep default stats on error
+      }
+    }
+
+    loadStats()
 
     // Check if email service is configured
     setIsConfigured(emailService.isEmailServiceConfigured())
@@ -28,6 +38,11 @@ export const Newsletter: React.FC = () => {
     if (import.meta.env.DEV) {
       debugEmailConfig()
     }
+
+    // Set up periodic stats refresh (every 30 seconds)
+    const interval = setInterval(loadStats, 30000)
+    
+    return () => clearInterval(interval)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
