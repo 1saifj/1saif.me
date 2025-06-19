@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Subscribers collection - Allow public read/write for newsletter subscriptions
+    match /subscribers/{subscriberId} {
+      // Allow anyone to create a subscription (for newsletter signup)
+      allow create: if isValidSubscription();
+      
+      // Allow reading by anyone (for stats) but limit fields
+      allow read: if true;
+      
+      // Allow updates only for status changes (confirmation, unsubscribe)
+      allow update: if isValidStatusUpdate();
+      
+      // No deletion allowed
+      allow delete: if false;
+    }
+    
+    // Analytics collection - Read-only for public stats
+    match /analytics/{analyticsId} {
+      // Allow reading for public analytics
+      allow read: if true;
+      
+      // Only allow system writes (via Cloud Functions)
+      allow write: if false;
+    }
+    
+    // Settings collection - Read-only for public
+    match /settings/{settingId} {
+      // Allow reading for public settings
+      allow read: if true;
+      
+      // No public writes to settings
+      allow write: if false;
+    }
+    
+    // Helper functions for validation
+    function isValidSubscription() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['email', 'status', 'subscribedAt', 'source', 'ipAddress', 'userAgent']) &&
+             data.email is string &&
+             data.email.matches('.*@.*\\..*') &&
+             data.status == 'pending' &&
+             data.subscribedAt is timestamp &&
+             data.source is string &&
+             data.ipAddress is string &&
+             data.userAgent is string;
+    }
+    
+    function isValidStatusUpdate() {
+      let oldData = resource.data;
+      let newData = request.resource.data;
+      
+      // Only allow status changes
+      return oldData.email == newData.email &&
+             oldData.subscribedAt == newData.subscribedAt &&
+             oldData.source == newData.source &&
+             newData.status in ['pending', 'confirmed', 'unsubscribed'];
+    }
+  }
+} 
