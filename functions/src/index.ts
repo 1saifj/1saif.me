@@ -7,6 +7,10 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
+// Load environment variables
+import * as dotenv from "dotenv";
+dotenv.config();
+
 import { onRequest, onCall } from "firebase-functions/v2/https";
 import { onDocumentCreated, onDocumentUpdated } from "firebase-functions/v2/firestore";
 import { initializeApp } from "firebase-admin/app";
@@ -14,12 +18,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
 import * as nodemailer from "nodemailer";
 
-// Email templates
-import { 
-  confirmationEmailTemplate, 
-  welcomeEmailTemplate, 
-  unsubscribeEmailTemplate 
-} from "./emailTemplates";
+// Email templates are defined inline below
 
 // Initialize Firebase Admin
 initializeApp();
@@ -27,15 +26,33 @@ const db = getFirestore();
 
 // Email configuration with Mailtrap
 const createTransporter = () => {
+  // Use sandbox for development, live for production
+  const host = process.env.NODE_ENV === 'production' 
+    ? "live.smtp.mailtrap.io" 
+    : "sandbox.smtp.mailtrap.io";
+    
   return nodemailer.createTransport({
-    host: "live.smtp.mailtrap.io", // Use live.smtp.mailtrap.io for production
+    host,
     port: 587,
     secure: false, // Use TLS
     auth: {
-      user: process.env.MAILTRAP_USERNAME, // Your Mailtrap username
-      pass: process.env.MAILTRAP_PASSWORD, // Your Mailtrap password
+      user: process.env.MAILTRAP_USERNAME,
+      pass: process.env.MAILTRAP_PASSWORD,
     },
   });
+};
+
+// Helper function to get website URLs
+const getWebsiteUrl = (path: string = '') => {
+  const domain = process.env.WEBSITE_DOMAIN || 'https://saifj.dev';
+  return `${domain}${path}`;
+};
+
+// Helper function to get email sender info
+const getEmailSender = () => {
+  const name = process.env.FROM_NAME || 'Saif Al-Janahi';
+  const email = process.env.FROM_EMAIL || 'noreply@saifj.dev';
+  return `"${name}" <${email}>`;
 };
 
 // Email templates
@@ -230,11 +247,11 @@ export const onNewSubscriber = onDocumentCreated(
 
     try {
       const transporter = createTransporter();
-      const confirmationUrl = `https://yoursite.com/confirm-subscription?token=${subscriber.confirmationToken}`;
+      const confirmationUrl = getWebsiteUrl(`/confirm-subscription?token=${subscriber.confirmationToken}`);
       const template = emailTemplates.confirmation(subscriber.email, confirmationUrl);
 
       await transporter.sendMail({
-        from: `"Saif Al-Janahi" <noreply@saifj.dev>`, // Update with your domain
+        from: getEmailSender(),
         to: subscriber.email,
         subject: template.subject,
         html: template.html,
@@ -260,11 +277,11 @@ export const onSubscriberConfirmed = onDocumentUpdated(
 
     try {
       const transporter = createTransporter();
-      const unsubscribeUrl = `https://yoursite.com/unsubscribe?token=${after.unsubscribeToken}`;
+      const unsubscribeUrl = getWebsiteUrl(`/unsubscribe?token=${after.unsubscribeToken}`);
       const template = emailTemplates.welcome(after.email, unsubscribeUrl);
 
       await transporter.sendMail({
-        from: `"Saif Al-Janahi" <noreply@saifj.dev>`, // Update with your domain
+        from: getEmailSender(),
         to: after.email,
         subject: template.subject,
         html: template.html,
@@ -300,7 +317,7 @@ export const confirmSubscription = onRequest(async (request, response) => {
     const subscriber = doc.data();
     
     if (subscriber.status === "confirmed") {
-      response.redirect("https://yoursite.com/already-confirmed"); // Update with your domain
+      response.redirect(getWebsiteUrl("/already-confirmed"));
       return;
     }
 
@@ -318,7 +335,7 @@ export const confirmSubscription = onRequest(async (request, response) => {
       source: subscriber.source || "unknown",
     });
 
-    response.redirect("https://yoursite.com/subscription-confirmed"); // Update with your domain
+    response.redirect(getWebsiteUrl("/subscription-confirmed"));
   } catch (error) {
     logger.error("Error confirming subscription:", error);
     response.status(500).send("Internal server error");
@@ -347,7 +364,7 @@ export const unsubscribe = onRequest(async (request, response) => {
     const subscriber = doc.data();
 
     if (subscriber.status === "unsubscribed") {
-      response.redirect("https://yoursite.com/already-unsubscribed"); // Update with your domain
+      response.redirect(getWebsiteUrl("/already-unsubscribed"));
       return;
     }
 
@@ -361,7 +378,7 @@ export const unsubscribe = onRequest(async (request, response) => {
     const template = emailTemplates.unsubscribe(subscriber.email);
 
     await transporter.sendMail({
-      from: `"Saif Al-Janahi" <noreply@saifj.dev>`, // Update with your domain
+      from: getEmailSender(),
       to: subscriber.email,
       subject: template.subject,
       html: template.html,
@@ -376,7 +393,7 @@ export const unsubscribe = onRequest(async (request, response) => {
       reason: request.body?.reason || "not_specified",
     });
 
-    response.redirect("https://yoursite.com/unsubscribed"); // Update with your domain
+    response.redirect(getWebsiteUrl("/unsubscribed"));
   } catch (error) {
     logger.error("Error processing unsubscription:", error);
     response.status(500).send("Internal server error");
@@ -415,17 +432,17 @@ export const sendNewsletter = onCall(async (request) => {
     for (const batch of batches) {
       const promises = batch.map(async (subscriber) => {
         try {
-          const unsubscribeUrl = `https://yoursite.com/unsubscribe?token=${subscriber.unsubscribeToken}`;
+          const unsubscribeUrl = getWebsiteUrl(`/unsubscribe?token=${subscriber.unsubscribeToken}`);
           
           await transporter.sendMail({
-            from: `"Saif Al-Janahi" <noreply@saifj.dev>`, // Update with your domain
+            from: getEmailSender(),
             to: subscriber.email,
             subject: isTest ? `[TEST] ${subject}` : subject,
             html: `
               ${content}
               <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #a0aec0; font-size: 12px; text-align: center;">
                 <p>Don't want to receive these emails? <a href="${unsubscribeUrl}" style="color: #667eea;">Unsubscribe here</a></p>
-                <p>© 2024 Saif Al-Janahi | Software Engineer</p>
+                <p>© 2024 ${process.env.FROM_NAME || 'Saif Al-Janahi'} | Software Engineer</p>
               </div>
             `,
           });
