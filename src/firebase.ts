@@ -33,14 +33,14 @@ if (typeof window !== 'undefined' && import.meta.env.PROD) {
 }
 */
 
-// Connect to Firestore emulator in development
-if (import.meta.env.DEV && !import.meta.env.VITE_USE_FIREBASE_PROD) {
-  try {
-    connectFirestoreEmulator(db, 'localhost', 8080);
-  } catch (error) {
-    console.log('Firestore emulator already connected or not available');
-  }
-}
+// Connect to Firestore emulator in development (disabled - using production Firebase)
+// if (import.meta.env.DEV && !import.meta.env.VITE_USE_FIREBASE_PROD) {
+//   try {
+//     connectFirestoreEmulator(db, 'localhost', 8080);
+//   } catch (error) {
+//     console.log('Firestore emulator already connected or not available');
+//   }
+// }
 
 // TypeScript interfaces for Firestore collections
 

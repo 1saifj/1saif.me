@@ -10,6 +10,7 @@ import { UnsubscribePage } from './pages/UnsubscribePage'
 import { PrivacyPolicy } from './pages/PrivacyPolicy'
 import TemplatesDemo from './pages/TemplatesDemo'
 import NewsletterTestPage from './pages/NewsletterTestPage'
+import ImageOptimizationPage from './pages/ImageOptimizationPage'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { SkipLink } from './components/SkipLink'
 import AnalyticsProvider, { useAnalytics } from './components/Analytics'
@@ -47,6 +48,7 @@ function App() {
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/newsletter-templates" element={<TemplatesDemo />} />
               <Route path="/newsletter-test" element={<NewsletterTestPage />} />
+              <Route path="/image-optimization" element={<ImageOptimizationPage />} />
             </Routes>
             <PWAInstallPrompt />
           </div>

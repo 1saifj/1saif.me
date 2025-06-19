@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { ChevronDown, Github, Linkedin, Mail, Phone, FileText } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { OptimizedImage } from '../utils/imageOptimization'
 
 const titles = [
   "Full-Stack Engineer",
@@ -47,13 +48,14 @@ export const Hero: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           {/* Profile Image */}
           <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 mx-auto mb-8 rounded-full overflow-hidden shadow-2xl ring-4 ring-white/20 dark:ring-white/10 hover:ring-white/40 dark:hover:ring-white/20 transition-all duration-300">
-            <img 
+            <OptimizedImage 
               src="/sj_image.jpeg" 
               alt="Saif Aljanahi - Full-Stack Software Engineer specializing in Golang, Python, and Flutter development"
               className="w-full h-full object-cover object-center"
-              loading="eager"
-              width="160"
-              height="160"
+              preset="avatar"
+              customOptions={{ width: 160, height: 160, quality: 95 }}
+              width={160}
+              height={160}
             />
           </div>
           
