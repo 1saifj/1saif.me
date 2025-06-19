@@ -1,4 +1,4 @@
-// Newsletter service for Firebase Firestore integration
+// Newsletter service for Firebase Firestore integration with Cloudflare Workers
 import { 
   collection, 
   addDoc, 
@@ -7,497 +7,492 @@ import {
   query, 
   where, 
   getDocs, 
-  getDoc, 
   orderBy, 
-  limit, 
-  startAfter,
-  Timestamp,
-  increment,
+  limit,
   serverTimestamp,
-  runTransaction,
-  QueryDocumentSnapshot,
-  DocumentData,
-  writeBatch
-} from 'firebase/firestore'
-import { app, firestore } from '../firebase'
-import type { 
-  Subscriber, 
-  SubscriptionStatus, 
-  AnalyticsEvent, 
-  NewsletterSettings,
-  SubscriptionResult,
-  AnalyticsMetrics,
-  PaginatedResult
-} from '../firebase'
-// Firebase Functions removed - using direct client-side approach
+  increment,
+  deleteDoc,
+  onSnapshot,
+  getCountFromServer
+} from 'firebase/firestore';
+import { firestore as db } from '../firebase';
 
-// Collection references
-const SUBSCRIBERS_COLLECTION = 'subscribers'
-const ANALYTICS_COLLECTION = 'analytics'
-const SETTINGS_COLLECTION = 'settings'
+// Cloudflare Worker endpoint for email functions
+const WORKER_URL = 'https://cloudflare-worker.1saifj.workers.dev';
 
-// Firebase Functions removed - email handling will be done via Cloudflare Workers
+// Types
+export interface Subscriber {
+  id?: string;
+  email: string;
+  status: 'pending' | 'confirmed' | 'unsubscribed';
+  subscribedAt: Date;
+  confirmedAt?: Date;
+  unsubscribedAt?: Date;
+  source?: string;
+  confirmationToken?: string;
+  unsubscribeToken?: string;
+  metadata?: {
+    userAgent?: string;
+    ipAddress?: string;
+    referrer?: string;
+  };
+}
 
-/**
- * Newsletter Service Class
- * Handles all newsletter-related operations with Firestore
- */
-export class NewsletterService {
-  
-  /**
-   * Subscribe a new email to the newsletter
-   * @param email - The email address to subscribe
-   * @param sourceIP - Optional IP address for tracking
-   * @param consentGiven - GDPR consent status
-   * @returns Promise with subscription result
-   */
-  static async subscribeEmail(
-    email: string, 
-    sourceIP?: string, 
-    consentGiven: boolean = true
-  ): Promise<SubscriptionResult> {
-    try {
-      // Validate email format
-      if (!this.isValidEmail(email)) {
-        throw new Error('Invalid email format')
-      }
+export interface AnalyticsEvent {
+  id?: string;
+  type: 'subscription' | 'confirmation' | 'unsubscribe' | 'newsletter_sent';
+  email?: string;
+  timestamp: Date;
+  metadata?: {
+    source?: string;
+    campaign?: string;
+    userAgent?: string;
+  };
+}
 
-      // Check if email already exists
-      const existingSubscriber = await this.getSubscriberByEmail(email)
-      if (existingSubscriber) {
-        if (existingSubscriber.status === 'confirmed') {
-          return {
-            success: false,
-            message: 'Email is already subscribed',
-            subscriberId: existingSubscriber.id
-          }
-        } else if (existingSubscriber.status === 'pending') {
-          return {
-            success: false,
-            message: 'Confirmation email already sent. Please check your inbox.',
-            subscriberId: existingSubscriber.id
-          }
-        }
-      }
+export interface SubscriptionStats {
+  totalSubscribers: number;
+  confirmedSubscribers: number;
+  pendingSubscribers: number;
+  unsubscribedCount: number;
+  subscriptionsToday: number;
+  subscriptionsThisWeek: number;
+  subscriptionsThisMonth: number;
+  confirmationRate: number;
+  unsubscribeRate: number;
+}
 
-      // Create new subscriber document
-      const subscriberData: Omit<Subscriber, 'id'> = {
-        email: email.toLowerCase().trim(),
-        status: 'pending',
-        subscribedAt: serverTimestamp() as Timestamp,
-        confirmedAt: null,
-        unsubscribedAt: null,
-        sourceIP: sourceIP || null,
-        consentGiven,
-        confirmationToken: this.generateConfirmationToken(),
-        unsubscribeToken: this.generateUnsubscribeToken(),
-        metadata: {
-          userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : null,
-          source: 'website'
-        }
-      }
+// Generate unique tokens
+function generateToken(): string {
+  return crypto.randomUUID();
+}
 
-      // Add subscriber to Firestore
-      const subscriberRef = await addDoc(
-        collection(firestore, SUBSCRIBERS_COLLECTION), 
-        subscriberData
-      )
+// Helper function to call Cloudflare Worker endpoints
+async function callWorkerEndpoint(endpoint: string, data?: any, method: 'GET' | 'POST' = 'POST'): Promise<any> {
+  try {
+    const response = await fetch(`${WORKER_URL}${endpoint}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: data ? JSON.stringify(data) : undefined,
+    });
 
-      // Log analytics event
-      await this.logAnalyticsEvent({
-        type: 'subscription_started',
-        email,
-        subscriberId: subscriberRef.id,
-        metadata: {
-          sourceIP,
-          consentGiven
-        }
-      })
-
-      // Update global subscription counts
-      await this.updateSubscriptionCounts('pending', 1)
-
-      return {
-        success: true,
-        message: 'Subscription successful! Please check your email to confirm.',
-        subscriberId: subscriberRef.id,
-        confirmationToken: subscriberData.confirmationToken || undefined
-      }
-
-    } catch (error) {
-      console.error('Newsletter subscription error:', error)
-      
-      // Log error analytics event
-      await this.logAnalyticsEvent({
-        type: 'subscription_error',
-        email,
-        metadata: {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          sourceIP
-        }
-      })
-
-      return {
-        success: false,
-        message: 'Subscription failed. Please try again later.',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Worker request failed: ${response.status} ${errorText}`);
     }
-  }
 
-  /**
-   * Confirm email subscription
-   * @param token - Confirmation token from email
-   * @returns Promise with confirmation result
-   */
-  static async confirmSubscription(token: string): Promise<SubscriptionResult> {
-    try {
-      // Find subscriber by confirmation token
-      const q = query(
-        collection(firestore, SUBSCRIBERS_COLLECTION),
-        where('confirmationToken', '==', token),
-        where('status', '==', 'pending')
-      )
-      
-      const querySnapshot = await getDocs(q)
-      
-      if (querySnapshot.empty) {
-        return {
-          success: false,
-          message: 'Invalid or expired confirmation link'
-        }
-      }
-
-      const subscriberDoc = querySnapshot.docs[0]
-      const subscriberData = subscriberDoc.data() as Subscriber
-
-      // Update subscriber status to confirmed
-      await updateDoc(doc(firestore, SUBSCRIBERS_COLLECTION, subscriberDoc.id), {
-        status: 'confirmed',
-        confirmedAt: serverTimestamp(),
-        confirmationToken: null // Clear token after confirmation
-      })
-
-      // Log analytics event
-      await this.logAnalyticsEvent({
-        type: 'subscription_confirmed',
-        email: subscriberData.email,
-        subscriberId: subscriberDoc.id
-      })
-
-      // Update subscription counts
-      await this.updateSubscriptionCounts('confirmed', 1)
-      await this.updateSubscriptionCounts('pending', -1)
-
-      return {
-        success: true,
-        message: 'Email confirmed successfully! Welcome to our newsletter.',
-        subscriberId: subscriberDoc.id
-      }
-
-    } catch (error) {
-      console.error('Confirmation error:', error)
-      return {
-        success: false,
-        message: 'Confirmation failed. Please try again.',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }
-    }
-  }
-
-  /**
-   * Unsubscribe email from newsletter
-   * @param token - Unsubscribe token from email
-   * @returns Promise with unsubscribe result
-   */
-  static async unsubscribe(token: string): Promise<SubscriptionResult> {
-    try {
-      // Find subscriber by unsubscribe token
-      const q = query(
-        collection(firestore, SUBSCRIBERS_COLLECTION),
-        where('unsubscribeToken', '==', token)
-      )
-      
-      const querySnapshot = await getDocs(q)
-      
-      if (querySnapshot.empty) {
-        return {
-          success: false,
-          message: 'Invalid unsubscribe link'
-        }
-      }
-
-      const subscriberDoc = querySnapshot.docs[0]
-      const subscriberData = subscriberDoc.data() as Subscriber
-
-      // Update subscriber status to unsubscribed
-      await updateDoc(doc(firestore, SUBSCRIBERS_COLLECTION, subscriberDoc.id), {
-        status: 'unsubscribed',
-        unsubscribedAt: serverTimestamp()
-      })
-
-      // Log analytics event
-      await this.logAnalyticsEvent({
-        type: 'unsubscribed',
-        email: subscriberData.email,
-        subscriberId: subscriberDoc.id
-      })
-
-      // Update subscription counts
-      if (subscriberData.status === 'confirmed') {
-        await this.updateSubscriptionCounts('confirmed', -1)
-      }
-      await this.updateSubscriptionCounts('unsubscribed', 1)
-
-      return {
-        success: true,
-        message: 'Successfully unsubscribed from newsletter.',
-        subscriberId: subscriberDoc.id
-      }
-
-    } catch (error) {
-      console.error('Unsubscribe error:', error)
-      return {
-        success: false,
-        message: 'Unsubscribe failed. Please try again.',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }
-    }
-  }
-
-  /**
-   * Get subscriber by email
-   * @param email - Email address to search for
-   * @returns Promise with subscriber data or null
-   */
-  static async getSubscriberByEmail(email: string): Promise<(Subscriber & { id: string }) | null> {
-    try {
-      const q = query(
-        collection(firestore, SUBSCRIBERS_COLLECTION),
-        where('email', '==', email.toLowerCase().trim())
-      )
-      
-      const querySnapshot = await getDocs(q)
-      
-      if (querySnapshot.empty) {
-        return null
-      }
-
-      const doc = querySnapshot.docs[0]
-      return {
-        id: doc.id,
-        ...doc.data() as Subscriber
-      }
-
-    } catch (error) {
-      console.error('Error fetching subscriber:', error)
-      return null
-    }
-  }
-
-  /**
-   * Get newsletter analytics and metrics
-   * @returns Promise with analytics data
-   */
-  static async getAnalytics(): Promise<AnalyticsMetrics> {
-    try {
-      // Get subscription counts from settings
-      const settingsDoc = await getDoc(doc(firestore, SETTINGS_COLLECTION, 'global'))
-      const settings = settingsDoc.exists() ? settingsDoc.data() as NewsletterSettings : null
-
-      // Get recent analytics events
-      const recentEventsQuery = query(
-        collection(firestore, ANALYTICS_COLLECTION),
-        orderBy('timestamp', 'desc'),
-        limit(100)
-      )
-      
-      const eventsSnapshot = await getDocs(recentEventsQuery)
-      const events = eventsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data() as AnalyticsEvent
-      }))
-
-      // Calculate metrics
-      const now = new Date()
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-      const todayEvents = events.filter(event => 
-        event.timestamp && event.timestamp.toDate() >= today
-      )
-
-      return {
-        totalSubscribers: settings?.subscriberCounts?.confirmed || 0,
-        pendingConfirmations: settings?.subscriberCounts?.pending || 0,
-        totalUnsubscribed: settings?.subscriberCounts?.unsubscribed || 0,
-        todaySubscriptions: todayEvents.filter(e => e.type === 'subscription_confirmed').length,
-        todayUnsubscribes: todayEvents.filter(e => e.type === 'unsubscribed').length,
-        conversionRate: this.calculateConversionRate(events),
-        recentEvents: events.slice(0, 10) // Last 10 events
-      }
-
-    } catch (error) {
-      console.error('Error fetching analytics:', error)
-      return {
-        totalSubscribers: 0,
-        pendingConfirmations: 0,
-        totalUnsubscribed: 0,
-        todaySubscriptions: 0,
-        todayUnsubscribes: 0,
-        conversionRate: 0,
-        recentEvents: []
-      }
-    }
-  }
-
-  /**
-   * Get paginated list of subscribers (admin use)
-   * @param pageSize - Number of subscribers per page
-   * @param lastDoc - Last document from previous page
-   * @param status - Filter by subscription status
-   * @returns Promise with paginated subscriber list
-   */
-  static async getSubscribers(
-    pageSize: number = 20,
-    lastDoc?: QueryDocumentSnapshot<DocumentData>,
-    status?: SubscriptionStatus
-  ): Promise<PaginatedResult<Subscriber & { id: string }>> {
-    try {
-      let q = query(
-        collection(firestore, SUBSCRIBERS_COLLECTION),
-        orderBy('subscribedAt', 'desc'),
-        limit(pageSize)
-      )
-
-      if (status) {
-        q = query(
-          collection(firestore, SUBSCRIBERS_COLLECTION),
-          where('status', '==', status),
-          orderBy('subscribedAt', 'desc'),
-          limit(pageSize)
-        )
-      }
-
-      if (lastDoc) {
-        q = query(q, startAfter(lastDoc))
-      }
-
-      const querySnapshot = await getDocs(q)
-      
-      const subscribers = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data() as Subscriber
-      }))
-
-      const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1]
-
-      return {
-        data: subscribers,
-        hasMore: querySnapshot.docs.length === pageSize,
-        lastDoc: lastVisible
-      }
-
-    } catch (error) {
-      console.error('Error fetching subscribers:', error)
-      return {
-        data: [],
-        hasMore: false,
-        lastDoc: undefined
-      }
-    }
-  }
-
-  /**
-   * Bulk operations for admin use
-   */
-  static async bulkUnsubscribe(subscriberIds: string[]): Promise<boolean> {
-    try {
-      const batch = writeBatch(firestore)
-      
-      for (const id of subscriberIds) {
-        const subscriberRef = doc(firestore, SUBSCRIBERS_COLLECTION, id)
-        batch.update(subscriberRef, {
-          status: 'unsubscribed',
-          unsubscribedAt: serverTimestamp()
-        })
-      }
-
-      await batch.commit()
-      
-      // Update counts
-      await this.updateSubscriptionCounts('unsubscribed', subscriberIds.length)
-      await this.updateSubscriptionCounts('confirmed', -subscriberIds.length)
-
-      return true
-    } catch (error) {
-      console.error('Bulk unsubscribe error:', error)
-      return false
-    }
-  }
-
-  // Private helper methods
-  private static isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
-
-  private static generateConfirmationToken(): string {
-    return 'conf_' + Math.random().toString(36).substring(2) + Date.now().toString(36)
-  }
-
-  private static generateUnsubscribeToken(): string {
-    return 'unsub_' + Math.random().toString(36).substring(2) + Date.now().toString(36)
-  }
-
-  private static async logAnalyticsEvent(event: Omit<AnalyticsEvent, 'timestamp'>): Promise<void> {
-    try {
-      await addDoc(collection(firestore, ANALYTICS_COLLECTION), {
-        ...event,
-        timestamp: serverTimestamp()
-      })
-    } catch (error) {
-      console.error('Error logging analytics event:', error)
-    }
-  }
-
-  private static async updateSubscriptionCounts(
-    status: SubscriptionStatus, 
-    increment_amount: number
-  ): Promise<void> {
-    try {
-      await runTransaction(firestore, async (transaction) => {
-        const settingsRef = doc(firestore, SETTINGS_COLLECTION, 'global')
-        const settingsDoc = await transaction.get(settingsRef)
-        
-        if (!settingsDoc.exists()) {
-          // Create initial settings document
-          transaction.set(settingsRef, {
-            subscriberCounts: {
-              pending: status === 'pending' ? increment_amount : 0,
-              confirmed: status === 'confirmed' ? increment_amount : 0,
-              unsubscribed: status === 'unsubscribed' ? increment_amount : 0
-            },
-            updatedAt: serverTimestamp()
-          })
-        } else {
-          // Update existing counts
-          transaction.update(settingsRef, {
-            [`subscriberCounts.${status}`]: increment(increment_amount),
-            updatedAt: serverTimestamp()
-          })
-        }
-      })
-    } catch (error) {
-      console.error('Error updating subscription counts:', error)
-    }
-  }
-
-  private static calculateConversionRate(events: AnalyticsEvent[]): number {
-    const subscriptionStarted = events.filter(e => e.type === 'subscription_started').length
-    const subscriptionConfirmed = events.filter(e => e.type === 'subscription_confirmed').length
-    
-    if (subscriptionStarted === 0) return 0
-    return Math.round((subscriptionConfirmed / subscriptionStarted) * 100)
+    return await response.json();
+  } catch (error) {
+    console.error('Cloudflare Worker request failed:', error);
+    throw error;
   }
 }
 
-export default NewsletterService 
+// Email functions using Cloudflare Workers
+export const emailService = {
+  async sendConfirmationEmail(email: string, confirmationToken: string): Promise<void> {
+    await callWorkerEndpoint('/send-confirmation', {
+      email,
+      confirmationToken,
+    });
+  },
+
+  async sendWelcomeEmail(email: string, unsubscribeToken: string): Promise<void> {
+    await callWorkerEndpoint('/send-welcome', {
+      email,
+      unsubscribeToken,
+    });
+  },
+
+  async sendUnsubscribeConfirmation(email: string): Promise<void> {
+    await callWorkerEndpoint('/send-unsubscribe', {
+      email,
+    });
+  },
+
+  async sendNewsletter(subject: string, content: string, isTest: boolean = false): Promise<{ totalSent: number; errors: number }> {
+    const result = await callWorkerEndpoint('/send-newsletter', {
+      subject,
+      content,
+      isTest,
+    });
+    return {
+      totalSent: result.totalSent || 0,
+      errors: result.errors || 0,
+    };
+  },
+
+  async checkHealth(): Promise<boolean> {
+    try {
+      const result = await callWorkerEndpoint('/health', null, 'GET');
+      return result.status === 'healthy';
+    } catch {
+      return false;
+    }
+  },
+};
+
+// Subscriber management
+export const subscriberService = {
+  async subscribe(email: string, metadata?: Subscriber['metadata']): Promise<{ success: boolean; message: string; requiresConfirmation?: boolean }> {
+    try {
+      // Check if email already exists
+      const existingQuery = query(
+        collection(db, 'subscribers'),
+        where('email', '==', email.toLowerCase())
+      );
+      const existingDocs = await getDocs(existingQuery);
+
+      if (!existingDocs.empty) {
+        const existingDoc = existingDocs.docs[0];
+        const existingData = existingDoc.data() as Subscriber;
+        
+        if (existingData.status === 'confirmed') {
+          return { success: false, message: 'Email is already subscribed and confirmed.' };
+        } else if (existingData.status === 'pending') {
+          // Resend confirmation email
+          if (existingData.confirmationToken) {
+            await emailService.sendConfirmationEmail(email, existingData.confirmationToken);
+          }
+          return { 
+            success: true, 
+            message: 'Confirmation email has been resent.', 
+            requiresConfirmation: true 
+          };
+        } else if (existingData.status === 'unsubscribed') {
+          // Reactivate subscription
+          const confirmationToken = generateToken();
+          const unsubscribeToken = generateToken();
+          
+          await updateDoc(doc(db, 'subscribers', existingDoc.id), {
+            status: 'pending',
+            subscribedAt: serverTimestamp(),
+            confirmationToken,
+            unsubscribeToken,
+            metadata: metadata || {},
+          });
+
+          await emailService.sendConfirmationEmail(email, confirmationToken);
+          await this.trackEvent('subscription', email, { source: metadata?.referrer });
+
+          return { 
+            success: true, 
+            message: 'Please check your email to confirm your subscription.', 
+            requiresConfirmation: true 
+          };
+        }
+      }
+
+      // Create new subscriber
+      const confirmationToken = generateToken();
+      const unsubscribeToken = generateToken();
+      
+      const newSubscriber: Omit<Subscriber, 'id'> = {
+        email: email.toLowerCase(),
+        status: 'pending',
+        subscribedAt: new Date(),
+        confirmationToken,
+        unsubscribeToken,
+        source: metadata?.referrer || 'website',
+        metadata: metadata || {},
+      };
+
+      await addDoc(collection(db, 'subscribers'), {
+        ...newSubscriber,
+        subscribedAt: serverTimestamp(),
+      });
+
+      // Send confirmation email via Cloudflare Worker
+      await emailService.sendConfirmationEmail(email, confirmationToken);
+
+      // Track subscription event
+      await this.trackEvent('subscription', email, { source: metadata?.referrer });
+
+      return { 
+        success: true, 
+        message: 'Please check your email to confirm your subscription.', 
+        requiresConfirmation: true 
+      };
+    } catch (error) {
+      console.error('Subscription error:', error);
+      return { success: false, message: 'Failed to process subscription. Please try again.' };
+    }
+  },
+
+  async confirmSubscription(token: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const q = query(
+        collection(db, 'subscribers'),
+        where('confirmationToken', '==', token)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        return { success: false, message: 'Invalid or expired confirmation token.' };
+      }
+
+      const docSnapshot = querySnapshot.docs[0];
+      const subscriber = docSnapshot.data() as Subscriber;
+
+      if (subscriber.status === 'confirmed') {
+        return { success: false, message: 'Email is already confirmed.' };
+      }
+
+      // Update subscriber status
+      await updateDoc(doc(db, 'subscribers', docSnapshot.id), {
+        status: 'confirmed',
+        confirmedAt: serverTimestamp(),
+        confirmationToken: null, // Remove token after confirmation
+      });
+
+      // Send welcome email via Cloudflare Worker
+      if (subscriber.unsubscribeToken) {
+        await emailService.sendWelcomeEmail(subscriber.email, subscriber.unsubscribeToken);
+      }
+
+      // Track confirmation event
+      await this.trackEvent('confirmation', subscriber.email);
+
+      return { success: true, message: 'Subscription confirmed successfully!' };
+    } catch (error) {
+      console.error('Confirmation error:', error);
+      return { success: false, message: 'Failed to confirm subscription. Please try again.' };
+    }
+  },
+
+  async unsubscribe(token: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const q = query(
+        collection(db, 'subscribers'),
+        where('unsubscribeToken', '==', token)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        return { success: false, message: 'Invalid unsubscribe token.' };
+      }
+
+      const docSnapshot = querySnapshot.docs[0];
+      const subscriber = docSnapshot.data() as Subscriber;
+
+      if (subscriber.status === 'unsubscribed') {
+        return { success: false, message: 'Email is already unsubscribed.' };
+      }
+
+      // Update subscriber status
+      await updateDoc(doc(db, 'subscribers', docSnapshot.id), {
+        status: 'unsubscribed',
+        unsubscribedAt: serverTimestamp(),
+      });
+
+      // Send unsubscribe confirmation email
+      await emailService.sendUnsubscribeConfirmation(subscriber.email);
+
+      // Track unsubscribe event
+      await this.trackEvent('unsubscribe', subscriber.email);
+
+      return { success: true, message: 'Successfully unsubscribed.' };
+    } catch (error) {
+      console.error('Unsubscribe error:', error);
+      return { success: false, message: 'Failed to unsubscribe. Please try again.' };
+    }
+  },
+
+  async getSubscribers(status?: Subscriber['status'], pageSize: number = 50): Promise<Subscriber[]> {
+    try {
+      let q = query(collection(db, 'subscribers'), orderBy('subscribedAt', 'desc'));
+      
+      if (status) {
+        q = query(collection(db, 'subscribers'), where('status', '==', status), orderBy('subscribedAt', 'desc'));
+      }
+      
+      if (pageSize) {
+        q = query(q, limit(pageSize));
+      }
+
+      const querySnapshot = await getDocs(q);
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        subscribedAt: doc.data().subscribedAt?.toDate(),
+        confirmedAt: doc.data().confirmedAt?.toDate(),
+        unsubscribedAt: doc.data().unsubscribedAt?.toDate(),
+      } as Subscriber));
+    } catch (error) {
+      console.error('Error fetching subscribers:', error);
+      return [];
+    }
+  },
+
+  async deleteSubscriber(id: string): Promise<void> {
+    await deleteDoc(doc(db, 'subscribers', id));
+  },
+
+  async trackEvent(type: AnalyticsEvent['type'], email?: string, metadata?: AnalyticsEvent['metadata']): Promise<void> {
+    try {
+      const event: Omit<AnalyticsEvent, 'id'> = {
+        type,
+        email: email?.toLowerCase(),
+        timestamp: new Date(),
+        metadata: metadata || {},
+      };
+
+      await addDoc(collection(db, 'analytics'), {
+        ...event,
+        timestamp: serverTimestamp(),
+      });
+
+      // Update daily stats
+      const today = new Date().toISOString().split('T')[0];
+      const statsRef = doc(db, 'daily_stats', today);
+      
+      const updateData: any = {};
+      updateData[`${type}_count`] = increment(1);
+      
+      await updateDoc(statsRef, updateData).catch(async () => {
+        // Document doesn't exist, create it
+        await addDoc(collection(db, 'daily_stats'), {
+          date: today,
+          [`${type}_count`]: 1,
+        });
+      });
+    } catch (error) {
+      console.error('Error tracking event:', error);
+    }
+  },
+
+  // Real-time subscription to subscriber changes
+  subscribeToSubscribers(callback: (subscribers: Subscriber[]) => void, status?: Subscriber['status']): () => void {
+    let q = query(collection(db, 'subscribers'), orderBy('subscribedAt', 'desc'));
+    
+    if (status) {
+      q = query(collection(db, 'subscribers'), where('status', '==', status), orderBy('subscribedAt', 'desc'));
+    }
+
+    return onSnapshot(q, (querySnapshot) => {
+      const subscribers = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        subscribedAt: doc.data().subscribedAt?.toDate(),
+        confirmedAt: doc.data().confirmedAt?.toDate(),
+        unsubscribedAt: doc.data().unsubscribedAt?.toDate(),
+      } as Subscriber));
+      
+      callback(subscribers);
+    });
+  },
+};
+
+// Analytics and stats
+export const analyticsService = {
+  async getStats(): Promise<SubscriptionStats> {
+    try {
+      const [totalSnapshot, confirmedSnapshot, pendingSnapshot, unsubscribedSnapshot] = await Promise.all([
+        getCountFromServer(collection(db, 'subscribers')),
+        getCountFromServer(query(collection(db, 'subscribers'), where('status', '==', 'confirmed'))),
+        getCountFromServer(query(collection(db, 'subscribers'), where('status', '==', 'pending'))),
+        getCountFromServer(query(collection(db, 'subscribers'), where('status', '==', 'unsubscribed'))),
+      ]);
+
+      const total = totalSnapshot.data().count;
+      const confirmed = confirmedSnapshot.data().count;
+      const pending = pendingSnapshot.data().count;
+      const unsubscribed = unsubscribedSnapshot.data().count;
+
+      // Calculate time-based stats
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      const [todaySnapshot, weekSnapshot, monthSnapshot] = await Promise.all([
+        getCountFromServer(query(collection(db, 'subscribers'), where('subscribedAt', '>=', today))),
+        getCountFromServer(query(collection(db, 'subscribers'), where('subscribedAt', '>=', weekAgo))),
+        getCountFromServer(query(collection(db, 'subscribers'), where('subscribedAt', '>=', monthAgo))),
+      ]);
+
+      const subscriptionsToday = todaySnapshot.data().count;
+      const subscriptionsThisWeek = weekSnapshot.data().count;
+      const subscriptionsThisMonth = monthSnapshot.data().count;
+
+      return {
+        totalSubscribers: total,
+        confirmedSubscribers: confirmed,
+        pendingSubscribers: pending,
+        unsubscribedCount: unsubscribed,
+        subscriptionsToday,
+        subscriptionsThisWeek,
+        subscriptionsThisMonth,
+        confirmationRate: total > 0 ? (confirmed / total) * 100 : 0,
+        unsubscribeRate: total > 0 ? (unsubscribed / total) * 100 : 0,
+      };
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      return {
+        totalSubscribers: 0,
+        confirmedSubscribers: 0,
+        pendingSubscribers: 0,
+        unsubscribedCount: 0,
+        subscriptionsToday: 0,
+        subscriptionsThisWeek: 0,
+        subscriptionsThisMonth: 0,
+        confirmationRate: 0,
+        unsubscribeRate: 0,
+      };
+    }
+  },
+
+  async getEvents(limit: number = 100): Promise<AnalyticsEvent[]> {
+    try {
+      const q = query(
+        collection(db, 'analytics'),
+        orderBy('timestamp', 'desc'),
+        limit(limit)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate(),
+      } as AnalyticsEvent));
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      return [];
+    }
+  },
+};
+
+// Export the services
+export default {
+  subscriber: subscriberService,
+  analytics: analyticsService,
+  email: emailService,
+};
+
+// Backward compatibility exports for existing components
+export class NewsletterService {
+  static async subscribeEmail(email: string, sourceIP?: string, consentGiven: boolean = true) {
+    return subscriberService.subscribe(email, { ipAddress: sourceIP });
+  }
+
+  static async confirmSubscription(token: string) {
+    return subscriberService.confirmSubscription(token);
+  }
+
+  static async unsubscribe(token: string) {
+    return subscriberService.unsubscribe(token);
+  }
+
+  static async getAnalytics() {
+    return analyticsService.getStats();
+  }
+
+  static async getSubscribers(pageSize: number = 20) {
+    return subscriberService.getSubscribers(undefined, pageSize);
+  }
+} 
