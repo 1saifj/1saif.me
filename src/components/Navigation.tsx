@@ -5,6 +5,7 @@ import { ThemeToggle } from './ThemeToggle'
 import SearchBox from './SearchBox'
 import { publishedBlogs } from '../data/blogs'
 import { downloadRSSFeed } from '../utils/rssGenerator'
+import { OptimizedImage } from '../utils/imageOptimization'
 
 export const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -98,10 +99,14 @@ export const Navigation: React.FC = () => {
               onClick={handleLogoClick}
               className="flex items-center hover:opacity-80 transition-opacity"
             >
-              <img 
+              <OptimizedImage 
                 src="/sj.png" 
                 alt="Saif Aljanahi Logo" 
                 className="w-10 h-10 rounded-full object-cover"
+                preset="logo"
+                customOptions={{ width: 40, height: 40, quality: 95 }}
+                width={40}
+                height={40}
               />
             </button>
           ) : (
@@ -109,10 +114,14 @@ export const Navigation: React.FC = () => {
               to="/"
               className="flex items-center hover:opacity-80 transition-opacity"
             >
-              <img 
+              <OptimizedImage 
                 src="/sj.png" 
                 alt="Saif Aljanahi Logo" 
                 className="w-10 h-10 rounded-full object-cover"
+                preset="logo"
+                customOptions={{ width: 40, height: 40, quality: 95 }}
+                width={40}
+                height={40}
               />
             </Link>
           )}

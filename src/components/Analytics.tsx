@@ -162,16 +162,13 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     window.addEventListener('scroll', handleScroll, { passive: true })
     document.addEventListener('click', handleExternalClick)
 
-    // Track page views for SPA navigation
-    useEffect(() => {
-      // Track page view in Cloudflare Analytics
-      if (window.cloudflare?.beam) {
-        window.cloudflare.beam.track('pageview', {
-          path: location.pathname,
-          title: document.title
-        })
-      }
-    }, [location])
+    // Track page view in Cloudflare Analytics
+    if (window.cloudflare?.beam) {
+      window.cloudflare.beam.track('pageview', {
+        path: location.pathname,
+        title: document.title
+      })
+    }
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
