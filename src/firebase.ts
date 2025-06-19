@@ -1,7 +1,7 @@
 // Firebase configuration for newsletter integration
 import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
+// import { getAnalytics } from "firebase/analytics"; // Temporarily disabled to avoid content blockers
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -20,11 +20,18 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firestore
 const db = getFirestore(app);
 
-// Initialize Analytics (only in production)
-let analytics;
+// Initialize Analytics (temporarily disabled to avoid content blockers)
+let analytics = null;
+/*
 if (typeof window !== 'undefined' && import.meta.env.PROD) {
-  analytics = getAnalytics(app);
+  try {
+    analytics = getAnalytics(app);
+  } catch (error) {
+    console.log('Analytics blocked by content blocker or unavailable');
+    analytics = null;
+  }
 }
+*/
 
 // Connect to Firestore emulator in development
 if (import.meta.env.DEV && !import.meta.env.VITE_USE_FIREBASE_PROD) {

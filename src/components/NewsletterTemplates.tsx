@@ -383,10 +383,127 @@ export const CompactInlineNewsletter: React.FC<NewsletterTemplateProps> = ({ onS
   )
 }
 
+/**
+ * Animated Interactive Newsletter Template
+ * Features: Floating elements, interactive hover states, mobile-first design
+ */
+export const AnimatedInteractiveNewsletter: React.FC<NewsletterTemplateProps> = ({ onSubscribe, isLoading }) => {
+  const [email, setEmail] = useState('')
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email) return
+    
+    try {
+      await onSubscribe(email)
+      setIsSubmitted(true)
+    } catch (error) {
+      console.error('Subscription error:', error)
+    }
+  }
+
+  if (isSubmitted) {
+    return (
+      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-400 via-cyan-400 to-blue-500 rounded-3xl p-8 text-white shadow-2xl">
+        <div className="relative z-10 text-center">
+          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+            <CheckCircle className="w-10 h-10" />
+          </div>
+          <h3 className="text-2xl font-bold mb-4">Welcome aboard! 🎉</h3>
+          <p className="text-lg opacity-90">
+            Get ready for amazing content delivered to your inbox!
+          </p>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/20 to-blue-600/20 animate-pulse"></div>
+      </div>
+    )
+  }
+
+  return (
+    <div 
+      className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-red-500 rounded-3xl p-8 shadow-2xl transition-all duration-500 hover:shadow-3xl hover:scale-105"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Floating Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className={`absolute top-4 right-4 w-32 h-32 bg-white/10 rounded-full blur-xl transition-all duration-1000 ${isHovered ? 'transform rotate-45 scale-150' : ''}`}></div>
+        <div className={`absolute bottom-8 left-8 w-24 h-24 bg-yellow-300/20 rounded-full blur-lg transition-all duration-700 ${isHovered ? 'transform -rotate-12 scale-125' : ''}`}></div>
+        <div className={`absolute top-1/2 left-1/3 w-16 h-16 bg-cyan-300/15 rounded-full blur-md transition-all duration-500 ${isHovered ? 'transform rotate-180 scale-110' : ''}`}></div>
+      </div>
+
+      <div className="relative z-10">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm font-semibold mb-6">
+            <Rocket className="w-4 h-4 animate-pulse" />
+            <span>Join the Innovation</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Stay Ahead of the Curve
+          </h2>
+          <p className="text-lg text-white/90 max-w-md mx-auto leading-relaxed">
+            Get exclusive insights, cutting-edge tutorials, and industry secrets delivered weekly
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="relative group">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email address"
+              required
+              className="w-full px-6 py-4 bg-white/95 backdrop-blur-sm text-slate-900 placeholder-slate-500 rounded-xl border-2 border-transparent focus:border-white focus:bg-white focus:outline-none transition-all duration-300 text-lg group-hover:bg-white"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-white text-purple-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none group relative overflow-hidden"
+          >
+            <span className="relative z-10 flex items-center justify-center space-x-2">
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Subscribing...</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-5 h-5 group-hover:animate-pulse" />
+                  <span>Get Instant Access</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-100 to-pink-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-white/80 text-sm flex items-center justify-center space-x-2">
+            <Shield className="w-4 h-4" />
+            <span>No spam, unsubscribe anytime. Privacy guaranteed.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Import the modern glass template
+import { ModernGlassNewsletter } from './ModernGlassNewsletter'
+
 // Export all templates
 export const NewsletterTemplates = {
   GradientHero: GradientHeroNewsletter,
   MinimalistCard: MinimalistCardNewsletter,
   FeatureRich: FeatureRichNewsletter,
-  CompactInline: CompactInlineNewsletter
+  CompactInline: CompactInlineNewsletter,
+  AnimatedInteractive: AnimatedInteractiveNewsletter,
+  ModernGlass: ModernGlassNewsletter
 } 

@@ -8,6 +8,7 @@ import { ResumePage } from './pages/ResumePage'
 import { ConfirmSubscriptionPage } from './pages/ConfirmSubscriptionPage'
 import { UnsubscribePage } from './pages/UnsubscribePage'
 import { PrivacyPolicy } from './pages/PrivacyPolicy'
+import TemplatesDemo from './pages/TemplatesDemo'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { SkipLink } from './components/SkipLink'
 import AnalyticsProvider, { useAnalytics } from './components/Analytics'
@@ -43,6 +44,7 @@ function App() {
               <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
               <Route path="/unsubscribe" element={<UnsubscribePage />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/newsletter-templates" element={<TemplatesDemo />} />
             </Routes>
             <PWAInstallPrompt />
           </div>

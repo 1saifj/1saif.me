@@ -37,6 +37,20 @@ export const NewsletterShowcase: React.FC = () => {
       description: 'Perfect for embedding in blog posts or sidebars',
       features: ['Space efficient', 'Inline friendly', 'Quick signup'],
       preview: '📝 Compact & Inline'
+    },
+    {
+      key: 'AnimatedInteractive' as const,
+      name: 'Animated Interactive',
+      description: 'Dynamic template with floating elements and hover effects',
+      features: ['Floating animations', 'Interactive hover', 'Modern dynamics'],
+      preview: '✨ Dynamic & Interactive'
+    },
+    {
+      key: 'ModernGlass' as const,
+      name: 'Modern Glass',
+      description: 'Glassmorphism design with mouse tracking and premium aesthetics',
+      features: ['Glassmorphism effect', 'Mouse tracking', 'Premium aesthetics'],
+      preview: '🔮 Glass & Premium'
     }
   ]
 
