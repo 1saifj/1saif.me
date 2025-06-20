@@ -9,6 +9,7 @@ import { GiscusComments } from '../components/GiscusComments'
 import { ArticleStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
+import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -17,6 +18,7 @@ export const BlogPost: React.FC = () => {
   const [viewCount, setViewCount] = useState(0)
   const [htmlContent, setHtmlContent] = useState<string>('')
   const [isLoadingContent, setIsLoadingContent] = useState(true)
+  const [viewStats, setViewStats] = useState<BlogViewStats | null>(null)
 
   // Find the blog post and its content
   const blog = publishedBlogs.find(b => createSlugFromTitle(b.title) === slug)
@@ -30,11 +32,30 @@ export const BlogPost: React.FC = () => {
     const readTime = Math.ceil(wordCount / 200) // Average reading speed
     setEstimatedReadTime(readTime)
 
-    // Track page view
-    const views = localStorage.getItem(`blog-views-${slug}`) || '0'
-    const newViews = parseInt(views) + 1
-    localStorage.setItem(`blog-views-${slug}`, newViews.toString())
-    setViewCount(newViews)
+    // Track page view in Firebase
+    const trackView = async () => {
+      if (slug) {
+        try {
+          await blogViewsService.trackView(slug, {
+            source: document.referrer ? 'referral' : 'direct'
+          });
+          
+          // Get updated stats
+          const stats = await blogViewsService.getBlogStats(slug);
+          setViewStats(stats);
+          setViewCount(stats.totalViews);
+        } catch (error) {
+          console.error('Failed to track view:', error);
+          // Fallback to localStorage
+          const views = localStorage.getItem(`blog-views-${slug}`) || '0'
+          const newViews = parseInt(views) + 1
+          localStorage.setItem(`blog-views-${slug}`, newViews.toString())
+          setViewCount(newViews)
+        }
+      }
+    };
+
+    trackView();
 
     // Reading progress tracker
     const handleScroll = () => {

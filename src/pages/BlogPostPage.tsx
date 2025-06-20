@@ -12,6 +12,7 @@ import { RelatedPosts } from '../components/RelatedPosts'
 import { GiscusComments } from '../components/GiscusComments'
 import { ArticleStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
+import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
 
 export const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -26,6 +27,7 @@ export const BlogPostPage: React.FC = () => {
   const [estimatedReadTime, setEstimatedReadTime] = useState(0)
   const [viewCount, setViewCount] = useState(0)
   const [htmlContent, setHtmlContent] = useState<string>('')
+  const [viewStats, setViewStats] = useState<BlogViewStats | null>(null)
   
   useEffect(() => {
     const handleScroll = () => {
@@ -688,7 +690,11 @@ export const BlogPostPage: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
                 <Eye className="w-4 h-4" />
-                <span>2.4k views</span>
+                <span>{viewStats ? (
+                  viewStats.totalViews > 1000 ? 
+                    `${(viewStats.totalViews / 1000).toFixed(1)}k` : 
+                    viewStats.totalViews
+                ) : viewCount} views</span>
               </div>
             </div>
 
