@@ -108,15 +108,27 @@ export const blogViewsService = {
       const today = getToday();
       
       // Check if this session already viewed this blog today (to prevent spam)
-      const recentViewQuery = query(
-        collection(db, 'blogViews'),
-        where('blogSlug', '==', blogSlug),
-        where('sessionId', '==', sessionId),
-        orderBy('viewedAt', 'desc'),
-        limit(1)
-      );
+      // Handle index building period gracefully
+      let recentViews: any = { empty: true };
       
-      const recentViews = await getDocs(recentViewQuery);
+      try {
+        const recentViewQuery = query(
+          collection(db, 'blogViews'),
+          where('blogSlug', '==', blogSlug),
+          where('sessionId', '==', sessionId),
+          orderBy('viewedAt', 'desc'),
+          limit(1)
+        );
+        
+        recentViews = await getDocs(recentViewQuery);
+      } catch (indexError: any) {
+        if (indexError.code === 'failed-precondition' || indexError.message?.includes('index')) {
+          console.log('⏳ Indexes still building, proceeding with basic tracking...');
+          // Continue without anti-spam check during index building
+        } else {
+          throw indexError;
+        }
+      }
       
       // Only track if no view in the last 30 minutes from same session
       if (!recentViews.empty) {
@@ -167,14 +179,25 @@ export const blogViewsService = {
       
       if (metricsDoc.exists()) {
         // Check if this session contributed to unique views today
-        const existingViewQuery = query(
-          collection(db, 'blogViews'),
-          where('blogSlug', '==', blogSlug),
-          where('sessionId', '==', sessionId)
-        );
+        let isUniqueView = true; // Default to unique during index building
         
-        const existingSessions = await getDocs(existingViewQuery);
-        const isUniqueView = existingSessions.size === 1; // First view from this session
+        try {
+          const existingViewQuery = query(
+            collection(db, 'blogViews'),
+            where('blogSlug', '==', blogSlug),
+            where('sessionId', '==', sessionId)
+          );
+          
+          const existingSessions = await getDocs(existingViewQuery);
+          isUniqueView = existingSessions.size === 1; // First view from this session
+        } catch (indexError: any) {
+          if (indexError.code === 'failed-precondition' || indexError.message?.includes('index')) {
+            console.log('⏳ Using default unique view calculation during index building...');
+            // Keep default isUniqueView = true
+          } else {
+            throw indexError;
+          }
+        }
         
         // Update existing metrics
         await updateDoc(metricsRef, {
@@ -208,17 +231,43 @@ export const blogViewsService = {
       const monthStart = getThisMonthStart();
 
       // Get all views for this blog
-      const viewsQuery = query(
-        collection(db, 'blogViews'),
-        where('blogSlug', '==', blogSlug),
-        orderBy('viewedAt', 'desc')
-      );
+      // Handle index building period gracefully
+      let views: BlogView[] = [];
       
-      const viewsSnapshot = await getDocs(viewsQuery);
-      const views = viewsSnapshot.docs.map(doc => ({ 
-        id: doc.id, 
-        ...doc.data() 
-      })) as BlogView[];
+      try {
+        const viewsQuery = query(
+          collection(db, 'blogViews'),
+          where('blogSlug', '==', blogSlug),
+          orderBy('viewedAt', 'desc')
+        );
+        
+        const viewsSnapshot = await getDocs(viewsQuery);
+        views = viewsSnapshot.docs.map(doc => ({ 
+          id: doc.id, 
+          ...doc.data() 
+        })) as BlogView[];
+      } catch (indexError: any) {
+        if (indexError.code === 'failed-precondition' || indexError.message?.includes('index')) {
+          console.log('⏳ Indexes still building, using simplified query...');
+          // Try basic query without orderBy during index building
+          try {
+            const basicQuery = query(
+              collection(db, 'blogViews'),
+              where('blogSlug', '==', blogSlug)
+            );
+            const basicSnapshot = await getDocs(basicQuery);
+            views = basicSnapshot.docs.map(doc => ({ 
+              id: doc.id, 
+              ...doc.data() 
+            })) as BlogView[];
+          } catch (basicError) {
+            console.log('⏳ All queries failing during index building, returning empty stats');
+            // Return empty during index building
+          }
+        } else {
+          throw indexError;
+        }
+      }
 
       // Calculate stats
       const totalViews = views.length;
@@ -304,13 +353,24 @@ export const blogViewsService = {
     try {
       const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       
-      const recentViewsQuery = query(
-        collection(db, 'blogViews'),
-        where('viewedAt', '>=', weekAgo),
-        orderBy('viewedAt', 'desc')
-      );
+      let recentViews: any = { docs: [] };
+      
+      try {
+        const recentViewsQuery = query(
+          collection(db, 'blogViews'),
+          where('viewedAt', '>=', weekAgo),
+          orderBy('viewedAt', 'desc')
+        );
 
-      const recentViews = await getDocs(recentViewsQuery);
+        recentViews = await getDocs(recentViewsQuery);
+      } catch (indexError: any) {
+        if (indexError.code === 'failed-precondition' || indexError.message?.includes('index')) {
+          console.log('⏳ Trending blogs unavailable during index building');
+          return [];
+        } else {
+          throw indexError;
+        }
+      }
       
       // Count views per blog
       const viewCounts = recentViews.docs.reduce((acc, doc) => {
