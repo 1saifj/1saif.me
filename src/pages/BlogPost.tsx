@@ -12,6 +12,7 @@ import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
 
 
+
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const [readingProgress, setReadingProgress] = useState(0)
@@ -36,6 +37,7 @@ export const BlogPost: React.FC = () => {
     // Track page view in Firebase
     const trackView = async () => {
       if (slug) {
+
         try {
           console.log('🔍 Tracking blog view for:', slug);
           await blogViewsService.trackView(slug, {
