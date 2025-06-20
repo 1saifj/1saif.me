@@ -157,7 +157,9 @@ export const COLLECTIONS = {
   SUBSCRIBERS: 'subscribers',
   ANALYTICS: 'analytics', 
   SETTINGS: 'settings',
-  METRICS: 'metrics'
+  METRICS: 'metrics',
+  BLOG_VIEWS: 'blogViews',
+  BLOG_VIEW_METRICS: 'blogViewMetrics'
 } as const;
 
 // Export Firebase services

@@ -34,6 +34,27 @@ service cloud.firestore {
       allow write: if false;
     }
     
+    // Blog Views collection - Allow public read/write for view tracking
+    match /blogViews/{viewId} {
+      // Allow anyone to create a view (for blog view tracking)
+      allow create: if isValidBlogView();
+      
+      // Allow reading by anyone (for view stats)
+      allow read: if true;
+      
+      // No updates or deletes allowed (views are immutable)
+      allow update, delete: if false;
+    }
+    
+    // Blog View Metrics collection - Read-only for public stats
+    match /blogViewMetrics/{metricsId} {
+      // Allow reading for public view statistics
+      allow read: if true;
+      
+      // Only allow system writes (via Cloud Functions or server-side code)
+      allow write: if false;
+    }
+    
     // Helper functions for validation
     function isValidSubscription() {
       let data = request.resource.data;
@@ -56,6 +77,16 @@ service cloud.firestore {
              oldData.subscribedAt == newData.subscribedAt &&
              oldData.source == newData.source &&
              newData.status in ['pending', 'confirmed', 'unsubscribed'];
+    }
+    
+    function isValidBlogView() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['blogSlug', 'viewedAt', 'sessionId']) &&
+             data.blogSlug is string &&
+             data.viewedAt is timestamp &&
+             data.sessionId is string &&
+             data.blogSlug.size() > 0 &&
+             data.sessionId.size() > 0;
     }
   }
 } 
