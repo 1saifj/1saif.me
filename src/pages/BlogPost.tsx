@@ -11,6 +11,7 @@ import SEOHead from '../components/SEOHead'
 import { SocialImageGenerator, generateSocialImageUrl } from '../components/SocialImageGenerator'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
+import { getOptimizedImageUrl, ImagePresets } from '../utils/imageOptimization'
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -246,7 +247,6 @@ export const BlogPost: React.FC = () => {
             className="space-y-6"
             itemScope 
             itemType="https://schema.org/Article"
-            data-telegram-article="true"
           >
             {/* Categories & Status */}
             <div className="flex flex-wrap items-center gap-3">
@@ -256,16 +256,19 @@ export const BlogPost: React.FC = () => {
                   className="inline-flex items-center px-3 py-1 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-600 dark:text-slate-300 rounded-full text-sm font-medium border border-slate-200/50 dark:border-slate-600/50"
                   itemProp="keywords"
                 >
-                  <Tag className="w-3 h-3 mr-1" />
+                  <Tag className="w-3 h-3 mr-1.5" />
                   {tag}
                 </span>
               ))}
-              
+              <span className="inline-flex items-center px-3 py-1 bg-green-100/80 dark:bg-green-900/30 backdrop-blur-sm text-green-700 dark:text-green-300 rounded-full text-sm font-medium border border-green-200/50 dark:border-green-600/50">
+                <Clock className="w-3 h-3 mr-1.5" />
+                5 min read
+              </span>
             </div>
 
             {/* Title */}
             <h1 
-              className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight"
+              className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white leading-tight"
               itemProp="headline"
             >
               {blog.title}
@@ -279,82 +282,48 @@ export const BlogPost: React.FC = () => {
               {blog.description}
             </p>
 
-            {/* Meta Information */}
-            <div className="flex flex-wrap items-center gap-6 text-slate-500 dark:text-slate-400">
-              <div className="flex items-center space-x-2" itemProp="author" itemScope itemType="https://schema.org/Person">
-                <User className="w-4 h-4" />
-                <span className="font-medium" itemProp="name">Saif Aljanahi</span>
-                <meta itemProp="url" content="https://1saif.me" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4" />
-                <time 
-                  dateTime={new Date(blog.createdAt).toISOString()}
-                  itemProp="datePublished"
-                >
-                  {formatDate(blog.createdAt)}
-                </time>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="w-4 h-4" />
-                <span itemProp="timeRequired" content={`PT${estimatedReadTime}M`}>
-                  {estimatedReadTime} min read
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Eye className="w-4 h-4" />
-                {isLoadingViews ? (
-                  <span className="flex items-center space-x-1">
-                    <div className="w-4 h-4 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin"></div>
-                    <span>Loading...</span>
+            {/* Author & Date */}
+            <div className="flex items-center gap-4 pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
+              <div className="flex items-center gap-3">
+                <img 
+                  src={getOptimizedImageUrl('/sj.png', ImagePresets.avatar())} 
+                  alt="Saif Aljanahi" 
+                  className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700"
+                />
+                <div>
+                  <span 
+                    className="font-medium text-slate-900 dark:text-white"
+                    itemProp="author"
+                    itemScope
+                    itemType="https://schema.org/Person"
+                  >
+                    <span itemProp="name">Saif Aljanahi</span>
                   </span>
-                ) : (
-                  <span>{viewCount.toLocaleString()} views</span>
-                )}
+                  <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                    <Calendar className="w-4 h-4" />
+                    <time 
+                      dateTime={new Date(blog.createdAt).toISOString()} 
+                      itemProp="datePublished"
+                    >
+                      {formatDate(blog.createdAt)}
+                    </time>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Featured Image */}
             {blog.featuredImage && (
-              <div className="relative mt-8 rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src={blog.featuredImage}
+              <div className="relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                <img 
+                  src={getOptimizedImageUrl(blog.featuredImage, ImagePresets.hero())} 
                   alt={blog.title}
-                  className="w-full h-64 md:h-80 lg:h-96 object-cover"
-                  loading="eager"
+                  className="w-full h-96 object-cover"
                   itemProp="image"
+                  data-cover="true"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
               </div>
             )}
-
-            {/* Hidden meta for Telegram IV */}
-            <meta itemProp="dateModified" content={blog.updatedAt ? new Date(blog.updatedAt).toISOString() : new Date(blog.createdAt).toISOString()} />
-            <meta itemProp="wordCount" content={articleContent?.content.split(' ').length.toString()} />
-            <meta itemProp="articleSection" content="Technology" />
-            <meta itemProp="inLanguage" content="en-US" />
-            <div itemProp="publisher" itemScope itemType="https://schema.org/Person" style={{display: 'none'}}>
-              <meta itemProp="name" content="Saif Aljanahi" />
-              <meta itemProp="url" content="https://1saif.me" />
-            </div>
-
-            {/* Engagement Actions */}
-            <div className="flex items-center justify-between pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={handleShare}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all border border-slate-200/50 dark:border-slate-600/50"
-                >
-                  <Share2 className="w-4 h-4" />
-                  <span className="font-medium">Share</span>
-                </button>
-              </div>
-
-              <div className="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
-                <Coffee className="w-4 h-4" />
-                <span>Grab a coffee and enjoy!</span>
-              </div>
-            </div>
           </article>
         </div>
       </section>

@@ -30,28 +30,27 @@ User-agent: TelegramBot
 Allow: /
 Allow: /blog/
 Allow: /telegram-instant-view.xml
+Allow: /sitemap.xml
+Allow: /rss.xml
+Crawl-delay: 1
 
 # Enhanced crawling for social media bots
 User-agent: facebookexternalhit
-Allow: /
-
 User-agent: Twitterbot
-Allow: /
-
 User-agent: LinkedInBot
-Allow: /
-
 User-agent: WhatsApp
+User-agent: Applebot
 Allow: /
+Allow: /blog/
+Allow: /sitemap.xml
+Allow: /rss.xml
 
-User-agent: SkypeUriPreview
+# Search engine optimization
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Slurp
 Allow: /
-
-User-agent: SlackBot
-Allow: /
-
-User-agent: DiscordBot
-Allow: /
+Crawl-delay: 1
 
 # Allow archiving and preservation bots
 User-agent: archive.org_bot

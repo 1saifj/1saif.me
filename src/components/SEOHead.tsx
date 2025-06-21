@@ -413,6 +413,53 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <link rel="dns-prefetch" href="//fonts.gstatic.com" />
       <link rel="dns-prefetch" href="//t.me" />
       <link rel="dns-prefetch" href="//telegram.org" />
+
+      {/* Telegram Instant View Optimization */}
+      <meta property="telegram:instant_view" content="supported" />
+      <meta property="telegram:instant_view:version" content="2.1" />
+      {type === 'article' && (
+        <>
+          <meta property="telegram:instant_view:path" content="/blog/" />
+          <meta property="telegram:article:author" content={author || 'Saif Aljanahi'} />
+          <meta property="telegram:article:published_time" content={publishedTime} />
+          {modifiedTime && <meta property="telegram:article:modified_time" content={modifiedTime} />}
+        </>
+      )}
+
+      {/* Additional structured data for better parsing */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": type === 'article' ? "Article" : "WebPage",
+          "headline": title,
+          "description": description,
+          "author": {
+            "@type": "Person",
+            "name": author || "Saif Aljanahi",
+            "url": "https://1saif.me"
+          },
+          "publisher": {
+            "@type": "Person", 
+            "name": "Saif Aljanahi",
+            "url": "https://1saif.me"
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": url || canonicalUrl
+          },
+          "url": url || canonicalUrl,
+          "image": image,
+          "datePublished": publishedTime,
+          "dateModified": modifiedTime || publishedTime,
+          "inLanguage": locale || "en-US",
+          ...(type === 'article' && {
+            "articleSection": category || section || "Technology",
+            "wordCount": wordCount,
+            "timeRequired": readingTime ? `PT${readingTime}M` : undefined,
+            "keywords": tags?.join(', ')
+          })
+        })}
+      </script>
     </Helmet>
   )
 }
