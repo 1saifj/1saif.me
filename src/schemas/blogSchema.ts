@@ -38,7 +38,8 @@ export const blogSchema = z.object({
   createdAt: z.union([z.string(), z.date(), z.number()]).transform(intoTimestamp),
   updatedAt: z.union([z.string(), z.date(), z.number()]).transform(intoTimestamp).optional(),
   draft: z.boolean().default(false),
-  tags: z.union([z.array(z.string()), z.string(), z.undefined()]).transform(intoTagsArray)
+  tags: z.union([z.array(z.string()), z.string(), z.undefined()]).transform(intoTagsArray),
+  featuredImage: z.string().optional()
 })
 
 export type BlogPost = z.infer<typeof blogSchema>

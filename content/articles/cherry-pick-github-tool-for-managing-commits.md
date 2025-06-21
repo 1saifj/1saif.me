@@ -3,6 +3,7 @@ title: "Cherry-Pick: A Useful GitHub Tool for Managing Commits"
 description: "Learn how to use the cherry-pick feature in GitHub Desktop to efficiently manage commits across branches."
 createdAt: "2024-07-13"
 updatedAt: 2024-07-13
+featuredImage: "/articles/database-locking/git_cherry_pick_feat.png"
 tags:
   - github
   - version-control

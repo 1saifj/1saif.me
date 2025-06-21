@@ -752,6 +752,26 @@ export const BlogPostPage: React.FC = () => {
                 </span>
               ))}
             </div>
+
+            {/* Featured Image */}
+            {parsedArticle.featuredImage && (
+              <div className="relative mt-12 -mb-16 max-w-5xl mx-auto z-10">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-700">
+                  <img
+                    src={parsedArticle.featuredImage}
+                    alt={parsedArticle.title}
+                    className="w-full h-64 md:h-80 lg:h-96 object-cover"
+                    loading="eager"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl">
+                      <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">Featured Article Image</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

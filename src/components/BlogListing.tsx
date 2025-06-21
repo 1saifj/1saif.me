@@ -286,13 +286,35 @@ export const BlogListing: React.FC = () => {
                       viewMode === 'list' ? 'sm:flex-row' : 'h-full'
                     }`}
                   >
-                    <div className={`p-6 flex flex-col flex-1`}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className={`inline-flex items-center space-x-2 bg-gradient-to-r ${badge.color} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg`}>
+                    {/* Featured Image */}
+                    {blog.featuredImage && (
+                      <div className={`relative overflow-hidden ${
+                        viewMode === 'list' ? 'sm:w-80 sm:h-48' : 'h-48'
+                      }`}>
+                        <img
+                          src={blog.featuredImage}
+                          alt={blog.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className={`absolute top-4 left-4 inline-flex items-center space-x-2 bg-gradient-to-r ${badge.color} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg`}>
                           <BadgeIcon className="w-3 h-3" />
                           <span>{badge.text}</span>
                         </div>
                       </div>
+                    )}
+
+                    <div className={`p-6 flex flex-col flex-1`}>
+                      {/* Badge for posts without featured image */}
+                      {!blog.featuredImage && (
+                        <div className="flex items-center justify-between mb-4">
+                          <div className={`inline-flex items-center space-x-2 bg-gradient-to-r ${badge.color} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg`}>
+                            <BadgeIcon className="w-3 h-3" />
+                            <span>{badge.text}</span>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="flex-1">
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
