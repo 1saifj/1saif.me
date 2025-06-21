@@ -5,6 +5,7 @@ import { projects as projectFiles } from '../utils/contentLoader'
 import { projectSchema, Language, SourceType } from '../schemas/projectSchema'
 import { findContentBySlug } from '../utils/slugUtils'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
+import SEOHead from '../components/SEOHead'
 
 const languageColors: Record<Language, string> = {
   typescript: 'from-blue-500 to-blue-600',
