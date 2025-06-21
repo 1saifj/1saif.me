@@ -8,6 +8,7 @@ import { RelatedPosts } from '../components/RelatedPosts'
 import { GiscusComments } from '../components/GiscusComments'
 import { ArticleStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
+import { SocialImageGenerator, generateSocialImageUrl } from '../components/SocialImageGenerator'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
 
@@ -20,6 +21,7 @@ export const BlogPost: React.FC = () => {
   const [isLoadingContent, setIsLoadingContent] = useState(true)
   const [viewStats, setViewStats] = useState<BlogViewStats | null>(null)
   const [isLoadingViews, setIsLoadingViews] = useState(true)
+  const [dynamicSocialImage, setDynamicSocialImage] = useState<string>('')
 
   // Find the blog post and its content
   const blog = publishedBlogs.find(b => createSlugFromTitle(b.title) === slug)
@@ -89,6 +91,17 @@ export const BlogPost: React.FC = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [blog, slug])
+
+  // Generate dynamic social image if blog doesn't have a featured image
+  useEffect(() => {
+    if (blog && !blog.featuredImage) {
+      generateSocialImageUrl(blog.title, 'Saif Aljanahi', {
+        tags: blog.tags,
+        publishedDate: new Date(blog.createdAt).toISOString(),
+        readingTime: estimatedReadTime
+      }).then(setDynamicSocialImage)
+    }
+  }, [blog, estimatedReadTime])
 
   // Convert markdown to HTML when content changes
   useEffect(() => {
@@ -181,12 +194,19 @@ export const BlogPost: React.FC = () => {
   return (
     <>
       <SEOHead 
-        title={`${blog.title} | Saif Aljanahi`}
+        title={blog.title}
         description={blog.description}
-        tags={blog.tags}
+        image={blog.featuredImage || dynamicSocialImage || '/sj_image.jpeg'}
+        url={`https://1saif.me/blog/${slug}`}
         type="article"
+        tags={blog.tags}
         publishedTime={new Date(blog.createdAt).toISOString()}
+        modifiedTime={blog.updatedAt ? new Date(blog.updatedAt).toISOString() : undefined}
         author="Saif Aljanahi"
+        section="Technology"
+        readingTime={estimatedReadTime}
+        wordCount={articleContent?.content.split(' ').length}
+        canonicalUrl={`https://1saif.me/blog/${slug}`}
       />
       <ArticleStructuredData 
         title={blog.title}
@@ -222,13 +242,19 @@ export const BlogPost: React.FC = () => {
           </Link>
 
           {/* Article Header */}
-          <article className="space-y-6">
+          <article 
+            className="space-y-6"
+            itemScope 
+            itemType="https://schema.org/Article"
+            data-telegram-article="true"
+          >
             {/* Categories & Status */}
             <div className="flex flex-wrap items-center gap-3">
               {blog.tags.slice(0, 3).map(tag => (
                 <span 
                   key={tag}
                   className="inline-flex items-center px-3 py-1 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-600 dark:text-slate-300 rounded-full text-sm font-medium border border-slate-200/50 dark:border-slate-600/50"
+                  itemProp="keywords"
                 >
                   <Tag className="w-3 h-3 mr-1" />
                   {tag}
@@ -238,30 +264,42 @@ export const BlogPost: React.FC = () => {
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight">
+            <h1 
+              className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight"
+              itemProp="headline"
+            >
               {blog.title}
             </h1>
 
             {/* Description */}
-            <p className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
+            <p 
+              className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl"
+              itemProp="description"
+            >
               {blog.description}
             </p>
 
             {/* Meta Information */}
             <div className="flex flex-wrap items-center gap-6 text-slate-500 dark:text-slate-400">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2" itemProp="author" itemScope itemType="https://schema.org/Person">
                 <User className="w-4 h-4" />
-                <span className="font-medium">Saif Aljanahi</span>
+                <span className="font-medium" itemProp="name">Saif Aljanahi</span>
+                <meta itemProp="url" content="https://1saif.me" />
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" />
-                <time dateTime={new Date(blog.createdAt).toISOString()}>
+                <time 
+                  dateTime={new Date(blog.createdAt).toISOString()}
+                  itemProp="datePublished"
+                >
                   {formatDate(blog.createdAt)}
                 </time>
               </div>
               <div className="flex items-center space-x-2">
                 <Clock className="w-4 h-4" />
-                <span>{estimatedReadTime} min read</span>
+                <span itemProp="timeRequired" content={`PT${estimatedReadTime}M`}>
+                  {estimatedReadTime} min read
+                </span>
               </div>
               <div className="flex items-center space-x-2">
                 <Eye className="w-4 h-4" />
@@ -284,10 +322,21 @@ export const BlogPost: React.FC = () => {
                   alt={blog.title}
                   className="w-full h-64 md:h-80 lg:h-96 object-cover"
                   loading="eager"
+                  itemProp="image"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
               </div>
             )}
+
+            {/* Hidden meta for Telegram IV */}
+            <meta itemProp="dateModified" content={blog.updatedAt ? new Date(blog.updatedAt).toISOString() : new Date(blog.createdAt).toISOString()} />
+            <meta itemProp="wordCount" content={articleContent?.content.split(' ').length.toString()} />
+            <meta itemProp="articleSection" content="Technology" />
+            <meta itemProp="inLanguage" content="en-US" />
+            <div itemProp="publisher" itemScope itemType="https://schema.org/Person" style={{display: 'none'}}>
+              <meta itemProp="name" content="Saif Aljanahi" />
+              <meta itemProp="url" content="https://1saif.me" />
+            </div>
 
             {/* Engagement Actions */}
             <div className="flex items-center justify-between pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
@@ -313,7 +362,11 @@ export const BlogPost: React.FC = () => {
       {/* Article Content */}
       <section className="py-16 bg-white dark:bg-slate-900">
         <div className="max-w-4xl mx-auto px-6">
-          <article className="blog-content">
+          <article 
+            className="blog-content"
+            itemProp="articleBody"
+            data-telegram-content="true"
+          >
             {isLoadingContent ? (
               <div className="animate-pulse space-y-4">
                 <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
