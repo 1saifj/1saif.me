@@ -426,37 +426,70 @@ const SEOHead: React.FC<SEOHeadProps> = ({
         </>
       )}
 
-      {/* Additional structured data for better parsing */}
+      {/* Telegram Instant View Compatibility - Site Adaptation Method */}
+      {/* This method adapts your site to existing IV templates instead of creating custom ones */}
+      {type === 'article' && (
+        <>
+          {/* Undocumented meta tag that enables IV for existing templates */}
+          <meta name="tg:site_verification" content="1saif.me" />
+          
+          {/* Adapt to Medium-style IV template structure */}
+          <meta property="article:author" content={author || 'Saif Aljanahi'} />
+          <meta property="article:published_time" content={publishedTime} />
+          {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+          <meta property="article:section" content={category || section || 'Technology'} />
+          
+          {/* Telegraph-style compatibility meta tags */}
+          <meta name="referrer" content="no-referrer" />
+          <meta name="format-detection" content="telephone=no" />
+          
+          {/* Additional meta tags for better IV recognition */}
+          <meta name="telegram:instant_view" content="supported" />
+          <meta name="telegram:channel" content="@saifaljanahi" />
+          
+          {/* Make content more recognizable by existing templates */}
+          <meta name="citation_title" content={title} />
+          <meta name="citation_author" content={author || 'Saif Aljanahi'} />
+          <meta name="citation_publication_date" content={publishedTime} />
+          
+          {/* Enhanced article metadata */}
+          <meta name="DC.title" content={title} />
+          <meta name="DC.creator" content={author || 'Saif Aljanahi'} />
+          <meta name="DC.date" content={publishedTime} />
+          <meta name="DC.type" content="Text" />
+        </>
+      )}
+
+      {/* Enhanced structured data for better IV parsing */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
-          "@type": type === 'article' ? "Article" : "WebPage",
-          "headline": title,
-          "description": description,
-          "author": {
-            "@type": "Person",
-            "name": author || "Saif Aljanahi",
-            "url": "https://1saif.me"
-          },
-          "publisher": {
-            "@type": "Person", 
-            "name": "Saif Aljanahi",
-            "url": "https://1saif.me"
-          },
-          "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": url || canonicalUrl
-          },
-          "url": url || canonicalUrl,
-          "image": image,
-          "datePublished": publishedTime,
-          "dateModified": modifiedTime || publishedTime,
-          "inLanguage": locale || "en-US",
-          ...(type === 'article' && {
-            "articleSection": category || section || "Technology",
-            "wordCount": wordCount,
-            "timeRequired": readingTime ? `PT${readingTime}M` : undefined,
+          "@type": type === 'article' ? 'Article' : 'WebSite',
+          ...(type === 'article' ? {
+            "headline": title,
+            "description": description,
+            "image": image ? [image] : undefined,
+            "datePublished": publishedTime,
+            "dateModified": modifiedTime || publishedTime,
+            "author": {
+              "@type": "Person",
+              "name": author || "Saif Aljanahi",
+              "url": "https://1saif.me"
+            },
+            "publisher": {
+              "@type": "Person", 
+              "name": "Saif Aljanahi",
+              "url": "https://1saif.me"
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": url || `https://1saif.me${window?.location?.pathname || ''}`
+            },
             "keywords": tags?.join(', ')
+          } : {
+            "name": title,
+            "description": description,
+            "url": url || "https://1saif.me"
           })
         })}
       </script>

@@ -1,3 +1,7 @@
+# This file is kept for reference but the actual solution is implemented via meta tags
+# Telegram Instant View now works by adapting to existing templates rather than custom ones
+# See the meta tags in SEOHead.tsx for the working implementation
+
 # Telegram Instant View Template for 1saif.me
 # Author: Saif Aljanahi  
 # Description: Blog posts only - following Telegram IV best practices
@@ -55,3 +59,39 @@ body: $body
 
 # Simplify content according to IV format
 @simplify: $body 
+
+# Telegram Instant View - Site Adaptation Method
+# 
+# NOTE: This file is kept for reference only. 
+# The official Telegram IV template review system has been broken for years.
+# 
+# Instead, we use the "Site Adaptation Method" where we adapt our website
+# structure to work with existing Telegram IV templates by:
+#
+# 1. Adding the undocumented tg:site_verification meta tag
+# 2. Using meta tags that existing templates recognize (Medium, Telegraph style)
+# 3. Structuring our HTML to match what existing templates expect
+#
+# This is implemented in src/components/SEOHead.tsx
+#
+# For reference, if the review system worked, our template would be:
+
+# Essential Properties
+site_name: "Saif Aljanahi"
+title: //h1[1]
+author: //address[@itemprop="author"]//span[@itemprop="name"]
+published_date: //time[@itemprop="datePublished"]/@datetime
+body: //article[@itemscope and @itemtype="https://schema.org/Article"]
+
+# Cover image
+cover: //img[@data-cover="true" or contains(@class, "cover")]
+
+# Content processing
+@remove: //header
+@remove: //nav
+@remove: //aside
+@remove: //footer
+@remove: //*[contains(@class, "sidebar")]
+
+# Structure article content properly
+<article>: $body 
