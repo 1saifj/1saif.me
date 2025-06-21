@@ -22,7 +22,10 @@ export const usePWA = () => {
 
     // Listen for beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault()
+      // Only prevent default if the event is cancelable
+      if (e.cancelable) {
+        e.preventDefault()
+      }
       setDeferredPrompt(e as BeforeInstallPromptEvent)
       setIsInstallable(true)
     }

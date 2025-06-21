@@ -15,14 +15,29 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { SkipLink } from './components/SkipLink'
 import AnalyticsProvider, { useAnalytics } from './components/Analytics'
 import PerformanceMonitor from './components/PerformanceMonitor'
-import Clarity from '@microsoft/clarity'
 
 function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const { trackPageView } = useAnalytics()
-  Clarity.init('s10i1oa5td');
 
   useEffect(() => {
+    // Initialize Microsoft Clarity with error handling
+    try {
+      // Dynamically import Clarity to handle blocking gracefully
+      import('@microsoft/clarity').then((Clarity) => {
+        if (Clarity && Clarity.default) {
+          Clarity.default.init('s10i1oa5td');
+          console.log('Microsoft Clarity initialized successfully');
+        }
+      }).catch((error) => {
+        // Silently handle the case where Clarity is blocked by ad blockers
+        console.log('Microsoft Clarity blocked or unavailable (this is normal with ad blockers)');
+      });
+    } catch (error) {
+      // Fallback error handling
+      console.log('Microsoft Clarity initialization failed (this is normal with ad blockers)');
+    }
+
     trackPageView(location.pathname, document.title)
   }, [location, trackPageView])
 

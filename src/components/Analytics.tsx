@@ -163,11 +163,16 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     document.addEventListener('click', handleExternalClick)
 
     // Track page view in Cloudflare Analytics
-    if (window.cloudflare?.beam) {
-      window.cloudflare.beam.track('pageview', {
-        path: location.pathname,
-        title: document.title
-      })
+    try {
+      if (typeof window !== 'undefined' && window.cloudflare?.beam) {
+        window.cloudflare.beam.track('pageview', {
+          path: location.pathname,
+          title: document.title
+        })
+      }
+    } catch (error) {
+      // Silently handle the case where Cloudflare Analytics is blocked
+      console.log('Cloudflare Analytics blocked or unavailable (this is normal with ad blockers)');
     }
 
     return () => {
