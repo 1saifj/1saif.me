@@ -2,6 +2,8 @@
 // Run this in browser console to verify functionality
 
 import { NewsletterService } from '../services/newsletterService';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { firestore as db } from '../firebase';
 
 /**
  * Test Firebase Newsletter Integration
@@ -77,4 +79,40 @@ export async function testNewsletter() {
 if (typeof window !== 'undefined') {
   (window as any).testNewsletter = testNewsletter;
   console.log('🧪 Newsletter test function available: testNewsletter()');
+}
+
+// Simple test to verify Firebase blog views write
+export async function testBlogViewWrite() {
+  try {
+    console.log('Testing blog view write to Firebase...');
+    
+    const testViewData = {
+      blogSlug: 'test-blog-post',
+      viewedAt: serverTimestamp(),
+      sessionId: 'test-session-123',
+      metadata: {
+        userAgent: 'Test User Agent',
+        referrer: 'direct',
+        device: 'desktop' as const,
+        source: 'test'
+      }
+    };
+
+    console.log('Attempting to write:', testViewData);
+    
+    const docRef = await addDoc(collection(db, 'blogViews'), testViewData);
+    console.log('✅ Blog view written successfully! Document ID:', docRef.id);
+    return { success: true, docId: docRef.id };
+    
+  } catch (error) {
+    console.error('❌ Failed to write blog view:', error);
+    return { success: false, error };
+  }
+}
+
+// Run the test if this file is imported
+if (typeof window !== 'undefined') {
+  // Only run in browser environment
+  (window as any).testBlogViewWrite = testBlogViewWrite;
+  console.log('🧪 Firebase test function available: testBlogViewWrite()');
 } 

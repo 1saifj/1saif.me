@@ -14,7 +14,6 @@ export const blogs: BlogPost[] = articles
         tags: article.frontmatter.tags || []
       }
       
-      console.log(`Processing blog: ${article.slug}`, blogData) // Debug log
       
       return blogSchema.parse(blogData)
     } catch (error) {
