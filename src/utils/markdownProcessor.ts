@@ -126,6 +126,14 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
       `
     })
 
+    // Enhanced images with responsive styling and dark mode support
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+      return `<figure class="my-8">
+        <img src="${src}" alt="${alt}" class="w-full max-w-4xl mx-auto rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 hover:shadow-xl transition-shadow duration-300" loading="lazy">
+        ${alt ? `<figcaption class="text-center text-sm text-slate-600 dark:text-slate-400 mt-3 italic">${alt}</figcaption>` : ''}
+      </figure>`
+    })
+
     // Enhanced links with better styling and security (dark mode support)
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
       const isExternal = url.startsWith('http') || url.startsWith('https')

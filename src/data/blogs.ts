@@ -11,7 +11,8 @@ export const blogs: BlogPost[] = articles
         createdAt: article.frontmatter.createdAt || Date.now(),
         updatedAt: article.frontmatter.updatedAt,
         draft: article.frontmatter.draft || false,
-        tags: article.frontmatter.tags || []
+        tags: article.frontmatter.tags || [],
+        featuredImage: article.frontmatter.featuredImage
       }
       
       
@@ -27,7 +28,8 @@ export const blogs: BlogPost[] = articles
         createdAt: article.frontmatter.createdAt || Date.now(),
         updatedAt: article.frontmatter.updatedAt,
         draft: false,
-        tags: Array.isArray(article.frontmatter.tags) ? article.frontmatter.tags : []
+        tags: Array.isArray(article.frontmatter.tags) ? article.frontmatter.tags : [],
+        featuredImage: article.frontmatter.featuredImage
       } as BlogPost
     }
   })

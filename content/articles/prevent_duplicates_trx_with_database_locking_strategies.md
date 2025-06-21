@@ -3,6 +3,7 @@ title: Preventing Duplicate Transactions with Database Locking Strategies in Fin
 description: Learn how to solve race conditions in financial applications using optimistic and pessimistic locking techniques with a real-world case study of a card issuing system.
 createdAt: "2025-04-10"
 updatedAt: 2025-04-10
+featuredImage: "/articles/database-locking/db_locks_feat.png"
 tags:
   - database
   - concurrency
@@ -201,7 +202,7 @@ if err != nil {
 
 After implementing these changes, our system started handling concurrent processing correctly. Even when multiple cron job instances ran simultaneously, each order was processed exactly once. The logs now showed a clean progression from "Pending" to "Approved" without duplicates.
 
-![Multi-Layered Database Locking Strategy Flow](db_locks.png)
+![Multi-Layered Database Locking Strategy Flow](/articles/database-locking/db_locks.png)
 
 The multi-layered approach provided several benefits:
 1. If Redis failed, the database optimistic locking still prevented duplicates

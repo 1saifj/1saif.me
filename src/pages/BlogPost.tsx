@@ -276,6 +276,19 @@ export const BlogPost: React.FC = () => {
               </div>
             </div>
 
+            {/* Featured Image */}
+            {blog.featuredImage && (
+              <div className="relative mt-8 rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src={blog.featuredImage}
+                  alt={blog.title}
+                  className="w-full h-64 md:h-80 lg:h-96 object-cover"
+                  loading="eager"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+              </div>
+            )}
+
             {/* Engagement Actions */}
             <div className="flex items-center justify-between pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
               <div className="flex items-center space-x-4">
