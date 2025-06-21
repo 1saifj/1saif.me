@@ -1,90 +1,168 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  
-  <!-- Homepage -->
-  <url>
-    <loc>https://1saif.me/</loc>
-    <lastmod>2025-01-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <image:image>
-      <image:loc>https://1saif.me/sj_image.jpeg</image:loc>
-      <image:title>Saif Aljanahi - Software Engineer</image:title>
-      <image:caption>Professional photo of Saif Aljanahi, Full-Stack Software Engineer</image:caption>
-    </image:image>
-  </url>
-  
-  <!-- Blog Posts -->
-  <url>
-    <loc>https://1saif.me/blog/typescript-with-react-a-complete-developer-guide</loc>
-    <lastmod>2024-02-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://1saif.me/blog/flutter-development-building-cross-platform-mobile-applications</loc>
-    <lastmod>2024-02-25</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://1saif.me/blog/building-scalable-backend-systems-with-golang-and-clean-architecture</loc>
-    <lastmod>2024-03-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://1saif.me/blog/python-for-backend-development-and-automation</loc>
-    <lastmod>2024-01-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://1saif.me/blog/real-time-classification-of-falls-and-activities-using-cnn-lstm-networks</loc>
-    <lastmod>2024-04-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Project Pages -->
-  <url>
-    <loc>https://1saif.me/project/al-qaseh-financial-backend-system</loc>
-    <lastmod>2025-01-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  
-  <url>
-    <loc>https://1saif.me/project/kufa-grad-tracking-platform</loc>
-    <lastmod>2025-01-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  
-  <url>
-    <loc>https://1saif.me/project/information-bank-smart-app</loc>
-    <lastmod>2025-01-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  
-  <url>
-    <loc>https://1saif.me/project/morabaa-software-solutions-frontend</loc>
-    <lastmod>2025-01-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://1saif.me/project/al-aaml-frontend-development</loc>
-    <lastmod>2025-01-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+    
+    <!-- Homepage -->
+    <url>
+        <loc>https://1saif.me/</loc>
+        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+        <image:image>
+            <image:loc>https://1saif.me/sj_image.jpeg</image:loc>
+            <image:title>Saif Aljanahi - Software Engineer</image:title>
+            <image:caption>Professional photo of Saif Aljanahi, Full-Stack Software Engineer</image:caption>
+        </image:image>
+    </url>
+    
+    <!-- Blog Index -->
+    <url>
+        <loc>https://1saif.me/blog</loc>
+        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- Projects -->
+    <url>
+        <loc>https://1saif.me/projects</loc>
+        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Blog Posts - These are the primary targets for Telegram Instant View -->
+    <url>
+        <loc>https://1saif.me/blog/cancel-http-requests-in-react</loc>
+        <lastmod>2024-12-15T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-12-15T00:00:00+00:00</news:publication_date>
+            <news:title>How to Cancel HTTP Requests in React: A Complete Guide</news:title>
+            <news:keywords>React, HTTP, AbortController, JavaScript, Frontend Development</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/cancel_http_requests_in_react/react_abort_controller.png</image:loc>
+            <image:caption>React HTTP Request Cancellation with AbortController</image:caption>
+            <image:title>How to Cancel HTTP Requests in React</image:title>
+        </image:image>
+    </url>
+    
+    <url>
+        <loc>https://1saif.me/blog/database-locking-mechanisms</loc>
+        <lastmod>2024-12-10T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-12-10T00:00:00+00:00</news:publication_date>
+            <news:title>Database Locking Mechanisms: A Deep Dive</news:title>
+            <news:keywords>Database, Locking, SQL, Performance, Backend Development</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/database-locking/api_mgt_feat.png</image:loc>
+            <image:caption>Database Locking Mechanisms Explained</image:caption>
+            <image:title>Database Locking Mechanisms: A Deep Dive</image:title>
+        </image:image>
+    </url>
+    
+    <url>
+        <loc>https://1saif.me/blog/scaling-flutter-apps</loc>
+        <lastmod>2024-12-05T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-12-05T00:00:00+00:00</news:publication_date>
+            <news:title>Scaling Flutter Apps: Best Practices and Architecture Patterns</news:title>
+            <news:keywords>Flutter, Mobile Development, Architecture, Scaling, Performance</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/scaling_flutter_apps/flutter_architecture.png</image:loc>
+            <image:caption>Flutter App Architecture for Scaling</image:caption>
+            <image:title>Scaling Flutter Apps: Best Practices and Architecture Patterns</image:title>
+        </image:image>
+    </url>
+    
+    <url>
+        <loc>https://1saif.me/blog/golang-concurrency-patterns</loc>
+        <lastmod>2024-11-28T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-11-28T00:00:00+00:00</news:publication_date>
+            <news:title>Advanced Golang Concurrency Patterns</news:title>
+            <news:keywords>Golang, Concurrency, Goroutines, Channels, Backend Development</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/golang_concurrency/goroutines_channels.png</image:loc>
+            <image:caption>Golang Concurrency Patterns with Goroutines and Channels</image:caption>
+            <image:title>Advanced Golang Concurrency Patterns</image:title>
+        </image:image>
+    </url>
+    
+    <url>
+        <loc>https://1saif.me/blog/kubernetes-deployment-strategies</loc>
+        <lastmod>2024-11-20T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-11-20T00:00:00+00:00</news:publication_date>
+            <news:title>Kubernetes Deployment Strategies: Blue-Green vs Rolling Updates</news:title>
+            <news:keywords>Kubernetes, DevOps, Deployment, Blue-Green, Rolling Updates</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/kubernetes_deployment/k8s_strategies.png</image:loc>
+            <image:caption>Kubernetes Deployment Strategies Comparison</image:caption>
+            <image:title>Kubernetes Deployment Strategies: Blue-Green vs Rolling Updates</image:title>
+        </image:image>
+    </url>
+    
+    <!-- Add RSS Feed for better discoverability -->
+    <url>
+        <loc>https://1saif.me/rss.xml</loc>
+        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <!-- Contact and Other Pages -->
+    <url>
+        <loc>https://1saif.me/contact</loc>
+        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <!-- Resume -->
+    <url>
+        <loc>https://1saif.me/resume</loc>
+        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
 </urlset>

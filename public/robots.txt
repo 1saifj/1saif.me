@@ -1,12 +1,71 @@
 User-agent: *
 Allow: /
 
-# Sitemaps
+# Allow all crawlers access to blog posts (Telegram Instant View targets)
+Allow: /blog/
+Allow: /articles/
+Allow: /public/articles/
+
+# Allow access to essential assets
+Allow: /sitemap.xml
+Allow: /rss.xml
+Allow: /telegram-instant-view.xml
+
+# Block admin and sensitive areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /.env
+Disallow: /config/
+
+# Site maps
 Sitemap: https://1saif.me/sitemap.xml
+
+# RSS Feed for content discovery
+Sitemap: https://1saif.me/rss.xml
+
+# Telegram Instant View Template
+# This tells Telegram where to find the IV template
+# Note: Telegram will discover this automatically when processing blog URLs
+User-agent: TelegramBot
+Allow: /
+Allow: /blog/
+Allow: /telegram-instant-view.xml
+
+# Enhanced crawling for social media bots
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: SkypeUriPreview
+Allow: /
+
+User-agent: SlackBot
+Allow: /
+
+User-agent: DiscordBot
+Allow: /
+
+# Allow archiving and preservation bots
+User-agent: archive.org_bot
+Allow: /
+
+User-agent: ia_archiver
+Allow: /
+
+# Crawl-delay for less aggressive bots
+User-agent: *
+Crawl-delay: 1
 
 # Block common bot paths
 Disallow: /private
-Disallow: /admin
 Disallow: /_next/
 Disallow: /.git/
 Disallow: /node_modules/
@@ -18,9 +77,6 @@ Allow: /projects
 Allow: /blog
 Allow: /contact
 Allow: /newsletter
-
-# Crawl delay (optional)
-Crawl-delay: 1
 
 # Allow all common file types
 Allow: *.css
