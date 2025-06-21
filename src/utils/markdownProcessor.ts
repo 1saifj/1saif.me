@@ -3,10 +3,10 @@ import { highlightCode, getLanguageLabel } from './syntaxHighlighter'
 export const convertMarkdownToHtml = async (markdown: string): Promise<string> => {
   // Step 1: Convert basic markdown elements
   let html = markdown
-    // Convert headers (with improved styling)
-    .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold text-slate-800 mt-8 mb-4 pb-2 border-b border-slate-200">$1</h3>')
-    .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold text-slate-800 mt-10 mb-6 pb-3 border-b-2 border-blue-100">$1</h2>')
-    .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold text-slate-900 mt-12 mb-8 pb-4 border-b-2 border-blue-200">$1</h1>')
+    // Convert headers (with improved styling and dark mode support)
+    .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mt-8 mb-4 pb-2 border-b border-slate-200 dark:border-slate-700">$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-10 mb-6 pb-3 border-b-2 border-blue-100 dark:border-blue-800">$1</h2>')
+    .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold text-slate-900 dark:text-white mt-12 mb-8 pb-4 border-b-2 border-blue-200 dark:border-blue-700">$1</h1>')
 
   // Step 2: Process code blocks asynchronously
   const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
@@ -35,12 +35,12 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
         return {
           ...block,
           replacement: `
-            <div class="code-block-container relative group my-2 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
-              <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
-                <span class="text-sm font-medium text-slate-600">${languageLabel}</span>
+            <div class="code-block-container relative group my-2 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
+              <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                <span class="text-sm font-medium text-slate-600 dark:text-slate-300">${languageLabel}</span>
                 <button 
                   data-copy-target="${codeId}" 
-                  class="copy-button text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded border transition-all duration-200 opacity-70 group-hover:opacity-100"
+                  class="copy-button text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100 rounded border border-slate-200 dark:border-slate-600 transition-all duration-200 opacity-70 group-hover:opacity-100"
                   title="Copy code"
                 >
                   Copy
@@ -59,19 +59,19 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
         return {
           ...block,
           replacement: `
-            <div class="code-block-container relative group my-2 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
-              <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
-                <span class="text-sm font-medium text-slate-600">${languageLabel}</span>
+            <div class="code-block-container relative group my-2 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
+              <div class="code-header flex items-center justify-between px-4 py-2 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                <span class="text-sm font-medium text-slate-600 dark:text-slate-300">${languageLabel}</span>
                 <button 
                   data-copy-target="fallback-${Math.random().toString(36).substr(2, 9)}" 
-                  class="copy-button text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded border transition-all duration-200 opacity-70 group-hover:opacity-100"
+                  class="copy-button text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100 rounded border border-slate-200 dark:border-slate-600 transition-all duration-200 opacity-70 group-hover:opacity-100"
                   title="Copy code"
                 >
                   Copy
                 </button>
               </div>
               <div class="code-content relative">
-                <pre class="m-0 p-4 bg-slate-900 text-slate-100 overflow-x-auto"><code>${escapedCode}</code></pre>
+                <pre class="m-0 p-4 bg-slate-900 dark:bg-slate-800 text-slate-100 dark:text-slate-200 overflow-x-auto"><code>${escapedCode}</code></pre>
               </div>
             </div>
           `.trim()
@@ -97,7 +97,7 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
 
   // Step 4: Continue with other markdown processing
   html = html
-    // Enhanced tables with professional styling
+    // Enhanced tables with professional styling and dark mode support
     .replace(/\|(.+)\|\n\|[-\s|:]+\|\n((?:\|.+\|\n?)*)/g, (match, header, rows) => {
       const headerCells = header.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell)
       const rowData = rows.trim().split('\n').map((row: string) => 
@@ -105,63 +105,61 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
       )
       
       const headerHtml = headerCells.map((cell: string) => 
-        `<th class="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase tracking-wider border-b-2 border-slate-300 bg-slate-50">${cell}</th>`
+        `<th class="px-6 py-4 text-left text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider border-b-2 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800">${cell}</th>`
       ).join('')
       
       const rowsHtml = rowData.map((row: string[], index: number) => 
-        `<tr class="${index % 2 === 0 ? 'bg-white' : 'bg-slate-50'} hover:bg-blue-50 transition-colors duration-150">
-          ${row.map((cell: string) => `<td class="px-6 py-4 text-sm text-slate-700 border-b border-slate-200">${cell}</td>`).join('')}
+        `<tr class="${index % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 dark:bg-slate-800'} hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-150">
+          ${row.map((cell: string) => `<td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">${cell}</td>`).join('')}
         </tr>`
       ).join('')
       
       return `
-        <div class="table-container my-6 overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
-          <table class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-slate-50">
+        <div class="table-container my-6 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+          <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+            <thead class="bg-slate-50 dark:bg-slate-800">
               <tr>${headerHtml}</tr>
             </thead>
-            <tbody class="bg-white divide-y divide-slate-200">${rowsHtml}</tbody>
+            <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700">${rowsHtml}</tbody>
           </table>
         </div>
       `
     })
 
-    // Enhanced links with better styling and security
+    // Enhanced links with better styling and security (dark mode support)
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
       const isExternal = url.startsWith('http') || url.startsWith('https')
       const securityAttrs = isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''
-      const styling = isExternal 
-        ? 'text-blue-600 hover:text-blue-800 underline decoration-2 underline-offset-2 hover:decoration-blue-300 transition-all duration-200'
-        : 'text-blue-600 hover:text-blue-800 underline decoration-2 underline-offset-2 hover:decoration-blue-300 transition-all duration-200'
+      const styling = 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline decoration-2 underline-offset-2 hover:decoration-blue-300 dark:hover:decoration-blue-400 transition-all duration-200'
       
       return `<a href="${url}" class="${styling}" ${securityAttrs}>${text}</a>`
     })
 
-    // Enhanced lists with improved spacing and styling
-    .replace(/^\* (.+$)/gm, '<li class="text-slate-700 leading-relaxed mb-2 ml-6 relative"><span class="absolute -left-6 text-blue-500 font-bold">•</span>$1</li>')
-    .replace(/^(\d+)\. (.+$)/gm, '<li class="text-slate-700 leading-relaxed mb-2 ml-8 relative"><span class="absolute -left-8 text-blue-600 font-semibold">$1.</span>$2</li>')
+    // Enhanced lists with improved spacing and styling (dark mode support)
+    .replace(/^\* (.+$)/gm, '<li class="text-slate-700 dark:text-slate-300 leading-relaxed mb-2 ml-6 relative"><span class="absolute -left-6 text-blue-500 dark:text-blue-400 font-bold">•</span>$1</li>')
+    .replace(/^(\d+)\. (.+$)/gm, '<li class="text-slate-700 dark:text-slate-300 leading-relaxed mb-2 ml-8 relative"><span class="absolute -left-8 text-blue-600 dark:text-blue-400 font-semibold">$1.</span>$2</li>')
 
-    // Text formatting with subtle styling improvements
-    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-bold text-slate-800">$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em class="italic text-slate-700">$1</em>')
-    .replace(/`([^`]+)`/g, '<code class="bg-slate-100 text-slate-800 px-2 py-1 rounded text-sm font-mono border">$1</code>')
+    // Text formatting with subtle styling improvements (dark mode support)
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-bold text-slate-800 dark:text-slate-200">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em class="italic text-slate-700 dark:text-slate-300">$1</em>')
+    .replace(/`([^`]+)`/g, '<code class="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-2 py-1 rounded text-sm font-mono border border-slate-200 dark:border-slate-700">$1</code>')
 
-    // Enhanced blockquotes with modern styling
-    .replace(/^> (.+$)/gm, '<blockquote class="border-l-4 border-blue-400 pl-6 py-2 my-4 bg-blue-50 text-slate-700 italic rounded-r-lg">$1</blockquote>')
+    // Enhanced blockquotes with modern styling (dark mode support)
+    .replace(/^> (.+$)/gm, '<blockquote class="border-l-4 border-blue-400 dark:border-blue-500 pl-6 py-2 my-4 bg-blue-50 dark:bg-blue-900/20 text-slate-700 dark:text-slate-300 italic rounded-r-lg">$1</blockquote>')
 
     // Convert line breaks while preserving structure
-    .replace(/\n\n/g, '</p><p class="text-slate-700 leading-relaxed mb-4">')
+    .replace(/\n\n/g, '</p><p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">')
     .replace(/\n/g, '<br>')
 
-  // Wrap content in paragraph tags with proper styling
+  // Wrap content in paragraph tags with proper styling (dark mode support)
   html = `<div class="prose prose-slate max-w-none">
-    <p class="text-slate-700 leading-relaxed mb-4">${html}</p>
+    <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">${html}</p>
   </div>`
 
   // Clean up any empty paragraphs and malformed tags
   html = html
-    .replace(/<p class="text-slate-700 leading-relaxed mb-4"><\/p>/g, '')
-    .replace(/<p class="text-slate-700 leading-relaxed mb-4">(\s*<(?:h[1-6]|div|blockquote|ul|ol|table))/g, '$1')
+    .replace(/<p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4"><\/p>/g, '')
+    .replace(/<p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">(\s*<(?:h[1-6]|div|blockquote|ul|ol|table))/g, '$1')
     .replace(/(<\/(?:h[1-6]|div|blockquote|ul|ol|table)>\s*)<\/p>/g, '$1')
 
   // Step 5: Restore protected code blocks
