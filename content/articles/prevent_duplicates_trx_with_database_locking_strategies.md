@@ -201,7 +201,9 @@ if err != nil {
 
 After implementing these changes, our system started handling concurrent processing correctly. Even when multiple cron job instances ran simultaneously, each order was processed exactly once. The logs now showed a clean progression from "Pending" to "Approved" without duplicates.
 
-![Diagram showing transaction flow with locking](https://dev-to-uploads.s3.amazonaws.com/i/o5zj9t6xkvhzpjx83z0w.png)
+**Transaction Flow with Multi-Layered Locking:**
+
+![Database Locking Strategy Diagram](./articles/database-locking/20250621_1841_Database%20Locking%20Strategy_simple_compose_01jy9jc5xnfn0vfbm2tk112znk.png)
 
 The multi-layered approach provided several benefits:
 1. If Redis failed, the database optimistic locking still prevented duplicates

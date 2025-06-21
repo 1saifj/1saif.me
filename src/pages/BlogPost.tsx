@@ -181,12 +181,12 @@ export const BlogPost: React.FC = () => {
   return (
     <>
       <SEOHead 
-        title={`${blog.title} | Saif Alqaseh`}
+        title={`${blog.title} | Saif Aljanahi`}
         description={blog.description}
         tags={blog.tags}
         type="article"
         publishedTime={new Date(blog.createdAt).toISOString()}
-        author="Saif Alqaseh"
+        author="Saif Aljanahi"
       />
       <ArticleStructuredData 
         title={blog.title}
@@ -251,7 +251,7 @@ export const BlogPost: React.FC = () => {
             <div className="flex flex-wrap items-center gap-6 text-slate-500 dark:text-slate-400">
               <div className="flex items-center space-x-2">
                 <User className="w-4 h-4" />
-                <span className="font-medium">Saif Alqaseh</span>
+                <span className="font-medium">Saif Aljanahi</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" />
@@ -360,7 +360,7 @@ export const BlogPost: React.FC = () => {
                   S
                 </div>
                 <div>
-                  <h4 className="font-semibold text-slate-900 dark:text-white">Saif Alqaseh</h4>
+                  <h4 className="font-semibold text-slate-900 dark:text-white">Saif Aljanahi</h4>
                   <p className="text-slate-600 dark:text-slate-400">Software Engineer & Tech Enthusiast</p>
                 </div>
               </div>
