@@ -18,6 +18,27 @@ export interface ImageOptions {
 }
 
 /**
+ * Check if we're in a development environment where Cloudflare features aren't available
+ */
+function isLocalDevelopment(): boolean {
+  // Check various indicators that we're in local development
+  return (
+    // Environment variables
+    process.env.NODE_ENV === 'development' ||
+    import.meta.env?.DEV === true ||
+    // URL indicators
+    (typeof window !== 'undefined' && (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.includes('local') ||
+      window.location.port !== '' ||
+      // Vite dev server typically runs on these ports
+      ['3000', '5173', '4173', '8080'].includes(window.location.port)
+    ))
+  );
+}
+
+/**
  * Generates an optimized image URL using Cloudflare Image Resizing
  * FREE tier: 100k requests/month
  */
@@ -25,8 +46,8 @@ export function getOptimizedImageUrl(
   originalUrl: string, 
   options: ImageOptions = {}
 ): string {
-  // If running locally or originalUrl is already a data URL, return as-is
-  if (process.env.NODE_ENV === 'development' || originalUrl.startsWith('data:')) {
+  // If running locally, in development, or originalUrl is already a data URL, return as-is
+  if (isLocalDevelopment() || originalUrl.startsWith('data:')) {
     return originalUrl;
   }
 
