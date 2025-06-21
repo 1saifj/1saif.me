@@ -243,88 +243,93 @@ export const BlogPost: React.FC = () => {
           </Link>
 
           {/* Article Header */}
-          <article 
-            className="space-y-6"
-            itemScope 
-            itemType="https://schema.org/Article"
-          >
-            {/* Categories & Status */}
-            <div className="flex flex-wrap items-center gap-3">
-              {blog.tags.slice(0, 3).map(tag => (
-                <span 
-                  key={tag}
-                  className="inline-flex items-center px-3 py-1 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-600 dark:text-slate-300 rounded-full text-sm font-medium border border-slate-200/50 dark:border-slate-600/50"
-                  itemProp="keywords"
-                >
-                  <Tag className="w-3 h-3 mr-1.5" />
-                  {tag}
+          <header className="mb-8">
+            <article 
+              className="space-y-6"
+              itemScope 
+              itemType="https://schema.org/Article"
+            >
+              {/* Categories & Status */}
+              <div className="flex flex-wrap items-center gap-3">
+                {blog.tags.slice(0, 3).map(tag => (
+                  <span 
+                    key={tag}
+                    className="inline-flex items-center px-3 py-1 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-600 dark:text-slate-300 rounded-full text-sm font-medium border border-slate-200/50 dark:border-slate-600/50"
+                    itemProp="keywords"
+                  >
+                    <Tag className="w-3 h-3 mr-1.5" />
+                    {tag}
+                  </span>
+                ))}
+                
+                <span className="inline-flex items-center px-3 py-1 bg-green-100/80 dark:bg-green-900/30 backdrop-blur-sm text-green-700 dark:text-green-300 rounded-full text-sm font-medium border border-green-200/50 dark:border-green-600/50">
+                  <Clock className="w-3 h-3 mr-1.5" />
+                  5 min read
                 </span>
-              ))}
-              <span className="inline-flex items-center px-3 py-1 bg-green-100/80 dark:bg-green-900/30 backdrop-blur-sm text-green-700 dark:text-green-300 rounded-full text-sm font-medium border border-green-200/50 dark:border-green-600/50">
-                <Clock className="w-3 h-3 mr-1.5" />
-                5 min read
-              </span>
-            </div>
+              </div>
 
-            {/* Title */}
-            <h1 
-              className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white leading-tight"
-              itemProp="headline"
-            >
-              {blog.title}
-            </h1>
+              {/* Title */}
+              <h1 
+                className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight"
+                itemProp="headline"
+              >
+                {blog.title}
+              </h1>
 
-            {/* Description */}
-            <p 
-              className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl"
-              itemProp="description"
-            >
-              {blog.description}
-            </p>
+              {/* Description */}
+              <p 
+                className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl"
+                itemProp="description"
+              >
+                {blog.description}
+              </p>
 
-            {/* Author & Date */}
-            <div className="flex items-center gap-4 pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
-              <div className="flex items-center gap-3">
+              {/* Author & Date - Telegraph-style structure */}
+              <div className="flex items-center gap-4 pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
                 <img 
                   src={getOptimizedImageUrl('/sj.png', ImagePresets.avatar())} 
                   alt="Saif Aljanahi" 
                   className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700"
                 />
                 <div>
-                  <span 
-                    className="font-medium text-slate-900 dark:text-white"
+                  <address 
+                    className="font-medium text-slate-900 dark:text-white not-italic"
                     itemProp="author"
                     itemScope
                     itemType="https://schema.org/Person"
                   >
                     <span itemProp="name">Saif Aljanahi</span>
-                  </span>
+                  </address>
                   <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                     <Calendar className="w-4 h-4" />
                     <time 
-                      dateTime={new Date(blog.createdAt).toISOString()} 
+                      dateTime={new Date(blog.createdAt).toISOString()}
                       itemProp="datePublished"
                     >
-                      {formatDate(blog.createdAt)}
+                      {new Date(blog.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
                     </time>
                   </div>
                 </div>
               </div>
-            </div>
+            </article>
+          </header>
 
-            {/* Featured Image */}
-            {blog.featuredImage && (
-              <div className="relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
-                <img 
-                  src={getOptimizedImageUrl(blog.featuredImage, ImagePresets.hero())} 
-                  alt={blog.title}
-                  className="w-full h-96 object-cover"
-                  itemProp="image"
-                  data-cover="true"
-                />
-              </div>
-            )}
-          </article>
+          {/* Featured Image */}
+          {blog.featuredImage && (
+            <div className="relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+              <img 
+                src={getOptimizedImageUrl(blog.featuredImage, ImagePresets.hero())} 
+                alt={blog.title}
+                className="w-full h-96 object-cover"
+                itemProp="image"
+                data-cover="true"
+              />
+            </div>
+          )}
         </div>
       </section>
 
