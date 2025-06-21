@@ -126,23 +126,6 @@ export const convertMarkdownToHtml = async (markdown: string): Promise<string> =
       `
     })
 
-    // Process images first (before links to avoid conflicts)
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
-      // Handle relative paths by ensuring they start with /
-      const imageSrc = src.startsWith('./') ? src.substring(1) : src.startsWith('/') ? src : `/${src}`
-      
-      return `
-        <div class="image-container my-6 flex justify-center">
-          <img 
-            src="${imageSrc}" 
-            alt="${alt}" 
-            class="max-w-full h-auto rounded-lg shadow-lg border border-slate-200 dark:border-slate-700"
-            loading="lazy"
-          />
-        </div>
-      `.trim()
-    })
-
     // Enhanced links with better styling and security (dark mode support)
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
       const isExternal = url.startsWith('http') || url.startsWith('https')
