@@ -3,6 +3,7 @@ title: Setting Up a Local Development Environment with a Webhook Service using D
 description: Learn how to set up a local development environment for a Node.js application with a webhook service using Docker Compose, including MongoDB and Nginx as a reverse proxy.
 createdAt: "2024-09-02"
 updatedAt: 2023-09-02
+featuredImage: "/articles/database-locking/docker_feat.png"
 tags:
   - docker
   - docker-compose
