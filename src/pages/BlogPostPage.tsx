@@ -26,6 +26,7 @@ export const BlogPostPage: React.FC = () => {
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [estimatedReadTime, setEstimatedReadTime] = useState(0)
   const [viewCount, setViewCount] = useState(0)
+  const [isLoadingViews, setIsLoadingViews] = useState(true)
   const [htmlContent, setHtmlContent] = useState<string>('')
   const [viewStats, setViewStats] = useState<BlogViewStats | null>(null)
   
@@ -455,6 +456,40 @@ export const BlogPostPage: React.FC = () => {
 
   const article = findContentBySlug(articles, slug)
   
+  // Track page view in Firebase with reliable updates
+  useEffect(() => {
+    if (!slug || !article) return
+
+    const trackView = async () => {
+      try {
+        // First, get current view count
+        const currentViewCount = await blogViewsService.getQuickViewCount(slug);
+        
+        // Track the new view in background
+        await blogViewsService.trackView(slug, {
+          source: document.referrer ? 'referral' : 'direct'
+        });
+        
+        // Get the final updated stats and set the view count
+        const updatedStats = await blogViewsService.getBlogStats(slug);
+        setViewStats(updatedStats);
+        setViewCount(updatedStats.totalViews);
+        setIsLoadingViews(false);
+        
+      } catch (error) {
+        console.error('Failed to track view:', error);
+        // Fallback to localStorage
+        const views = localStorage.getItem(`blog-views-${slug}`) || '0'
+        const newViews = parseInt(views) + 1
+        localStorage.setItem(`blog-views-${slug}`, newViews.toString())
+        setViewCount(newViews);
+        setIsLoadingViews(false);
+      }
+    };
+
+    trackView();
+  }, [slug, article]);
+
   // Convert markdown to HTML when content changes
   useEffect(() => {
     if (article?.content) {
@@ -690,11 +725,18 @@ export const BlogPostPage: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
                 <Eye className="w-4 h-4" />
-                <span>{viewStats ? (
-                  viewStats.totalViews > 1000 ? 
-                    `${(viewStats.totalViews / 1000).toFixed(1)}k` : 
-                    viewStats.totalViews
-                ) : viewCount} views</span>
+                {isLoadingViews ? (
+                  <span className="flex items-center space-x-1">
+                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Loading...</span>
+                  </span>
+                ) : (
+                  <span>{viewStats ? (
+                    viewStats.totalViews > 1000 ? 
+                      `${(viewStats.totalViews / 1000).toFixed(1)}k` : 
+                      viewStats.totalViews
+                  ) : viewCount} views</span>
+                )}
               </div>
             </div>
 

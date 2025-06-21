@@ -5,6 +5,11 @@ import App from './App.tsx';
 import './index.css';
 import { initPerformanceMonitoring } from './utils/performance';
 
+// Import test modules for development
+if (import.meta.env.DEV) {
+  import('./test/firebaseTest.ts');
+}
+
 // Initialize performance monitoring
 initPerformanceMonitoring();
 

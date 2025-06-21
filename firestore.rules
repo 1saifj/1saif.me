@@ -81,12 +81,17 @@ service cloud.firestore {
     
     function isValidBlogView() {
       let data = request.resource.data;
-      return data.keys().hasAll(['blogSlug', 'viewedAt', 'sessionId']) &&
+      let requiredFields = ['blogSlug', 'viewedAt', 'sessionId'];
+      let allowedFields = ['blogSlug', 'viewedAt', 'sessionId', 'metadata'];
+      
+      return data.keys().hasAll(requiredFields) &&
+             data.keys().hasOnly(allowedFields) &&
              data.blogSlug is string &&
              data.viewedAt is timestamp &&
              data.sessionId is string &&
              data.blogSlug.size() > 0 &&
-             data.sessionId.size() > 0;
+             data.sessionId.size() > 0 &&
+             (!('metadata' in data) || data.metadata is map);
     }
   }
 } 

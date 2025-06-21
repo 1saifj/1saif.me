@@ -11,8 +11,6 @@ import SEOHead from '../components/SEOHead'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
 
-
-
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const [readingProgress, setReadingProgress] = useState(0)
@@ -21,6 +19,7 @@ export const BlogPost: React.FC = () => {
   const [htmlContent, setHtmlContent] = useState<string>('')
   const [isLoadingContent, setIsLoadingContent] = useState(true)
   const [viewStats, setViewStats] = useState<BlogViewStats | null>(null)
+  const [isLoadingViews, setIsLoadingViews] = useState(true)
 
   // Find the blog post and its content
   const blog = publishedBlogs.find(b => createSlugFromTitle(b.title) === slug)
@@ -34,29 +33,32 @@ export const BlogPost: React.FC = () => {
     const readTime = Math.ceil(wordCount / 200) // Average reading speed
     setEstimatedReadTime(readTime)
 
-    // Track page view in Firebase
+    // Track page view in Firebase with proper sequencing
     const trackView = async () => {
       if (slug) {
-
         try {
-          console.log('🔍 Tracking blog view for:', slug);
+          // First, get current view count
+          const currentViewCount = await blogViewsService.getQuickViewCount(slug);
+          
+          // Track the new view in background
           await blogViewsService.trackView(slug, {
             source: document.referrer ? 'referral' : 'direct'
           });
           
-          // Get updated stats
-          const stats = await blogViewsService.getBlogStats(slug);
-          setViewStats(stats);
-          setViewCount(stats.totalViews);
-          console.log('✅ Blog view tracking successful:', stats);
+          // Get the final updated stats and set the view count
+          const updatedStats = await blogViewsService.getBlogStats(slug);
+          setViewStats(updatedStats);
+          setViewCount(updatedStats.totalViews);
+          setIsLoadingViews(false);
+          
         } catch (error) {
           console.error('Failed to track view:', error);
           // Fallback to localStorage
           const views = localStorage.getItem(`blog-views-${slug}`) || '0'
           const newViews = parseInt(views) + 1
           localStorage.setItem(`blog-views-${slug}`, newViews.toString())
-          setViewCount(newViews)
-          console.log('📦 Using localStorage fallback, views:', newViews);
+          setViewCount(newViews);
+          setIsLoadingViews(false);
         }
       }
     };
@@ -179,12 +181,12 @@ export const BlogPost: React.FC = () => {
   return (
     <>
       <SEOHead 
-        title={`${blog.title} | Saif Aljanahi`}
+        title={`${blog.title} | Saif Alqaseh`}
         description={blog.description}
         tags={blog.tags}
         type="article"
         publishedTime={new Date(blog.createdAt).toISOString()}
-        author="Saif Aljanahi"
+        author="Saif Alqaseh"
       />
       <ArticleStructuredData 
         title={blog.title}
@@ -249,7 +251,7 @@ export const BlogPost: React.FC = () => {
             <div className="flex flex-wrap items-center gap-6 text-slate-500 dark:text-slate-400">
               <div className="flex items-center space-x-2">
                 <User className="w-4 h-4" />
-                <span className="font-medium">Saif Aljanahi</span>
+                <span className="font-medium">Saif Alqaseh</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" />
@@ -263,7 +265,14 @@ export const BlogPost: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Eye className="w-4 h-4" />
-                <span>{viewCount.toLocaleString()} views</span>
+                {isLoadingViews ? (
+                  <span className="flex items-center space-x-1">
+                    <div className="w-4 h-4 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin"></div>
+                    <span>Loading...</span>
+                  </span>
+                ) : (
+                  <span>{viewCount.toLocaleString()} views</span>
+                )}
               </div>
             </div>
 
@@ -351,7 +360,7 @@ export const BlogPost: React.FC = () => {
                   S
                 </div>
                 <div>
-                  <h4 className="font-semibold text-slate-900 dark:text-white">Saif Aljanahi</h4>
+                  <h4 className="font-semibold text-slate-900 dark:text-white">Saif Alqaseh</h4>
                   <p className="text-slate-600 dark:text-slate-400">Software Engineer & Tech Enthusiast</p>
                 </div>
               </div>
