@@ -261,3 +261,36 @@ export function saveRSSFiles(): void {
     console.error('Failed to generate RSS files:', error)
   }
 }
+
+/**
+ * Download RSS feed as a file for users
+ */
+export function downloadRSSFeed(blogs: any[]): void {
+  try {
+    const rssXML = generateRSSFeed()
+    
+    // Create a Blob with the RSS content
+    const blob = new Blob([rssXML], { type: 'application/rss+xml' })
+    
+    // Create a temporary URL for the blob
+    const url = window.URL.createObjectURL(blob)
+    
+    // Create a temporary link element and trigger download
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'saif-aljanahi-blog-rss.xml'
+    link.style.display = 'none'
+    
+    // Add to DOM, click, and remove
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    // Clean up the URL
+    window.URL.revokeObjectURL(url)
+    
+    console.log('RSS feed download initiated')
+  } catch (error) {
+    console.error('Failed to download RSS feed:', error)
+  }
+}
