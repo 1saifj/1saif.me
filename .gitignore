@@ -39,6 +39,7 @@ node_modules/
 .cursor
 .taskmaster
 .vscode
+.dev-dist/
 
 # Added by Task Master AI
 # OS specific
