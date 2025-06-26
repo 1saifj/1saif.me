@@ -45,7 +45,7 @@ const corsHeaders = {
 // Email templates
 const emailTemplates = {
 	confirmation: (email: string, confirmationToken: string, websiteDomain: string) => ({
-		subject: '🎯 Confirm Your Newsletter Subscription',
+		subject: 'Confirm Your Newsletter Subscription',
 		html: `
       <!DOCTYPE html>
       <html lang="en">
@@ -54,58 +54,47 @@ const emailTemplates = {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Confirm Your Subscription</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center; color: white; }
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f4f4f7; }
+          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+          .header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #e9e9eb; }
           .content { padding: 40px 30px; }
-          .button { display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-          .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; }
+          .button { display: inline-block; padding: 14px 28px; background-color: #1a1a1a; color: white !important; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
+          .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 12px; border-top: 1px solid #e9e9eb; }
+          .footer a { color: #1a1a1a; text-decoration: none; }
         </style>
       </head>
       <body>
         <div style="padding: 40px 20px;">
           <div class="container">
             <div class="header">
-              <h1 style="margin: 0; font-size: 28px;">Almost There! 🚀</h1>
-              <p style="margin: 10px 0 0; opacity: 0.9;">One click away from joining our community</p>
+              <img src="${websiteDomain}/sj.png" alt="Logo" style="width: 50px; height: 50px; margin-bottom: 16px;">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #1a1a1a;">Confirm Your Subscription</h1>
             </div>
             <div class="content">
-              <h2 style="color: #333; margin-bottom: 20px;">Hi there! 👋</h2>
-              <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
-                Thanks for signing up for our newsletter! You're about to join thousands of developers, designers, and tech enthusiasts who stay ahead of the curve.
-              </p>
+              <h2 style="color: #333; margin-bottom: 20px; font-size: 20px; font-weight: 600;">Hello,</h2>
               <p style="color: #555; line-height: 1.6; margin-bottom: 30px;">
-                Please confirm your email address by clicking the button below:
+                Thank you for subscribing to the newsletter. Please click the button below to confirm your email address and activate your subscription.
               </p>
               <div style="text-align: center;">
                 <a href="${websiteDomain}/confirm-subscription?token=${confirmationToken}" class="button">
-                  ✅ Confirm My Subscription
+                  Confirm Subscription
                 </a>
               </div>
               <p style="color: #777; font-size: 14px; margin-top: 30px; line-height: 1.6;">
-                If you didn't sign up for this newsletter, you can safely ignore this email. The link above will expire in 24 hours.
+                If you did not request this, please ignore this email. This link will expire in 24 hours.
               </p>
             </div>
             <div class="footer">
-              <p>© 2024 Saif Al-Janahi. Made with ❤️ for the community.</p>
-              <p>This email was sent to ${email}</p>
+              <p>© ${new Date().getFullYear()} Saif Al-Janahi. All rights reserved.</p>
+              <p>You received this email because you subscribed at <a href="${websiteDomain}">${websiteDomain}</a>.</p>
             </div>
           </div>
         </div>
       </body>
       </html>
     `,
-		text: `Hi there!
-
-Thanks for signing up for our newsletter! Please confirm your email address by visiting this link:
-
-${websiteDomain}/confirm-subscription?token=${confirmationToken}
-
-If you didn't sign up for this newsletter, you can safely ignore this email.
-
-Best regards,
-Saif Al-Janahi
-`
+		text: `Hello,\n\nThank you for subscribing. Please confirm your email address by visiting this link:\n\n${websiteDomain}/confirm-subscription?token=${confirmationToken}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nSaif Al-Janahi`
 	}),
 
 	welcome: (email: string, unsubscribeToken: string, websiteDomain: string) => ({
@@ -116,81 +105,52 @@ Saif Al-Janahi
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome!</title>
+        <title>Welcome Aboard!</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); padding: 40px 20px; text-align: center; color: white; }
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f4f4f7; }
+          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+          .header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #e9e9eb; }
           .content { padding: 40px 30px; }
-          .feature { display: flex; align-items: center; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; }
-          .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; }
+          .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 12px; border-top: 1px solid #e9e9eb; }
+          .footer a { color: #1a1a1a; text-decoration: none; }
+          ul { list-style-type: none; padding: 0; }
+          li { margin-bottom: 10px; color: #555; }
         </style>
       </head>
       <body>
         <div style="padding: 40px 20px;">
           <div class="container">
             <div class="header">
-              <h1 style="margin: 0; font-size: 28px;">Welcome Aboard! 🎉</h1>
-              <p style="margin: 10px 0 0; opacity: 0.9;">You're now part of our amazing community</p>
+              <img src="${websiteDomain}/sj.png" alt="Logo" style="width: 50px; height: 50px; margin-bottom: 16px;">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #1a1a1a;">Welcome Aboard!</h1>
             </div>
             <div class="content">
-              <h2 style="color: #333; margin-bottom: 20px;">Thanks for confirming! 🙌</h2>
+              <h2 style="color: #333; margin-bottom: 20px; font-size: 20px; font-weight: 600;">Thanks for confirming!</h2>
               <p style="color: #555; line-height: 1.6; margin-bottom: 30px;">
-                Your subscription is now active! Here's what you can expect:
+                You're now part of the community. Here's what you can expect:
               </p>
-              
-              <div class="feature">
-                <span style="font-size: 24px; margin-right: 15px;">📬</span>
-                <div>
-                  <strong style="color: #333;">Weekly Updates</strong>
-                  <p style="margin: 5px 0 0; color: #666; font-size: 14px;">Latest insights, tutorials, and industry news</p>
-                </div>
-              </div>
-              
-              <div class="feature">
-                <span style="font-size: 24px; margin-right: 15px;">🚀</span>
-                <div>
-                  <strong style="color: #333;">Exclusive Content</strong>
-                  <p style="margin: 5px 0 0; color: #666; font-size: 14px;">Subscriber-only articles and resources</p>
-                </div>
-              </div>
-              
-              <div class="feature">
-                <span style="font-size: 24px; margin-right: 15px;">💡</span>
-                <div>
-                  <strong style="color: #333;">Early Access</strong>
-                  <p style="margin: 5px 0 0; color: #666; font-size: 14px;">Be the first to know about new projects and tools</p>
-                </div>
-              </div>
-              
+              <ul>
+                <li><strong>Weekly Updates:</strong> Latest insights, tutorials, and industry news.</li>
+                <li><strong>Exclusive Content:</strong> Subscriber-only articles and resources.</li>
+                <li><strong>Early Access:</strong> Be the first to know about new projects and tools.</li>
+              </ul>
               <p style="color: #555; line-height: 1.6; margin-top: 30px;">
-                Stay tuned for your first newsletter coming soon!
+                Stay tuned for your first newsletter!
               </p>
             </div>
             <div class="footer">
-              <p>© 2024 Saif Al-Janahi. Made with ❤️ for the community.</p>
-              <p><a href="${websiteDomain}/unsubscribe?token=${unsubscribeToken}" style="color: #6c757d;">Unsubscribe</a> | This email was sent to ${email}</p>
+              <p>© ${new Date().getFullYear()} Saif Al-Janahi. All rights reserved.</p>
+              <p>
+                <a href="${websiteDomain}/unsubscribe?token=${unsubscribeToken}">Unsubscribe</a> | This email was sent to ${email}
+              </p>
             </div>
           </div>
         </div>
       </body>
       </html>
     `,
-		text: `Welcome aboard!
-
-Thanks for confirming your subscription! Here's what you can expect:
-
-📬 Weekly Updates - Latest insights, tutorials, and industry news
-🚀 Exclusive Content - Subscriber-only articles and resources  
-💡 Early Access - Be the first to know about new projects and tools
-
-Stay tuned for your first newsletter coming soon!
-
-To unsubscribe: ${websiteDomain}/unsubscribe?token=${unsubscribeToken}
-
-Best regards,
-Saif Al-Janahi
-`
+		text: `Welcome aboard!\n\nThanks for confirming your subscription! Here's what you can expect:\n\n- Weekly Updates: Latest insights, tutorials, and industry news.\n- Exclusive Content: Subscriber-only articles and resources.\n- Early Access: Be the first to know about new projects and tools.\n\nStay tuned for your first newsletter coming soon!\n\nTo unsubscribe: ${websiteDomain}/unsubscribe?token=${unsubscribeToken}\n\nBest regards,\nSaif Al-Janahi`
 	}),
 
 	unsubscribe: (email: string) => ({
@@ -203,83 +163,71 @@ Saif Al-Janahi
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Unsubscribed</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 40px 20px; text-align: center; color: white; }
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+          body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f4f4f7; }
+          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+          .header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #e9e9eb; }
           .content { padding: 40px 30px; text-align: center; }
-          .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; }
+          .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 12px; border-top: 1px solid #e9e9eb; }
+          .footer a { color: #1a1a1a; text-decoration: none; }
         </style>
       </head>
       <body>
         <div style="padding: 40px 20px;">
           <div class="container">
             <div class="header">
-              <h1 style="margin: 0; font-size: 28px;">Until Next Time! 👋</h1>
-              <p style="margin: 10px 0 0; opacity: 0.9;">You've been unsubscribed</p>
+              <img src="https://1saif.me/sj.png" alt="Logo" style="width: 50px; height: 50px; margin-bottom: 16px;">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #1a1a1a;">Sorry to See You Go</h1>
             </div>
             <div class="content">
-              <h2 style="color: #333; margin-bottom: 20px;">We're sorry to see you go! 😢</h2>
-              <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
-                You have been successfully unsubscribed from our newsletter. You won't receive any more emails from us.
-              </p>
-              <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
-                If you change your mind, you're always welcome to subscribe again!
-              </p>
-              <p style="color: #777; font-size: 14px;">
-                We'd love to hear your feedback about why you unsubscribed - it helps us improve!
+              <h2 style="color: #333; margin-bottom: 20px; font-size: 20px; font-weight: 600;">You have been unsubscribed.</h2>
+              <p style="color: #555; line-height: 1.6; margin-bottom: 30px;">
+                You will no longer receive newsletter emails. If this was a mistake, you can subscribe again at any time.
               </p>
             </div>
             <div class="footer">
-              <p>© 2024 Saif Al-Janahi. Thanks for being part of our journey.</p>
-              <p>This email was sent to ${email}</p>
+              <p>© ${new Date().getFullYear()} Saif Al-Janahi. All rights reserved.</p>
+              <p>This confirmation was sent to ${email}.</p>
             </div>
           </div>
         </div>
       </body>
       </html>
     `,
-		text: `Until next time!
-
-You have been successfully unsubscribed from our newsletter. You won't receive any more emails from us.
-
-If you change your mind, you're always welcome to subscribe again!
-
-Thanks for being part of our journey.
-
-Best regards,
-Saif Al-Janahi
-`
+		text: `You have been unsubscribed.\n\nYou will no longer receive newsletter emails. If this was a mistake, you can subscribe again at any time on https://1saif.me.\n\nBest regards,\nSaif Al-Janahi`
 	})
 };
 
 // Email sending function using Mailtrap
 async function sendEmail(to: string, subject: string, html: string, text: string, env: Env): Promise<boolean> {
 	try {
-		console.log('Attempting to send email to:', to);
-		console.log('Using FROM_EMAIL:', env.FROM_EMAIL);
-		console.log('Using FROM_NAME:', env.FROM_NAME);
-		console.log('Mailtrap token exists:', !!env.MAILTRAP_TOKEN);
-		
-		const requestBody = {
+		// Use environment variables for FROM address for flexibility
+		const fromEmail = env.FROM_EMAIL;
+		const fromName = env.FROM_NAME;
+
+		console.log(`Attempting to send email to: ${to}`);
+		console.log(`Using FROM_EMAIL: ${fromEmail}`);
+		console.log(`Using FROM_NAME: ${fromName}`);
+		console.log(`Mailtrap token exists: ${!!env.MAILTRAP_TOKEN}`);
+
+		const payload = {
 			from: {
-				email: env.FROM_EMAIL,
-				name: env.FROM_NAME,
+				email: fromEmail,
+				name: fromName
 			},
 			to: [{ email: to }],
 			subject,
 			html,
 			text,
 		};
-		
-		console.log('Request body:', JSON.stringify(requestBody, null, 2));
-		
+
 		const response = await fetch('https://send.api.mailtrap.io/api/send', {
 			method: 'POST',
 			headers: {
 				'Authorization': `Bearer ${env.MAILTRAP_TOKEN}`,
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(requestBody),
+			body: JSON.stringify(payload),
 		});
 
 		console.log('Response status:', response.status);

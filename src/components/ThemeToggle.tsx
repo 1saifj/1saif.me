@@ -14,7 +14,7 @@ export const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-full transition-all duration-300 text-slate-300 dark:text-slate-300 hover:bg-slate-500 dark:hover:bg-slate-700"
+      className="p-2 rounded-full transition-all duration-300 text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
       title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
       aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >

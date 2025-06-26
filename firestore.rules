@@ -58,14 +58,20 @@ service cloud.firestore {
     // Helper functions for validation
     function isValidSubscription() {
       let data = request.resource.data;
-      return data.keys().hasAll(['email', 'status', 'subscribedAt', 'source', 'ipAddress', 'userAgent']) &&
+      // Core required fields
+      let hasRequiredFields = data.keys().hasAll(['email', 'status', 'subscribedAt', 'source']);
+      // All allowed fields
+      let hasOnlyAllowedFields = data.keys().hasOnly(['email', 'status', 'subscribedAt', 'source', 'confirmationToken', 'unsubscribeToken', 'metadata', 'confirmedAt', 'unsubscribedAt']);
+
+      return hasRequiredFields &&
+             hasOnlyAllowedFields &&
              data.email is string &&
              data.email.matches('.*@.*\\..*') &&
              data.status == 'pending' &&
              data.subscribedAt is timestamp &&
              data.source is string &&
-             data.ipAddress is string &&
-             data.userAgent is string;
+             // Ensure metadata, if present, is a map
+             (!('metadata' in data) || data.metadata is map);
     }
     
     function isValidStatusUpdate() {

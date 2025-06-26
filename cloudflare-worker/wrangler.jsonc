@@ -29,10 +29,12 @@
 	 */
 	"vars": { 
 		"WEBSITE_DOMAIN": "https://1saif.me",
-		"FROM_EMAIL": "newsletter@mailtrap.club", 
-		"FROM_NAME": "Saif Al-Janahi Newsletter",
+		"FROM_EMAIL": "hello@1saif.me", 
+		"FROM_NAME": "Saif Aljanahi Newsletter",
 		"FIREBASE_PROJECT_ID": "portfolio-58276"
 	},
+	// Default FROM email address
+
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
