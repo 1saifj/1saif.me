@@ -1,59 +1,34 @@
 import { useState, useEffect } from 'react'
 
-type Theme = 'light' | 'dark' | 'system'
+type Theme = 'light' | 'dark'
 
 export const useTheme = () => {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('theme') as Theme) || 'system'
-    }
-    return 'system'
-  })
+      const storedTheme = localStorage.getItem('theme') as Theme
+      if (storedTheme) return storedTheme
 
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    }
+    return 'light'
+  })
 
   useEffect(() => {
     const root = window.document.documentElement
     
-    const updateTheme = () => {
-      let newTheme: 'light' | 'dark'
-      
-      if (theme === 'system') {
-        newTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      } else {
-        newTheme = theme
-      }
-      
-      setResolvedTheme(newTheme)
-      
-      root.classList.remove('light', 'dark')
-      root.classList.add(newTheme)
-      
-      // Update meta theme-color
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', newTheme === 'dark' ? '#0f172a' : '#ffffff')
-      }
-    }
-
-    updateTheme()
+    root.classList.remove('light', 'dark')
+    root.classList.add(theme)
+    
     localStorage.setItem('theme', theme)
 
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = () => {
-      if (theme === 'system') {
-        updateTheme()
-      }
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', theme === 'dark' ? '#0f172a' : '#ffffff')
     }
-
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme])
 
   return {
     theme,
-    resolvedTheme,
     setTheme
   }
 }
