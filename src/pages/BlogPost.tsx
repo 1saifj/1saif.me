@@ -225,14 +225,14 @@ export const BlogPost: React.FC = () => {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-12 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
+      <section className="relative pt-20 sm:pt-24 pb-8 sm:pb-12 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-400/10 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
+          <div className="absolute top-0 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-blue-400/10 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-400/10 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
         </div>
 
-        <div className="relative max-w-4xl mx-auto px-6">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
           {/* Back Navigation */}
           <Link 
             to="/blog"
@@ -270,7 +270,7 @@ export const BlogPost: React.FC = () => {
 
               {/* Title */}
               <h1 
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight"
                 itemProp="headline"
               >
                 {blog.title}
@@ -278,7 +278,7 @@ export const BlogPost: React.FC = () => {
 
               {/* Description */}
               <p 
-                className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl"
+                className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl"
                 itemProp="description"
               >
                 {blog.description}
@@ -334,8 +334,8 @@ export const BlogPost: React.FC = () => {
       </section>
 
       {/* Article Content */}
-      <section className="py-16 bg-white dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto px-6">
+      <section className="py-8 sm:py-12 lg:py-16 bg-white dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <article 
             className="blog-content"
             itemProp="articleBody"
