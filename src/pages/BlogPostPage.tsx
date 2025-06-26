@@ -367,28 +367,78 @@ export const BlogPostPage: React.FC = () => {
         .article-content {
           margin-top: -40px;
           border-radius: 20px 20px 0 0;
+          padding: 1.5rem;
+        }
+        
+        .toc-sidebar {
+          position: static;
+          margin-bottom: 2rem;
         }
       }
       
       @media (max-width: 768px) {
+        .article-header {
+          padding-bottom: 2rem;
+        }
+        
         .article-prose h1 {
-          font-size: 2rem;
+          font-size: 1.75rem;
+          margin: 1.5rem 0 1rem 0;
         }
         
         .article-prose h2 {
           font-size: 1.5rem;
+          margin: 1.25rem 0 0.75rem 0;
+        }
+        
+        .article-prose h3 {
+          font-size: 1.25rem;
+          margin: 1rem 0 0.5rem 0;
         }
         
         .article-prose p {
           font-size: 1rem;
           line-height: 1.7;
+          margin-bottom: 1rem;
         }
         
         .scroll-top-btn {
-          bottom: 24px;
-          right: 24px;
-          width: 48px;
-          height: 48px;
+          bottom: 20px;
+          right: 20px;
+          width: 44px;
+          height: 44px;
+        }
+        
+        .article-content {
+          padding: 1rem;
+        }
+        
+        .container {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .article-header {
+          padding-top: 5rem;
+          padding-bottom: 1.5rem;
+        }
+        
+        .article-prose h1 {
+          font-size: 1.5rem;
+        }
+        
+        .article-prose h2 {
+          font-size: 1.25rem;
+        }
+        
+        .article-prose p {
+          font-size: 0.95rem;
+        }
+        
+        .article-content {
+          padding: 0.75rem;
         }
       }
     `
@@ -777,11 +827,11 @@ export const BlogPostPage: React.FC = () => {
       </section>
 
       <div className="container mx-auto px-6 max-w-7xl relative">
-        <div className="grid lg:grid-cols-5 gap-12">
+        <div className="grid lg:grid-cols-5 gap-6 lg:gap-12">
           {/* Table of Contents Sidebar */}
           <aside className={`lg:col-span-1 ${showToc ? 'block' : 'hidden lg:block'}`}>
-            <div className="sticky top-32">
-              <div className="toc-sidebar p-6">
+            <div className="lg:sticky lg:top-32">
+              <div className="toc-sidebar p-4 lg:p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-bold text-slate-900 flex items-center">
                     <BookOpen className="w-5 h-5 mr-3 text-blue-600" />
@@ -834,7 +884,7 @@ export const BlogPostPage: React.FC = () => {
 
           {/* Main Content */}
           <main className="lg:col-span-4">
-            <article className="article-content p-8 md:p-12 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
+            <article className="article-content p-4 sm:p-6 md:p-8 lg:p-12 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
               <div 
                 className="
                   article-prose max-w-none text-slate-700 dark:text-slate-300 leading-relaxed

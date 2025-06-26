@@ -72,7 +72,7 @@ const emailTemplates = {
           <!-- Footer -->
           <div style="background: #f7fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
             <p style="color: #a0aec0; font-size: 12px; margin: 0;">
-              © 2024 Saif Al-Janahi | Software Engineer<br>
+              © 2025 Saif Al-Janahi | Software Engineer<br>
               If you didn't sign up for this newsletter, you can safely ignore this email.
             </p>
           </div>
@@ -89,7 +89,7 @@ ${confirmationUrl}
 
 If you didn't sign up for this newsletter, you can safely ignore this email.
 
-© 2024 Saif Al-Janahi | Software Engineer
+© 2025 Saif Aljanahi | Software Engineer
     `
   }),
 
@@ -136,7 +136,7 @@ If you didn't sign up for this newsletter, you can safely ignore this email.
           <!-- Footer -->
           <div style="background: #f7fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
             <p style="color: #a0aec0; font-size: 12px; margin: 0;">
-              © 2024 Saif Al-Janahi | Software Engineer<br>
+              © 2025 Saif Aljanahi | Software Engineer<br>
               Don't want to receive these emails? <a href="${unsubscribeUrl}" style="color: #667eea;">Unsubscribe here</a>
             </p>
           </div>
@@ -158,7 +158,7 @@ I promise to keep it valuable and not spam your inbox.
 
 Don't want to receive these emails? Unsubscribe here: ${unsubscribeUrl}
 
-© 2024 Saif Al-Janahi | Software Engineer
+© 2025 Saif Aljanahi | Software Engineer
     `
   }),
 
@@ -203,7 +203,7 @@ Don't want to receive these emails? Unsubscribe here: ${unsubscribeUrl}
           <!-- Footer -->
           <div style="background: #f7fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
             <p style="color: #a0aec0; font-size: 12px; margin: 0;">
-              © 2024 Saif Al-Janahi | Software Engineer
+              © 2025 Saif Aljanahi | Software Engineer
             </p>
           </div>
         </div>
@@ -217,7 +217,7 @@ You've been successfully unsubscribed from my newsletter. If this was a mistake,
 
 Thanks for being part of the journey, and I hope our paths cross again soon!
 
-© 2024 Saif Al-Janahi | Software Engineer
+© 2025 Saif Aljanahi | Software Engineer
     `
   })
 };
