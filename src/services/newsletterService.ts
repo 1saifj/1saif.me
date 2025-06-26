@@ -70,8 +70,11 @@ function generateToken(): string {
 
 // Helper function to call Cloudflare Worker endpoints
 async function callWorkerEndpoint(endpoint: string, data?: any, method: 'GET' | 'POST' = 'POST'): Promise<any> {
+  const workerUrl = import.meta.env.VITE_WORKER_URL || 'https://cloudflare-worker.1saifj.workers.dev';
+  const url = `${workerUrl}${endpoint}`;
+
   try {
-    const response = await fetch(`${WORKER_URL}${endpoint}`, {
+    const response = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -81,12 +84,13 @@ async function callWorkerEndpoint(endpoint: string, data?: any, method: 'GET' | 
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Worker request failed: ${response.status} ${errorText}`);
+      throw new Error(`Worker request failed: ${response.status} ${response.statusText}: ${errorText}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result;
   } catch (error) {
-    console.error('Cloudflare Worker request failed:', error);
+    console.error(`Error calling worker endpoint ${endpoint}:`, error);
     throw error;
   }
 }
@@ -254,12 +258,10 @@ export const subscriberService = {
         await emailService.sendWelcomeEmail(subscriberData.email, subscriberData.unsubscribeToken);
       }
 
-      await this.trackEvent('confirmation', subscriberData.email);
-
-      return { success: true, message: 'Subscription confirmed successfully!' };
+      return { success: true, message: 'Email confirmed successfully! Welcome to the newsletter.' };
     } catch (error) {
-      console.error('Confirmation error:', error);
-      return { success: false, message: 'An unexpected error occurred during confirmation.' };
+      console.error('Error confirming subscription:', error);
+      return { success: false, message: 'Failed to confirm subscription. Please try again.' };
     }
   },
 

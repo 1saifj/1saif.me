@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import { CheckCircle, XCircle, Mail, ArrowRight, Home, Heart, MessageCircle, Loader2, Info, Send } from 'lucide-react'
+import { CheckCircle, XCircle, Home, MessageCircle, Loader2, Info, Send } from 'lucide-react'
 import { NewsletterService } from '../services/newsletterService'
 
 const StatusCard: React.FC<{
@@ -77,7 +77,6 @@ const UnsubscribePageComponent: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'already-unsubscribed'>('loading')
   const [message, setMessage] = useState('')
   const token = searchParams.get('token')
-  const email = searchParams.get('email')
 
   useEffect(() => {
     if (!token) {
