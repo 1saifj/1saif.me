@@ -155,7 +155,7 @@ export const ProjectPage: React.FC = () => {
           ? 'bg-slate-900/95 backdrop-blur-md border-b border-slate-700/50 shadow-2xl' 
           : 'bg-transparent'
       }`}>
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <nav className="flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
               <Link 
@@ -190,7 +190,7 @@ export const ProjectPage: React.FC = () => {
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.05%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
         
-        <div className="container mx-auto px-6 max-w-6xl relative">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative">
           <div className="text-center mb-12">
             {/* Project Badge */}
             <div className="inline-flex items-center space-x-4 mb-8 flex-wrap justify-center">
@@ -214,11 +214,11 @@ export const ProjectPage: React.FC = () => {
               </div>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 sm:mb-8 leading-tight tracking-tight">
               {project.name}
             </h1>
             
-            <p className="text-2xl text-slate-300 mb-12 leading-relaxed max-w-4xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl text-slate-300 mb-8 sm:mb-12 leading-relaxed max-w-4xl mx-auto">
               {project.description}
             </p>
 
@@ -264,7 +264,7 @@ export const ProjectPage: React.FC = () => {
 
       {/* Main Content */}
       <main className="relative">
-        <div className="container mx-auto px-6 pb-20 max-w-6xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 max-w-6xl">
           {/* Project Details Card */}
           <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden mb-12 border border-white/20">
             <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 px-8 py-8">

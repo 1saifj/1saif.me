@@ -73,14 +73,14 @@ export const PrivacyPolicyPage: React.FC = () => {
     <>
       <Navigation />
       <main className="pt-20">
-        <div className="container mx-auto px-6 py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
-            <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 transition-colors duration-300">
+            <div className="text-center mb-8 sm:mb-12">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6 transition-colors duration-300">
                 Privacy Policy
               </h1>
-              <p className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
                 This privacy policy explains how we collect, use, and protect your personal information.
               </p>
               <div className="flex items-center justify-center mt-4 text-sm text-slate-500 dark:text-slate-400">
@@ -90,7 +90,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             </div>
 
             {/* Introduction */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 mb-8 transition-colors duration-300 border border-slate-200 dark:border-slate-700">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 transition-colors duration-300 border border-slate-200 dark:border-slate-700">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 transition-colors duration-300">
                 1. Introduction
               </h2>
@@ -105,7 +105,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             </div>
 
             {/* Data We Collect */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 mb-8 transition-colors duration-300 border border-slate-200 dark:border-slate-700">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 transition-colors duration-300 border border-slate-200 dark:border-slate-700">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 transition-colors duration-300">
                 2. Information We Collect
               </h2>

@@ -6,9 +6,9 @@ export const PrivacyPolicy: React.FC = () => {
     <>
       <Navigation />
       <div className="pt-20 min-h-screen bg-slate-50 dark:bg-slate-900">
-        <div className="container mx-auto px-6 py-12">
-          <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8">
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-8">Privacy Policy</h1>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-6 sm:mb-8">Privacy Policy</h1>
             
             <div className="prose prose-slate dark:prose-invert max-w-none">
               <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">
