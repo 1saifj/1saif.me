@@ -137,7 +137,7 @@ export const emailService = {
 
 // Subscriber management
 export const subscriberService = {
-  async subscribe(email: string, metadata?: Subscriber['metadata']): Promise<{ success: boolean; message: string; requiresConfirmation?: boolean }> {
+  async subscribe(email: string, metadata?: Subscriber['metadata']): Promise<{ success: boolean; message: string; requiresConfirmation?: boolean; subscriberId?: string }> {
     try {
       // Check if email already exists
       const existingQuery = query(
@@ -184,7 +184,8 @@ export const subscriberService = {
       return { 
         success: true, 
         message: 'Please check your email to confirm your subscription.', 
-        requiresConfirmation: true 
+        requiresConfirmation: true,
+        subscriberId: existingDoc.id,
       };
         }
       }
@@ -203,7 +204,7 @@ export const subscriberService = {
         metadata: metadata || {},
       };
 
-      await addDoc(collection(db, 'subscribers'), {
+      const docRef = await addDoc(collection(db, 'subscribers'), {
         ...newSubscriber,
         subscribedAt: serverTimestamp(),
       });
@@ -217,7 +218,8 @@ export const subscriberService = {
       return { 
         success: true, 
         message: 'Please check your email to confirm your subscription.', 
-        requiresConfirmation: true 
+        requiresConfirmation: true,
+        subscriberId: docRef.id,
       };
     } catch (error) {
       console.error('Subscription error:', error);
@@ -481,7 +483,12 @@ export default {
 // Backward compatibility exports for existing components
 export class NewsletterService {
   static async subscribeEmail(email: string, sourceIP?: string, consentGiven: boolean = true) {
-    return subscriberService.subscribe(email, { ipAddress: sourceIP });
+    const metadata = { ipAddress: sourceIP };
+    const result = await subscriberService.subscribe(email, metadata);
+
+    return {
+      ...result
+    };
   }
 
   static async confirmSubscription(token: string) {

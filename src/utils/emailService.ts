@@ -11,8 +11,8 @@ interface SubscriptionResult {
 interface EmailStats {
   confirmedSubscribers: number
   totalSubscribers: number
-  pendingConfirmations: number
-  conversionRate: number
+  pendingSubscribers: number
+  confirmationRate: number
 }
 
 /**
@@ -23,8 +23,8 @@ class EmailService {
   private stats: EmailStats = {
     confirmedSubscribers: 0,
     totalSubscribers: 0,
-    pendingConfirmations: 0,
-    conversionRate: 0
+    pendingSubscribers: 0,
+    confirmationRate: 0
   }
 
   /**
@@ -34,7 +34,19 @@ class EmailService {
    */
   async subscribe(email: string, source: string = 'website'): Promise<SubscriptionResult> {
     try {
-      const result = await NewsletterService.subscribeEmail(email, undefined, true)
+      let ipAddress: string | undefined;
+      try {
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        if (ipResponse.ok) {
+          const ipData = await ipResponse.json();
+          ipAddress = ipData.ip;
+        }
+      } catch (ipError) {
+        console.warn('Could not fetch IP address:', ipError);
+        // Continue without IP address if it fails
+      }
+
+      const result = await NewsletterService.subscribeEmail(email, ipAddress, true)
       
       // Update local stats cache
       if (result.success) {
@@ -103,10 +115,10 @@ class EmailService {
       const analytics = await NewsletterService.getAnalytics()
       
       this.stats = {
-        confirmedSubscribers: analytics.totalSubscribers,
-        totalSubscribers: analytics.totalSubscribers + analytics.pendingConfirmations,
-        pendingConfirmations: analytics.pendingConfirmations,
-        conversionRate: analytics.conversionRate
+        confirmedSubscribers: analytics.confirmedSubscribers,
+        totalSubscribers: analytics.confirmedSubscribers + analytics.pendingSubscribers,
+        pendingSubscribers: analytics.pendingSubscribers,
+        confirmationRate: analytics.confirmationRate
       }
     } catch (error) {
       console.error('Error refreshing stats:', error)
