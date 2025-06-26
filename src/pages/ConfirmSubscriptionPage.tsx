@@ -8,11 +8,11 @@ const StatusCard: React.FC<{
   title: string;
   children: React.ReactNode;
 }> = ({ icon, title, children }) => (
-  <div className="text-center bg-white dark:bg-slate-800/50 backdrop-blur-lg rounded-2xl shadow-lg border border-slate-200/50 dark:border-slate-700/50 p-8 lg:p-12 animate-fade-in">
-    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-6 bg-opacity-10">
+  <div className="text-center bg-white dark:bg-slate-800/50 backdrop-blur-lg rounded-2xl shadow-lg border border-slate-200/50 dark:border-slate-700/50 p-6 sm:p-8 lg:p-12 animate-fade-in">
+    <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full mb-4 sm:mb-6 bg-opacity-10">
       {icon}
     </div>
-    <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-4">{title}</h1>
+    <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white mb-3 sm:mb-4">{title}</h1>
     {children}
   </div>
 );
