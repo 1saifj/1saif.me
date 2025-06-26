@@ -13,8 +13,8 @@ export const BlogListingPage: React.FC = () => {
         type="website"
       />
       <Navigation />
-      <main id="main-content" role="main">
-        <section id="blog" aria-labelledby="blog-heading">
+      <main id="main-content" role="main" className="min-h-screen">
+        <section id="blog" aria-labelledby="blog-heading" className="px-4 sm:px-6 lg:px-8">
           <BlogListing />
         </section>
       </main>
