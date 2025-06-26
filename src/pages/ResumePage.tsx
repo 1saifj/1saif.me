@@ -14,7 +14,7 @@ export const ResumePage: React.FC = () => {
       />
       <Navigation />
       <main id="main-content" role="main" className="pt-20">
-        <section id="resume" aria-labelledby="resume-heading" className="min-h-screen">
+        <section id="resume" aria-labelledby="resume-heading" className="min-h-screen px-4 sm:px-6 lg:px-8">
           <Resume />
         </section>
       </main>

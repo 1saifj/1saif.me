@@ -72,7 +72,7 @@ const emailTemplates = {
           <!-- Footer -->
           <div style="background: #f7fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
             <p style="color: #a0aec0; font-size: 12px; margin: 0;">
-              © 2025 Saif Al-Janahi | Software Engineer<br>
+              © 2025 Saif Aljanahi | Software Engineer<br>
               If you didn't sign up for this newsletter, you can safely ignore this email.
             </p>
           </div>
