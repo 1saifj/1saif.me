@@ -16,12 +16,14 @@ export const Navigation: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+      setIsScrolled(window.scrollY > 10)
     }
 
     if (isHomePage) {
-      window.addEventListener('scroll', handleScroll)
+      window.addEventListener('scroll', handleScroll, { passive: true })
       return () => window.removeEventListener('scroll', handleScroll)
+    } else {
+      setIsScrolled(true)
     }
   }, [isHomePage])
 
@@ -34,6 +36,7 @@ export const Navigation: React.FC = () => {
       }
       if (e.key === 'Escape') {
         setIsSearchOpen(false)
+        setIsMobileMenuOpen(false)
       }
     }
 
@@ -48,10 +51,10 @@ export const Navigation: React.FC = () => {
     { href: '#projects', label: 'Projects' },
     { href: '#blog', label: 'Blog' },
     { href: '#research', label: 'Research' },
-    { href: '#contact', label: 'Contact' }
+    { href: '#contact', label: 'Contact' },
   ]
 
-  const handleNavigation = (link: { href: string; label: string; isRoute?: boolean }) => {
+  const handleNavigation = (link: { href: string; isRoute?: boolean }) => {
     if (link.isRoute) {
       // Navigate to route
       window.location.href = link.href
@@ -70,10 +73,7 @@ export const Navigation: React.FC = () => {
 
   const handleLogoClick = () => {
     if (isHomePage) {
-      const element = document.querySelector('#home')
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
-      }
+      document.body.scrollIntoView({ behavior: 'smooth' })
     }
   }
 
@@ -81,180 +81,136 @@ export const Navigation: React.FC = () => {
     downloadRSSFeed(publishedBlogs)
   }
 
-  const linkClass = isScrolled || !isHomePage
-    ? 'text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400'
-    : 'text-slate-900 dark:text-white hover:text-slate-700 dark:hover:text-white/80'
+  const onHero = !isScrolled && isHomePage
 
-  const navBgClass = isScrolled || !isHomePage
-    ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-xl'
-    : 'bg-white/10 dark:bg-slate-900/10 backdrop-blur-md'
+  const linkClass = `relative font-medium transition-colors after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:w-0 after:h-[2px] after:transition-all after:duration-300 after:ease-in-out hover:after:w-full ${
+    onHero 
+    ? 'text-slate-200 hover:text-white after:bg-blue-400' 
+    : 'text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 after:bg-blue-500'
+  }`
+  
+  const iconButtonClass = `p-2 rounded-full transition-all duration-200 ${
+    onHero
+    ? 'text-slate-200 hover:text-white hover:bg-white/10'
+    : 'text-slate-600 dark:text-slate-300 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+  }`
+
+  const titleClass = `font-bold text-lg transition-colors ${
+    onHero
+    ? 'text-white group-hover:text-blue-300'
+    : 'text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400'
+  }`
+
+  const navBgClass = isScrolled
+    ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200/80 dark:border-slate-800/80 shadow-md'
+    : 'bg-transparent'
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBgClass}`}>
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          {isHomePage ? (
-            <button 
-              onClick={handleLogoClick}
-              className="flex items-center hover:opacity-80 transition-opacity"
-            >
-              <OptimizedImage 
-                src="/sj.png" 
-                alt="Saif Aljanahi Logo" 
-                className="w-10 h-10 rounded-full object-cover"
-                preset="logo"
-                customOptions={{ width: 40, height: 40, quality: 95 }}
-                width={40}
-                height={40}
-              />
-            </button>
-          ) : (
-            <Link 
-              to="/"
-              className="flex items-center hover:opacity-80 transition-opacity"
-            >
-              <OptimizedImage 
-                src="/sj.png" 
-                alt="Saif Aljanahi Logo" 
-                className="w-10 h-10 rounded-full object-cover"
-                preset="logo"
-                customOptions={{ width: 40, height: 40, quality: 95 }}
-                width={40}
-                height={40}
-              />
-            </Link>
-          )}
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBgClass}`}>
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex-shrink-0">
+              <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2 group">
+                <OptimizedImage 
+                  src="/sj.png" 
+                  alt="Saif Aljanahi Logo" 
+                  className="w-9 h-9 rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  preset="logo"
+                  customOptions={{ width: 36, height: 36, quality: 95 }}
+                  width={36}
+                  height={36}
+                />
+                <span className={titleClass}>Saif Aljanahi</span>
+              </Link>
+            </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-6">
+              {navLinks.map(link => (
+                link.isRoute ? (
+                  <Link key={link.href} to={link.href} className={linkClass}>
+                    {link.label}
+                  </Link>
+                ) : (
+                  <button key={link.href} onClick={() => handleNavigation(link)} className={linkClass}>
+                    {link.label}
+                  </button>
+                )
+              ))}
+            </div>
+
+            <div className="hidden md:flex items-center space-x-2">
+              <button onClick={() => setIsSearchOpen(true)} className={iconButtonClass} title="Search (⌘K)">
+                <Search className="w-5 h-5" />
+              </button>
+              <button onClick={handleRSSDownload} className={iconButtonClass} title="Download RSS Feed">
+                <Rss className="w-5 h-5" />
+              </button>
+              <ThemeToggle />
+            </div>
+
+            <div className="md:hidden flex items-center">
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className={iconButtonClass} aria-label="Toggle menu">
+                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div className={`
+          md:hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg shadow-lg
+          transition-all duration-300 ease-in-out overflow-hidden
+          ${isMobileMenuOpen ? 'max-h-[80vh] border-t border-slate-200 dark:border-slate-800' : 'max-h-0 border-t-0'}
+        `}>
+          <div className="py-4 px-2 space-y-1">
             {navLinks.map(link => (
               link.isRoute ? (
                 <Link
                   key={link.href}
                   to={link.href}
-                  className={`${linkClass} font-medium transition-colors`}
+                  className="block text-left px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
-              ) : isHomePage ? (
+              ) : (
                 <button
                   key={link.href}
                   onClick={() => handleNavigation(link)}
-                  className={`${linkClass} font-medium transition-colors`}
+                  className="w-full text-left block px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                 >
                   {link.label}
                 </button>
-              ) : (
-                <Link
-                  key={link.href}
-                  to={`/${link.href}`}
-                  className={`${linkClass} font-medium transition-colors`}
-                >
-                  {link.label}
-                </Link>
               )
             ))}
-            
-            {/* Search Button */}
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              title="Search (⌘K)"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-            
-            {/* RSS Feed Button */}
-            <button
-              onClick={handleRSSDownload}
-              className="text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
-              title="Download RSS Feed"
-            >
-              <Rss className="w-5 h-5" />
-            </button>
-            
-            {/* Theme Toggle */}
-            <ThemeToggle />
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className={`${linkClass} transition-colors`}
-              title="Search"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-            <ThemeToggle />
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`${linkClass} transition-colors`}
-            >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className={`md:hidden backdrop-blur-md border-t transition-colors duration-300 ${isScrolled || !isHomePage ? 'bg-white/95 dark:bg-slate-900/95 border-slate-200 dark:border-slate-800' : 'bg-transparent border-transparent'}`}>
-            <div className="py-4 space-y-2">
-              {navLinks.map(link => (
-                link.isRoute ? (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    className={`block w-full text-left px-4 py-2 ${linkClass} hover:bg-white/10 dark:hover:bg-slate-800/50 transition-colors`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ) : isHomePage ? (
-                  <button
-                    key={link.href}
-                    onClick={() => handleNavigation(link)}
-                    className={`block w-full text-left px-4 py-2 ${linkClass} hover:bg-white/10 dark:hover:bg-slate-800/50 transition-colors`}
-                  >
-                    {link.label}
-                  </button>
-                ) : (
-                  <Link
-                    key={link.href}
-                    to={`/${link.href}`}
-                    className={`block w-full text-left px-4 py-2 ${linkClass} hover:bg-white/10 dark:hover:bg-slate-800/50 transition-colors`}
-                  >
-                    {link.label}
-                  </Link>
-                )
-              ))}
-              
-              <button
-                onClick={() => setIsSearchOpen(true)}
-                className={`flex items-center space-x-2 w-full text-left px-4 py-2 ${linkClass} hover:bg-white/10 dark:hover:bg-slate-800/50 transition-colors`}
-              >
-                <Search className="w-4 h-4" />
-                <span>Search (⌘K)</span>
-              </button>
-              
-              <button
-                onClick={handleRSSDownload}
-                className={`flex items-center space-x-2 w-full text-left px-4 py-2 ${linkClass} hover:bg-white/10 dark:hover:bg-slate-800/50 transition-colors`}
-              >
-                <Rss className="w-4 h-4" />
-                <span>RSS Feed</span>
-              </button>
+            <div className="border-t border-slate-200 dark:border-slate-700 mx-4 my-2"></div>
+            <div className="flex justify-around items-center pt-2">
+                <button onClick={() => { setIsSearchOpen(true); setIsMobileMenuOpen(false); }} className={`${iconButtonClass} flex-1 flex justify-center`} title="Search (⌘K)">
+                  <Search className="w-5 h-5" />
+                </button>
+                <button onClick={handleRSSDownload} className={`${iconButtonClass} flex-1 flex justify-center`} title="Download RSS Feed">
+                  <Rss className="w-5 h-5" />
+                </button>
+                <div className="flex-1 flex justify-center">
+                  <ThemeToggle />
+                </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      </nav>
 
-      {/* Search Box */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 z-40 md:hidden" 
+          onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
+      )}
+
       <SearchBox 
         isOpen={isSearchOpen} 
         onClose={() => setIsSearchOpen(false)} 
       />
-    </nav>
+    </>
   )
 }
