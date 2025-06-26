@@ -80,7 +80,6 @@ function App() {
               <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
               <Route path="/unsubscribe" element={<UnsubscribePage />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/newsletter-templates" element={<TemplatesDemo />} />
               <Route path="/newsletter-test" element={<NewsletterTestPage />} />
               <Route path="/image-optimization" element={<ImageOptimizationPage />} />
             </Routes>
