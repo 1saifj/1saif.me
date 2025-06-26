@@ -229,42 +229,37 @@ export const subscriberService = {
 
   async confirmSubscription(token: string): Promise<{ success: boolean; message: string }> {
     try {
-      const q = query(
-        collection(db, 'subscribers'),
-        where('confirmationToken', '==', token)
-      );
+      const q = query(collection(db, 'subscribers'), where('confirmationToken', '==', token), limit(1));
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
         return { success: false, message: 'Invalid or expired confirmation token.' };
       }
 
-      const docSnapshot = querySnapshot.docs[0];
-      const subscriber = docSnapshot.data() as Subscriber;
+      const subscriberDoc = querySnapshot.docs[0];
+      const subscriberData = subscriberDoc.data() as Subscriber;
 
-      if (subscriber.status === 'confirmed') {
-        return { success: false, message: 'Email is already confirmed.' };
+      if (subscriberData.status === 'confirmed') {
+        return { success: false, message: 'This email address has already been confirmed.' };
       }
 
-      // Update subscriber status
-      await updateDoc(doc(db, 'subscribers', docSnapshot.id), {
+      await updateDoc(doc(db, 'subscribers', subscriberDoc.id), {
         status: 'confirmed',
         confirmedAt: serverTimestamp(),
-        confirmationToken: null, // Remove token after confirmation
+        confirmationToken: null, // Clear the token after use
       });
 
-      // Send welcome email via Cloudflare Worker
-      if (subscriber.unsubscribeToken) {
-        await emailService.sendWelcomeEmail(subscriber.email, subscriber.unsubscribeToken);
+      // Send welcome email after confirmation
+      if (subscriberData.unsubscribeToken) {
+        await emailService.sendWelcomeEmail(subscriberData.email, subscriberData.unsubscribeToken);
       }
 
-      // Track confirmation event
-      await this.trackEvent('confirmation', subscriber.email);
+      await this.trackEvent('confirmation', subscriberData.email);
 
       return { success: true, message: 'Subscription confirmed successfully!' };
     } catch (error) {
       console.error('Confirmation error:', error);
-      return { success: false, message: 'Failed to confirm subscription. Please try again.' };
+      return { success: false, message: 'An unexpected error occurred during confirmation.' };
     }
   },
 

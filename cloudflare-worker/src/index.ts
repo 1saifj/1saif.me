@@ -252,20 +252,89 @@ async function sendEmail(to: string, subject: string, html: string, text: string
 // Main request handler
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		const url = new URL(request.url);
-		const path = url.pathname;
-
-		// Handle CORS preflight requests
+		// Handle OPTIONS for CORS preflight
 		if (request.method === 'OPTIONS') {
-			return new Response(null, {
-				status: 204,
-				headers: corsHeaders,
-			});
+			return new Response(null, { headers: corsHeaders });
 		}
+		
+		const url = new URL(request.url);
 
 		try {
+			if (url.pathname === '/send-confirmation') {
+				if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+				const { email, confirmationToken } = await request.json<ConfirmationEmailRequest>();
+				if (!email || !confirmationToken) return new Response('Missing email or token', { status: 400 });
+				
+				const { subject, html, text } = emailTemplates.confirmation(email, confirmationToken, env.WEBSITE_DOMAIN);
+				const success = await sendEmail(email, subject, html, text, env);
+				
+				return new Response(JSON.stringify({ success }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+			}
+
+			if (url.pathname === '/send-welcome') {
+				if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+				const { email, unsubscribeToken } = await request.json<WelcomeEmailRequest>();
+				if (!email || !unsubscribeToken) return new Response('Missing email or unsubscribe token', { status: 400 });
+
+				const { subject, html, text } = emailTemplates.welcome(email, unsubscribeToken, env.WEBSITE_DOMAIN);
+				const success = await sendEmail(email, subject, html, text, env);
+
+				return new Response(JSON.stringify({ success }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+			}
+
+			if (url.pathname === '/send-unsubscribe') {
+				if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+				const { email } = await request.json<UnsubscribeEmailRequest>();
+				if (!email) return new Response('Missing email', { status: 400 });
+
+				const template = emailTemplates.unsubscribe(email);
+				const success = await sendEmail(email, template.subject, template.html, template.text, env);
+
+				return new Response(JSON.stringify({
+					success,
+					message: success ? 'Unsubscribe confirmation sent' : 'Failed to send unsubscribe confirmation'
+				}), {
+					status: success ? 200 : 500,
+					headers: {
+						'Content-Type': 'application/json',
+						...corsHeaders,
+					},
+				});
+			}
+
+			if (url.pathname === '/send-newsletter' && request.method === 'POST') {
+				const { subject, content, isTest = false } = await request.json<NewsletterRequest>();
+				
+				if (!subject || !content) {
+					return new Response(JSON.stringify({
+						error: 'Subject and content are required'
+					}), {
+						status: 400,
+						headers: {
+							'Content-Type': 'application/json',
+							...corsHeaders,
+						},
+					});
+				}
+
+				// For testing, we'll just return success without actually sending to all subscribers
+				// In a real implementation, you'd fetch all confirmed subscribers from Firebase and send emails
+				return new Response(JSON.stringify({
+					success: true,
+					totalSent: isTest ? 1 : 0,
+					errors: 0,
+					message: isTest ? 'Test newsletter functionality verified' : 'Newsletter sending not implemented (would send to all confirmed subscribers)'
+				}), {
+					status: 200,
+					headers: {
+						'Content-Type': 'application/json',
+						...corsHeaders,
+					},
+				});
+			}
+
 			// Health check endpoint
-			if (path === '/health' && request.method === 'GET') {
+			if (url.pathname === '/health' && request.method === 'GET') {
 				return new Response(JSON.stringify({
 					status: 'healthy',
 					timestamp: new Date().toISOString(),
@@ -281,7 +350,7 @@ export default {
 			}
 
 			// Test Mailtrap token endpoint
-			if (path === '/test-mailtrap' && request.method === 'GET') {
+			if (url.pathname === '/test-mailtrap' && request.method === 'GET') {
 				try {
 					console.log('Testing Mailtrap API...');
 					console.log('Token exists:', !!env.MAILTRAP_TOKEN);
@@ -334,131 +403,6 @@ export default {
 						},
 					});
 				}
-			}
-
-			      // Send confirmation email
-      if (path === '/send-confirmation' && request.method === 'POST') {
-        const { email, confirmationToken } = await request.json() as ConfirmationEmailRequest;
-				
-				if (!email || !confirmationToken) {
-					return new Response(JSON.stringify({
-						error: 'Email and confirmationToken are required'
-					}), {
-						status: 400,
-						headers: {
-							'Content-Type': 'application/json',
-							...corsHeaders,
-						},
-					});
-				}
-
-				const template = emailTemplates.confirmation(email, confirmationToken, env.WEBSITE_DOMAIN);
-				const success = await sendEmail(email, template.subject, template.html, template.text, env);
-
-				return new Response(JSON.stringify({
-					success,
-					message: success ? 'Confirmation email sent' : 'Failed to send confirmation email'
-				}), {
-					status: success ? 200 : 500,
-					headers: {
-						'Content-Type': 'application/json',
-						...corsHeaders,
-					},
-				});
-			}
-
-			      // Send welcome email
-      if (path === '/send-welcome' && request.method === 'POST') {
-        const { email, unsubscribeToken } = await request.json() as WelcomeEmailRequest;
-				
-				if (!email || !unsubscribeToken) {
-					return new Response(JSON.stringify({
-						error: 'Email and unsubscribeToken are required'
-					}), {
-						status: 400,
-						headers: {
-							'Content-Type': 'application/json',
-							...corsHeaders,
-						},
-					});
-				}
-
-				const template = emailTemplates.welcome(email, unsubscribeToken, env.WEBSITE_DOMAIN);
-				const success = await sendEmail(email, template.subject, template.html, template.text, env);
-
-				return new Response(JSON.stringify({
-					success,
-					message: success ? 'Welcome email sent' : 'Failed to send welcome email'
-				}), {
-					status: success ? 200 : 500,
-					headers: {
-						'Content-Type': 'application/json',
-						...corsHeaders,
-					},
-				});
-			}
-
-			      // Send unsubscribe confirmation
-      if (path === '/send-unsubscribe' && request.method === 'POST') {
-        const { email } = await request.json() as UnsubscribeEmailRequest;
-				
-				if (!email) {
-					return new Response(JSON.stringify({
-						error: 'Email is required'
-					}), {
-						status: 400,
-						headers: {
-							'Content-Type': 'application/json',
-							...corsHeaders,
-						},
-					});
-				}
-
-				const template = emailTemplates.unsubscribe(email);
-				const success = await sendEmail(email, template.subject, template.html, template.text, env);
-
-				return new Response(JSON.stringify({
-					success,
-					message: success ? 'Unsubscribe confirmation sent' : 'Failed to send unsubscribe confirmation'
-				}), {
-					status: success ? 200 : 500,
-					headers: {
-						'Content-Type': 'application/json',
-						...corsHeaders,
-					},
-				});
-			}
-
-			      // Send newsletter to all subscribers
-      if (path === '/send-newsletter' && request.method === 'POST') {
-        const { subject, content, isTest = false } = await request.json() as NewsletterRequest;
-				
-				if (!subject || !content) {
-					return new Response(JSON.stringify({
-						error: 'Subject and content are required'
-					}), {
-						status: 400,
-						headers: {
-							'Content-Type': 'application/json',
-							...corsHeaders,
-						},
-					});
-				}
-
-				// For testing, we'll just return success without actually sending to all subscribers
-				// In a real implementation, you'd fetch all confirmed subscribers from Firebase and send emails
-				return new Response(JSON.stringify({
-					success: true,
-					totalSent: isTest ? 1 : 0,
-					errors: 0,
-					message: isTest ? 'Test newsletter functionality verified' : 'Newsletter sending not implemented (would send to all confirmed subscribers)'
-				}), {
-					status: 200,
-					headers: {
-						'Content-Type': 'application/json',
-						...corsHeaders,
-					},
-				});
 			}
 
 			// 404 for unknown endpoints
