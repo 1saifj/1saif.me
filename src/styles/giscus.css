@@ -1,0 +1,58 @@
+/* Giscus Comments Styling - Matches Portfolio Design System */
+
+.giscus-container {
+  width: 100%;
+  min-height: 200px;
+}
+
+/* Override Giscus default styles to match design system */
+.giscus {
+  width: 100% !important;
+}
+
+.giscus iframe {
+  width: 100% !important;
+  border: none !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .giscus iframe {
+    border-radius: 8px !important;
+  }
+}
+
+/* Hide loading overlay once giscus loads */
+.giscus:not([data-loading="lazy"]) + #giscus-loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Custom theme adjustments for light mode */
+.giscus[data-theme="light"] iframe {
+  color-scheme: light;
+}
+
+/* Custom theme adjustments for dark mode */
+.giscus[data-theme="dark"] iframe {
+  color-scheme: dark;
+}
+
+/* Ensure proper responsive behavior on all screen sizes */
+@media (max-width: 480px) {
+  .giscus-container {
+    min-height: 180px;
+  }
+  
+  .giscus iframe {
+    border-radius: 6px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .giscus iframe {
+    border-radius: 16px !important;
+  }
+} 
