@@ -1,0 +1,11 @@
+# Cloudflare Pages / Netlify SPA Configuration
+# This file ensures client-side routing works on refresh
+
+# SPA fallback - redirect all non-file requests to index.html
+/*    /index.html   200
+
+# Optional: Force HTTPS
+# http://1saif.me/*  https://1saif.me/:splat  301!
+
+# Optional: www redirect
+# https://www.1saif.me/*  https://1saif.me/:splat  301!

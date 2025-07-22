@@ -21,21 +21,10 @@ export interface ImageOptions {
  * Check if we're in a development environment where Cloudflare features aren't available
  */
 function isLocalDevelopment(): boolean {
-  // Check various indicators that we're in local development
-  return (
-    // Environment variables
-    process.env.NODE_ENV === 'development' ||
-    import.meta.env?.DEV === true ||
-    // URL indicators
-    (typeof window !== 'undefined' && (
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.hostname.includes('local') ||
-      window.location.port !== '' ||
-      // Vite dev server typically runs on these ports
-      ['3000', '5173', '4173', '8080'].includes(window.location.port)
-    ))
-  );
+  return typeof window !== 'undefined' && 
+    (window.location.hostname === 'localhost' || 
+     window.location.hostname === '127.0.0.1' || 
+     window.location.hostname.includes('localhost'));
 }
 
 /**
@@ -74,16 +63,15 @@ export function getOptimizedImageUrl(
   
   const paramString = params.join(',');
   
-  // Ensure URL is absolute
+  // Ensure URL is absolute - safe window access
   const baseUrl = originalUrl.startsWith('/') 
-    ? `${window.location.origin}${originalUrl}`
+    ? (typeof window !== 'undefined' ? `${window.location.origin}${originalUrl}` : `https://1saif.me${originalUrl}`)
     : originalUrl;
-
+  
   // Return Cloudflare Image Resizing URL
-  return `${window.location.origin}/cdn-cgi/image/${paramString}/${baseUrl}`;
-}
-
-/**
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://1saif.me';
+  return `${origin}/cdn-cgi/image/${paramString}/${baseUrl}`;
+}/**
  * Common image optimization presets for different use cases
  */
 export const ImagePresets = {
@@ -163,7 +151,8 @@ export function useResponsiveImage(src: string, preset: keyof typeof ImagePreset
   
   React.useEffect(() => {
     const updateImageSrc = () => {
-      const width = window.innerWidth;
+      // Safe window access with fallback
+      const width = typeof window !== 'undefined' ? window.innerWidth : 1024;
       let targetWidth: number;
       
       // Responsive breakpoints
@@ -186,9 +175,12 @@ export function useResponsiveImage(src: string, preset: keyof typeof ImagePreset
     };
     
     updateImageSrc();
-    window.addEventListener('resize', updateImageSrc);
     
-    return () => window.removeEventListener('resize', updateImageSrc);
+    // Only add event listener if window exists
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', updateImageSrc);
+      return () => window.removeEventListener('resize', updateImageSrc);
+    }
   }, [src, preset]);
   
   return optimizedSrc;
@@ -218,8 +210,9 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     customOptions ? getOptimizedImageUrl(src, customOptions) : responsiveSrc
   );
   const [hasError, setHasError] = React.useState(false);
+  const [isLoaded, setIsLoaded] = React.useState(false);
 
-  const handleError = () => {
+  const handleError = React.useCallback(() => {
     if (!hasError) {
       setHasError(true);
       if (fallback) {
@@ -229,11 +222,12 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         setImageSrc(src);
       }
     }
-  };
+  }, [hasError, fallback, src]);
 
-  const handleLoad = () => {
+  const handleLoad = React.useCallback(() => {
     setHasError(false);
-  };
+    setIsLoaded(true);
+  }, []);
 
   React.useEffect(() => {
     if (!customOptions) {
@@ -245,7 +239,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     ...props,
     src: imageSrc,
     alt,
-    className: `${className} transition-opacity duration-300`,
+    className: `${className} transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`,
     onError: handleError,
     onLoad: handleLoad,
     loading: 'lazy'
@@ -282,18 +276,19 @@ export function generateSrcSet(src: string, widths: number[], options?: Omit<Ima
  * Analytics for image optimization performance
  */
 export function trackImageOptimization(originalSize?: number, optimizedSize?: number, format?: string) {
-  if (originalSize && optimizedSize) {
-    const savings = ((originalSize - optimizedSize) / originalSize) * 100;
-    
-    // Track with Cloudflare Analytics
-    if ((window as any).cloudflare?.beam) {
-      (window as any).cloudflare.beam.track('image_optimization', {
-        original_size: originalSize,
-        optimized_size: optimizedSize,
-        savings_percent: Math.round(savings),
-        format: format || 'unknown'
-      });
-    }
+  if (typeof window === 'undefined' || !originalSize || !optimizedSize) return;
+  
+  const savings = ((originalSize - optimizedSize) / originalSize) * 100;
+  
+  // Track with Cloudflare Analytics
+  const cloudflare = (window as { cloudflare?: { beam?: { track: (event: string, data: Record<string, unknown>) => void } } }).cloudflare;
+  if (cloudflare?.beam) {
+    cloudflare.beam.track('image_optimization', {
+      original_size: originalSize,
+      optimized_size: optimizedSize,
+      savings_percent: Math.round(savings),
+      format: format || 'unknown'
+    });
   }
 }
 
