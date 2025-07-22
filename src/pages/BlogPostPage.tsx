@@ -1,22 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, Link, Navigate } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, Tag, Share2, BookOpen, User, ChevronRight, Home, Copy, Check, List, Eye, Star, MessageCircle, Menu, X, Twitter, Linkedin, Facebook, Link as LinkIcon, Download, Printer as Print, ChevronUp } from 'lucide-react'
+import { useParams, Link } from 'react-router-dom'
+import { ArrowLeft, Calendar, Clock, Tag, Share2, BookOpen, User, ChevronRight, Home, Eye, Star, Menu, X, ChevronUp } from 'lucide-react'
 import { articles } from '../utils/contentLoader'
 import { blogSchema } from '../schemas/blogSchema'
 import { findContentBySlug } from '../utils/slugUtils'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import ContentRecommendations from '../components/ContentRecommendations'
 import AIContentEnhancer from '../components/AIContentEnhancer'
-import { createSlugFromTitle } from '../utils/slugUtils'
-import { RelatedPosts } from '../components/RelatedPosts'
-import { GiscusComments } from '../components/GiscusComments'
-import { ArticleStructuredData } from '../components/StructuredData'
-import SEOHead from '../components/SEOHead'
-import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
+import { useBlogViews } from '../hooks/useBlogViews'
 
 export const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
-  const [copied, setCopied] = useState(false)
+  const [, setCopied] = useState(false)
   const [tableOfContents, setTableOfContents] = useState<Array<{id: string, text: string, level: number}>>([])
   const [activeSection, setActiveSection] = useState<string>('')
   const [showToc, setShowToc] = useState(false)
@@ -24,11 +19,25 @@ export const BlogPostPage: React.FC = () => {
   const [readingProgress, setReadingProgress] = useState(0)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [showShareMenu, setShowShareMenu] = useState(false)
-  const [estimatedReadTime, setEstimatedReadTime] = useState(0)
-  const [viewCount, setViewCount] = useState(0)
-  const [isLoadingViews, setIsLoadingViews] = useState(true)
   const [htmlContent, setHtmlContent] = useState<string>('')
-  const [viewStats, setViewStats] = useState<BlogViewStats | null>(null)
+  const { viewCount, isLoading: isLoadingViews } = useBlogViews(slug ?? null);
+  const article = findContentBySlug(articles, slug ?? '');
+
+  // Convert markdown to HTML when content changes
+  useEffect(() => {
+    if (article?.content) {
+      convertMarkdownToHtml(article.content)
+        .then(html => {
+          setHtmlContent(html)
+        })
+        .catch(() => {
+          console.error('Failed to convert markdown:')
+          setHtmlContent('<p>Error loading content</p>')
+        })
+    } else {
+      setHtmlContent('');
+    }
+  }, [article])
   
   useEffect(() => {
     const handleScroll = () => {
@@ -504,55 +513,8 @@ export const BlogPostPage: React.FC = () => {
     )
   }
 
-  const article = findContentBySlug(articles, slug)
   
-  // Track page view in Firebase with reliable updates
-  useEffect(() => {
-    if (!slug || !article) return
 
-    const trackView = async () => {
-      try {
-        // First, get current view count
-        const currentViewCount = await blogViewsService.getQuickViewCount(slug);
-        
-        // Track the new view in background
-        await blogViewsService.trackView(slug, {
-          source: document.referrer ? 'referral' : 'direct'
-        });
-        
-        // Get the final updated stats and set the view count
-        const updatedStats = await blogViewsService.getBlogStats(slug);
-        setViewStats(updatedStats);
-        setViewCount(updatedStats.totalViews);
-        setIsLoadingViews(false);
-        
-      } catch (error) {
-        console.error('Failed to track view:', error);
-        // Fallback to localStorage
-        const views = localStorage.getItem(`blog-views-${slug}`) || '0'
-        const newViews = parseInt(views) + 1
-        localStorage.setItem(`blog-views-${slug}`, newViews.toString())
-        setViewCount(newViews);
-        setIsLoadingViews(false);
-      }
-    };
-
-    trackView();
-  }, [slug, article]);
-
-  // Convert markdown to HTML when content changes
-  useEffect(() => {
-    if (article?.content) {
-      convertMarkdownToHtml(article.content)
-        .then(html => {
-          setHtmlContent(html)
-        })
-        .catch(error => {
-          console.error('Failed to convert markdown:', error)
-          setHtmlContent('<p>Error loading content</p>')
-        })
-    }
-  }, [article])
   
   if (!article) {
     return (
@@ -592,7 +554,7 @@ export const BlogPostPage: React.FC = () => {
       draft: article.frontmatter.draft || false,
       tags: article.frontmatter.tags || []
     })
-  } catch (error) {
+  } catch {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-6">
@@ -781,11 +743,9 @@ export const BlogPostPage: React.FC = () => {
                     <span>Loading...</span>
                   </span>
                 ) : (
-                  <span>{viewStats ? (
-                    viewStats.totalViews > 1000 ? 
-                      `${(viewStats.totalViews / 1000).toFixed(1)}k` : 
-                      viewStats.totalViews
-                  ) : viewCount} views</span>
+                  <span>{viewCount > 1000 ?
+                    `${(viewCount / 1000).toFixed(1)}k` :
+                    viewCount} views</span>
                 )}
               </div>
             </div>

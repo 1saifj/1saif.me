@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, Eye, Share2, BookOpen, Tag, User, Coffee, Award, Zap, TrendingUp } from 'lucide-react'
+import { ArrowLeft, Eye, Share2 } from 'lucide-react'
 import { publishedBlogs } from '../data/blogs'
 import { articles } from '../utils/contentLoader'
 import { createSlugFromTitle } from '../utils/slugUtils'
@@ -8,20 +8,18 @@ import { RelatedPosts } from '../components/RelatedPosts'
 import { GiscusComments } from '../components/GiscusComments'
 import { ArticleStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
-import { SocialImageGenerator, generateSocialImageUrl } from '../components/SocialImageGenerator'
+import { generateSocialImageUrl } from '../components/SocialImageGenerator'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
-import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
-import { getOptimizedImageUrl, ImagePresets } from '../utils/imageOptimization'
+import { useBlogViews } from '../hooks/useBlogViews'
+import { OptimizedImage } from '../utils/imageOptimization'
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
   const [readingProgress, setReadingProgress] = useState(0)
+  const { viewCount, isLoading: isLoadingViews } = useBlogViews(slug ?? null);
   const [estimatedReadTime, setEstimatedReadTime] = useState(0)
-  const [viewCount, setViewCount] = useState(0)
   const [htmlContent, setHtmlContent] = useState<string>('')
   const [isLoadingContent, setIsLoadingContent] = useState(true)
-  const [viewStats, setViewStats] = useState<BlogViewStats | null>(null)
-  const [isLoadingViews, setIsLoadingViews] = useState(true)
   const [dynamicSocialImage, setDynamicSocialImage] = useState<string>('')
 
   // Find the blog post and its content
@@ -36,37 +34,6 @@ export const BlogPost: React.FC = () => {
     const readTime = Math.ceil(wordCount / 200) // Average reading speed
     setEstimatedReadTime(readTime)
 
-    // Track page view in Firebase with proper sequencing
-    const trackView = async () => {
-      if (slug) {
-        try {
-          // First, get current view count
-          const currentViewCount = await blogViewsService.getQuickViewCount(slug);
-          
-          // Track the new view in background
-          await blogViewsService.trackView(slug, {
-            source: document.referrer ? 'referral' : 'direct'
-          });
-          
-          // Get the final updated stats and set the view count
-          const updatedStats = await blogViewsService.getBlogStats(slug);
-          setViewStats(updatedStats);
-          setViewCount(updatedStats.totalViews);
-          setIsLoadingViews(false);
-          
-        } catch (error) {
-          console.error('Failed to track view:', error);
-          // Fallback to localStorage
-          const views = localStorage.getItem(`blog-views-${slug}`) || '0'
-          const newViews = parseInt(views) + 1
-          localStorage.setItem(`blog-views-${slug}`, newViews.toString())
-          setViewCount(newViews);
-          setIsLoadingViews(false);
-        }
-      }
-    };
-
-    trackView();
 
     // Reading progress tracker
     const handleScroll = () => {
@@ -91,7 +58,7 @@ export const BlogPost: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [blog, slug])
+  }, [blog, slug, articleContent])
 
   // Generate dynamic social image if blog doesn't have a featured image
   useEffect(() => {
@@ -174,7 +141,7 @@ export const BlogPost: React.FC = () => {
     if (navigator.share) {
       try {
         await navigator.share(shareData)
-      } catch (error) {
+      } catch {
         // Fallback to clipboard
         navigator.clipboard.writeText(window.location.href)
       }
@@ -184,13 +151,6 @@ export const BlogPost: React.FC = () => {
     }
   }
 
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
 
   return (
     <>
@@ -220,57 +180,70 @@ export const BlogPost: React.FC = () => {
 
       {/* Reading Progress Bar */}
       <div 
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-50 transition-all duration-300"
+        className="fixed top-0 left-0 h-1 bg-blue-600 z-50 transition-all duration-300"
         style={{ width: `${readingProgress}%` }}
       />
 
-      {/* Hero Section */}
-      <section className="relative pt-20 sm:pt-24 pb-8 sm:pb-12 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-blue-400/10 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-400/10 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
-        </div>
-
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
-          {/* Back Navigation */}
-          <Link 
-            to="/blog"
-            className="inline-flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mb-8 group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Back to Blog</span>
-          </Link>
-
-          {/* Article Header */}
-          <header className="mb-8">
-            <article 
-              className="space-y-6"
-              itemScope 
-              itemType="https://schema.org/Article"
+      {/* Clean Header */}
+      <header className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <Link 
+              to="/blog"
+              className="inline-flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors text-sm font-medium"
             >
-              {/* Categories & Status */}
-              <div className="flex flex-wrap items-center gap-3">
-                {blog.tags.slice(0, 3).map(tag => (
-                  <span 
-                    key={tag}
-                    className="inline-flex items-center px-3 py-1 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-600 dark:text-slate-300 rounded-full text-sm font-medium border border-slate-200/50 dark:border-slate-600/50"
-                    itemProp="keywords"
-                  >
-                    <Tag className="w-3 h-3 mr-1.5" />
-                    {tag}
-                  </span>
-                ))}
-                
-                <span className="inline-flex items-center px-3 py-1 bg-green-100/80 dark:bg-green-900/30 backdrop-blur-sm text-green-700 dark:text-green-300 rounded-full text-sm font-medium border border-green-200/50 dark:border-green-600/50">
-                  <Clock className="w-3 h-3 mr-1.5" />
-                  5 min read
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Blog</span>
+            </Link>
+            
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-slate-500 dark:text-slate-400">
+                {Math.round(readingProgress)}% complete
+              </div>
+              <button
+                onClick={handleShare}
+                className="inline-flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors text-sm font-medium"
+              >
+                <Share2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Share</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Article Container */}
+      <main className="bg-white dark:bg-slate-950 min-h-screen">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Article Header */}
+          <header className="pt-12 pb-8 border-b border-slate-200 dark:border-slate-800">
+            <div className="max-w-3xl">
+              
+              {/* Meta Information */}
+              <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-slate-600 dark:text-slate-400">
+                <time 
+                  dateTime={new Date(blog.createdAt).toISOString()}
+                  className="font-medium"
+                >
+                  {new Date(blog.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </time>
+                <span>•</span>
+                <span>{estimatedReadTime} min read</span>
+                <span>•</span>
+                <span className="inline-flex items-center space-x-1">
+                  <Eye className="w-4 h-4" />
+                  <span>{isLoadingViews ? '...' : viewCount > 1000 ? `${(viewCount / 1000).toFixed(1)}k` : viewCount} views</span>
                 </span>
               </div>
-
+              
               {/* Title */}
               <h1 
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight"
+                className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white leading-[1.1] mb-6"
                 itemProp="headline"
               >
                 {blog.title}
@@ -278,71 +251,49 @@ export const BlogPost: React.FC = () => {
 
               {/* Description */}
               <p 
-                className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl"
+                className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed mb-8"
                 itemProp="description"
               >
                 {blog.description}
               </p>
 
-              {/* Author & Date - Telegraph-style structure */}
-              <div className="flex items-center gap-4 pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
-                <img 
-                  src={getOptimizedImageUrl('/sj.png', ImagePresets.avatar())} 
-                  alt="Saif Aljanahi" 
-                  className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700"
-                />
-                <div>
-                  <address 
-                    className="font-medium text-slate-900 dark:text-white not-italic"
-                    itemProp="author"
-                    itemScope
-                    itemType="https://schema.org/Person"
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2">
+                {blog.tags.slice(0, 4).map(tag => (
+                  <span 
+                    key={tag}
+                    className="inline-flex items-center px-3 py-1 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-full"
                   >
-                    <span itemProp="name">Saif Aljanahi</span>
-                  </address>
-                  <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                    <Calendar className="w-4 h-4" />
-                    <time 
-                      dateTime={new Date(blog.createdAt).toISOString()}
-                      itemProp="datePublished"
-                    >
-                      {new Date(blog.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </time>
-                  </div>
-                </div>
+                    {tag}
+                  </span>
+                ))}
               </div>
-            </article>
+            </div>
           </header>
 
           {/* Featured Image */}
           {blog.featuredImage && (
-            <div className="relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
-              <img 
-                src={getOptimizedImageUrl(blog.featuredImage, ImagePresets.hero())} 
-                alt={blog.title}
-                className="w-full h-96 object-cover"
-                itemProp="image"
-                data-cover="true"
-              />
+            <div className="py-8">
+              <div className="relative rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                <OptimizedImage 
+                  src={blog.featuredImage}
+                  preset="hero"
+                  fallback="/sj_image.jpeg"
+                  alt={blog.title}
+                  className="w-full h-96 object-cover"
+                  itemProp="image"
+                />
+              </div>
             </div>
           )}
-        </div>
-      </section>
 
-      {/* Article Content */}
-      <section className="py-8 sm:py-12 lg:py-16 bg-white dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          {/* Article Content */}
           <article 
-            className="blog-content"
+            className="py-8"
             itemProp="articleBody"
-            data-telegram-content="true"
           >
             {isLoadingContent ? (
-              <div className="animate-pulse space-y-4">
+              <div className="animate-pulse space-y-6">
                 <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
                 <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
                 <div className="h-32 bg-slate-200 dark:bg-slate-700 rounded"></div>
@@ -352,67 +303,40 @@ export const BlogPost: React.FC = () => {
             ) : (
               <div 
                 className="
-                  text-slate-700 dark:text-slate-300 leading-relaxed
-                  [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:text-slate-900 [&>h1]:dark:text-white [&>h1]:mb-6 [&>h1]:mt-8 [&>h1]:leading-tight
-                  [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-slate-900 [&>h2]:dark:text-white [&>h2]:mb-4 [&>h2]:mt-8 [&>h2]:leading-tight [&>h2]:border-b [&>h2]:border-slate-200 [&>h2]:dark:border-slate-700 [&>h2]:pb-2
-                  [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:text-slate-900 [&>h3]:dark:text-white [&>h3]:mb-4 [&>h3]:mt-6 [&>h3]:leading-tight
-                  [&>h4]:text-lg [&>h4]:font-semibold [&>h4]:text-slate-900 [&>h4]:dark:text-white [&>h4]:mb-3 [&>h4]:mt-4
-                  [&>h5]:text-base [&>h5]:font-semibold [&>h5]:text-slate-900 [&>h5]:dark:text-white [&>h5]:mb-2 [&>h5]:mt-3
-                  [&>h6]:text-sm [&>h6]:font-semibold [&>h6]:text-slate-600 [&>h6]:dark:text-slate-400 [&>h6]:mb-2 [&>h6]:mt-3
-                  
-                  [&>p]:mb-6 [&>p]:leading-relaxed [&>p]:text-slate-700 [&>p]:dark:text-slate-300
-                  
-                  [&>ul]:mb-6 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:space-y-2 [&>ul]:text-slate-700 [&>ul]:dark:text-slate-300
-                  [&>ol]:mb-6 [&>ol]:list-decimal [&>ol]:list-inside [&>ol]:space-y-2 [&>ol]:text-slate-700 [&>ol]:dark:text-slate-300
-                  [&>li]:leading-relaxed
-                  
-                  [&>blockquote]:border-l-4 [&>blockquote]:border-blue-500 [&>blockquote]:bg-blue-50 [&>blockquote]:dark:bg-blue-900/20 [&>blockquote]:p-4 [&>blockquote]:my-6 [&>blockquote]:italic [&>blockquote]:text-slate-600 [&>blockquote]:dark:text-slate-400
-                  
-                  [&>pre]:bg-slate-900 [&>pre]:dark:bg-slate-800 [&>pre]:text-green-400 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:mb-6 [&>pre]:overflow-x-auto [&>pre]:text-sm [&>pre]:leading-relaxed [&>pre]:border [&>pre]:border-slate-200 [&>pre]:dark:border-slate-700
-                  [&>code]:bg-slate-100 [&>code]:dark:bg-slate-800 [&>code]:px-2 [&>code]:py-1 [&>code]:rounded [&>code]:text-sm [&>code]:font-mono [&>code]:text-red-600 [&>code]:dark:text-red-400
-                  [&>pre_code]:bg-transparent [&>pre_code]:text-green-400 [&>pre_code]:p-0
-                  
-                  [&>table]:w-full [&>table]:mb-6 [&>table]:border-collapse [&>table]:border [&>table]:border-slate-300 [&>table]:dark:border-slate-600
-                  [&>table_th]:bg-slate-100 [&>table_th]:dark:bg-slate-800 [&>table_th]:p-3 [&>table_th]:text-left [&>table_th]:font-semibold [&>table_th]:border [&>table_th]:border-slate-300 [&>table_th]:dark:border-slate-600
-                  [&>table_td]:p-3 [&>table_td]:border [&>table_td]:border-slate-300 [&>table_td]:dark:border-slate-600
-                  
-                  [&>a]:text-blue-600 [&>a]:dark:text-blue-400 [&>a]:underline [&>a]:hover:text-blue-800 [&>a]:dark:hover:text-blue-300 [&>a]:transition-colors
-                  
-                  [&>strong]:font-bold [&>strong]:text-slate-900 [&>strong]:dark:text-white
-                  [&>em]:italic [&>em]:text-slate-700 [&>em]:dark:text-slate-300
-                  
-                  [&>hr]:my-8 [&>hr]:border-slate-300 [&>hr]:dark:border-slate-600
-                  
-                  [&>img]:max-w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:my-6 [&>img]:shadow-lg [&>img]:mx-auto
-                  
-                  [&>.highlight]:bg-yellow-100 [&>.highlight]:dark:bg-yellow-900/30 [&>.highlight]:px-1 [&>.highlight]:rounded
+                  prose prose-lg prose-slate dark:prose-invert max-w-none
+                  prose-headings:font-bold prose-headings:text-slate-900 dark:prose-headings:text-white
+                  prose-h1:text-3xl prose-h1:mb-6 prose-h1:mt-8 prose-h1:leading-tight
+                  prose-h2:text-2xl prose-h2:mb-4 prose-h2:mt-8 prose-h2:leading-tight prose-h2:border-b prose-h2:border-slate-200 dark:prose-h2:border-slate-700 prose-h2:pb-2
+                  prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-6 prose-h3:leading-tight
+                  prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:leading-relaxed prose-p:mb-6
+                  prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+                  prose-strong:font-semibold prose-strong:text-slate-900 dark:prose-strong:text-white
+                  prose-code:text-sm prose-code:font-mono prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-slate-800 dark:prose-code:text-slate-200 prose-code:before:content-none prose-code:after:content-none
+                  prose-pre:bg-slate-900 dark:prose-pre:bg-slate-800 prose-pre:text-slate-100 prose-pre:rounded-lg prose-pre:border prose-pre:border-slate-200 dark:prose-pre:border-slate-700
+                  prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-950/30 prose-blockquote:not-italic prose-blockquote:font-normal
+                  prose-ul:my-6 prose-ol:my-6 prose-li:my-1
+                  prose-img:rounded-lg prose-img:shadow-lg
+                  prose-table:text-sm
+                  prose-hr:border-slate-300 dark:prose-hr:border-slate-700
                 "
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
               />
             )}
           </article>
 
-          {/* Article Footer */}
-          <div className="mt-16 pt-8 border-t border-slate-200 dark:border-slate-700">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  S
-                </div>
-                <div>
-                  <h4 className="font-semibold text-slate-900 dark:text-white">Saif Aljanahi</h4>
-                  <p className="text-slate-600 dark:text-slate-400">Software Engineer & Tech Enthusiast</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={handleShare}
-                  className="flex items-center space-x-1 px-3 py-2 rounded-lg text-slate-500 hover:text-blue-500 transition-colors"
-                >
-                  <Share2 className="w-5 h-5" />
-                  <span className="font-medium">Share</span>
-                </button>
+          {/* Author Section */}
+          <div className="py-8 border-t border-slate-200 dark:border-slate-800">
+            <div className="flex items-center space-x-4">
+              <OptimizedImage 
+                src="/sj.png"
+                preset="avatar"
+                fallback="/sj_image.jpeg"
+                alt="Saif Aljanahi" 
+                className="w-16 h-16 rounded-full object-cover"
+              />
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Saif Aljanahi</h3>
+                <p className="text-slate-600 dark:text-slate-400">Software Engineer & Tech Writer</p>
               </div>
             </div>
           </div>
@@ -430,7 +354,7 @@ export const BlogPost: React.FC = () => {
             postTitle={blog.title}
           />
         </div>
-      </section>
+      </main>
     </>
   )
 } 
