@@ -3,7 +3,7 @@ title: How to Mock an API in ONE minute
 description: Tools and Libraries for Quickly Setting Up a Mock API
 createdAt: "2022-12-17"
 updatedAt: 2022-12-17
-featuredImage: "/articles/database-locking/api_mock_feat.png"
+featuredImage: "/articles/api_mock_feat.png"
 tags:
   - api
   - testing

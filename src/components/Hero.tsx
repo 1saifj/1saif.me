@@ -59,7 +59,7 @@ export const Hero: React.FC = () => {
             />
           </div>
           
-          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-6 tracking-tight px-4">
             Saif Aljanahi
           </h1>
           
@@ -70,7 +70,7 @@ export const Hero: React.FC = () => {
             </h2>
           </div>
           
-          <p className="text-lg sm:text-xl text-gray-300 dark:text-gray-200 mb-10 max-w-xl sm:max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl text-gray-300 dark:text-gray-200 mb-10 max-w-xl sm:max-w-2xl mx-auto leading-relaxed px-4">
             Transforming complex business requirements into scalable, secure software solutions using 
             <strong className="text-white"> Golang</strong>, <strong className="text-white">Python</strong>, 
             <strong className="text-white"> Flutter</strong>, and <strong className="text-white">Clean Architecture</strong> principles.

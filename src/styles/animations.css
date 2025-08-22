@@ -134,6 +134,12 @@
   animation: shimmer 2s infinite;
 }
 
+/* Progressive Reading Block Animations */
+.reading-block {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

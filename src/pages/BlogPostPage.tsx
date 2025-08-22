@@ -13,6 +13,55 @@ import { GiscusComments } from '../components/GiscusComments'
 import { ArticleStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
 import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
+import ProgressiveReading from '../components/ProgressiveReading'
+
+// Progressive Reading Blocks Component
+const ProgressiveReadingBlock: React.FC<{ delay?: number; className?: string }> = ({ 
+  delay = 0, 
+  className = '',
+  children 
+}) => {
+  return (
+    <div 
+      className={`reading-block ${className}`}
+      style={{
+        animationDelay: `${delay}ms`,
+        animation: 'fadeInUp 0.8s ease-out forwards',
+        animationFillMode: 'forwards'
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+// Content Loading Skeleton
+const ContentLoadingSkeleton: React.FC = () => {
+  return (
+    <div className="space-y-8 animate-pulse">
+      {/* Heading skeleton */}
+      <div className="space-y-4">
+        <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded-lg w-3/4"></div>
+        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+      </div>
+      
+      {/* Paragraph skeletons */}
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="space-y-3">
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded"></div>
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-5/6"></div>
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-4/6"></div>
+        </div>
+      ))}
+      
+      {/* Code block skeleton */}
+      <div className="space-y-3">
+        <div className="h-6 bg-slate-300 dark:bg-slate-600 rounded-lg w-1/4"></div>
+        <div className="h-32 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
+      </div>
+    </div>
+  )
+}
 
 export const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -28,6 +77,7 @@ export const BlogPostPage: React.FC = () => {
   const [viewCount, setViewCount] = useState(0)
   const [isLoadingViews, setIsLoadingViews] = useState(true)
   const [htmlContent, setHtmlContent] = useState<string>('')
+  const [isContentLoading, setIsContentLoading] = useState(true)
   const [viewStats, setViewStats] = useState<BlogViewStats | null>(null)
   
   useEffect(() => {
@@ -543,13 +593,16 @@ export const BlogPostPage: React.FC = () => {
   // Convert markdown to HTML when content changes
   useEffect(() => {
     if (article?.content) {
+      setIsContentLoading(true)
       convertMarkdownToHtml(article.content)
         .then(html => {
           setHtmlContent(html)
+          setIsContentLoading(false)
         })
         .catch(error => {
           console.error('Failed to convert markdown:', error)
           setHtmlContent('<p>Error loading content</p>')
+          setIsContentLoading(false)
         })
     }
   }, [article])
@@ -686,6 +739,16 @@ export const BlogPostPage: React.FC = () => {
 
   return (
     <div className="blog-container">
+      {/* Progressive Reading System */}
+      <ProgressiveReading 
+        articleSlug={slug}
+        content={article?.content || ''}
+        showDetailedStats={true}
+        showFloatingProgress={true}
+        showReadingResume={true}
+        className="mb-8"
+      />
+
       {/* Reading Progress Bar */}
       <div 
         className="reading-progress"
@@ -885,112 +948,125 @@ export const BlogPostPage: React.FC = () => {
           {/* Main Content */}
           <main className="lg:col-span-4">
             <article className="article-content p-4 sm:p-6 md:p-8 lg:p-12 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
-              <div 
-                className="
-                  article-prose max-w-none text-slate-700 dark:text-slate-300 leading-relaxed
-                  [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:text-slate-900 [&>h1]:dark:text-white [&>h1]:mb-6 [&>h1]:mt-8 [&>h1]:leading-tight
-                  [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-slate-900 [&>h2]:dark:text-white [&>h2]:mb-4 [&>h2]:mt-8 [&>h2]:leading-tight [&>h2]:border-b [&>h2]:border-slate-200 [&>h2]:dark:border-slate-700 [&>h2]:pb-2
-                  [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:text-slate-900 [&>h3]:dark:text-white [&>h3]:mb-4 [&>h3]:mt-6 [&>h3]:leading-tight
-                  [&>h4]:text-lg [&>h4]:font-semibold [&>h4]:text-slate-900 [&>h4]:dark:text-white [&>h4]:mb-3 [&>h4]:mt-4
-                  [&>h5]:text-base [&>h5]:font-semibold [&>h5]:text-slate-900 [&>h5]:dark:text-white [&>h5]:mb-2 [&>h5]:mt-3
-                  [&>h6]:text-sm [&>h6]:font-semibold [&>h6]:text-slate-600 [&>h6]:dark:text-slate-400 [&>h6]:mb-2 [&>h6]:mt-3
-                  
-                  [&>p]:mb-6 [&>p]:leading-relaxed [&>p]:text-slate-700 [&>p]:dark:text-slate-300
-                  
-                  [&>ul]:mb-6 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:space-y-2 [&>ul]:text-slate-700 [&>ul]:dark:text-slate-300
-                  [&>ol]:mb-6 [&>ol]:list-decimal [&>ol]:list-inside [&>ol]:space-y-2 [&>ol]:text-slate-700 [&>ol]:dark:text-slate-300
-                  [&>li]:leading-relaxed
-                  
-                  [&>blockquote]:border-l-4 [&>blockquote]:border-blue-500 [&>blockquote]:bg-blue-50 [&>blockquote]:dark:bg-blue-900/20 [&>blockquote]:p-4 [&>blockquote]:my-6 [&>blockquote]:italic [&>blockquote]:text-slate-600 [&>blockquote]:dark:text-slate-400
-                  
-                  [&>pre]:bg-slate-900 [&>pre]:dark:bg-slate-800 [&>pre]:text-green-400 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:mb-6 [&>pre]:overflow-x-auto [&>pre]:text-sm [&>pre]:leading-relaxed [&>pre]:border [&>pre]:border-slate-200 [&>pre]:dark:border-slate-700
-                  [&>code]:bg-slate-100 [&>code]:dark:bg-slate-800 [&>code]:px-2 [&>code]:py-1 [&>code]:rounded [&>code]:text-sm [&>code]:font-mono [&>code]:text-red-600 [&>code]:dark:text-red-400
-                  [&>pre_code]:bg-transparent [&>pre_code]:text-green-400 [&>pre_code]:p-0
-                  
-                  [&>table]:w-full [&>table]:mb-6 [&>table]:border-collapse [&>table]:border [&>table]:border-slate-300 [&>table]:dark:border-slate-600
-                  [&>table_th]:bg-slate-100 [&>table_th]:dark:bg-slate-800 [&>table_th]:p-3 [&>table_th]:text-left [&>table_th]:font-semibold [&>table_th]:border [&>table_th]:border-slate-300 [&>table_th]:dark:border-slate-600
-                  [&>table_td]:p-3 [&>table_td]:border [&>table_td]:border-slate-300 [&>table_td]:dark:border-slate-600
-                  
-                  [&>a]:text-blue-600 [&>a]:dark:text-blue-400 [&>a]:underline [&>a]:hover:text-blue-800 [&>a]:dark:hover:text-blue-300 [&>a]:transition-colors
-                  
-                  [&>strong]:font-bold [&>strong]:text-slate-900 [&>strong]:dark:text-white
-                  [&>em]:italic [&>em]:text-slate-700 [&>em]:dark:text-slate-300
-                  
-                  [&>hr]:my-8 [&>hr]:border-slate-300 [&>hr]:dark:border-slate-600
-                  
-                  [&>img]:max-w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:my-6 [&>img]:shadow-lg [&>img]:mx-auto
-                  
-                  [&>.highlight]:bg-yellow-100 [&>.highlight]:dark:bg-yellow-900/30 [&>.highlight]:px-1 [&>.highlight]:rounded
-                "
-                dangerouslySetInnerHTML={{ __html: htmlContent }}
-              />
+              {isContentLoading ? (
+                <ContentLoadingSkeleton />
+              ) : (
+                <ProgressiveReadingBlock delay={100}>
+                  <div 
+                    className="
+                      article-prose max-w-none text-slate-700 dark:text-slate-300 leading-relaxed
+                      [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:text-slate-900 [&>h1]:dark:text-white [&>h1]:mb-6 [&>h1]:mt-8 [&>h1]:leading-tight
+                      [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-slate-900 [&>h2]:dark:text-white [&>h2]:mb-4 [&>h2]:mt-8 [&>h2]:leading-tight [&>h2]:border-b [&>h2]:border-slate-200 [&>h2]:dark:border-slate-700 [&>h2]:pb-2
+                      [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:text-slate-900 [&>h3]:dark:text-white [&>h3]:mb-4 [&>h3]:mt-6 [&>h3]:leading-tight
+                      [&>h4]:text-lg [&>h4]:font-semibold [&>h4]:text-slate-900 [&>h4]:dark:text-white [&>h4]:mb-3 [&>h4]:mt-4
+                      [&>h5]:text-base [&>h5]:font-semibold [&>h5]:text-slate-900 [&>h5]:dark:text-white [&>h5]:mb-2 [&>h5]:mt-3
+                      [&>h6]:text-sm [&>h6]:font-semibold [&>h6]:text-slate-600 [&>h6]:dark:text-slate-400 [&>h6]:mb-2 [&>h6]:mt-3
+                      
+                      [&>p]:mb-6 [&>p]:leading-relaxed [&>p]:text-slate-700 [&>p]:dark:text-slate-300
+                      
+                      [&>ul]:mb-6 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:space-y-2 [&>ul]:text-slate-700 [&>ul]:dark:text-slate-300
+                      [&>ol]:mb-6 [&>ol]:list-decimal [&>ol]:list-inside [&>ol]:space-y-2 [&>ol]:text-slate-700 [&>ol]:dark:text-slate-300
+                      [&>li]:leading-relaxed
+                      
+                      [&>blockquote]:border-l-4 [&>blockquote]:border-blue-500 [&>blockquote]:bg-blue-50 [&>blockquote]:dark:bg-blue-900/20 [&>blockquote]:p-4 [&>blockquote]:my-6 [&>blockquote]:italic [&>blockquote]:text-slate-600 [&>blockquote]:dark:text-slate-400
+                      
+                      [&>pre]:bg-slate-900 [&>pre]:dark:bg-slate-800 [&>pre]:text-green-400 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:mb-6 [&>pre]:overflow-x-auto [&>pre]:text-sm [&>pre]:leading-relaxed [&>pre]:border [&>pre]:border-slate-200 [&>pre]:dark:border-slate-700
+                      [&>code]:bg-slate-100 [&>code]:dark:bg-slate-800 [&>code]:px-2 [&>code]:py-1 [&>code]:rounded [&>code]:text-sm [&>code]:font-mono [&>code]:text-red-600 [&>code]:dark:text-red-400
+                      [&>pre_code]:bg-transparent [&>pre_code]:text-green-400 [&>pre_code]:p-0
+                      
+                      [&>table]:w-full [&>table]:mb-6 [&>table]:border-collapse [&>table]:border [&>table]:border-slate-300 [&>table]:dark:border-slate-600
+                      [&>table_th]:bg-slate-100 [&>table_th]:dark:bg-slate-800 [&>table_th]:p-3 [&>table_th]:text-left [&>table_th]:font-semibold [&>table_th]:border [&>table_th]:border-slate-300 [&>table_th]:dark:border-slate-600
+                      [&>table_td]:p-3 [&>table_td]:border [&>table_td]:border-slate-300 [&>table_td]:dark:border-slate-600
+                      
+                      [&>a]:text-blue-600 [&>a]:dark:text-blue-400 [&>a]:underline [&>a]:hover:text-blue-800 [&>a]:dark:hover:text-blue-300 [&>a]:transition-colors
+                      
+                      [&>strong]:font-bold [&>strong]:text-slate-900 [&>strong]:dark:text-white
+                      [&>em]:italic [&>em]:text-slate-700 [&>em]:dark:text-slate-300
+                      
+                      [&>hr]:my-8 [&>hr]:border-slate-300 [&>hr]:dark:border-slate-600
+                      
+                      [&>img]:max-w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:my-6 [&>img]:shadow-lg [&>img]:mx-auto
+                      
+                      [&>.highlight]:bg-yellow-100 [&>.highlight]:dark:bg-yellow-900/30 [&>.highlight]:px-1 [&>.highlight]:rounded
+                    "
+                    dangerouslySetInnerHTML={{ __html: htmlContent }}
+                  />
+                </ProgressiveReadingBlock>
+              )}
             </article>
 
             {/* AI Content Enhancement */}
-            <AIContentEnhancer 
-              content={article.content}
-              title={article.frontmatter.title || ''}
-              existingTags={article.frontmatter.tags || []}
-              className="mb-12"
-            />
+            <ProgressiveReadingBlock delay={200}>
+              <AIContentEnhancer 
+                content={article.content}
+                title={article.frontmatter.title || ''}
+                existingTags={article.frontmatter.tags || []}
+                className="mb-12"
+              />
+            </ProgressiveReadingBlock>
 
             {/* AI-Powered Content Recommendations */}
-            <ContentRecommendations
-              currentSlug={slug!}
-              className="mb-12"
-            />
+            <ProgressiveReadingBlock delay={300}>
+              <ContentRecommendations
+                currentSlug={slug!}
+                className="mb-12"
+              />
+            </ProgressiveReadingBlock>
 
             {/* Author Bio */}
-            <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 rounded-3xl p-8 text-white shadow-2xl mb-12 relative overflow-hidden">
-              <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.05%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
-              
-              <div className="relative flex items-start space-x-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 ring-4 ring-white/20 shadow-xl">
-                  <img 
-                    src="/sj_image.jpeg" 
-                    alt="Saif Aljanahi - Full-Stack Software Engineer"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3">About the Author</h3>
-                  <h4 className="text-xl font-semibold mb-4 text-blue-300">Saif Aljanahi</h4>
-                  <p className="text-slate-300 mb-6 leading-relaxed">
-                    Full-Stack Software Engineer specializing in <strong className="text-white">Golang</strong>, <strong className="text-white">Python</strong>, <strong className="text-white">Flutter</strong>, and <strong className="text-white">Clean Architecture</strong>. 
-                    Currently working as Software Engineer at <strong className="text-white">AlQaseh</strong> and Assistant Engineer at <strong className="text-white">University of Kufa</strong>, building scalable solutions for 
-                    financial systems and healthcare technology.
-                  </p>
-                  <div className="flex flex-wrap gap-4">
-                    <a 
-                      href="https://github.com/1saifj" 
-                      className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm border border-white/20"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <span>GitHub</span>
-                    </a>
-                    <a 
-                      href="https://www.linkedin.com/in/1saifj" 
-                      className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm border border-white/20"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <span>LinkedIn</span>
-                    </a>
-                    <a 
-                      href="mailto:saifalialjanahi@gmail.com" 
-                      className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                    >
-                      <span>Contact</span>
-                    </a>
+            <ProgressiveReadingBlock delay={400}>
+              <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 rounded-3xl p-8 text-white shadow-2xl mb-12 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.05%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+                
+                <div className="relative flex items-start space-x-6">
+                  <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 ring-4 ring-white/20 shadow-xl">
+                    <img 
+                      src="/sj_image.jpeg" 
+                      alt="Saif Aljanahi - Full-Stack Software Engineer"
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold mb-3">About the Author</h3>
+                    <h4 className="text-xl font-semibold mb-4 text-blue-300">Saif Aljanahi</h4>
+                    <p className="text-slate-300 mb-6 leading-relaxed">
+                      Full-Stack Software Engineer specializing in <strong className="text-white">Golang</strong>, <strong className="text-white">Python</strong>, <strong className="text-white">Flutter</strong>, and <strong className="text-white">Clean Architecture</strong>. 
+                      Currently working as Software Engineer at <strong className="text-white">AlQaseh</strong> and Assistant Engineer at <strong className="text-white">University of Kufa</strong>, building scalable solutions for 
+                      financial systems and healthcare technology.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <a 
+                        href="https://github.com/1saifj" 
+                        className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm border border-white/20"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <span>GitHub</span>
+                      </a>
+                      <a 
+                        href="https://www.linkedin.com/in/1saifj" 
+                        className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm border border-white/20"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <span>LinkedIn</span>
+                      </a>
+                      <a 
+                        href="mailto:saifalialjanahi@gmail.com" 
+                        className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                      >
+                        <span>Contact</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ProgressiveReadingBlock>
 
             {/* Navigation */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-slate-200">
+            <ProgressiveReadingBlock delay={500}>
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-slate-200">
               <Link 
                 to="/#blog"
                 className="group inline-flex items-center space-x-3 bg-slate-900 text-white px-8 py-4 rounded-xl hover:bg-slate-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl hover:scale-105"
@@ -1007,6 +1083,7 @@ export const BlogPostPage: React.FC = () => {
                 </p>
               </div>
             </div>
+            </ProgressiveReadingBlock>
           </main>
         </div>
       </div>

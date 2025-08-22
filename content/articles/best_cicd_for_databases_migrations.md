@@ -3,7 +3,7 @@ title: "Database Migrations Done Right: Git-Style Version Control for Your Schem
 description: "Transform your database deployment chaos into elegant, version-controlled workflows. Learn battle-tested strategies for managing schema changes across teams and environments with zero downtime."
 createdAt: "2025-01-22"
 updatedAt: 2025-01-22
-featuredImage: "/articles/database-migrations/db_git_flow_feat.png"
+featuredImage: "/articles/db_cicd_feat.png"
 tags:
   - database
   - migrations

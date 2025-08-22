@@ -50,14 +50,12 @@ class AnalyticsManager {
   }
 
   trackReadingProgress(articleSlug: string, progress: number) {
-    if (progress > 0 && progress % 25 === 0) { // Track at 25%, 50%, 75%, 100%
-      this.trackEvent({
-        action: 'reading_progress',
-        category: 'engagement',
-        label: articleSlug,
-        value: progress
-      })
-    }
+    this.trackEvent({
+      action: 'reading_progress',
+      category: 'engagement',
+      label: articleSlug,
+      value: progress
+    })
   }
 
   trackDownload(fileName: string) {

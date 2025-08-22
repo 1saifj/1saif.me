@@ -127,7 +127,7 @@ export const Projects: React.FC = () => {
               <Star className="w-4 h-4" />
               <span>Featured Software Projects</span>
             </div>
-            <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 tracking-tight">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 tracking-tight px-4">
               Project Portfolio
             </h2>
             <p className="text-xl text-slate-300 max-w-4xl mx-auto leading-relaxed">
