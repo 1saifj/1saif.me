@@ -35,19 +35,25 @@ export const Blog: React.FC = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-blue-950 dark:to-purple-950 min-h-screen transition-colors duration-300">
+    <section className="py-16 sm:py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-blue-950 dark:to-purple-950 min-h-screen transition-colors duration-300 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/20 dark:bg-blue-900/10 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute top-60 right-20 w-96 h-96 bg-purple-200/20 dark:bg-purple-900/10 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
+        <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-cyan-200/20 dark:bg-cyan-900/10 rounded-full blur-3xl animate-pulse-slow delay-2000"></div>
+      </div>
       <div className="container mx-auto px-6">
         <div className="max-w-7xl mx-auto">
           {/* Enhanced Header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 sm:mb-16 relative z-10">
             <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-medium mb-6 shadow-lg">
               <TrendingUp className="w-4 h-4" />
               <span>Latest Technical Insights</span>
             </div>
-            <h2 id="blog-heading" className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight transition-colors duration-300">
+            <h2 id="blog-heading" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-6 sm:mb-8 tracking-tight px-4 transition-colors duration-300 bg-gradient-to-r from-slate-900 to-blue-900 dark:from-white dark:to-blue-200 bg-clip-text text-transparent">
               Engineering Blog
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-4xl mx-auto leading-relaxed transition-colors duration-300">
+            <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-4xl mx-auto leading-relaxed transition-colors duration-300 backdrop-blur-sm bg-white/30 dark:bg-slate-900/30 rounded-2xl p-6 sm:p-8 border border-white/20 dark:border-slate-700/30 shadow-sm">
               Deep dives into <strong className="text-slate-900 dark:text-white">software architecture</strong>, <strong className="text-slate-900 dark:text-white">system design</strong>, 
               and <strong className="text-slate-900 dark:text-white">engineering best practices</strong> from real-world experience
             </p>
@@ -55,12 +61,12 @@ export const Blog: React.FC = () => {
 
           {/* Featured Article Hero */}
           {featuredArticle && (
-            <div className="mb-20">
-              <div className="relative bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 dark:from-slate-950 dark:via-blue-950 dark:to-slate-950 rounded-3xl overflow-hidden shadow-2xl transition-colors duration-300">
+            <div className="mb-16 sm:mb-20">
+              <div className="relative bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 dark:from-slate-950 dark:via-blue-950 dark:to-slate-950 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl transition-colors duration-300 hover:shadow-3xl hover:scale-[1.01] transition-all duration-500 border-2 border-transparent hover:border-blue-500/20">
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.05%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
                 
-                <div className="relative p-8 md:p-16">
-                  <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div className="relative p-6 sm:p-8 md:p-12 lg:p-16">
+                  <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     <div>
                       <div className="flex items-center space-x-3 mb-6">
                         <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
@@ -72,15 +78,15 @@ export const Blog: React.FC = () => {
                         </div>
                       </div>
                       
-                      <h3 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
                         {featuredArticle.title}
                       </h3>
                       
-                      <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+                      <p className="text-lg sm:text-xl text-blue-100 mb-8 leading-relaxed">
                         {featuredArticle.description}
                       </p>
 
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-blue-100 mb-8">
+                      <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm text-blue-100 mb-8">
                         <div className="flex items-center space-x-2">
                           <User className="w-4 h-4" />
                           <span>Saif Aljanahi</span>
@@ -99,7 +105,7 @@ export const Blog: React.FC = () => {
 
                       <Link 
                         to={`/blog/${createSlugFromTitle(featuredArticle.title)}`}
-                        className="group inline-flex items-center space-x-3 bg-white text-slate-900 px-8 py-4 rounded-xl hover:bg-slate-100 transition-all duration-300 font-bold shadow-xl hover:shadow-2xl hover:scale-105"
+                        className="group inline-flex items-center space-x-3 bg-white text-slate-900 px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover:bg-slate-100 transition-all duration-300 font-bold shadow-xl hover:shadow-2xl hover:scale-105 text-sm sm:text-base"
                       >
                         <BookOpen className="w-5 h-5" />
                         <span>Read Full Article</span>
@@ -107,13 +113,13 @@ export const Blog: React.FC = () => {
                       </Link>
                     </div>
 
-                    <div className="relative">
-                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-2xl">
-                        <div className="flex flex-wrap gap-3 mb-6">
+                    <div className="relative mt-8 lg:mt-0">
+                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-white/20 shadow-2xl">
+                        <div className="flex flex-wrap gap-2 sm:gap-3 mb-6">
                           {featuredArticle.tags.slice(0, 4).map(tag => (
                             <span 
                               key={tag}
-                              className="px-3 py-1 bg-white/20 text-white rounded-full text-sm font-medium backdrop-blur-sm border border-white/30"
+                              className="px-2 sm:px-3 py-1 bg-white/20 text-white rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm border border-white/30"
                             >
                               {tag}
                             </span>
@@ -137,7 +143,7 @@ export const Blog: React.FC = () => {
           {/* Recent Articles */}
           {recentArticles.length > 0 && (
             <div className="mb-16">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 stagger-children">
                 {recentArticles.map((blog, index) => {
                   const slug = createSlugFromTitle(blog.title)
                   const badge = getArticleBadge(blog, index + 1) // +1 to offset featured
@@ -145,7 +151,7 @@ export const Blog: React.FC = () => {
                   return (
                     <article
                       key={`${blog.title}-${index}`}
-                      className="group relative bg-white dark:bg-slate-800 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] overflow-hidden border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 flex flex-col"
+                      className="group relative bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] overflow-hidden border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 flex flex-col animate-fade-in-up"
                     >
                       <div className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-700 dark:via-blue-900/20 dark:to-purple-900/20 p-6 pb-4 transition-colors duration-300">
                         <div className={`absolute top-4 right-4 bg-gradient-to-r ${badge.color} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg`}>
@@ -154,35 +160,35 @@ export const Blog: React.FC = () => {
                         </div>
 
                         <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mb-4 transition-colors duration-300">
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center space-x-1 bg-white/70 dark:bg-slate-600/70 backdrop-blur-sm rounded-full px-3 py-1 border border-white/50 dark:border-slate-500/50">
+                          <div className="flex items-center space-x-2 sm:space-x-4">
+                            <div className="flex items-center space-x-1 bg-white/70 dark:bg-slate-600/70 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 border border-white/50 dark:border-slate-500/50 text-xs sm:text-sm">
                               <Calendar className="w-3 h-3" />
                               <time dateTime={new Date(blog.createdAt).toISOString()}>
                                 {formatDate(blog.createdAt)}
                               </time>
                             </div>
-                            <div className="flex items-center space-x-1 bg-white/70 dark:bg-slate-600/70 backdrop-blur-sm rounded-full px-3 py-1 border border-white/50 dark:border-slate-500/50">
+                            <div className="flex items-center space-x-1 bg-white/70 dark:bg-slate-600/70 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 border border-white/50 dark:border-slate-500/50 text-xs sm:text-sm">
                               <Clock className="w-3 h-3" />
                               <span>{estimateReadTime(blog.description)} min</span>
                             </div>
                           </div>
                         </div>
                         
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 min-h-[3.25rem]">
+                        <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 min-h-[3.25rem]">
                           {blog.title}
                         </h3>
                         
-                        <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed line-clamp-3 text-sm transition-colors duration-300 min-h-[4.5rem]">
+                        <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed line-clamp-3 text-xs sm:text-sm transition-colors duration-300 min-h-[4.5rem]">
                           {blog.description}
                         </p>
                       </div>
 
-                      <div className="px-6 pb-6 mt-auto">
-                        <div className="flex flex-wrap gap-2 mb-6">
+                      <div className="px-4 sm:px-6 pb-4 sm:pb-6 mt-auto">
+                        <div className="flex flex-wrap gap-1 sm:gap-2 mb-4 sm:mb-6">
                           {blog.tags.slice(0, 3).map(tag => (
                             <span 
                               key={tag}
-                              className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-600 dark:to-slate-700 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200 cursor-pointer border border-slate-200 dark:border-slate-600 hover:border-blue-200 dark:hover:border-blue-700"
+                              className="inline-flex items-center px-2 sm:px-3 py-1 bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-600 dark:to-slate-700 text-slate-700 dark:text-slate-200 rounded-full text-xs font-medium hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 hover:text-blue-700 dark:hover:text-blue-300 transition-all duration-200 cursor-pointer border border-slate-200 dark:border-slate-600 hover:border-blue-200 dark:hover:border-blue-700"
                             >
                               <Tag className="w-3 h-3 mr-1" />
                               {tag}
@@ -196,7 +202,7 @@ export const Blog: React.FC = () => {
                         </div>
                         <Link 
                           to={`/blog/${slug}`}
-                          className="group/link relative w-full inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 text-white px-6 py-4 rounded-2xl font-semibold text-sm transition-all duration-300 hover:from-blue-700 hover:via-purple-700 hover:to-cyan-700 hover:scale-105 hover:shadow-xl overflow-hidden"
+                          className="group/link relative w-full inline-flex items-center justify-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold text-xs sm:text-sm transition-all duration-300 hover:from-blue-700 hover:via-purple-700 hover:to-cyan-700 hover:scale-105 hover:shadow-xl overflow-hidden"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 opacity-0 group-hover/link:opacity-100 transition-opacity duration-300"></div>
                           

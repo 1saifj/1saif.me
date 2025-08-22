@@ -12,6 +12,7 @@ import { SocialImageGenerator, generateSocialImageUrl } from '../components/Soci
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
 import { getOptimizedImageUrl, ImagePresets } from '../utils/imageOptimization'
+import ProgressiveReading from '../components/ProgressiveReading'
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -218,10 +219,13 @@ export const BlogPost: React.FC = () => {
         slug={slug!}
       />
 
-      {/* Reading Progress Bar */}
-      <div 
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-50 transition-all duration-300"
-        style={{ width: `${readingProgress}%` }}
+      {/* Progressive Reading System */}
+      <ProgressiveReading 
+        articleSlug={slug!}
+        content={articleContent?.content || ''}
+        showDetailedStats={false}
+        showFloatingProgress={true}
+        showReadingResume={true}
       />
 
       {/* Hero Section */}

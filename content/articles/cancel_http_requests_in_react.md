@@ -3,7 +3,7 @@ title: How to Cancel HTTP Requests in React using Axios
 description: Introduction Axios is an amazing library for fetching...
 createdAt: "2023-01-22"
 updatedAt: 2023-03-12
-featuredImage: "/articles/database-locking/http_cancel_feat.png"
+featuredImage: "/articles/http_cancel_feat.png"
 tags:
   - react
   - axios

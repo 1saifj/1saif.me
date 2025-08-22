@@ -3,7 +3,7 @@ title: Most Effective Design Patterns In Golang
 description: A quick review of the useability of design patterns in Golang.
 createdAt: "2023-06-25"
 updatedAt: 2023-06-25
-featuredImage: "/articles/database-locking/go_design_patterns_feat.png"
+featuredImage: "/articles/go_design_patterns_feat.png"
 tags:
   - Golang
   - Design-patterns

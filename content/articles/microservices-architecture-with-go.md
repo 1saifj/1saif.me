@@ -3,7 +3,7 @@ title: "Microservices Architecture with Go and Docker"
 description: "Explore how to design and implement a microservices architecture using Go and containerization with Docker."
 createdAt: "2024-04-22"
 updatedAt: 2024-04-22
-featuredImage: "/articles/database-locking/go_micro_feat.png"
+featuredImage: "/articles/go_micro_feat.png"
 tags:
   - backend
   - go
