@@ -122,14 +122,15 @@ export const highlightCode = async (code: string, language: string): Promise<str
       console.warn(`Language '${language}' (normalized: '${normalizedLang}') is not available in Shiki. Falling back to plain text.`)
       return await codeToHtml(code, {
         lang: 'text',
-        theme: 'vitesse-dark'
+        theme: 'github-dark'
       })
     }
     
-    // Use Shiki to highlight the code
+    // Use Shiki to highlight the code with a professional theme
     const highlighted = await codeToHtml(code, {
       lang: normalizedLang,
-      theme: 'vitesse-dark' // Using a modern, VS Code-like theme
+      theme: 'github-dark', // Using GitHub's dark theme for better readability
+      transformers: []
     })
     
     return highlighted
@@ -140,7 +141,7 @@ export const highlightCode = async (code: string, language: string): Promise<str
     try {
       return await codeToHtml(code, {
         lang: 'text',
-        theme: 'vitesse-dark'
+        theme: 'github-dark'
       })
     } catch (fallbackError) {
       console.error('Failed to highlight as plain text:', fallbackError)

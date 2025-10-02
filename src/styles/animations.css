@@ -60,6 +60,26 @@
   }
 }
 
+/* Progress bar specific shimmer animation */
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* Progress bar wave animation */
+@keyframes progressWave {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  100% {
+    transform: translateX(100%) skewX(-15deg);
+  }
+}
+
 /* Animation classes */
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out;
@@ -90,6 +110,14 @@
     #f1f5f9 80px
   );
   background-size: 200px;
+}
+
+.animate-progress-shimmer {
+  animation: progressShimmer 2s infinite;
+}
+
+.animate-progress-wave {
+  animation: progressWave 3s infinite ease-in-out;
 }
 
 /* Stagger animations for lists */
@@ -169,6 +197,38 @@ html {
   background: linear-gradient(180deg, #2563eb, #1d4ed8);
 }
 
+/* Thin scrollbar for code blocks */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #64748b;
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thumb-slate-600::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.scrollbar-thumb-slate-600::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
 /* Text truncation utilities */
 .line-clamp-2 {
   display: -webkit-box;
@@ -217,3 +277,192 @@ html {
 .interactive:active {
   transform: translateY(0);
 }
+
+/* Code block animations */
+.code-block-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.code-block-container:hover .copy-button {
+  transform: translateY(-1px);
+}
+
+.copy-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.copy-button:active {
+  transform: scale(0.95);
+}
+
+/* Syntax highlighting enhancements */
+.syntax-highlighted-code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', 'Roboto Mono', monospace;
+  line-height: 1.6;
+}
+
+/* Code block language indicator */
+.code-header span svg {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes codeBlockSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced Progress Bar Animations */
+@keyframes milestoneGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4);
+  }
+}
+
+@keyframes celebrationBounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-20px) scale(1.1);
+  }
+  60% {
+    transform: translateY(-10px) scale(1.05);
+  }
+}
+
+@keyframes achievementSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes focusModeTransition {
+  from {
+    backdrop-filter: blur(0px);
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes sparkleRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes readingPulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Animation classes for enhanced progress bar */
+.animate-milestone-glow {
+  animation: milestoneGlow 2s infinite;
+}
+
+.animate-celebration-bounce {
+  animation: celebrationBounce 1s ease-out;
+}
+
+.animate-achievement-slide-in {
+  animation: achievementSlideIn 0.5s ease-out;
+}
+
+.animate-sparkle-rotate {
+  animation: sparkleRotate 2s linear infinite;
+}
+
+.animate-reading-pulse {
+  animation: readingPulse 1.5s ease-in-out infinite;
+}
+
+/* Focus mode styles */
+.focus-mode {
+  position: relative;
+}
+
+.focus-mode::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+  z-index: 1;
+  pointer-events: none;
+  animation: focusModeTransition 0.3s ease-out;
+}
+
+.focus-mode .reading-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Enhanced tooltips */
+.enhanced-tooltip {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.enhanced-tooltip:hover {
+  transform: translateY(-2px);
+}
+
+.enhanced-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+.enhanced-tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Reading insights animations */
+.insight-item {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.insight-item:nth-child(1) { animation-delay: 0.1s; }
+.insight-item:nth-child(2) { animation-delay: 0.2s; }
+.insight-item:nth-child(3) { animation-delay: 0.3s; }
