@@ -128,7 +128,7 @@ export const confirmationEmailTemplate = (data: EmailTemplateData): string => `
                 <span style="font-size: 40px;">📧</span>
             </div>
             
-            <h1 class="title">Almost There! 🚀</h1>
+            <h1 class="title">Almost There!</h1>
             <p class="subtitle">
                 Thanks for subscribing to our newsletter. Just one more step to complete your subscription.
             </p>
@@ -138,7 +138,7 @@ export const confirmationEmailTemplate = (data: EmailTemplateData): string => `
             </div>
             
             <a href="${data.confirmationUrl}" class="cta-button">
-                ✨ Confirm Subscription
+                Confirm Subscription
             </a>
         </div>
         
@@ -314,12 +314,11 @@ export const welcomeEmailTemplate = (data: EmailTemplateData): string => `
 <body>
     <div class="container">
         <div class="header">
-            <span class="celebration-emoji">🎉</span>
             <div class="logo">${data.companyName || 'Saif Al-Janahi'}</div>
         </div>
         
         <div class="content">
-            <h1 class="title">Welcome Aboard! 🚀</h1>
+            <h1 class="title">Welcome Aboard!</h1>
             <p class="subtitle">
                 Your subscription is confirmed! Get ready for exclusive engineering insights, tutorials, and behind-the-scenes content.
             </p>
@@ -343,11 +342,11 @@ export const welcomeEmailTemplate = (data: EmailTemplateData): string => `
                     <span class="benefit-text">System architecture insights and best practices</span>
                 </div>
                 <div class="benefit-item">
-                    <span class="benefit-icon">🚀</span>
+                    <span class="benefit-icon">📑</span>
                     <span class="benefit-text">Early access to new projects and tools</span>
                 </div>
                 <div class="benefit-item">
-                    <span class="benefit-icon">💡</span>
+                    <span class="benefit-icon">📈</span>
                     <span class="benefit-text">Industry insights and career development tips</span>
                 </div>
             </div>
@@ -541,7 +540,7 @@ export const newsletterContentTemplate = (data: EmailTemplateData & {
         <div class="content">
             ${data.monthlyHighlight ? `
             <div class="highlight-section">
-                <h2 style="color: #92400e; margin-bottom: 15px;">⭐ Monthly Highlight</h2>
+                <h2 style="color: #92400e; margin-bottom: 15px;">📢 Monthly Highlight</h2>
                 <h3 style="color: #1e293b; margin-bottom: 10px;">${data.monthlyHighlight.title}</h3>
                 <p style="color: #475569; margin-bottom: 15px;">${data.monthlyHighlight.description}</p>
                 <a href="${data.monthlyHighlight.url}" style="background: #92400e; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 500;">

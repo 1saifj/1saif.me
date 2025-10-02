@@ -63,7 +63,7 @@ export const Skills: React.FC = () => {
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-slate-900 dark:text-white mb-4 sm:mb-6 tracking-tight">
               Technical Skills
             </h2>
-            <div className="w-12 sm:w-16 h-0.5 bg-slate-300 dark:bg-slate-600 mx-auto mb-6 sm:mb-8"></div>
+            <div className="w-12 sm:w-16 h-0.5 bg-slate-300 dark:bg-slate-600 mx-auto mb-4 xs:mb-6 sm:mb-8"></div>
             <p className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-light leading-relaxed">
               Technologies and tools I work with to build modern software solutions
             </p>
@@ -71,8 +71,8 @@ export const Skills: React.FC = () => {
 
           {/* Technical Skills Grid */}
           <div className="mb-12 sm:mb-16">
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 xs:p-5 sm:p-6 lg:p-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xs:gap-5 sm:gap-6 lg:gap-8">
                 {skillCategories.map((category) => {
                   const IconComponent = category.icon
                   const colorClasses = {

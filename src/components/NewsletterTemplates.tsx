@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Mail, Sparkles, Zap, TrendingUp, BookOpen, Users, CheckCircle, ArrowRight, Star, Rocket, Heart, Shield } from 'lucide-react'
+import { Mail, Zap, TrendingUp, BookOpen, Users, CheckCircle, ArrowRight, Heart, Shield, Award, FileText } from 'lucide-react'
 
 interface NewsletterTemplateProps {
   onSubscribe: (email: string) => Promise<void>
@@ -34,13 +34,13 @@ export const GradientHeroNewsletter: React.FC<NewsletterTemplateProps> = ({ onSu
           <div className="w-20 h-20 mx-auto mb-6 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
             <CheckCircle className="w-10 h-10 text-white" />
           </div>
-          <h3 className="text-2xl font-bold mb-3">Almost There! 🚀</h3>
+          <h3 className="text-2xl font-bold mb-3">Almost There!</h3>
           <p className="text-white/90 leading-relaxed">
             Check your email for a confirmation link to complete your subscription.
           </p>
         </div>
         <div className="absolute top-4 right-4 text-white/30">
-          <Sparkles className="w-8 h-8 animate-pulse" />
+          <CheckCircle className="w-8 h-8 animate-pulse" />
         </div>
       </div>
     )
@@ -58,7 +58,7 @@ export const GradientHeroNewsletter: React.FC<NewsletterTemplateProps> = ({ onSu
       <div className="relative z-10">
         <div className="text-center mb-8">
           <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-            <Rocket className="w-4 h-4" />
+            <Users className="w-4 h-4" />
             <span className="text-sm font-medium">Join 1,000+ Engineers</span>
           </div>
           
@@ -68,7 +68,7 @@ export const GradientHeroNewsletter: React.FC<NewsletterTemplateProps> = ({ onSu
           
           <p className="text-lg text-white/90 leading-relaxed max-w-2xl mx-auto">
             Get exclusive insights, tutorials, and industry secrets delivered to your inbox. 
-            No spam, just pure engineering gold. ✨
+            No spam, just pure engineering excellence.
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export const GradientHeroNewsletter: React.FC<NewsletterTemplateProps> = ({ onSu
               className="px-6 py-3 bg-white text-purple-600 font-semibold rounded-xl hover:bg-white/90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" style={{animationDuration: '1s'}}></div>
               ) : (
                 <>
                   <span>Subscribe</span>
@@ -182,7 +182,7 @@ export const MinimalistCardNewsletter: React.FC<NewsletterTemplateProps> = ({ on
           className="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
         >
           {isLoading ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" style={{animationDuration: '1s'}}></div>
           ) : (
             <>
               <span>Subscribe</span>
@@ -235,7 +235,7 @@ export const FeatureRichNewsletter: React.FC<NewsletterTemplateProps> = ({ onSub
           <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
         </div>
         <h3 className="text-2xl font-bold text-green-900 dark:text-green-100 mb-3">
-          Welcome to the Community! 🎉
+          Welcome to the Community!
         </h3>
         <p className="text-green-700 dark:text-green-300 leading-relaxed">
           Check your email for a confirmation link. You're one step away from exclusive engineering content!
@@ -248,7 +248,7 @@ export const FeatureRichNewsletter: React.FC<NewsletterTemplateProps> = ({ onSub
     <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-700">
       <div className="text-center mb-8">
         <div className="inline-flex items-center space-x-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-          <Star className="w-4 h-4" />
+          <Award className="w-4 h-4" />
           <span>Trusted by 1,000+ Engineers</span>
         </div>
         
@@ -294,7 +294,7 @@ export const FeatureRichNewsletter: React.FC<NewsletterTemplateProps> = ({ onSub
             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" style={{animationDuration: '1s'}}></div>
             ) : (
               <>
                 <span>Get Started</span>
@@ -411,7 +411,7 @@ export const AnimatedInteractiveNewsletter: React.FC<NewsletterTemplateProps> = 
           <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
             <CheckCircle className="w-10 h-10" />
           </div>
-          <h3 className="text-2xl font-bold mb-4">Welcome aboard! 🎉</h3>
+          <h3 className="text-2xl font-bold mb-4">Welcome aboard!</h3>
           <p className="text-lg opacity-90">
             Get ready for amazing content delivered to your inbox!
           </p>

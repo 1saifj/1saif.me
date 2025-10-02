@@ -140,9 +140,9 @@ export const ContactForm: React.FC = () => {
               onChange={(e) => handleInputChange('name', e.target.value)}
               className={`w-full px-4 py-3 rounded-xl border ${
                 errors.name 
-                  ? 'border-red-300 dark:border-red-600 focus:ring-red-500' 
-                  : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500'
-              } bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:border-transparent transition-all duration-200 placeholder:text-slate-400 dark:placeholder:text-slate-500`}
+                  ? 'border-red-300 dark:border-red-600 focus:border-red-400 dark:focus:border-red-500' 
+                  : 'border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400'
+              } bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all duration-200 placeholder:text-slate-400 dark:placeholder:text-slate-500`}
               placeholder="Your full name"
             />
             {errors.name && (
@@ -163,9 +163,9 @@ export const ContactForm: React.FC = () => {
               onChange={(e) => handleInputChange('email', e.target.value)}
               className={`w-full px-4 py-3 rounded-xl border ${
                 errors.email 
-                  ? 'border-red-300 dark:border-red-600 focus:ring-red-500' 
-                  : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500'
-              } bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:border-transparent transition-all duration-200 placeholder:text-slate-400 dark:placeholder:text-slate-500`}
+                  ? 'border-red-300 dark:border-red-600 focus:border-red-400 dark:focus:border-red-500' 
+                  : 'border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400'
+              } bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all duration-200 placeholder:text-slate-400 dark:placeholder:text-slate-500`}
               placeholder="your.email@example.com"
             />
             {errors.email && (
@@ -188,9 +188,9 @@ export const ContactForm: React.FC = () => {
             onChange={(e) => handleInputChange('subject', e.target.value)}
             className={`w-full px-4 py-3 rounded-xl border ${
               errors.subject 
-                ? 'border-red-300 dark:border-red-600 focus:ring-red-500' 
-                : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500'
-            } bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:border-transparent transition-all duration-200 placeholder:text-slate-400 dark:placeholder:text-slate-500`}
+                ? 'border-red-300 dark:border-red-600 focus:border-red-400 dark:focus:border-red-500' 
+                : 'border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400'
+            } bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all duration-200 placeholder:text-slate-400 dark:placeholder:text-slate-500`}
             placeholder="Project inquiry, collaboration, consultation..."
           />
           {errors.subject && (
@@ -210,7 +210,7 @@ export const ContactForm: React.FC = () => {
             <select
               value={formData.urgency}
               onChange={(e) => handleInputChange('urgency', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200"
             >
               <option value="low">Low - General inquiry</option>
               <option value="medium">Medium - Project discussion</option>
@@ -225,7 +225,7 @@ export const ContactForm: React.FC = () => {
             <select
               value={formData.contactMethod}
               onChange={(e) => handleInputChange('contactMethod', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500/20 transition-all duration-200"
             >
               <option value="email">Email response</option>
               <option value="phone">Phone call</option>
@@ -245,9 +245,9 @@ export const ContactForm: React.FC = () => {
             rows={5}
             className={`w-full px-4 py-3 rounded-xl border ${
               errors.message 
-                ? 'border-red-300 dark:border-red-600 focus:ring-red-500' 
-                : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500'
-            } bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:border-transparent transition-all duration-200 resize-none placeholder:text-slate-400 dark:placeholder:text-slate-500`}
+                ? 'border-red-300 dark:border-red-600 focus:border-red-400 dark:focus:border-red-500' 
+                : 'border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400'
+            } bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-all duration-200 resize-none placeholder:text-slate-400 dark:placeholder:text-slate-500`}
             placeholder="Tell me about your project, requirements, timeline, and any specific technologies you'd like to discuss..."
           />
           {errors.message && (

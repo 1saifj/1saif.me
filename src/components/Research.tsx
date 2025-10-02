@@ -18,45 +18,46 @@ export const Research: React.FC = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 transition-colors duration-300">
-      <div className="container mx-auto px-6">
+    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 transition-colors duration-300">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 transition-colors duration-300">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6 transition-colors duration-300">
               Research Publication
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto transition-colors duration-300">
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto transition-colors duration-300 px-4 sm:px-0">
               Contributing to machine learning and healthcare technology through research in intelligent fall detection systems
             </p>
           </div>
 
           {/* Featured Publication */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-700 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center space-x-3">
-                <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-3 py-1 rounded-full text-sm font-medium transition-colors duration-300">
+          <div className="bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl shadow-xl p-3 xs:p-4 sm:p-6 md:p-8 border border-slate-200 dark:border-slate-700 hover:shadow-2xl transition-all duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4 sm:mb-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-colors duration-300">
                   {publication.status}
                 </div>
-                <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium transition-colors duration-300">
+                <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-colors duration-300">
                   {publication.type}
                 </div>
               </div>
-              <div className="flex items-center text-slate-500 dark:text-slate-400 text-sm transition-colors duration-300">
-                <Calendar className="w-4 h-4 mr-1" />
-                {publication.date}
+              <div className="flex items-center text-slate-500 dark:text-slate-400 text-xs sm:text-sm transition-colors duration-300">
+                <Calendar className="w-3 sm:w-4 h-3 sm:h-4 mr-1" />
+                <span className="hidden sm:inline">{publication.date}</span>
+                <span className="sm:hidden">Sep 2021</span>
               </div>
             </div>
 
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 leading-tight transition-colors duration-300">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3 sm:mb-4 leading-tight transition-colors duration-300">
               {publication.title}
             </h3>
 
             {/* Journal Information */}
-            <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 mb-6 transition-colors duration-300">
-              <div className="grid md:grid-cols-2 gap-4 text-sm">
-                <div>
+            <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 transition-colors duration-300">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
+                <div className="col-span-1 sm:col-span-2">
                   <span className="font-semibold text-slate-700 dark:text-slate-200">Journal: </span>
-                  <span className="text-slate-600 dark:text-slate-300">{publication.journal}</span>
+                  <span className="text-slate-600 dark:text-slate-300 break-words">{publication.journal}</span>
                 </div>
                 <div>
                   <span className="font-semibold text-slate-700 dark:text-slate-200">Volume: </span>
@@ -66,9 +67,9 @@ export const Research: React.FC = () => {
                   <span className="font-semibold text-slate-700 dark:text-slate-200">Pages: </span>
                   <span className="text-slate-600 dark:text-slate-300">{publication.pages}</span>
                 </div>
-                <div>
+                <div className="col-span-1 sm:col-span-2">
                   <span className="font-semibold text-slate-700 dark:text-slate-200">DOI: </span>
-                  <span className="text-slate-600 dark:text-slate-300">{publication.doi}</span>
+                  <span className="text-slate-600 dark:text-slate-300 break-all text-xs">{publication.doi}</span>
                 </div>
               </div>
             </div>
@@ -96,24 +97,24 @@ export const Research: React.FC = () => {
             </div>
 
             {/* Abstract */}
-            <div className="mb-6">
-              <h4 className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center transition-colors duration-300">
-                <FileText className="w-4 h-4 mr-2" />
+            <div className="mb-4 sm:mb-6">
+              <h4 className="font-semibold text-slate-900 dark:text-white mb-2 sm:mb-3 flex items-center transition-colors duration-300 text-sm sm:text-base">
+                <FileText className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2" />
                 Abstract:
               </h4>
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-700 p-4 rounded-lg transition-colors duration-300">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-700 p-3 sm:p-4 rounded-lg transition-colors duration-300 text-xs sm:text-sm">
                 {publication.abstract}
               </p>
             </div>
 
             {/* Keywords */}
-            <div className="mb-6">
-              <h4 className="font-semibold text-slate-900 dark:text-white mb-3 transition-colors duration-300">Research Keywords:</h4>
-              <div className="flex flex-wrap gap-2">
+            <div className="mb-4 sm:mb-6">
+              <h4 className="font-semibold text-slate-900 dark:text-white mb-2 sm:mb-3 transition-colors duration-300 text-sm sm:text-base">Research Keywords:</h4>
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {publication.keywords.map((keyword, keyIndex) => (
                   <span 
                     key={keyIndex}
-                    className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1 rounded-full text-sm font-medium border border-slate-200 dark:border-slate-600 transition-colors duration-300"
+                    className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium border border-slate-200 dark:border-slate-600 transition-colors duration-300"
                   >
                     {keyword}
                   </span>
@@ -122,17 +123,17 @@ export const Research: React.FC = () => {
             </div>
 
             {/* Action Button */}
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-slate-500 dark:text-slate-400 transition-colors duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 transition-colors duration-300 hidden sm:block">
                 Published in {publication.journal} • {publication.date}
               </div>
               <a
                 href={publication.researchGateUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                className="flex items-center justify-center space-x-2 bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-xs xs:text-sm sm:text-base w-full sm:w-auto"
               >
-                <Link className="w-4 h-4" />
+                <Link className="w-3 sm:w-4 h-3 sm:h-4" />
                 <span>View on ResearchGate</span>
                 <ExternalLink className="w-3 h-3" />
               </a>

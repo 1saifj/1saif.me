@@ -544,8 +544,8 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-      <div className="flex items-start justify-center pt-20 px-4">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-2xl overflow-hidden">
+      <div className="flex items-start justify-center pt-10 xs:pt-16 sm:pt-20 px-3 xs:px-4">
+        <div className="bg-white dark:bg-slate-800 rounded-xl xs:rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-2xl overflow-hidden">
           {/* Search Input */}
           <div className="flex items-center p-4 border-b border-slate-200 dark:border-slate-700">
             <Search className="w-5 h-5 text-slate-400 mr-3" />
@@ -576,7 +576,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Results */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[50vh] xs:max-h-[60vh] sm:max-h-96 overflow-y-auto">
             {query && results.length === 0 && (
               <div className="p-8 text-center">
                 <Search className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />

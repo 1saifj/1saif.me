@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Sparkles, Tag, Key, Target, RefreshCw, Check, AlertCircle } from 'lucide-react'
+import { Tag, Key, Target, RefreshCw, Check, AlertCircle, Brain } from 'lucide-react'
 import { useAIContent } from '../services/aiContentService'
 
 interface AIContentEnhancerProps {
@@ -64,15 +64,15 @@ export const AIContentEnhancer: React.FC<AIContentEnhancerProps> = ({
     return (
       <div className={`bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 ${className}`}>
         <div className="flex items-center space-x-3 mb-4">
-          <RefreshCw className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-spin" />
+          <RefreshCw className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-spin" style={{animationDuration: '2s'}} />
           <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
-            ✨ AI Enhancing Content...
+            AI Enhancing Content...
           </h3>
         </div>
         <div className="space-y-3">
-          <div className="h-4 bg-blue-200 dark:bg-blue-800 rounded animate-pulse" />
-          <div className="h-4 bg-blue-200 dark:bg-blue-800 rounded animate-pulse w-3/4" />
-          <div className="h-4 bg-blue-200 dark:bg-blue-800 rounded animate-pulse w-1/2" />
+          <div className="h-4 bg-blue-200 dark:bg-blue-800 rounded animate-shimmer" />
+          <div className="h-4 bg-blue-200 dark:bg-blue-800 rounded animate-shimmer w-3/4" style={{animationDelay: '0.1s'}} />
+          <div className="h-4 bg-blue-200 dark:bg-blue-800 rounded animate-shimmer w-1/2" style={{animationDelay: '0.2s'}} />
         </div>
       </div>
     )
@@ -106,11 +106,11 @@ export const AIContentEnhancer: React.FC<AIContentEnhancerProps> = ({
       {/* Header */}
       <div className="flex items-center space-x-3 mb-6">
         <div className="flex items-center justify-center w-10 h-10 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg">
-          <Sparkles className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+          <Brain className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
-            ✨ AI-Enhanced Content Analysis
+            AI-Enhanced Content Analysis
           </h3>
           <p className="text-sm text-emerald-700 dark:text-emerald-300">
             Powered by Llama 3.3-70B
@@ -176,7 +176,7 @@ export const AIContentEnhancer: React.FC<AIContentEnhancerProps> = ({
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                   } border`}
                 >
-                  {isNew && <Sparkles className="w-3 h-3 mr-1" />}
+                  {isNew && <Check className="w-3 h-3 mr-1" />}
                   {tag}
                 </span>
               )

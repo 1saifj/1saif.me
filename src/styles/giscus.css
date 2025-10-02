@@ -3,24 +3,77 @@
 .giscus-container {
   width: 100%;
   min-height: 200px;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Override Giscus default styles to match design system */
 .giscus {
   width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
 }
 
 .giscus iframe {
   width: 100% !important;
+  max-width: 100% !important;
   border: none !important;
   border-radius: 12px !important;
   background: transparent !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Prevent horizontal overflow on mobile */
+.giscus-frame {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
 }
 
 /* Mobile responsive adjustments */
 @media (max-width: 640px) {
+  .giscus-container {
+    min-height: 180px;
+  }
+  
   .giscus iframe {
     border-radius: 8px !important;
+    min-height: 350px !important;
+  }
+  
+  /* Ensure proper spacing on very small screens */
+  .giscus {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .giscus-container {
+    min-height: 160px;
+  }
+  
+  .giscus iframe {
+    border-radius: 6px !important;
+    min-height: 400px !important;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .giscus iframe {
+    border-radius: 10px !important;
+    min-height: 300px !important;
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 1024px) {
+  .giscus iframe {
+    border-radius: 16px !important;
+    min-height: 280px !important;
   }
 }
 
@@ -31,28 +84,20 @@
 }
 
 /* Custom theme adjustments for light mode */
-.giscus[data-theme="light"] iframe {
+.giscus[data-theme="light"] iframe,
+.giscus[data-theme*="light"] iframe {
   color-scheme: light;
 }
 
 /* Custom theme adjustments for dark mode */
-.giscus[data-theme="dark"] iframe {
+.giscus[data-theme="dark"] iframe,
+.giscus[data-theme*="dark"] iframe {
   color-scheme: dark;
 }
 
-/* Ensure proper responsive behavior on all screen sizes */
-@media (max-width: 480px) {
+/* Prevent iframe content from breaking container */
+@supports (container-type: inline-size) {
   .giscus-container {
-    min-height: 180px;
-  }
-  
-  .giscus iframe {
-    border-radius: 6px !important;
+    container-type: inline-size;
   }
 }
-
-@media (min-width: 1024px) {
-  .giscus iframe {
-    border-radius: 16px !important;
-  }
-} 

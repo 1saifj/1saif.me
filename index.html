@@ -58,6 +58,26 @@
     <!-- Cloudflare Web Analytics (Privacy-first, no cookies) -->
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "274a7b58a685474da3ab9456f466cdc8", "spa": true}'></script>
     
+    <!-- Theme initialization script - prevents flash of incorrect theme -->
+    <script>
+      // Immediately set theme to prevent FOUC
+      (function() {
+        try {
+          const storedTheme = localStorage.getItem('theme');
+          const theme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.classList.add(theme);
+          // Update theme color meta tag
+          const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+          if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', theme === 'dark' ? '#0f172a' : '#ffffff');
+          }
+        } catch (e) {
+          // Fallback to light theme if localStorage is not available
+          document.documentElement.classList.add('light');
+        }
+      })();
+    </script>
+    
     <!-- Structured Data -->
     <script type="application/ld+json">
     {

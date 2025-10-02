@@ -1,0 +1,66 @@
+:root, :root[data-theme='light'] {
+  color-scheme: light;
+  
+  /* Canvas backgrounds */
+  --color-canvas-default: #ffffff;
+  --color-canvas-subtle: #f8fafc; /* slate-50 */
+  --color-canvas-inset: #f1f5f9; /* slate-100 */
+  
+  /* Foreground colors */
+  --color-fg-default: #0f172a; /* slate-900 */
+  --color-fg-muted: #475569; /* slate-600 */
+  --color-fg-subtle: #64748b; /* slate-500 */
+  
+  /* Border colors */
+  --color-border-default: #e2e8f0; /* slate-200 */
+  --color-border-muted: #f1f5f9; /* slate-100 */
+  --color-neutral-muted: rgba(15, 23, 42, 0.06);
+  
+  /* Accent colors */
+  --color-accent-fg: #2563eb; /* blue-600 */
+  --color-accent-emphasis: #1d4ed8; /* blue-700 */
+  --color-accent-muted: rgba(37, 99, 235, 0.1);
+  --color-accent-subtle: rgba(37, 99, 235, 0.05);
+  
+  /* Button styles */
+  --color-btn-text: #0f172a;
+  --color-btn-bg: #ffffff;
+  --color-btn-border: #e2e8f0;
+  --color-btn-hover-bg: #f8fafc;
+  --color-btn-hover-border: #cbd5e1;
+  --color-btn-active-bg: #f1f5f9;
+  --color-btn-selected-bg: #f1f5f9;
+  
+  /* Primary button */
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-bg: #2563eb; /* blue-600 */
+  --color-btn-primary-border: #2563eb;
+  --color-btn-primary-hover-bg: #1d4ed8; /* blue-700 */
+  --color-btn-primary-hover-border: #1d4ed8;
+  --color-btn-primary-selected-bg: #1e40af;
+  --color-btn-primary-disabled-bg: rgba(37, 99, 235, 0.3);
+  
+  /* State colors */
+  --color-attention-fg: #a16207; /* amber-700 */
+  --color-attention-muted: rgba(161, 98, 7, 0.1);
+  --color-danger-fg: #dc2626; /* red-600 */
+  --color-danger-muted: rgba(220, 38, 38, 0.1);
+  --color-success-fg: #16a34a; /* green-600 */
+  --color-success-muted: rgba(22, 163, 74, 0.1);
+  
+  /* Additional theme variables */
+  --color-neutral-emphasis-plus: #0f172a;
+  --color-neutral-emphasis: #475569;
+  --color-neutral-subtle: rgba(15, 23, 42, 0.08);
+}
+
+/* Subtle card look inside iframe */
+html,
+body {
+  background: transparent !important;
+}
+
+/* Make comment UI a bit rounder and modern (Primer variables control radius minimally, so rely on elements) */
+* {
+  --modern-radius: 12px;
+}

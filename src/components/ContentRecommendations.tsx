@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Clock, Tag, Sparkles, TrendingUp } from 'lucide-react'
+import { ArrowRight, Clock, Tag, TrendingUp, Brain } from 'lucide-react'
 import { useAIContent } from '../services/aiContentService'
 import { publishedBlogs } from '../data/blogs'
 import { articles } from '../utils/contentLoader'
@@ -103,7 +103,7 @@ export const ContentRecommendations: React.FC<ContentRecommendationsProps> = ({
       <div className={`${className}`}>
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg border border-slate-200 dark:border-slate-700">
           <div className="flex items-center space-x-2 mb-6">
-            <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-pulse" />
+            <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-pulse-subtle" />
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">
               AI is analyzing related content...
             </h3>
@@ -129,7 +129,7 @@ export const ContentRecommendations: React.FC<ContentRecommendationsProps> = ({
     <div className={`${className}`}>
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-8 shadow-lg border border-blue-200 dark:border-slate-700">
         <div className="flex items-center space-x-2 mb-6">
-          <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           <h3 className="text-xl font-bold text-slate-900 dark:text-white">
             AI-Recommended Reading
           </h3>
@@ -153,7 +153,7 @@ export const ContentRecommendations: React.FC<ContentRecommendationsProps> = ({
                 key={rec.slug}
                 to={`/blog/${rec.slug}`}
                 onClick={() => handleRecommendationClick(rec.slug)}
-                className="group block p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200 hover:shadow-md"
+                className="group block p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-150 hover:shadow-md hover:-translate-y-0.5"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
@@ -187,12 +187,12 @@ export const ContentRecommendations: React.FC<ContentRecommendationsProps> = ({
                         </div>
                       </div>
 
-                      <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-1 transition-all duration-200" />
+                      <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all duration-150" />
                     </div>
 
                     <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700">
                       <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                        💡 {rec.reason}
+                        {rec.reason}
                       </p>
                     </div>
                   </div>
@@ -204,7 +204,7 @@ export const ContentRecommendations: React.FC<ContentRecommendationsProps> = ({
 
         <div className="mt-6 p-4 bg-blue-50 dark:bg-slate-700/50 rounded-xl border border-blue-200 dark:border-slate-600">
           <div className="flex items-center space-x-2 text-sm text-blue-700 dark:text-blue-300">
-            <Sparkles className="w-4 h-4" />
+            <Brain className="w-4 h-4" />
             <span className="font-medium">Powered by AI</span>
             <span className="text-blue-600 dark:text-blue-400">•</span>
             <span>Recommendations improve as you read more content</span>

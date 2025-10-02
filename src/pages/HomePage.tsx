@@ -22,22 +22,22 @@ export const HomePage: React.FC = () => {
         <section id="home" aria-labelledby="hero-heading" className="min-h-screen">
           <Hero />
         </section>
-        <section id="about" aria-labelledby="about-heading" className="px-4 sm:px-6 lg:px-8">
+        <section id="about" aria-labelledby="about-heading">
           <About />
         </section>
-        <section id="skills" aria-labelledby="skills-heading" className="px-4 sm:px-6 lg:px-8">
+        <section id="skills" aria-labelledby="skills-heading">
           <Skills />
         </section>
-        <section id="projects" aria-labelledby="projects-heading" className="px-4 sm:px-6 lg:px-8">
+        <section id="projects" aria-labelledby="projects-heading">
           <Projects />
         </section>
-        <section id="blog" aria-labelledby="blog-heading" className="px-4 sm:px-6 lg:px-8">
+        <section id="blog" aria-labelledby="blog-heading">
           <Blog />
         </section>
-        <section id="research" aria-labelledby="research-heading" className="px-4 sm:px-6 lg:px-8">
+        <section id="research" aria-labelledby="research-heading">
           <Research />
         </section>
-        <section id="contact" aria-labelledby="contact-heading" className="px-4 sm:px-6 lg:px-8">
+        <section id="contact" aria-labelledby="contact-heading">
           <Contact />
         </section>
       </main>

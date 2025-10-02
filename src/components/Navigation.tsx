@@ -115,7 +115,7 @@ export const Navigation: React.FC = () => {
                 <OptimizedImage 
                   src="/sj.png" 
                   alt="Saif Aljanahi Logo" 
-                  className="w-9 h-9 rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  className="w-9 h-9 rounded-full object-cover"
                   preset="logo"
                   customOptions={{ width: 36, height: 36, quality: 95 }}
                   width={36}

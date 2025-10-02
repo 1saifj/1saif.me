@@ -1,0 +1,64 @@
+:root, :root[data-theme='dark'] {
+  color-scheme: dark;
+  
+  /* Canvas backgrounds - matching your dark theme */
+  --color-canvas-default: #0f172a; /* slate-900 */
+  --color-canvas-subtle: #1e293b; /* slate-800 */
+  --color-canvas-inset: #020617; /* slate-950 */
+  
+  /* Foreground colors */
+  --color-fg-default: #e2e8f0; /* slate-200 */
+  --color-fg-muted: #94a3b8; /* slate-400 */
+  --color-fg-subtle: #64748b; /* slate-500 */
+  
+  /* Border colors */
+  --color-border-default: #334155; /* slate-700 */
+  --color-border-muted: #1e293b; /* slate-800 */
+  --color-neutral-muted: rgba(148, 163, 184, 0.1);
+  
+  /* Accent colors (your brand blue) */
+  --color-accent-fg: #60a5fa; /* blue-400 */
+  --color-accent-emphasis: #3b82f6; /* blue-500 */
+  --color-accent-muted: rgba(96, 165, 250, 0.1);
+  --color-accent-subtle: rgba(96, 165, 250, 0.05);
+  
+  /* Button styles */
+  --color-btn-text: #e2e8f0;
+  --color-btn-bg: #1e293b;
+  --color-btn-border: #334155;
+  --color-btn-hover-bg: #334155;
+  --color-btn-hover-border: #475569;
+  --color-btn-active-bg: #475569;
+  --color-btn-selected-bg: #334155;
+  
+  /* Primary button */
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-bg: #2563eb; /* blue-600 */
+  --color-btn-primary-border: #2563eb;
+  --color-btn-primary-hover-bg: #1d4ed8; /* blue-700 */
+  --color-btn-primary-hover-border: #1d4ed8;
+  --color-btn-primary-selected-bg: #1e40af;
+  --color-btn-primary-disabled-bg: rgba(37, 99, 235, 0.3);
+  
+  /* State colors */
+  --color-attention-fg: #fbbf24; /* amber-400 */
+  --color-attention-muted: rgba(251, 191, 36, 0.1);
+  --color-danger-fg: #f87171; /* red-400 */
+  --color-danger-muted: rgba(248, 113, 113, 0.1);
+  --color-success-fg: #34d399; /* emerald-400 */
+  --color-success-muted: rgba(52, 211, 153, 0.1);
+  
+  /* Additional theme variables for better integration */
+  --color-neutral-emphasis-plus: #cbd5e1;
+  --color-neutral-emphasis: #94a3b8;
+  --color-neutral-subtle: rgba(148, 163, 184, 0.1);
+}
+
+html,
+body {
+  background: transparent !important;
+}
+
+* {
+  --modern-radius: 12px;
+}
