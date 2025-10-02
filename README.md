@@ -353,6 +353,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+## 🤖 **MCP (Model Context Protocol) Setup**
+
+This project includes MCP configuration for enhanced AI-assisted development with Claude Code:
+
+### **Available MCP Servers:**
+- **Filesystem Server**: File navigation and content access
+- **Sequential Thinking Server**: Step-by-step problem solving
+- **Frontend Engineering Server**: Custom tools for React/TypeScript development
+
+### **MCP Tools Available:**
+- `analyze_component` - Analyze React components for best practices
+- `check_performance` - Review frontend performance metrics
+- `lint_code` - Run ESLint analysis on code
+
+### **Usage:**
+The MCP configuration is automatically loaded when using Claude Code in this directory. No additional setup required.
+
+---
+
 ## 🌟 **Star History**
 
 If you found this project helpful, please consider giving it a ⭐ on GitHub!

@@ -16,7 +16,7 @@ import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
 import ProgressiveReading from '../components/ProgressiveReading'
 
 // Progressive Reading Blocks Component
-const ProgressiveReadingBlock: React.FC<{ delay?: number; className?: string }> = ({ 
+const ProgressiveReadingBlock: React.FC<{ delay?: number; className?: string; children: React.ReactNode }> = ({ 
   delay = 0, 
   className = '',
   children 

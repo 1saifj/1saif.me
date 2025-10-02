@@ -372,9 +372,12 @@ export const BlogPost: React.FC = () => {
                   
                   [&>blockquote]:border-l-4 [&>blockquote]:border-blue-500 [&>blockquote]:bg-blue-50 [&>blockquote]:dark:bg-blue-900/20 [&>blockquote]:p-4 [&>blockquote]:my-6 [&>blockquote]:italic [&>blockquote]:text-slate-600 [&>blockquote]:dark:text-slate-400
                   
-                  [&>pre]:bg-slate-900 [&>pre]:dark:bg-slate-800 [&>pre]:text-green-400 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:mb-6 [&>pre]:overflow-x-auto [&>pre]:text-sm [&>pre]:leading-relaxed [&>pre]:border [&>pre]:border-slate-200 [&>pre]:dark:border-slate-700
-                  [&>code]:bg-slate-100 [&>code]:dark:bg-slate-800 [&>code]:px-2 [&>code]:py-1 [&>code]:rounded [&>code]:text-sm [&>code]:font-mono [&>code]:text-red-600 [&>code]:dark:text-red-400
-                  [&>pre_code]:bg-transparent [&>pre_code]:text-green-400 [&>pre_code]:p-0
+                  [&_.code-block-container]:my-8 [&_.code-block-container]:rounded-xl [&_.code-block-container]:overflow-hidden [&_.code-block-container]:border [&_.code-block-container]:border-slate-200 [&_.code-block-container]:dark:border-slate-700 [&_.code-block-container]:shadow-lg [&_.code-block-container]:hover:shadow-xl [&_.code-block-container]:transition-shadow [&_.code-block-container]:duration-300
+                  [&_.code-header]:flex [&_.code-header]:items-center [&_.code-header]:justify-between [&_.code-header]:px-4 [&_.code-header]:py-3 [&_.code-header]:bg-gradient-to-r [&_.code-header]:from-slate-50 [&_.code-header]:to-slate-100 [&_.code-header]:dark:from-slate-800 [&_.code-header]:dark:to-slate-700 [&_.code-header]:border-b [&_.code-header]:border-slate-200 [&_.code-header]:dark:border-slate-600
+                  [&_.code-header_span]:text-sm [&_.code-header_span]:font-semibold [&_.code-header_span]:text-slate-700 [&_.code-header_span]:dark:text-slate-300 [&_.code-header_span]:flex [&_.code-header_span]:items-center [&_.code-header_span]:space-x-2
+                  [&_.copy-button]:px-3 [&_.copy-button]:py-1.5 [&_.copy-button]:text-xs [&_.copy-button]:font-medium [&_.copy-button]:bg-white [&_.copy-button]:dark:bg-slate-600 [&_.copy-button]:text-slate-600 [&_.copy-button]:dark:text-slate-300 [&_.copy-button]:border [&_.copy-button]:border-slate-300 [&_.copy-button]:dark:border-slate-500 [&_.copy-button]:rounded-md [&_.copy-button]:hover:bg-slate-50 [&_.copy-button]:dark:hover:bg-slate-500 [&_.copy-button]:hover:text-slate-800 [&_.copy-button]:dark:hover:text-slate-100 [&_.copy-button]:transition-all [&_.copy-button]:duration-200 [&_.copy-button]:opacity-80 [&_.copy-button]:hover:opacity-100
+                  [&_.syntax-highlighted-code]:block [&_.syntax-highlighted-code]:w-full
+                  [&_.syntax-highlighted-code>pre]:!bg-transparent [&_.syntax-highlighted-code>pre]:!margin-0 [&_.syntax-highlighted-code>pre]:!padding-4 [&_.syntax-highlighted-code>pre]:text-sm [&_.syntax-highlighted-code>pre]:leading-relaxed [&_.syntax-highlighted-code>pre]:overflow-x-auto [&_.syntax-highlighted-code>pre]:scrollbar-thin [&_.syntax-highlighted-code>pre]:scrollbar-thumb-slate-400 [&_.syntax-highlighted-code>pre]:scrollbar-track-transparent
                   
                   [&>table]:w-full [&>table]:mb-6 [&>table]:border-collapse [&>table]:border [&>table]:border-slate-300 [&>table]:dark:border-slate-600
                   [&>table_th]:bg-slate-100 [&>table_th]:dark:bg-slate-800 [&>table_th]:p-3 [&>table_th]:text-left [&>table_th]:font-semibold [&>table_th]:border [&>table_th]:border-slate-300 [&>table_th]:dark:border-slate-600
@@ -390,6 +393,8 @@ export const BlogPost: React.FC = () => {
                   [&>img]:max-w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:my-6 [&>img]:shadow-lg [&>img]:mx-auto
                   
                   [&>.highlight]:bg-yellow-100 [&>.highlight]:dark:bg-yellow-900/30 [&>.highlight]:px-1 [&>.highlight]:rounded
+                  
+                  [&_code:not(.syntax-highlighted-code_code)]:bg-slate-100 [&_code:not(.syntax-highlighted-code_code)]:dark:bg-slate-800 [&_code:not(.syntax-highlighted-code_code)]:px-2 [&_code:not(.syntax-highlighted-code_code)]:py-1 [&_code:not(.syntax-highlighted-code_code)]:rounded [&_code:not(.syntax-highlighted-code_code)]:text-sm [&_code:not(.syntax-highlighted-code_code)]:font-mono [&_code:not(.syntax-highlighted-code_code)]:text-red-600 [&_code:not(.syntax-highlighted-code_code)]:dark:text-red-400
                 "
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
               />
