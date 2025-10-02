@@ -14,6 +14,7 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { SkipLink } from './components/SkipLink'
 import AnalyticsProvider, { useAnalytics } from './components/Analytics'
 import PerformanceMonitor from './components/PerformanceMonitor'
+import { ThemeProvider } from './components/ThemeProvider'
 import { v4 as uuidv4 } from 'uuid'
 
 function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
@@ -65,27 +66,29 @@ function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <Router>
-      <AnalyticsProvider>
-        <AnalyticsWrapper>
-          <SkipLink />
-          <PerformanceMonitor />
-          <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/blog" element={<BlogListingPage />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/project/:slug" element={<ProjectPage />} />
-              <Route path="/resume" element={<ResumePage />} />
-              <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
-              <Route path="/unsubscribe" element={<UnsubscribePage />} />
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/newsletter-test" element={<NewsletterTestPage />} />
-              <Route path="/image-optimization" element={<ImageOptimizationPage />} />
-            </Routes>
-            <PWAInstallPrompt />
-          </div>
-        </AnalyticsWrapper>
-      </AnalyticsProvider>
+      <ThemeProvider>
+        <AnalyticsProvider>
+          <AnalyticsWrapper>
+            <SkipLink />
+            <PerformanceMonitor />
+            <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/blog" element={<BlogListingPage />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="/project/:slug" element={<ProjectPage />} />
+                <Route path="/resume" element={<ResumePage />} />
+                <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
+                <Route path="/unsubscribe" element={<UnsubscribePage />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/newsletter-test" element={<NewsletterTestPage />} />
+                <Route path="/image-optimization" element={<ImageOptimizationPage />} />
+              </Routes>
+              <PWAInstallPrompt />
+            </div>
+          </AnalyticsWrapper>
+        </AnalyticsProvider>
+      </ThemeProvider>
     </Router>
   )
 }

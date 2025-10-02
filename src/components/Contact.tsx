@@ -85,15 +85,14 @@ export const Contact: React.FC = () => {
             </div>
 
             <div className="group bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
-              <div className="flex items-start space-x-4">
-                <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-full shadow-lg">
-                  <Clock className="w-6 h-6" />
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-gradient-to-r from-orange-600 to-amber-600 rounded-xl p-3 mb-4">
+                  <Clock className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Availability</h3>
-                  <p className="text-slate-600 dark:text-slate-300">Working Hours: 9:00 AM - 5:00 PM</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Baghdad, East Africa Time (GMT+3)</p>
-                </div>
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Availability</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  9 AM - 5 PM (GMT+3)
+                </p>
               </div>
             </div>
           </div>
@@ -165,7 +164,7 @@ export const Contact: React.FC = () => {
                   Connect on Social
                 </h3>
                 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <a 
                     href="https://github.com/1saifj" 
                     target="_blank"

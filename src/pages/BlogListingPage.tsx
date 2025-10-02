@@ -14,7 +14,7 @@ export const BlogListingPage: React.FC = () => {
       />
       <Navigation />
       <main id="main-content" role="main" className="min-h-screen">
-        <section id="blog" aria-labelledby="blog-heading" className="px-4 sm:px-6 lg:px-8">
+        <section id="blog" aria-labelledby="blog-heading">
           <BlogListing />
         </section>
       </main>

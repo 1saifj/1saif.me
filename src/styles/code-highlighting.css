@@ -1,0 +1,119 @@
+/* Code Highlighting Theme Support */
+
+/* Light mode code blocks */
+:root {
+  --code-bg: #f6f8fa;
+  --code-border: #d1d5db;
+  --code-header-bg: #ffffff;
+  --code-text: #24292f;
+  --code-comment: #6e7781;
+  --code-keyword: #cf222e;
+  --code-string: #0a3069;
+  --code-function: #8250df;
+  --code-variable: #953800;
+  --code-number: #0550ae;
+}
+
+/* Dark mode code blocks */
+.dark {
+  --code-bg: #0d1117;
+  --code-border: #30363d;
+  --code-header-bg: #161b22;
+  --code-text: #c9d1d9;
+  --code-comment: #8b949e;
+  --code-keyword: #ff7b72;
+  --code-string: #a5d6ff;
+  --code-function: #d2a8ff;
+  --code-variable: #ffa657;
+  --code-number: #79c0ff;
+}
+
+/* Apply theme colors */
+.code-block-wrapper {
+  background: var(--code-header-bg);
+  border-color: var(--code-border);
+}
+
+.code-block-content {
+  background: var(--code-bg);
+}
+
+.code-block-content pre,
+.code-block-content code {
+  background: var(--code-bg) !important;
+  color: var(--code-text);
+}
+
+/* Override Shiki inline styles for theme support */
+.shiki,
+.shiki * {
+  background: transparent !important;
+}
+
+/* Light mode token colors */
+html:not(.dark) .shiki .token.comment,
+html:not(.dark) .shiki .token.prolog,
+html:not(.dark) .shiki .token.doctype,
+html:not(.dark) .shiki .token.cdata {
+  color: var(--code-comment);
+}
+
+html:not(.dark) .shiki .token.keyword,
+html:not(.dark) .shiki .token.tag,
+html:not(.dark) .shiki .token.boolean,
+html:not(.dark) .shiki .token.constant {
+  color: var(--code-keyword);
+}
+
+html:not(.dark) .shiki .token.string,
+html:not(.dark) .shiki .token.attr-value {
+  color: var(--code-string);
+}
+
+html:not(.dark) .shiki .token.function,
+html:not(.dark) .shiki .token.class-name {
+  color: var(--code-function);
+}
+
+html:not(.dark) .shiki .token.variable,
+html:not(.dark) .shiki .token.property {
+  color: var(--code-variable);
+}
+
+html:not(.dark) .shiki .token.number {
+  color: var(--code-number);
+}
+
+/* Dark mode token colors */
+html.dark .shiki .token.comment,
+html.dark .shiki .token.prolog,
+html.dark .shiki .token.doctype,
+html.dark .shiki .token.cdata {
+  color: var(--code-comment);
+}
+
+html.dark .shiki .token.keyword,
+html.dark .shiki .token.tag,
+html.dark .shiki .token.boolean,
+html.dark .shiki .token.constant {
+  color: var(--code-keyword);
+}
+
+html.dark .shiki .token.string,
+html.dark .shiki .token.attr-value {
+  color: var(--code-string);
+}
+
+html.dark .shiki .token.function,
+html.dark .shiki .token.class-name {
+  color: var(--code-function);
+}
+
+html.dark .shiki .token.variable,
+html.dark .shiki .token.property {
+  color: var(--code-variable);
+}
+
+html.dark .shiki .token.number {
+  color: var(--code-number);
+}

@@ -143,8 +143,8 @@ export const CareerTimeline: React.FC = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-700">
-      <div className="text-center mb-12">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-4 xs:p-6 sm:p-8 border border-slate-200 dark:border-slate-700">
+      <div className="text-center mb-8 sm:mb-10 lg:mb-12">
         <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
           <Calendar className="w-4 h-4" />
           <span>Career Journey</span>
@@ -161,13 +161,13 @@ export const CareerTimeline: React.FC = () => {
         {/* Vertical line */}
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-600 via-purple-600 to-green-600 rounded-full"></div>
 
-        <div className="space-y-12">
+        <div className="space-y-8 sm:space-y-10 lg:space-y-12">
           {timelineItems.map((item, index) => {
             const IconComponent = getTypeIcon(item.type)
             const colorClass = getTypeColor(item.type)
             
             return (
-              <div key={item.id} className="relative flex items-start space-x-8">
+              <div key={item.id} className="relative flex items-start space-x-4 xs:space-x-6 sm:space-x-8">
                 {/* Timeline dot with icon */}
                 <div className={`relative z-10 bg-gradient-to-r ${colorClass} rounded-xl p-3 shadow-lg`}>
                   <IconComponent className="w-6 h-6 text-white" />
@@ -175,7 +175,7 @@ export const CareerTimeline: React.FC = () => {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-6 border border-slate-200 dark:border-slate-600">
+                  <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 xs:p-4 sm:p-6 border border-slate-200 dark:border-slate-600">
                     {/* Header */}
                     <div className="mb-4">
                       <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">

@@ -1,4 +1,5 @@
 @import './styles/animations.css';
+@import './styles/code-highlighting.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,26 +20,26 @@
   }
 }
 
-/* Custom component styles */
+/* Professional component styles with subtle animations */
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105;
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5;
   }
   
   .btn-secondary {
-    @apply bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl font-medium border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition-all duration-200 shadow-sm hover:shadow-md;
+    @apply bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl font-medium border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 transition-all duration-200 shadow-sm hover:shadow;
   }
   
   .card {
-    @apply bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105;
+    @apply bg-white dark:bg-slate-800 rounded-2xl shadow-md border border-slate-100 dark:border-slate-700 overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
   }
   
   .card-dark {
-    @apply bg-slate-800 dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-700 dark:border-slate-600 overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105;
+    @apply bg-slate-800 dark:bg-slate-900 rounded-2xl shadow-md border border-slate-700 dark:border-slate-600 overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
   }
   
   .input-field {
-    @apply w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500;
+    @apply w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all duration-150 text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500;
   }
   
   .badge {
@@ -93,16 +94,232 @@
     backface-visibility: hidden;
   }
   
-  /* Shiki code block reset */
-  .syntax-highlighted-code pre {
-    margin: 0 !important;
-    padding: 1rem !important;
-    border-radius: 0 !important;
-    background: transparent !important;
+  /* Code blocks - removed old styles as we're using inline styles now */
+  
+  /* Minimal scrollbar for code blocks */
+  .code-content::-webkit-scrollbar {
+    height: 8px;
   }
   
-  .syntax-highlighted-code pre code {
-    padding: 0 !important;
-    background: transparent !important;
+  .code-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .code-content::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded;
+  }
+  
+  /* Copy button animation */
+  .copy-button {
+    @apply relative overflow-hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .copy-button:hover {
+    transform: translateY(-1px);
+  }
+  
+  .copy-button:active {
+    transform: translateY(0);
+  }
+  
+  /* Code Block Container Styling */
+  .code-block-wrapper {
+    @apply my-6 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700;
+  }
+  
+  .code-block-content {
+    @apply bg-slate-50 dark:bg-slate-900;
+  }
+  
+  /* Shiki Dual Theme Support */
+  .shiki {
+    background-color: transparent !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    overflow-x: auto;
+  }
+  
+  .shiki code {
+    background-color: transparent !important;
+    font-family: 'SF Mono', Monaco, Consolas, 'Courier New', monospace !important;
+    font-size: 0.875rem !important;
+    line-height: 1.7 !important;
+  }
+  
+  /* Light theme colors */
+  html:not(.dark) .shiki,
+  html:not(.dark) .shiki span {
+    color: var(--shiki-light, #24292e) !important;
+  }
+  
+  /* Dark theme colors */
+  html.dark .shiki,
+  html.dark .shiki span {
+    color: var(--shiki-dark, #e1e4e8) !important;
+  }
+  
+  /* Token colors for light theme */
+  html:not(.dark) .shiki .line {
+    color: #24292e;
+  }
+  
+  /* Token colors for dark theme */
+  html.dark .shiki .line {
+    color: #e1e4e8;
+  }
+  
+  /* Article Content Styling - Best Practices */
+  .article-content {
+    @apply text-lg leading-relaxed;
+  }
+  
+  .article-content h1 {
+    @apply text-4xl font-bold mt-12 mb-6 text-slate-900 dark:text-white;
+  }
+  
+  .article-content h2 {
+    @apply text-3xl font-semibold mt-10 mb-5 text-slate-800 dark:text-slate-100 pb-2 border-b border-slate-200 dark:border-slate-800;
+  }
+  
+  .article-content h3 {
+    @apply text-2xl font-semibold mt-8 mb-4 text-slate-800 dark:text-slate-100;
+  }
+  
+  .article-content p {
+    @apply mb-6 text-slate-700 dark:text-slate-300;
+  }
+  
+  .article-content a {
+    @apply text-blue-600 dark:text-blue-400 font-medium underline underline-offset-2 decoration-blue-300 dark:decoration-blue-600;
+    @apply hover:text-blue-700 dark:hover:text-blue-300 hover:decoration-blue-500 transition-colors;
+  }
+  
+  .article-content strong {
+    @apply font-semibold text-slate-900 dark:text-white;
+  }
+  
+  .article-content em {
+    @apply italic;
+  }
+  
+  .article-content ul {
+    @apply list-disc list-inside mb-6 space-y-2 ml-4;
+  }
+  
+  .article-content ol {
+    @apply list-decimal list-inside mb-6 space-y-2 ml-4;
+  }
+  
+  .article-content li {
+    @apply text-slate-700 dark:text-slate-300;
+  }
+  
+  .article-content blockquote {
+    @apply pl-4 border-l-4 border-blue-500 dark:border-blue-400 my-6;
+    @apply bg-blue-50 dark:bg-blue-950/20 py-3 pr-4 rounded-r-lg;
+    @apply text-slate-700 dark:text-slate-300;
+  }
+  
+  .article-content code:not(pre code) {
+    @apply px-1.5 py-0.5 rounded text-sm font-mono;
+    @apply bg-slate-100 dark:bg-slate-800 text-pink-600 dark:text-pink-400;
+    @apply border border-slate-200 dark:border-slate-700;
+  }
+  
+  .article-content table {
+    @apply w-full my-8 border-collapse;
+  }
+  
+  .article-content th {
+    @apply text-left px-4 py-3 bg-slate-50 dark:bg-slate-800 font-semibold;
+    @apply text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700;
+  }
+  
+  .article-content td {
+    @apply px-4 py-3 text-slate-700 dark:text-slate-300;
+    @apply border border-slate-200 dark:border-slate-700;
+  }
+  
+  .article-content tr:nth-child(even) {
+    @apply bg-slate-50 dark:bg-slate-900/50;
+  }
+  
+  .article-content figure {
+    @apply my-8;
+  }
+  
+  .article-content img {
+    @apply w-full rounded-xl shadow-xl;
+  }
+  
+  .article-content figcaption {
+    @apply text-center text-sm text-slate-600 dark:text-slate-400 mt-3 italic;
+  }
+  
+  .article-content hr {
+    @apply my-12 border-slate-200 dark:border-slate-800;
+  }
+  
+  /* Animations */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    33% {
+      transform: translateY(-10px) rotate(1deg);
+    }
+    66% {
+      transform: translateY(5px) rotate(-1deg);
+    }
+  }
+  
+  @keyframes float-delayed {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    33% {
+      transform: translateY(10px) rotate(-1deg);
+    }
+    66% {
+      transform: translateY(-5px) rotate(1deg);
+    }
+  }
+  
+  .animate-float {
+    animation: float 20s ease-in-out infinite;
+  }
+  
+  .animate-float-delayed {
+    animation: float-delayed 25s ease-in-out infinite;
+    animation-delay: 5s;
+  }
+  
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+  
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  
+  .animate-fade-out {
+    animation: fade-out 0.3s ease-out forwards;
   }
 }

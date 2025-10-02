@@ -471,24 +471,44 @@ export const BlogPostPage: React.FC = () => {
       
       @media (max-width: 480px) {
         .article-header {
-          padding-top: 5rem;
+          padding-top: 4.5rem;
           padding-bottom: 1.5rem;
         }
         
         .article-prose h1 {
           font-size: 1.5rem;
+          margin: 1.25rem 0 0.875rem 0;
         }
         
         .article-prose h2 {
           font-size: 1.25rem;
+          margin: 1rem 0 0.625rem 0;
+        }
+        
+        .article-prose h3 {
+          font-size: 1.125rem;
+          margin: 0.875rem 0 0.5rem 0;
         }
         
         .article-prose p {
           font-size: 0.95rem;
+          line-height: 1.6;
         }
         
         .article-content {
-          padding: 0.75rem;
+          padding: 1rem;
+        }
+        
+        .container {
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+        }
+        
+        .scroll-top-btn {
+          bottom: 16px;
+          right: 16px;
+          width: 40px;
+          height: 40px;
         }
       }
     `

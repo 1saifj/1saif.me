@@ -8,13 +8,15 @@ interface GiscusCommentsProps {
 }
 
 export const GiscusComments: React.FC<GiscusCommentsProps> = ({ postSlug, postTitle }) => {
-  const [theme, setTheme] = useState<string>('light')
+  const [theme, setTheme] = useState<string>('')
 
   useEffect(() => {
-    // Listen for theme changes
+    // Listen for theme changes and switch to our custom theme URLs
     const updateTheme = () => {
       const isDark = document.documentElement.classList.contains('dark')
-      setTheme(isDark ? 'dark' : 'light')
+      // Use absolute URL to ensure themes are loaded correctly
+      const baseUrl = window.location.origin
+      setTheme(isDark ? `${baseUrl}/giscus-themes/dark.css` : `${baseUrl}/giscus-themes/light.css`)
     }
 
     // Initial theme detection
@@ -100,4 +102,4 @@ export const GiscusComments: React.FC<GiscusCommentsProps> = ({ postSlug, postTi
       </div>
     </section>
   )
-} 
+}

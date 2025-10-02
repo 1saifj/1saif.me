@@ -29,7 +29,7 @@ export const NewsletterShowcase: React.FC = () => {
       name: 'Feature Rich',
       description: 'Showcases benefits and includes social proof',
       features: ['Feature highlights', 'Social proof', 'Detailed benefits'],
-      preview: '⭐ Feature-Packed'
+      preview: 'Feature-Packed'
     },
     {
       key: 'CompactInline' as const,
@@ -43,7 +43,7 @@ export const NewsletterShowcase: React.FC = () => {
       name: 'Animated Interactive',
       description: 'Dynamic template with floating elements and hover effects',
       features: ['Floating animations', 'Interactive hover', 'Modern dynamics'],
-      preview: '✨ Dynamic & Interactive'
+      preview: 'Dynamic & Interactive'
     },
     {
       key: 'ModernGlass' as const,
@@ -281,7 +281,7 @@ export const MyNewsletterComponent = () => {
                 
                 <div className="mt-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-lg">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
-                    💡 <strong>Pro Tip:</strong> All templates are fully responsive and include dark mode support. 
+                    <strong>Pro Tip:</strong> All templates are fully responsive and include dark mode support.
                     They work seamlessly with your existing Firebase newsletter integration!
                   </p>
                 </div>

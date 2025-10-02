@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Mail, Sparkles, CheckCircle, ArrowRight, Star, Users, TrendingUp } from 'lucide-react'
+import { Mail, CheckCircle, ArrowRight, Users, TrendingUp, Award } from 'lucide-react'
 
 interface ModernGlassNewsletterProps {
   onSubscribe: (email: string) => Promise<void>
@@ -61,7 +61,7 @@ export const ModernGlassNewsletter: React.FC<ModernGlassNewsletterProps> = ({ on
             </div>
             
             <h3 className="text-3xl font-bold text-white mb-4">
-              Welcome to the Experience! 🎉
+              Welcome to the Experience!
             </h3>
             <p className="text-white/90 text-lg mb-8 max-w-md mx-auto">
               Thank you for joining our community. Get ready for innovative insights delivered to your inbox.
@@ -79,7 +79,7 @@ export const ModernGlassNewsletter: React.FC<ModernGlassNewsletterProps> = ({ on
                 <div className="text-white/70 text-sm">Updates</div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <Star className="w-6 h-6 text-white mx-auto mb-2" />
+                <Award className="w-6 h-6 text-white mx-auto mb-2" />
                 <div className="text-white font-semibold">Premium</div>
                 <div className="text-white/70 text-sm">Content</div>
               </div>
@@ -93,7 +93,7 @@ export const ModernGlassNewsletter: React.FC<ModernGlassNewsletterProps> = ({ on
   return (
     <div 
       ref={containerRef}
-      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 p-1 transition-all duration-700 hover:shadow-2xl hover:shadow-purple-500/25"
+      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 p-1 transition-all duration-300 hover:shadow-xl"
       style={{
         background: `
           linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%),
@@ -106,9 +106,9 @@ export const ModernGlassNewsletter: React.FC<ModernGlassNewsletterProps> = ({ on
       <div className="relative bg-white/10 backdrop-blur-xl rounded-[23px] p-10 border border-white/20">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden rounded-[23px]">
-          <div className="absolute -top-4 -left-4 w-24 h-24 bg-white/5 rounded-full blur-xl animate-pulse" />
-          <div className="absolute top-1/2 -right-8 w-32 h-32 bg-white/5 rounded-full blur-xl animate-pulse delay-1000" />
-          <div className="absolute -bottom-6 left-1/3 w-20 h-20 bg-white/5 rounded-full blur-xl animate-pulse delay-500" />
+          <div className="absolute -top-4 -left-4 w-24 h-24 bg-white/5 rounded-full blur-xl animate-pulse-subtle" />
+          <div className="absolute top-1/2 -right-8 w-32 h-32 bg-white/5 rounded-full blur-xl animate-pulse-subtle" style={{animationDelay: '1s'}} />
+          <div className="absolute -bottom-6 left-1/3 w-20 h-20 bg-white/5 rounded-full blur-xl animate-pulse-subtle" style={{animationDelay: '0.5s'}} />
         </div>
 
         {/* Content overlay */}
@@ -116,7 +116,7 @@ export const ModernGlassNewsletter: React.FC<ModernGlassNewsletterProps> = ({ on
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-4 border border-white/30">
-              <Sparkles className="w-4 h-4" />
+              <Mail className="w-4 h-4" />
               <span>Premium Newsletter</span>
             </div>
             
@@ -146,7 +146,7 @@ export const ModernGlassNewsletter: React.FC<ModernGlassNewsletterProps> = ({ on
             
             <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div className="w-8 h-8 bg-blue-400 rounded-lg flex items-center justify-center">
-                <Star className="w-5 h-5 text-white" />
+                <Award className="w-5 h-5 text-white" />
               </div>
               <div>
                 <div className="text-white font-semibold text-sm">Premium Access</div>
@@ -178,7 +178,7 @@ export const ModernGlassNewsletter: React.FC<ModernGlassNewsletterProps> = ({ on
             <button
               type="submit"
               disabled={isLoading || !email}
-              className="group w-full relative overflow-hidden bg-white/20 backdrop-blur-sm hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed border border-white/30 hover:border-white/50 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-white/20"
+              className="group w-full relative overflow-hidden bg-white/20 backdrop-blur-sm hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed border border-white/30 hover:border-white/50 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-200 hover:shadow-md"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 group-hover:animate-pulse" />
               
