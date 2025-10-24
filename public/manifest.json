@@ -39,22 +39,6 @@
       "type": "image/png"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshot-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Desktop view of Saif's portfolio"
-    },
-    {
-      "src": "/screenshot-mobile.png",
-      "sizes": "375x812",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Mobile view of Saif's portfolio"
-    }
-  ],
   "shortcuts": [
     {
       "name": "View Blog",

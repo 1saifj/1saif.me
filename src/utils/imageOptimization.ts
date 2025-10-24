@@ -46,6 +46,10 @@ export function getOptimizedImageUrl(
   originalUrl: string, 
   options: ImageOptions = {}
 ): string {
+  // Cloudflare Image Resizing requires a paid plan
+  // Return original URL for now
+  return originalUrl;
+  
   // If running locally, in development, or originalUrl is already a data URL, return as-is
   if (isLocalDevelopment() || originalUrl.startsWith('data:')) {
     return originalUrl;
