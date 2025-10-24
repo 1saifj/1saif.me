@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "npm run seo:generate && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "preview:local": "./scripts/preview.sh",
@@ -21,7 +21,11 @@
     "analyze": "npm run build && npx vite-bundle-analyzer dist/stats.html",
     "mcp:frontend": "node mcp-frontend-server.js",
     "verify:images": "node scripts/verify-blog-images.cjs",
-    "algolia:index": "node scripts/algolia-index-proper.cjs"
+    "algolia:index": "node scripts/algolia-index-proper.cjs",
+    "seo:sitemap": "node scripts/generate-sitemap.cjs",
+    "seo:rss": "node scripts/generate-rss.cjs",
+    "seo:generate": "npm run seo:sitemap && npm run seo:rss",
+    "seo:all": "npm run seo:generate && npm run algolia:index"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",

@@ -6,14 +6,17 @@ export const PersonStructuredData: React.FC = () => {
     "@context": "https://schema.org",
     "@type": "Person",
     "name": "Saif Aljanahi",
-    "alternateName": "Saif Aljanahi",
+    "alternateName": "1saifj",
     "jobTitle": "Full-Stack Software Engineer",
-    "description": "Experienced Full-Stack Software Engineer specializing in Golang, Python, Flutter, and modern web technologies. Expert in building scalable backend systems and beautiful mobile applications.",
-    "url": "https://1saif.me",
+    "description": "Experienced Full-Stack Software Engineer specializing in Golang, Python, Flutter, and Clean Architecture. Backend Team Lead at AlQaseh with expertise in financial systems and healthcare technology.",
+    "url": "https://saifaljanahi.dev",
+    "email": "saifalialjanahi@gmail.com",
+    "telephone": "+964-7822084101",
+    "image": "https://saifaljanahi.dev/sj_image.jpeg",
     "sameAs": [
-      "https://github.com/saif-alqaseh",
-      "https://linkedin.com/in/saif-alqaseh", 
-      "https://twitter.com/saif_alqaseh"
+      "https://github.com/1saifj",
+      "https://www.linkedin.com/in/1saifj",
+      "https://www.researchgate.net/profile/Saif-Aljanahi"
     ],
     "knowsAbout": [
       "Software Engineering",
@@ -29,13 +32,26 @@ export const PersonStructuredData: React.FC = () => {
       "API Development",
       "System Architecture"
     ],
-    "worksFor": {
-      "@type": "Organization",
-      "name": "Freelance Software Engineer"
-    },
+    "worksFor": [
+      {
+        "@type": "Organization",
+        "name": "AlQaseh",
+        "url": "https://alqaseh.com"
+      },
+      {
+        "@type": "Organization",
+        "name": "University of Kufa",
+        "url":"https://uokufa.edu.iq"
+      }
+    ],
     "alumniOf": {
       "@type": "EducationalOrganization",
-      "name": "University of Technology"
+      "name": "University of Kufa",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Al-Najaf",
+        "addressCountry": "Iraq"
+      }
     }
   }
 
@@ -70,22 +86,37 @@ export const ArticleStructuredData: React.FC<ArticleStructuredDataProps> = ({
     "@type": "BlogPosting",
     "headline": title,
     "description": description,
-    "image": `https://1saif.me/og-images/blog/${slug}.png`, // You can generate OG images
+    "image": {
+      "@type": "ImageObject",
+      "url": `https://saifaljanahi.dev/articles/${slug}_feat.png`,
+      "width": 1200,
+      "height": 630
+    },
     "datePublished": publishedDate,
     "dateModified": modifiedDate || publishedDate,
     "author": {
       "@type": "Person",
       "name": "Saif Aljanahi",
-      "url": "https://1saif.me"
+      "url": "https://saifaljanahi.dev",
+      "sameAs": [
+        "https://github.com/1saifj",
+        "https://www.linkedin.com/in/1saifj"
+      ]
     },
     "publisher": {
-      "@type": "Person",
+      "@type": "Organization",
       "name": "Saif Aljanahi",
-      "url": "https://1saif.me"
+      "url": "https://saifaljanahi.dev",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://saifaljanahi.dev/sj.png",
+        "width": 512,
+        "height": 512
+      }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://1saif.me/blog/${slug}`
+      "@id": `https://saifaljanahi.dev/blog/${slug}`
     },
     "keywords": tags.join(", "),
     "articleSection": "Technology",
@@ -104,19 +135,23 @@ export const ArticleStructuredData: React.FC<ArticleStructuredDataProps> = ({
 export const WebsiteStructuredData: React.FC = () => {
   const websiteData = {
     "@context": "https://schema.org",
-    "@type": "Website",
-    "name": "Saif Aljanahi - Software Engineer Portfolio",
-    "alternateName": "1saif.me",
-    "url": "https://1saif.me",
-    "description": "Portfolio website of Saif Aljanahi, a Full-Stack Software Engineer specializing in Golang, Python, Flutter, and modern web technologies.",
+    "@type": "WebSite",
+    "name": "Saif Aljanahi - Full-Stack Software Engineer",
+    "alternateName": "Saif Aljanahi Portfolio",
+    "url": "https://saifaljanahi.dev",
+    "description": "Portfolio and blog of Saif Aljanahi, Backend Team Lead specializing in Golang, Python, Flutter, and Clean Architecture. Technical articles on software engineering, system design, and financial systems.",
     "inLanguage": "en-US",
     "author": {
       "@type": "Person",
-      "name": "Saif Aljanahi"
+      "name": "Saif Aljanahi",
+      "url": "https://saifaljanahi.dev"
     },
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://1saif.me/blog?search={search_term_string}",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://saifaljanahi.dev/blog?search={search_term_string}"
+      },
       "query-input": "required name=search_term_string"
     }
   }
@@ -133,29 +168,54 @@ export const WebsiteStructuredData: React.FC = () => {
 export const OrganizationStructuredData: React.FC = () => {
   const organizationData = {
     "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    "name": "Saif Aljanahi Software Engineering Services",
-    "image": "https://1saif.me/images/saif-alqaseh.jpg",
-    "description": "Professional software engineering services specializing in full-stack development, mobile applications, and backend systems.",
+    "@type": "Organization",
+    "@id": "https://saifaljanahi.dev/#organization",
+    "name": "Saif Aljanahi",
+    "url": "https://saifaljanahi.dev",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://saifaljanahi.dev/sj.png",
+      "width": 512,
+      "height": 512
+    },
+    "image": "https://saifaljanahi.dev/sj_image.jpeg",
+    "description": "Professional software engineering services specializing in Golang backend development, financial systems, and Clean Architecture. Expert in building scalable, secure applications.",
     "founder": {
       "@type": "Person",
-      "name": "Saif Aljanahi"
+      "name": "Saif Aljanahi",
+      "url": "https://saifaljanahi.dev"
     },
-    "areaServed": "Worldwide",
-    "serviceType": [
-      "Full-Stack Development",
-      "Mobile App Development", 
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Al-Najaf",
+      "addressCountry": "Iraq"
+    },
+    "areaServed": {
+      "@type": "Place",
+      "name": "Worldwide"
+    },
+    "knowsAbout": [
+      "Golang",
+      "Python",
+      "Flutter",
+      "Clean Architecture",
       "Backend Development",
+      "Financial Systems",
+      "PostgreSQL",
+      "Microservices",
       "API Development",
-      "Database Design",
-      "System Architecture",
-      "Technical Consulting"
+      "System Design"
     ],
-    "url": "https://1saif.me",
+    "sameAs": [
+      "https://github.com/1saifj",
+      "https://www.linkedin.com/in/1saifj",
+      "https://www.researchgate.net/profile/Saif-Aljanahi"
+    ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "contactType": "customer service",
-      "url": "https://1saif.me/#contact",
+      "contactType": "Professional",
+      "email": "saifalialjanahi@gmail.com",
+      "telephone": "+964-7822084101",
       "availableLanguage": ["English", "Arabic"]
     }
   }
@@ -195,7 +255,7 @@ export const FAQStructuredData: React.FC = () => {
         "name": "How can I contact Saif Aljanahi for a project?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "You can contact Saif through the contact form on his portfolio website at 1saif.me, via email, or through his social media profiles on GitHub and LinkedIn."
+          "text": "You can contact Saif via email at saifalialjanahi@gmail.com, through the contact form on his website at saifaljanahi.dev, or connect on LinkedIn and GitHub."
         }
       },
       {

@@ -36,72 +36,54 @@ export const About: React.FC = () => {
   ]
 
   return (
-    <section className="py-20 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+    <section className="py-20 bg-white dark:bg-slate-900 transition-colors duration-300">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 transition-colors duration-300">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
               About Saif Aljanahi
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-4xl mx-auto leading-relaxed transition-colors duration-300">
-              <strong>Full-Stack Engineer</strong> with 3+ years of experience building enterprise-grade systems. 
-              Specialized in <strong>Golang backend development</strong>, <strong>financial technology</strong>, and 
-              <strong>scalable architecture</strong> with a proven track record of leading high-performance teams.
+            <p className="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
+              Full-Stack Engineer with 3+ years of experience building enterprise-grade systems. 
+              Specialized in Golang backend development, financial technology, and scalable architecture 
+              with a proven track record of leading high-performance teams.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-start mb-16">
+          <div className="grid md:grid-cols-2 gap-12 mb-12">
             <div>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 transition-colors duration-300">Professional Journey</h3>
-              <div className="space-y-4 text-slate-600 dark:text-slate-300 leading-relaxed transition-colors duration-300">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Professional Journey</h3>
+              <div className="space-y-4 text-slate-600 dark:text-slate-300 leading-relaxed">
                 <p>
-                  As a <strong className="text-slate-900 dark:text-white">Full-Stack Engineer</strong> with deep expertise in 
-                  <strong className="text-slate-900 dark:text-white"> Golang</strong>, <strong className="text-slate-900 dark:text-white">TypeScript</strong>, 
-                  and <strong className="text-slate-900 dark:text-white">Clean Architecture</strong>, I specialize in building mission-critical 
-                  financial systems that process millions of dollars in transactions while maintaining the highest security standards.
-                </p>
-                <p>
-                  My leadership experience includes <strong className="text-slate-900 dark:text-white">leading cross-functional teams</strong> of 5+ developers, 
-                  establishing engineering best practices, and implementing <strong className="text-slate-900 dark:text-white">CI/CD pipelines</strong> that 
-                  reduced deployment time by 60%. I've successfully delivered <strong className="text-slate-900 dark:text-white">PCI DSS compliant systems</strong> 
-                  and achieved <strong className="text-slate-900 dark:text-white">99.9% system uptime</strong> in production environments.
+                  As a Full-Stack Engineer with deep expertise in Golang, TypeScript, and Clean Architecture, 
+                  I specialize in building mission-critical financial systems that process millions of dollars 
+                  in transactions while maintaining the highest security standards.
                 </p>
                 <p>
-                  Currently serving as <strong className="text-slate-900 dark:text-white">Backend Team Lead at AlQaseh</strong>, I architect and maintain 
-                  enterprise-grade financial systems while mentoring junior developers and driving technical innovation. My passion for 
-                  <strong className="text-slate-900 dark:text-white"> performance optimization</strong> and <strong className="text-slate-900 dark:text-white"> scalable architecture</strong> 
-                  has resulted in systems that serve thousands of concurrent users with sub-200ms response times.
+                  My leadership experience includes leading cross-functional teams of 5+ developers, establishing 
+                  engineering best practices, and implementing CI/CD pipelines that reduced deployment time by 60%. 
+                  I've successfully delivered PCI DSS compliant systems and achieved 99.9% system uptime in production environments.
                 </p>
-              </div>
-
-              {/* Call to Action */}
-              <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Ready to collaborate?</h4>
-                <p className="text-slate-600 dark:text-slate-300 text-sm mb-4">
-                  I'm always interested in discussing new opportunities, technical challenges, and innovative projects.
+                <p>
+                  Currently serving as Backend Team Lead at AlQaseh, I architect and maintain enterprise-grade 
+                  financial systems while mentoring junior developers and driving technical innovation. My passion 
+                  for performance optimization and scalable architecture has resulted in systems that serve thousands 
+                  of concurrent users with sub-200ms response times.
                 </p>
-                <a 
-                  href="#contact" 
-                  className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors"
-                >
-                  Get in touch →
-                </a>
               </div>
             </div>
             
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 transition-colors duration-300 border border-slate-200 dark:border-slate-700">
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 transition-colors duration-300">Core Technical Expertise</h3>
-              <div className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Core Technical Expertise</h3>
+              <div className="space-y-4">
                 {skills.map((skill, index) => (
-                  <div key={index} className="group">
-                    <div className="flex items-start space-x-4">
-                      <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3 flex-shrink-0 transition-all duration-300 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50">
-                        <skill.icon className="w-6 h-6 text-blue-600 dark:text-blue-400 transition-colors duration-300" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-slate-900 dark:text-white mb-2 transition-colors duration-300">{skill.title}</h4>
-                        <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed transition-colors duration-300">{skill.description}</p>
-                      </div>
+                  <div key={index} className="flex items-start space-x-4 p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3 flex-shrink-0">
+                      <skill.icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 dark:text-white mb-1">{skill.title}</h4>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{skill.description}</p>
                     </div>
                   </div>
                 ))}
@@ -109,7 +91,18 @@ export const About: React.FC = () => {
             </div>
           </div>
 
-
+          <div className="mt-12 p-6 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+            <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Ready to collaborate?</h4>
+            <p className="text-slate-600 dark:text-slate-300 text-sm mb-4">
+              I'm always interested in discussing new opportunities, technical challenges, and innovative projects.
+            </p>
+            <a 
+              href="#contact" 
+              className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors"
+            >
+              Get in touch →
+            </a>
+          </div>
         </div>
       </div>
     </section>

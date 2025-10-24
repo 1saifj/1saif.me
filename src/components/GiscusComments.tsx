@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Giscus from '@giscus/react'
-import '../styles/giscus.css'
+import '../design-system/styles/giscus.css'
 
 interface GiscusCommentsProps {
   postSlug: string
@@ -11,12 +11,11 @@ export const GiscusComments: React.FC<GiscusCommentsProps> = ({ postSlug, postTi
   const [theme, setTheme] = useState<string>('')
 
   useEffect(() => {
-    // Listen for theme changes and switch to our custom theme URLs
+    // Listen for theme changes and switch between built-in giscus themes
     const updateTheme = () => {
       const isDark = document.documentElement.classList.contains('dark')
-      // Use absolute URL to ensure themes are loaded correctly
-      const baseUrl = window.location.origin
-      setTheme(isDark ? `${baseUrl}/giscus-themes/dark.css` : `${baseUrl}/giscus-themes/light.css`)
+      // Use built-in giscus themes to avoid CORS issues
+      setTheme(isDark ? 'dark' : 'light')
     }
 
     // Initial theme detection

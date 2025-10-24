@@ -7,7 +7,7 @@ import { initPerformanceMonitoring } from './utils/performance';
 
 // Import test modules for development
 if (import.meta.env.DEV) {
-  import('./test/firebaseTest.ts');
+  import('./tests/firebaseTest.ts');
 }
 
 // Initialize performance monitoring

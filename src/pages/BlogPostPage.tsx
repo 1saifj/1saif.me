@@ -13,27 +13,7 @@ import { GiscusComments } from '../components/GiscusComments'
 import { ArticleStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
 import { blogViewsService, BlogViewStats } from '../services/blogViewsService'
-import ProgressiveReading from '../components/ProgressiveReading'
 
-// Progressive Reading Blocks Component
-const ProgressiveReadingBlock: React.FC<{ delay?: number; className?: string; children: React.ReactNode }> = ({ 
-  delay = 0, 
-  className = '',
-  children 
-}) => {
-  return (
-    <div 
-      className={`reading-block ${className}`}
-      style={{
-        animationDelay: `${delay}ms`,
-        animation: 'fadeInUp 0.8s ease-out forwards',
-        animationFillMode: 'forwards'
-      }}
-    >
-      {children}
-    </div>
-  )
-}
 
 // Content Loading Skeleton
 const ContentLoadingSkeleton: React.FC = () => {
@@ -182,17 +162,6 @@ export const BlogPostPage: React.FC = () => {
         box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
       }
       
-      .reading-progress {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
-        transform-origin: left;
-        z-index: 9999;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-      }
       
       .floating-actions {
         position: fixed;
@@ -759,21 +728,6 @@ export const BlogPostPage: React.FC = () => {
 
   return (
     <div className="blog-container">
-      {/* Progressive Reading System */}
-      <ProgressiveReading 
-        articleSlug={slug}
-        content={article?.content || ''}
-        showDetailedStats={true}
-        showFloatingProgress={true}
-        showReadingResume={true}
-        className="mb-8"
-      />
-
-      {/* Reading Progress Bar */}
-      <div 
-        className="reading-progress"
-        style={{ transform: `scaleX(${readingProgress / 100})` }}
-      />
 
       {/* Enhanced Header */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -945,22 +899,6 @@ export const BlogPostPage: React.FC = () => {
                   ))}
                 </nav>
                 
-                {/* Reading Progress */}
-                <div className="mt-8 pt-6 border-t border-slate-200">
-                  <div className="flex items-center justify-between text-sm text-slate-500 mb-3">
-                    <div className="flex items-center space-x-2">
-                      <Eye className="w-4 h-4" />
-                      <span>{estimateReadTime(article.content)} min read</span>
-                    </div>
-                    <span className="font-semibold text-blue-600">{Math.round(readingProgress)}%</span>
-                  </div>
-                  <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 h-2 rounded-full transition-all duration-500 shadow-sm"
-                      style={{ width: `${readingProgress}%` }}
-                    />
-                  </div>
-                </div>
               </div>
             </div>
           </aside>
@@ -971,8 +909,7 @@ export const BlogPostPage: React.FC = () => {
               {isContentLoading ? (
                 <ContentLoadingSkeleton />
               ) : (
-                <ProgressiveReadingBlock delay={100}>
-                  <div 
+                  <div
                     className="
                       article-prose max-w-none text-slate-700 dark:text-slate-300 leading-relaxed
                       [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:text-slate-900 [&>h1]:dark:text-white [&>h1]:mb-6 [&>h1]:mt-8 [&>h1]:leading-tight
@@ -1011,30 +948,24 @@ export const BlogPostPage: React.FC = () => {
                     "
                     dangerouslySetInnerHTML={{ __html: htmlContent }}
                   />
-                </ProgressiveReadingBlock>
               )}
             </article>
 
             {/* AI Content Enhancement */}
-            <ProgressiveReadingBlock delay={200}>
-              <AIContentEnhancer 
+              <AIContentEnhancer
                 content={article.content}
                 title={article.frontmatter.title || ''}
                 existingTags={article.frontmatter.tags || []}
                 className="mb-12"
               />
-            </ProgressiveReadingBlock>
 
             {/* AI-Powered Content Recommendations */}
-            <ProgressiveReadingBlock delay={300}>
               <ContentRecommendations
                 currentSlug={slug!}
                 className="mb-12"
               />
-            </ProgressiveReadingBlock>
 
             {/* Author Bio */}
-            <ProgressiveReadingBlock delay={400}>
               <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 rounded-3xl p-8 text-white shadow-2xl mb-12 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.05%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
                 
@@ -1082,10 +1013,8 @@ export const BlogPostPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </ProgressiveReadingBlock>
 
             {/* Navigation */}
-            <ProgressiveReadingBlock delay={500}>
               <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-slate-200">
               <Link 
                 to="/#blog"
@@ -1103,7 +1032,6 @@ export const BlogPostPage: React.FC = () => {
                 </p>
               </div>
             </div>
-            </ProgressiveReadingBlock>
           </main>
         </div>
       </div>
