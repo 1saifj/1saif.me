@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { Send, CheckCircle, AlertCircle, Loader } from 'lucide-react'
 import { useAnalytics } from './Analytics'
+import { addContact } from '../services/contactService'
 
 interface FormData {
   name: string
@@ -62,35 +63,34 @@ export const ContactForm: React.FC = () => {
     })
 
     try {
-      // Simulate form submission - replace with your actual endpoint
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      // Save to Firebase Firestore
+      await addContact({
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        urgency: formData.urgency,
+        contactMethod: formData.contactMethod
       })
 
-      if (response.ok) {
-        setIsSubmitted(true)
-        trackContact(`form_${formData.contactMethod}`)
-        
-        // Reset form after 5 seconds
-        setTimeout(() => {
-          setIsSubmitted(false)
-          setFormData({
-            name: '',
-            email: '',
-            subject: '',
-            message: '',
-            urgency: 'medium',
-            contactMethod: 'email'
-          })
-        }, 5000)
-      } else {
-        throw new Error('Failed to send message')
-      }
+      setIsSubmitted(true)
+      trackContact(`form_${formData.contactMethod}`)
+      
+      // Reset form after 5 seconds
+      setTimeout(() => {
+        setIsSubmitted(false)
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+          urgency: 'medium',
+          contactMethod: 'email'
+        })
+      }, 5000)
     } catch (error) {
       console.error('Contact form error:', error)
-      // Handle error - show error message
+      alert('Failed to send message. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
