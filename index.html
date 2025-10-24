@@ -62,7 +62,16 @@
     
     <!-- Cloudflare Web Analytics (Privacy-first, no cookies) -->
     <!-- Note: This script may be blocked by ad blockers or DNS filters. This is expected and won't affect site functionality. -->
-    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "274a7b58a685474da3ab9456f466cdc8", "spa": true}'></script>
+    <!-- Only load in production to avoid CORS errors in development -->
+    <script>
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const script = document.createElement('script');
+        script.defer = true;
+        script.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+        script.setAttribute('data-cf-beacon', '{"token": "274a7b58a685474da3ab9456f466cdc8", "spa": true}');
+        document.head.appendChild(script);
+      }
+    </script>
     
     <!-- Theme initialization script - prevents flash of incorrect theme -->
     <script>
