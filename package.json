@@ -80,5 +80,8 @@
     "vite-plugin-pwa": "^1.0.0",
     "vitest": "^3.2.3",
     "workbox-window": "^7.3.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.52.5"
   }
 }
