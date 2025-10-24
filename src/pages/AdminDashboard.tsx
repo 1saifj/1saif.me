@@ -1,17 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Users, Mail, Filter, Search, Download, Trash2, Eye, Calendar, Clock } from 'lucide-react'
-
-interface Contact {
-  id: string
-  name: string
-  email: string
-  subject: string
-  message: string
-  urgency: 'low' | 'medium' | 'high'
-  contactMethod: 'email' | 'phone' | 'video'
-  createdAt: string
-  status: 'new' | 'read' | 'responded' | 'archived'
-}
+import { getAllContacts, updateContactStatus, deleteContact as deleteContactService, Contact } from '../services/contactService'
 
 export const AdminDashboard: React.FC = () => {
   const [contacts, setContacts] = useState<Contact[]>([])
@@ -23,35 +12,23 @@ export const AdminDashboard: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
 
-  // Mock data - replace with actual API call
+  // Load contacts from Firebase
   useEffect(() => {
-    const mockContacts: Contact[] = [
-      {
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        subject: 'Project Inquiry',
-        message: 'I would like to discuss a potential project collaboration...',
-        urgency: 'high',
-        contactMethod: 'email',
-        createdAt: new Date().toISOString(),
-        status: 'new'
-      },
-      {
-        id: '2',
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        subject: 'Consultation Request',
-        message: 'Looking for technical consultation on system architecture...',
-        urgency: 'medium',
-        contactMethod: 'video',
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-        status: 'read'
-      }
-    ]
-    setContacts(mockContacts)
-    setFilteredContacts(mockContacts)
-  }, [])
+    if (isAuthenticated) {
+      loadContacts()
+    }
+  }, [isAuthenticated])
+
+  const loadContacts = async () => {
+    try {
+      const fetchedContacts = await getAllContacts()
+      setContacts(fetchedContacts)
+      setFilteredContacts(fetchedContacts)
+    } catch (error) {
+      console.error('Error loading contacts:', error)
+      alert('Failed to load contacts')
+    }
+  }
 
   useEffect(() => {
     let filtered = contacts
@@ -85,16 +62,28 @@ export const AdminDashboard: React.FC = () => {
     }
   }
 
-  const handleStatusChange = (contactId: string, newStatus: Contact['status']) => {
-    setContacts(prev =>
-      prev.map(c => c.id === contactId ? { ...c, status: newStatus } : c)
-    )
+  const handleStatusChange = async (contactId: string, newStatus: Contact['status']) => {
+    try {
+      await updateContactStatus(contactId, newStatus)
+      setContacts(prev =>
+        prev.map(c => c.id === contactId ? { ...c, status: newStatus } : c)
+      )
+    } catch (error) {
+      console.error('Error updating status:', error)
+      alert('Failed to update status')
+    }
   }
 
-  const handleDelete = (contactId: string) => {
+  const handleDelete = async (contactId: string) => {
     if (confirm('Are you sure you want to delete this contact?')) {
-      setContacts(prev => prev.filter(c => c.id !== contactId))
-      setSelectedContact(null)
+      try {
+        await deleteContactService(contactId)
+        setContacts(prev => prev.filter(c => c.id !== contactId))
+        setSelectedContact(null)
+      } catch (error) {
+        console.error('Error deleting contact:', error)
+        alert('Failed to delete contact')
+      }
     }
   }
 
