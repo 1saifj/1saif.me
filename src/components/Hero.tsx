@@ -1,139 +1,125 @@
 import React, { useState, useEffect } from 'react'
-import { ChevronDown, Github, Linkedin, Mail, Phone, FileText } from 'lucide-react'
+import { Github, Linkedin, Mail, Phone, FileText } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { OptimizedImage } from '../utils/imageOptimization'
 
-const titles = [
-  "Full-Stack Engineer",
-  "System Architect", 
-  "Golang Developer",
-  "Flutter Developer",
-  "Python Developer"
-]
-
 export const Hero: React.FC = () => {
-  const [currentTitle, setCurrentTitle] = useState(0)
-  const [displayText, setDisplayText] = useState('')
-  const [isDeleting, setIsDeleting] = useState(false)
+  const titles = [
+    'Full-Stack Engineer',
+    'Backend Developer',
+    'Golang Specialist',
+    'System Architect',
+    'Tech Lead'
+  ]
+  const [currentTitleIndex, setCurrentTitleIndex] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const currentFullTitle = titles[currentTitle]
-      
-      if (!isDeleting) {
-        setDisplayText(currentFullTitle.substring(0, displayText.length + 1))
-        
-        if (displayText === currentFullTitle) {
-          setTimeout(() => setIsDeleting(true), 2000)
-        }
-      } else {
-        setDisplayText(currentFullTitle.substring(0, displayText.length - 1))
-        
-        if (displayText === '') {
-          setIsDeleting(false)
-          setCurrentTitle((prev) => (prev + 1) % titles.length)
-        }
-      }
-    }, isDeleting ? 50 : 100)
+    const interval = setInterval(() => {
+      setIsAnimating(true)
+      setTimeout(() => {
+        setCurrentTitleIndex((prev) => (prev + 1) % titles.length)
+        setIsAnimating(false)
+      }, 500)
+    }, 3000)
 
-    return () => clearTimeout(timer)
-  }, [displayText, isDeleting, currentTitle])
-
+    return () => clearInterval(interval)
+  }, [])
   return (
-    <section className="pt-16 md:pt-20 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 dark:from-slate-950 dark:via-blue-950 dark:to-slate-950 flex items-center justify-center relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.05%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20 dark:opacity-10"></div>
-      
+    <section className="relative pt-16 md:pt-20 min-h-screen bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/10 dark:bg-blue-600/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-3xl animate-float-delayed"></div>
+      </div>
+
       <div className="container mx-auto px-6 text-center relative z-10">
-        <div className="max-w-4xl mx-auto">
-          {/* Profile Image */}
-          <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 mx-auto mb-8 rounded-full overflow-hidden shadow-2xl ring-4 ring-white/20 dark:ring-white/10 hover:ring-white/40 dark:hover:ring-white/20 transition-all duration-300">
-            <OptimizedImage 
-              src="/sj_image.jpeg" 
-              alt="Saif Aljanahi - Full-Stack Software Engineer specializing in Golang, Python, and Flutter development"
-              className="w-full h-full object-cover object-center"
-              preset="avatar"
-              customOptions={{ width: 160, height: 160, quality: 95 }}
-              width={160}
-              height={160}
-            />
+        <div className="max-w-5xl mx-auto">
+          {/* Profile Image with animated border */}
+          <div className="relative w-32 h-32 md:w-40 md:h-40 mx-auto mb-8">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full animate-spin-slow blur-sm"></div>
+            <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white dark:border-slate-900">
+              <OptimizedImage 
+                src="/sj_image.jpeg" 
+                alt="Saif Aljanahi - Full-Stack Software Engineer specializing in Golang, Python, and Flutter development"
+                className="w-full h-full object-cover object-center"
+                preset="avatar"
+                customOptions={{ width: 160, height: 160, quality: 95 }}
+                width={160}
+                height={160}
+              />
+            </div>
           </div>
           
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-6 tracking-tight px-4">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
             Saif Aljanahi
           </h1>
           
-          <div className="h-16 mb-8">
-            <h2 className="text-xl sm:text-2xl md:text-3xl text-blue-300 dark:text-blue-200 font-light">
-              {displayText}
-              <span className="animate-pulse">|</span>
-            </h2>
+          {/* Animated title with gradient */}
+          <div className="mb-8 min-h-[3.5rem] flex items-center justify-center">
+            <span className={`text-2xl sm:text-3xl md:text-4xl font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent transition-all duration-500 ${isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+              {titles[currentTitleIndex]}
+            </span>
           </div>
           
-          <p className="text-lg sm:text-xl text-gray-300 dark:text-gray-200 mb-10 max-w-xl sm:max-w-2xl mx-auto leading-relaxed px-4">
-            Transforming complex business requirements into scalable, secure software solutions using 
-            <strong className="text-white"> Golang</strong>, <strong className="text-white">Python</strong>, 
-            <strong className="text-white"> Flutter</strong>, and <strong className="text-white">Clean Architecture</strong> principles.
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-3xl mx-auto leading-relaxed">
+            Building scalable, secure software solutions with Golang, Python, Flutter, and Clean Architecture.
           </p>
           
-          {/* Resume Button */}
-          <div className="mb-10">
+          {/* CTA */}
+          <div className="mb-12">
             <Link 
               to="/resume"
-              className="group inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 transform"
+              className="group inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
             >
-              <FileText className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
+              <FileText className="w-5 h-5 transition-transform group-hover:rotate-12" aria-hidden="true" />
               <span>View Resume</span>
             </Link>
           </div>
           
-          {/* Contact Info */}
-          <div className="grid md:grid-cols-2 gap-4 mb-12 max-w-2xl mx-auto">
-            <div className="flex items-center justify-center space-x-2 text-gray-300 dark:text-gray-200">
-              <Phone className="w-4 h-4" aria-hidden="true" />
-              <span>+964-7822084101</span>
-            </div>
-            <div className="flex items-center justify-center space-x-2 text-gray-300 dark:text-gray-200">
-              <Mail className="w-4 h-4" aria-hidden="true" />
-              <span>saifalialjanahi@gmail.com</span>
-            </div>
+          {/* Contact */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-10">
+            <a href="tel:+9647822084101" className="group flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300">
+              <Phone className="w-4 h-4 transition-transform group-hover:scale-110" aria-hidden="true" />
+              <span className="font-medium">+964-7822084101</span>
+            </a>
+            <span className="hidden sm:block text-slate-300 dark:text-slate-700">•</span>
+            <a href="mailto:saifalialjanahi@gmail.com" className="group flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300">
+              <Mail className="w-4 h-4 transition-transform group-hover:scale-110" aria-hidden="true" />
+              <span className="font-medium">saifalialjanahi@gmail.com</span>
+            </a>
           </div>
           
-          {/* Social Links */}
-          <div className="flex justify-center space-x-8 mb-16">
+          {/* Social */}
+          <div className="flex justify-center gap-6">
             <a 
               href="https://github.com/1saifj" 
-              className="group flex items-center space-x-3 bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+              className="group flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300 hover:scale-105"
               aria-label="Visit Saif Aljanahi's GitHub profile"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Github className="w-5 h-5 text-white group-hover:text-blue-300 dark:group-hover:text-blue-200 transition-colors" aria-hidden="true" />
-              <span className="text-white font-medium">GitHub</span>
+              <Github className="w-5 h-5 transition-transform group-hover:rotate-12" aria-hidden="true" />
+              <span className="font-medium">GitHub</span>
             </a>
             <a 
               href="https://www.linkedin.com/in/1saifj" 
-              className="group flex items-center space-x-3 bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+              className="group flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300 hover:scale-105"
               aria-label="Connect with Saif Aljanahi on LinkedIn"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Linkedin className="w-5 h-5 text-white group-hover:text-blue-300 dark:group-hover:text-blue-200 transition-colors" aria-hidden="true" />
-              <span className="text-white font-medium">LinkedIn</span>
+              <Linkedin className="w-5 h-5 transition-transform group-hover:rotate-12" aria-hidden="true" />
+              <span className="font-medium">LinkedIn</span>
             </a>
             <a 
               href="mailto:saifalialjanahi@gmail.com" 
-              className="group flex items-center space-x-3 bg-white/10 hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+              className="group flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300 hover:scale-105"
               aria-label="Send email to Saif Aljanahi"
             >
-              <Mail className="w-5 h-5 text-white group-hover:text-blue-300 dark:group-hover:text-blue-200 transition-colors" aria-hidden="true" />
-              <span className="text-white font-medium">Email</span>
+              <Mail className="w-5 h-5 transition-transform group-hover:rotate-12" aria-hidden="true" />
+              <span className="font-medium">Email</span>
             </a>
-          </div>
-          
-          {/* Scroll Indicator */}
-          <div className="animate-bounce">
-            <ChevronDown className="w-8 h-8 text-white/60 dark:text-white/40 mx-auto" aria-hidden="true" />
           </div>
         </div>
       </div>

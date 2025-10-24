@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, Rss, Search } from 'lucide-react'
-import { ThemeToggle } from './ThemeToggle'
+import { ThemeToggle } from '../design-system'
 import { SearchBox } from './SearchBox'
 import { publishedBlogs } from '../data/blogs'
 import { downloadRSSFeed } from '../utils/rssGenerator'
@@ -83,23 +83,11 @@ export const Navigation: React.FC = () => {
 
   const onHero = !isScrolled && isHomePage
 
-  const linkClass = `relative font-medium transition-colors after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:w-0 after:h-[2px] after:transition-all after:duration-300 after:ease-in-out hover:after:w-full ${
-    onHero 
-    ? 'text-slate-200 hover:text-white after:bg-blue-400' 
-    : 'text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 after:bg-blue-500'
-  }`
+  const linkClass = `relative font-medium transition-colors after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:w-0 after:h-[2px] after:transition-all after:duration-300 after:ease-in-out hover:after:w-full text-slate-900 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 after:bg-blue-500`
   
-  const iconButtonClass = `p-2 rounded-full transition-all duration-200 ${
-    onHero
-    ? 'text-slate-200 hover:text-white hover:bg-white/10'
-    : 'text-slate-600 dark:text-slate-300 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-  }`
+  const iconButtonClass = `p-2 rounded-full transition-all duration-200 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800`
 
-  const titleClass = `font-bold text-lg transition-colors ${
-    onHero
-    ? 'text-white group-hover:text-blue-300'
-    : 'text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400'
-  }`
+  const titleClass = `font-bold text-lg transition-colors text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400`
 
   const navBgClass = isScrolled
     ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200/80 dark:border-slate-800/80 shadow-md'

@@ -10,11 +10,12 @@ import { UnsubscribePage } from './pages/UnsubscribePage'
 import { PrivacyPolicy } from './pages/PrivacyPolicy'
 import NewsletterTestPage from './pages/NewsletterTestPage'
 import ImageOptimizationPage from './pages/ImageOptimizationPage'
+import { AdminDashboard } from './pages/AdminDashboard'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { SkipLink } from './components/SkipLink'
 import AnalyticsProvider, { useAnalytics } from './components/Analytics'
 import PerformanceMonitor from './components/PerformanceMonitor'
-import { ThemeProvider } from './components/ThemeProvider'
+import { ThemeProvider } from './design-system'
 import { v4 as uuidv4 } from 'uuid'
 
 function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
@@ -65,7 +66,7 @@ function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ThemeProvider>
         <AnalyticsProvider>
           <AnalyticsWrapper>
@@ -83,6 +84,7 @@ function App() {
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/newsletter-test" element={<NewsletterTestPage />} />
                 <Route path="/image-optimization" element={<ImageOptimizationPage />} />
+                <Route path="/admin" element={<AdminDashboard />} />
               </Routes>
               <PWAInstallPrompt />
             </div>

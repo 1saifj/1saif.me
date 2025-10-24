@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Saif Aljanahi Blog</title>
+  <subtitle>Full-Stack Software Engineer specializing in Golang, Python, Flutter, and modern web technologies</subtitle>
+  <link href="https://1saif.me/blog" rel="alternate"/>
+  <link href="https://1saif.me/atom.xml" rel="self"/>
+  <id>https://1saif.me/blog</id>
+  <updated>2025-04-10T00:00:00.000Z</updated>
+  <author>
+    <name>Saif Aljanahi</name>
+    <email>saifalialjanahi@gmail.com</email>
+    <uri>https://1saif.me</uri>
+  </author>
+  <logo>https://1saif.me/sj.png</logo>
+  <icon>https://1saif.me/favicon.png</icon>
+
+  <entry>
+    <title>Preventing Duplicate Transactions with Database Locking Strategies in Financial Systems</title>
+    <link href="https://1saif.me/blog/prevent-duplicates-trx-with-database-locking-strategies" rel="alternate"/>
+    <id>https://1saif.me/blog/prevent-duplicates-trx-with-database-locking-strategies</id>
+    <published>2025-04-10T00:00:00.000Z</published>
+    <updated>2025-04-10T00:00:00.000Z</updated>
+    <summary>Introduction
+
+When building financial systems, processing transactions exactly once is critical. Too often, developers overlook the complexities of concurrent processing, leading to duplicate transactions that can have serious consequences. In this article, I&apos;ll share how we solved a challenging...</summary>
+    <content type="html"><![CDATA[
+      <p>Learn how to solve race conditions in financial applications using optimistic and pessimistic locking techniques with a real-world case study of a card issuing system.</p>
+      <img src="https://1saif.me/articles/database-locking/db_locks_feat.png" alt="Preventing Duplicate Transactions with Database Locking Strategies in Financial Systems" />
+      <p><a href="https://1saif.me/blog/prevent-duplicates-trx-with-database-locking-strategies">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="database"/>
+    <category term="concurrency"/>
+    <category term="optimistic-locking"/>
+    <category term="financial-systems"/>
+    <category term="redis"/>
+  </entry>
+
+  <entry>
+    <title>Database Migrations Done Right: Git-Style Version Control for Your Schema</title>
+    <link href="https://1saif.me/blog/best-cicd-for-databases-migrations" rel="alternate"/>
+    <id>https://1saif.me/blog/best-cicd-for-databases-migrations</id>
+    <published>2025-01-22T00:00:00.000Z</published>
+    <updated>2025-01-22T00:00:00.000Z</updated>
+    <summary>The Database Migration Crisis Every Developer Faces
+
+Picture this: It&apos;s Friday evening, you&apos;re about to deploy your feature to production, and suddenly you realize three different developers have made conflicting database changes. Sarah added a new user profile table, Mike modified the orders sch...</summary>
+    <content type="html"><![CDATA[
+      <p>Transform your database deployment chaos into elegant, version-controlled workflows. Learn battle-tested strategies for managing schema changes across teams and environments with zero downtime.</p>
+      <img src="https://1saif.me/articles/db_cicd_feat.png" alt="Database Migrations Done Right: Git-Style Version Control for Your Schema" />
+      <p><a href="https://1saif.me/blog/best-cicd-for-databases-migrations">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="database"/>
+    <category term="migrations"/>
+    <category term="version-control"/>
+    <category term="devops"/>
+    <category term="flyway"/>
+    <category term="liquibase"/>
+    <category term="ci-cd"/>
+    <category term="zero-downtime"/>
+    <category term="schema-management"/>
+  </entry>
+
+  <entry>
+    <title>Setting Up a Local Development Environment with a Webhook Service using Docker Compose</title>
+    <link href="https://1saif.me/blog/setting-up-a-local-development-environment-with-a-webhook-service-using-docker-compose" rel="alternate"/>
+    <id>https://1saif.me/blog/setting-up-a-local-development-environment-with-a-webhook-service-using-docker-compose</id>
+    <published>2024-09-02T00:00:00.000Z</published>
+    <updated>2023-09-02T00:00:00.000Z</updated>
+    <summary>Introduction
+
+In modern web development, webhooks play a crucial role in enabling real-time communication between different services. Setting up a local development environment that includes a webhook service can be daunting due to multiple dependencies and configurations. Docker Compose simplifi...</summary>
+    <content type="html"><![CDATA[
+      <p>Learn how to set up a local development environment for a Node.js application with a webhook service using Docker Compose, including MongoDB and Nginx as a reverse proxy.</p>
+      <img src="https://1saif.me/articles/docker_feat.png" alt="Setting Up a Local Development Environment with a Webhook Service using Docker Compose" />
+      <p><a href="https://1saif.me/blog/setting-up-a-local-development-environment-with-a-webhook-service-using-docker-compose">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="docker"/>
+    <category term="docker-compose"/>
+    <category term="nodejs"/>
+    <category term="webhook"/>
+    <category term="development"/>
+  </entry>
+
+  <entry>
+    <title>Cherry-Pick: A Useful GitHub Tool for Managing Commits</title>
+    <link href="https://1saif.me/blog/cherry-pick-github-tool-for-managing-commits" rel="alternate"/>
+    <id>https://1saif.me/blog/cherry-pick-github-tool-for-managing-commits</id>
+    <published>2024-07-13T00:00:00.000Z</published>
+    <updated>2024-07-13T00:00:00.000Z</updated>
+    <summary>Introduction
+
+In software development, version control is crucial for maintaining code integrity and facilitating collaboration. GitHub Desktop, a user-friendly interface for Git, offers numerous features to streamline version control processes. One such feature is cherry-pick, which allows devel...</summary>
+    <content type="html"><![CDATA[
+      <p>Learn how to use the cherry-pick feature in GitHub Desktop to efficiently manage commits across branches.</p>
+      <img src="https://1saif.me/articles/git_cherry_pick_feat.png" alt="Cherry-Pick: A Useful GitHub Tool for Managing Commits" />
+      <p><a href="https://1saif.me/blog/cherry-pick-github-tool-for-managing-commits">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="github"/>
+    <category term="version-control"/>
+    <category term="git"/>
+    <category term="development"/>
+  </entry>
+
+  <entry>
+    <title>Microservices Architecture with Go and Docker</title>
+    <link href="https://1saif.me/blog/microservices-architecture-with-go" rel="alternate"/>
+    <id>https://1saif.me/blog/microservices-architecture-with-go</id>
+    <published>2024-04-22T00:00:00.000Z</published>
+    <updated>2024-04-22T00:00:00.000Z</updated>
+    <summary>Microservices Architecture with Go and Docker
+
+Microservices architecture has become increasingly popular for building complex, scalable applications. In this post, I&apos;ll share insights from my experience implementing microservices using Go and Docker, with practical examples and best practices....</summary>
+    <content type="html"><![CDATA[
+      <p>Explore how to design and implement a microservices architecture using Go and containerization with Docker.</p>
+      <img src="https://1saif.me/articles/go_micro_feat.png" alt="Microservices Architecture with Go and Docker" />
+      <p><a href="https://1saif.me/blog/microservices-architecture-with-go">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="backend"/>
+    <category term="go"/>
+    <category term="microservices"/>
+    <category term="docker"/>
+  </entry>
+
+  <entry>
+    <title>Flutter State Management: Comparing Provider, Riverpod, and Bloc</title>
+    <link href="https://1saif.me/blog/flutter-state-management-comparison" rel="alternate"/>
+    <id>https://1saif.me/blog/flutter-state-management-comparison</id>
+    <published>2024-03-10T00:00:00.000Z</published>
+    <updated>2024-03-10T00:00:00.000Z</updated>
+    <summary>Flutter State Management: Comparing Provider, Riverpod, and Bloc
+
+State management is one of the most critical aspects of building Flutter applications. In this article, I&apos;ll compare three popular state management solutions — Provider, Riverpod, and Bloc — based on my experience implementing them...</summary>
+    <content type="html"><![CDATA[
+      <p>A comprehensive comparison of popular state management solutions for Flutter applications.</p>
+      <img src="https://1saif.me/articles/flutter_state_mgt_feat.png" alt="Flutter State Management: Comparing Provider, Riverpod, and Bloc" />
+      <p><a href="https://1saif.me/blog/flutter-state-management-comparison">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="mobile"/>
+    <category term="flutter"/>
+    <category term="dart"/>
+    <category term="state-management"/>
+  </entry>
+
+  <entry>
+    <title>Managing Multiple Database Schemas with Gorm</title>
+    <link href="https://1saif.me/blog/managing-multiple-database-schemas-with-gorm" rel="alternate"/>
+    <id>https://1saif.me/blog/managing-multiple-database-schemas-with-gorm</id>
+    <published>2023-07-09T00:00:00.000Z</published>
+    <updated>2023-07-09T00:00:00.000Z</updated>
+    <summary>Introduction
+
+Gorm is an exceptional Object-Relational Mapping (ORM) library for Golang, equipped with a wide range of features.
+
+Identifying the Issue
+
+Although the Gorm documentation is comprehensive, it does not always include all the minor details that a developer might need. I encountered...</summary>
+    <content type="html"><![CDATA[
+      <p>This tutorial will guide you through the process of handling multiple database schemas using Gorm in one connection</p>
+      <img src="https://1saif.me/articles/gorm_schema_feat.png" alt="Managing Multiple Database Schemas with Gorm" />
+      <p><a href="https://1saif.me/blog/managing-multiple-database-schemas-with-gorm">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="golang"/>
+    <category term="gorm"/>
+    <category term="database"/>
+  </entry>
+
+  <entry>
+    <title>Most Effective Design Patterns In Golang</title>
+    <link href="https://1saif.me/blog/most-effective-design-patterns-in-golang" rel="alternate"/>
+    <id>https://1saif.me/blog/most-effective-design-patterns-in-golang</id>
+    <published>2023-06-25T00:00:00.000Z</published>
+    <updated>2023-06-25T00:00:00.000Z</updated>
+    <summary>Introduction (still writing it)
+
+In the scope of software development. Design patterns are typical solutions to commonly occurring problems in software design.
+They are like pre-made blueprints that you can customize to solve a recurring design problem in your code.
+
+In this article, we will have...</summary>
+    <content type="html"><![CDATA[
+      <p>A quick review of the useability of design patterns in Golang.</p>
+      <img src="https://1saif.me/articles/go_design_patterns_feat.png" alt="Most Effective Design Patterns In Golang" />
+      <p><a href="https://1saif.me/blog/most-effective-design-patterns-in-golang">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="Golang"/>
+    <category term="Design-patterns"/>
+    <category term="Observer pattern"/>
+    <category term="Singleton pattern"/>
+    <category term="Factory Pattern"/>
+    <category term="Builder Pattern"/>
+    <category term="Facade Design"/>
+  </entry>
+
+  <entry>
+    <title>An Introduction to API Management with Apiman</title>
+    <link href="https://1saif.me/blog/getting-started with-apimaan-Introduction-to-api-management" rel="alternate"/>
+    <id>https://1saif.me/blog/getting-started with-apimaan-Introduction-to-api-management</id>
+    <published>2023-05-26T00:00:00.000Z</published>
+    <updated>2023-05-26T00:00:00.000Z</updated>
+    <summary>Getting Started with Apiman: An Introduction to API Management
+
+APIs (Application Programming Interfaces) have become an integral part of modern software development, enabling seamless integration between different applications and systems. As your organization grows and your API ecosystem expand...</summary>
+    <content type="html"><![CDATA[
+      <p>Learn how to install and utilize Apiman as an API management platform to streamline your API development and documentation.</p>
+      <img src="https://1saif.me/articles/api_mgt_feat.png" alt="An Introduction to API Management with Apiman" />
+      <p><a href="https://1saif.me/blog/getting-started with-apimaan-Introduction-to-api-management">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="apiman"/>
+    <category term="api-management"/>
+    <category term="postman"/>
+    <category term="api-portal"/>
+  </entry>
+
+  <entry>
+    <title>How to Cancel HTTP Requests in React using Axios</title>
+    <link href="https://1saif.me/blog/cancel-http-requests-in-react" rel="alternate"/>
+    <id>https://1saif.me/blog/cancel-http-requests-in-react</id>
+    <published>2023-01-22T00:00:00.000Z</published>
+    <updated>2023-03-12T00:00:00.000Z</updated>
+    <summary>Introduction
+
+Axios is an amazing library for fetching and processing HTTP requests and sometimes comes in handy to use a cancel feature in specific situations.
+
+The problem we want to solve
+
+For me, I struggled with a function that gets products by their categories, and these categories are ju...</summary>
+    <content type="html"><![CDATA[
+      <p>Introduction Axios is an amazing library for fetching...</p>
+      <img src="https://1saif.me/articles/http_cancel_feat.png" alt="How to Cancel HTTP Requests in React using Axios" />
+      <p><a href="https://1saif.me/blog/cancel-http-requests-in-react">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="react"/>
+    <category term="axios"/>
+    <category term="http-client"/>
+  </entry>
+
+  <entry>
+    <title>How to Mock an API in ONE minute</title>
+    <link href="https://1saif.me/blog/mocking-an-api-in-dart" rel="alternate"/>
+    <id>https://1saif.me/blog/mocking-an-api-in-dart</id>
+    <published>2022-12-17T00:00:00.000Z</published>
+    <updated>2022-12-17T00:00:00.000Z</updated>
+    <summary>Mocking an API can be useful when you want to test your application&apos;s integration with an API, but you don&apos;t have access to the real API or you don&apos;t want to make real API calls during testing. In this article, we&apos;ll show you how to quickly set up a mock API using modern tools in JavaScript, Go, Da...</summary>
+    <content type="html"><![CDATA[
+      <p>Tools and Libraries for Quickly Setting Up a Mock API</p>
+      <img src="https://1saif.me/articles/api_mock_feat.png" alt="How to Mock an API in ONE minute" />
+      <p><a href="https://1saif.me/blog/mocking-an-api-in-dart">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="api"/>
+    <category term="testing"/>
+  </entry>
+</feed>

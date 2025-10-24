@@ -1,5 +1,5 @@
 import React from 'react'
-import { ExternalLink, Calendar, Users, FileText, Link } from 'lucide-react'
+import { ExternalLink, Calendar, Users, FileText, Link, BookOpen, Award } from 'lucide-react'
 
 export const Research: React.FC = () => {
   const publication = {
@@ -18,75 +18,84 @@ export const Research: React.FC = () => {
   }
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 transition-colors duration-300">
+    <div className="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-blue-950 dark:to-purple-950 min-h-screen transition-colors duration-300">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6 transition-colors duration-300">
-              Research Publication
+        <div className="max-w-5xl mx-auto">
+          {/* Page Header */}
+          <div className="text-center mb-8 sm:mb-12 py-8 sm:py-12 lg:py-20">
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6 shadow-lg">
+              <Award className="w-3 sm:w-4 h-3 sm:h-4" />
+              <span>Research Publication</span>
+            </div>
+            <h2 id="research-heading" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6 tracking-tight transition-colors duration-300 px-4">
+              Academic Research
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto transition-colors duration-300 px-4 sm:px-0">
+            <p className="text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed transition-colors duration-300 px-4">
               Contributing to machine learning and healthcare technology through research in intelligent fall detection systems
             </p>
           </div>
 
-          {/* Featured Publication */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl shadow-xl p-3 xs:p-4 sm:p-6 md:p-8 border border-slate-200 dark:border-slate-700 hover:shadow-2xl transition-all duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4 sm:mb-6">
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-colors duration-300">
-                  {publication.status}
-                </div>
-                <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-colors duration-300">
-                  {publication.type}
-                </div>
+          {/* Publication Card */}
+          <article className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/20 dark:border-slate-700/50 hover:shadow-2xl transition-all duration-500">
+            {/* Header with Badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6">
+              <div className="inline-flex items-center space-x-1 sm:space-x-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-2 sm:px-2.5 lg:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold shadow-lg">
+                <Award className="w-2.5 sm:w-3 h-2.5 sm:h-3" />
+                <span>{publication.status}</span>
               </div>
-              <div className="flex items-center text-slate-500 dark:text-slate-400 text-xs sm:text-sm transition-colors duration-300">
-                <Calendar className="w-3 sm:w-4 h-3 sm:h-4 mr-1" />
+              <div className="inline-flex items-center space-x-1 sm:space-x-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-2 sm:px-2.5 lg:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold shadow-lg">
+                <BookOpen className="w-2.5 sm:w-3 h-2.5 sm:h-3" />
+                <span>{publication.type}</span>
+              </div>
+              <div className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs ml-auto">
+                <Calendar className="w-2.5 sm:w-3 h-2.5 sm:h-3" />
                 <span className="hidden sm:inline">{publication.date}</span>
                 <span className="sm:hidden">Sep 2021</span>
               </div>
             </div>
 
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3 sm:mb-4 leading-tight transition-colors duration-300">
+            {/* Title */}
+            <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6 leading-tight transition-colors duration-300">
               {publication.title}
             </h3>
 
             {/* Journal Information */}
-            <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 transition-colors duration-300">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
-                <div className="col-span-1 sm:col-span-2">
-                  <span className="font-semibold text-slate-700 dark:text-slate-200">Journal: </span>
-                  <span className="text-slate-600 dark:text-slate-300 break-words">{publication.journal}</span>
+            <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 mb-6 transition-colors duration-300 border border-slate-200 dark:border-slate-600">
+              <div className="space-y-3">
+                <div>
+                  <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Journal</span>
+                  <p className="text-sm sm:text-base text-slate-900 dark:text-white font-medium mt-1">{publication.journal}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Volume</span>
+                    <p className="text-sm sm:text-base text-slate-900 dark:text-white font-medium mt-1">{publication.volume}</p>
+                  </div>
+                  <div>
+                    <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Pages</span>
+                    <p className="text-sm sm:text-base text-slate-900 dark:text-white font-medium mt-1">{publication.pages}</p>
+                  </div>
                 </div>
                 <div>
-                  <span className="font-semibold text-slate-700 dark:text-slate-200">Volume: </span>
-                  <span className="text-slate-600 dark:text-slate-300">{publication.volume}</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-slate-700 dark:text-slate-200">Pages: </span>
-                  <span className="text-slate-600 dark:text-slate-300">{publication.pages}</span>
-                </div>
-                <div className="col-span-1 sm:col-span-2">
-                  <span className="font-semibold text-slate-700 dark:text-slate-200">DOI: </span>
-                  <span className="text-slate-600 dark:text-slate-300 break-all text-xs">{publication.doi}</span>
+                  <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">DOI</span>
+                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-mono mt-1 break-all">{publication.doi}</p>
                 </div>
               </div>
             </div>
 
             {/* Authors */}
             <div className="mb-6">
-              <div className="flex items-center text-slate-600 dark:text-slate-300 mb-2 transition-colors duration-300">
-                <Users className="w-4 h-4 mr-2" />
-                <span className="font-semibold">Authors:</span>
+              <div className="flex items-center text-slate-900 dark:text-white mb-3 transition-colors duration-300">
+                <Users className="w-4 sm:w-5 h-4 sm:h-5 mr-2" />
+                <span className="font-semibold text-sm sm:text-base">Authors</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {publication.authors.map((author, authorIndex) => (
                   <span 
                     key={authorIndex}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-300 ${
+                    className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-300 ${
                       author === "Saif Aljanahi" 
-                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-700" 
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md" 
                         : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
                     }`}
                   >
@@ -97,24 +106,24 @@ export const Research: React.FC = () => {
             </div>
 
             {/* Abstract */}
-            <div className="mb-4 sm:mb-6">
-              <h4 className="font-semibold text-slate-900 dark:text-white mb-2 sm:mb-3 flex items-center transition-colors duration-300 text-sm sm:text-base">
-                <FileText className="w-3 sm:w-4 h-3 sm:h-4 mr-1 sm:mr-2" />
-                Abstract:
-              </h4>
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-700 p-3 sm:p-4 rounded-lg transition-colors duration-300 text-xs sm:text-sm">
+            <div className="mb-6">
+              <div className="flex items-center text-slate-900 dark:text-white mb-3 transition-colors duration-300">
+                <FileText className="w-4 sm:w-5 h-4 sm:h-5 mr-2" />
+                <h4 className="font-semibold text-sm sm:text-base">Abstract</h4>
+              </div>
+              <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed transition-colors duration-300">
                 {publication.abstract}
               </p>
             </div>
 
             {/* Keywords */}
-            <div className="mb-4 sm:mb-6">
-              <h4 className="font-semibold text-slate-900 dark:text-white mb-2 sm:mb-3 transition-colors duration-300 text-sm sm:text-base">Research Keywords:</h4>
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
+            <div className="mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
+              <h4 className="font-semibold text-slate-900 dark:text-white mb-3 transition-colors duration-300 text-sm sm:text-base">Keywords</h4>
+              <div className="flex flex-wrap gap-2">
                 {publication.keywords.map((keyword, keyIndex) => (
                   <span 
                     key={keyIndex}
-                    className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium border border-slate-200 dark:border-slate-600 transition-colors duration-300"
+                    className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-300"
                   >
                     {keyword}
                   </span>
@@ -123,24 +132,24 @@ export const Research: React.FC = () => {
             </div>
 
             {/* Action Button */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 transition-colors duration-300 hidden sm:block">
-                Published in {publication.journal} • {publication.date}
-              </div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
               <a
                 href={publication.researchGateUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center space-x-2 bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-xs xs:text-sm sm:text-base w-full sm:w-auto"
+                className="group inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base flex-1 sm:flex-initial"
               >
-                <Link className="w-3 sm:w-4 h-3 sm:h-4" />
+                <Link className="w-4 sm:w-5 h-4 sm:h-5" />
                 <span>View on ResearchGate</span>
-                <ExternalLink className="w-3 h-3" />
+                <ExternalLink className="w-3 sm:w-4 h-3 sm:h-4 group-hover:translate-x-0.5 transition-transform" />
               </a>
+              <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 transition-colors duration-300 text-center sm:text-left">
+                Published in {publication.journal} • {publication.date}
+              </div>
             </div>
-          </div>
+          </article>
         </div>
       </div>
-    </section>
+    </div>
   )
 }

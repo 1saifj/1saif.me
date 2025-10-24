@@ -9,7 +9,7 @@
     <!-- Homepage -->
     <url>
         <loc>https://1saif.me/</loc>
-        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <lastmod>2025-10-24T00:00:00+00:00</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
         <image:image>
@@ -22,7 +22,7 @@
     <!-- Blog Index -->
     <url>
         <loc>https://1saif.me/blog</loc>
-        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <lastmod>2025-10-24T00:00:00+00:00</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
@@ -30,138 +30,274 @@
     <!-- Projects -->
     <url>
         <loc>https://1saif.me/projects</loc>
-        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <lastmod>2025-10-24T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
-    </url>
-    
-    <!-- Blog Posts - These are the primary targets for Telegram Instant View -->
-    <url>
-        <loc>https://1saif.me/blog/cancel-http-requests-in-react</loc>
-        <lastmod>2024-12-15T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-        <news:news>
-            <news:publication>
-                <news:name>Saif Aljanahi</news:name>
-                <news:language>en</news:language>
-            </news:publication>
-            <news:publication_date>2024-12-15T00:00:00+00:00</news:publication_date>
-            <news:title>How to Cancel HTTP Requests in React: A Complete Guide</news:title>
-            <news:keywords>React, HTTP, AbortController, JavaScript, Frontend Development</news:keywords>
-        </news:news>
-        <image:image>
-            <image:loc>https://1saif.me/articles/cancel_http_requests_in_react/react_abort_controller.png</image:loc>
-            <image:caption>React HTTP Request Cancellation with AbortController</image:caption>
-            <image:title>How to Cancel HTTP Requests in React</image:title>
-        </image:image>
-    </url>
-    
-    <url>
-        <loc>https://1saif.me/blog/database-locking-mechanisms</loc>
-        <lastmod>2024-12-10T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-        <news:news>
-            <news:publication>
-                <news:name>Saif Aljanahi</news:name>
-                <news:language>en</news:language>
-            </news:publication>
-            <news:publication_date>2024-12-10T00:00:00+00:00</news:publication_date>
-            <news:title>Database Locking Mechanisms: A Deep Dive</news:title>
-            <news:keywords>Database, Locking, SQL, Performance, Backend Development</news:keywords>
-        </news:news>
-        <image:image>
-            <image:loc>https://1saif.me/articles/database-locking/api_mgt_feat.png</image:loc>
-            <image:caption>Database Locking Mechanisms Explained</image:caption>
-            <image:title>Database Locking Mechanisms: A Deep Dive</image:title>
-        </image:image>
-    </url>
-    
-    <url>
-        <loc>https://1saif.me/blog/scaling-flutter-apps</loc>
-        <lastmod>2024-12-05T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-        <news:news>
-            <news:publication>
-                <news:name>Saif Aljanahi</news:name>
-                <news:language>en</news:language>
-            </news:publication>
-            <news:publication_date>2024-12-05T00:00:00+00:00</news:publication_date>
-            <news:title>Scaling Flutter Apps: Best Practices and Architecture Patterns</news:title>
-            <news:keywords>Flutter, Mobile Development, Architecture, Scaling, Performance</news:keywords>
-        </news:news>
-        <image:image>
-            <image:loc>https://1saif.me/articles/scaling_flutter_apps/flutter_architecture.png</image:loc>
-            <image:caption>Flutter App Architecture for Scaling</image:caption>
-            <image:title>Scaling Flutter Apps: Best Practices and Architecture Patterns</image:title>
-        </image:image>
-    </url>
-    
-    <url>
-        <loc>https://1saif.me/blog/golang-concurrency-patterns</loc>
-        <lastmod>2024-11-28T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-        <news:news>
-            <news:publication>
-                <news:name>Saif Aljanahi</news:name>
-                <news:language>en</news:language>
-            </news:publication>
-            <news:publication_date>2024-11-28T00:00:00+00:00</news:publication_date>
-            <news:title>Advanced Golang Concurrency Patterns</news:title>
-            <news:keywords>Golang, Concurrency, Goroutines, Channels, Backend Development</news:keywords>
-        </news:news>
-        <image:image>
-            <image:loc>https://1saif.me/articles/golang_concurrency/goroutines_channels.png</image:loc>
-            <image:caption>Golang Concurrency Patterns with Goroutines and Channels</image:caption>
-            <image:title>Advanced Golang Concurrency Patterns</image:title>
-        </image:image>
-    </url>
-    
-    <url>
-        <loc>https://1saif.me/blog/kubernetes-deployment-strategies</loc>
-        <lastmod>2024-11-20T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-        <news:news>
-            <news:publication>
-                <news:name>Saif Aljanahi</news:name>
-                <news:language>en</news:language>
-            </news:publication>
-            <news:publication_date>2024-11-20T00:00:00+00:00</news:publication_date>
-            <news:title>Kubernetes Deployment Strategies: Blue-Green vs Rolling Updates</news:title>
-            <news:keywords>Kubernetes, DevOps, Deployment, Blue-Green, Rolling Updates</news:keywords>
-        </news:news>
-        <image:image>
-            <image:loc>https://1saif.me/articles/kubernetes_deployment/k8s_strategies.png</image:loc>
-            <image:caption>Kubernetes Deployment Strategies Comparison</image:caption>
-            <image:title>Kubernetes Deployment Strategies: Blue-Green vs Rolling Updates</image:title>
-        </image:image>
-    </url>
-    
-    <!-- Add RSS Feed for better discoverability -->
-    <url>
-        <loc>https://1saif.me/rss.xml</loc>
-        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>0.7</priority>
-    </url>
-    
-    <!-- Contact and Other Pages -->
-    <url>
-        <loc>https://1saif.me/contact</loc>
-        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
     </url>
     
     <!-- Resume -->
     <url>
         <loc>https://1saif.me/resume</loc>
-        <lastmod>2024-12-28T00:00:00+00:00</lastmod>
+        <lastmod>2025-10-24T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <!-- Contact -->
+    <url>
+        <loc>https://1saif.me/contact</loc>
+        <lastmod>2025-10-24T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <!-- Preventing Duplicate Transactions with Database Locking Strategies in Financial Systems -->
+    <url>
+        <loc>https://1saif.me/blog/prevent-duplicates-trx-with-database-locking-strategies</loc>
+        <lastmod>2025-04-10T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2025-04-10T00:00:00+00:00</news:publication_date>
+            <news:title>Preventing Duplicate Transactions with Database Locking Strategies in Financial Systems</news:title>
+            <news:keywords>database, concurrency, optimistic-locking, financial-systems, redis</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/database-locking/db_locks_feat.png</image:loc>
+            <image:caption>Learn how to solve race conditions in financial applications using optimistic and pessimistic locking techniques with a real-world case study of a card issuing system.</image:caption>
+            <image:title>Preventing Duplicate Transactions with Database Locking Strategies in Financial Systems</image:title>
+        </image:image>
+    </url>
+    
+    <!-- Database Migrations Done Right: Git-Style Version Control for Your Schema -->
+    <url>
+        <loc>https://1saif.me/blog/best-cicd-for-databases-migrations</loc>
+        <lastmod>2025-01-22T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2025-01-22T00:00:00+00:00</news:publication_date>
+            <news:title>Database Migrations Done Right: Git-Style Version Control for Your Schema</news:title>
+            <news:keywords>database, migrations, version-control, devops, flyway, liquibase, ci-cd, zero-downtime, schema-management</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/db_cicd_feat.png</image:loc>
+            <image:caption>Transform your database deployment chaos into elegant, version-controlled workflows. Learn battle-tested strategies for managing schema changes across teams and environments with zero downtime.</image:caption>
+            <image:title>Database Migrations Done Right: Git-Style Version Control for Your Schema</image:title>
+        </image:image>
+    </url>
+    
+    <!-- Cherry-Pick: A Useful GitHub Tool for Managing Commits -->
+    <url>
+        <loc>https://1saif.me/blog/cherry-pick-github-tool-for-managing-commits</loc>
+        <lastmod>2024-07-13T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-07-13T00:00:00+00:00</news:publication_date>
+            <news:title>Cherry-Pick: A Useful GitHub Tool for Managing Commits</news:title>
+            <news:keywords>github, version-control, git, development</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/git_cherry_pick_feat.png</image:loc>
+            <image:caption>Learn how to use the cherry-pick feature in GitHub Desktop to efficiently manage commits across branches.</image:caption>
+            <image:title>Cherry-Pick: A Useful GitHub Tool for Managing Commits</image:title>
+        </image:image>
+    </url>
+    
+    <!-- Microservices Architecture with Go and Docker -->
+    <url>
+        <loc>https://1saif.me/blog/microservices-architecture-with-go</loc>
+        <lastmod>2024-04-22T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-04-22T00:00:00+00:00</news:publication_date>
+            <news:title>Microservices Architecture with Go and Docker</news:title>
+            <news:keywords>backend, go, microservices, docker</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/go_micro_feat.png</image:loc>
+            <image:caption>Explore how to design and implement a microservices architecture using Go and containerization with Docker.</image:caption>
+            <image:title>Microservices Architecture with Go and Docker</image:title>
+        </image:image>
+    </url>
+    
+    <!-- Flutter State Management: Comparing Provider, Riverpod, and Bloc -->
+    <url>
+        <loc>https://1saif.me/blog/flutter-state-management-comparison</loc>
+        <lastmod>2024-03-10T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-03-10T00:00:00+00:00</news:publication_date>
+            <news:title>Flutter State Management: Comparing Provider, Riverpod, and Bloc</news:title>
+            <news:keywords>mobile, flutter, dart, state-management</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/flutter_state_mgt_feat.png</image:loc>
+            <image:caption>A comprehensive comparison of popular state management solutions for Flutter applications.</image:caption>
+            <image:title>Flutter State Management: Comparing Provider, Riverpod, and Bloc</image:title>
+        </image:image>
+    </url>
+    
+    <!-- Setting Up a Local Development Environment with a Webhook Service using Docker Compose -->
+    <url>
+        <loc>https://1saif.me/blog/setting-up-a-local-development-environment-with-a-webhook-service-using-docker-compose</loc>
+        <lastmod>2023-09-02T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-09-02T00:00:00+00:00</news:publication_date>
+            <news:title>Setting Up a Local Development Environment with a Webhook Service using Docker Compose</news:title>
+            <news:keywords>docker, docker-compose, nodejs, webhook, development</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/docker_feat.png</image:loc>
+            <image:caption>Learn how to set up a local development environment for a Node.js application with a webhook service using Docker Compose, including MongoDB and Nginx as a reverse proxy.</image:caption>
+            <image:title>Setting Up a Local Development Environment with a Webhook Service using Docker Compose</image:title>
+        </image:image>
+    </url>
+    
+    <!-- Managing Multiple Database Schemas with Gorm -->
+    <url>
+        <loc>https://1saif.me/blog/managing-multiple-database-schemas-with-gorm</loc>
+        <lastmod>2023-07-09T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2023-07-09T00:00:00+00:00</news:publication_date>
+            <news:title>Managing Multiple Database Schemas with Gorm</news:title>
+            <news:keywords>golang, gorm, database</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/gorm_schema_feat.png</image:loc>
+            <image:caption>This tutorial will guide you through the process of handling multiple database schemas using Gorm in one connection</image:caption>
+            <image:title>Managing Multiple Database Schemas with Gorm</image:title>
+        </image:image>
+    </url>
+    
+    <!-- Most Effective Design Patterns In Golang -->
+    <url>
+        <loc>https://1saif.me/blog/most-effective-design-patterns-in-golang</loc>
+        <lastmod>2023-06-25T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2023-06-25T00:00:00+00:00</news:publication_date>
+            <news:title>Most Effective Design Patterns In Golang</news:title>
+            <news:keywords>Golang, Design-patterns, Observer pattern, Singleton pattern, Factory Pattern, Builder Pattern, Facade Design</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/go_design_patterns_feat.png</image:loc>
+            <image:caption>A quick review of the useability of design patterns in Golang.</image:caption>
+            <image:title>Most Effective Design Patterns In Golang</image:title>
+        </image:image>
+    </url>
+    
+    <!-- An Introduction to API Management with Apiman -->
+    <url>
+        <loc>https://1saif.me/blog/getting-started with-apimaan-Introduction-to-api-management</loc>
+        <lastmod>2023-05-26T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2023-05-26T00:00:00+00:00</news:publication_date>
+            <news:title>An Introduction to API Management with Apiman</news:title>
+            <news:keywords>apiman, api-management, postman, api-portal</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/api_mgt_feat.png</image:loc>
+            <image:caption>Learn how to install and utilize Apiman as an API management platform to streamline your API development and documentation.</image:caption>
+            <image:title>An Introduction to API Management with Apiman</image:title>
+        </image:image>
+    </url>
+    
+    <!-- How to Cancel HTTP Requests in React using Axios -->
+    <url>
+        <loc>https://1saif.me/blog/cancel-http-requests-in-react</loc>
+        <lastmod>2023-03-12T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2023-01-22T00:00:00+00:00</news:publication_date>
+            <news:title>How to Cancel HTTP Requests in React using Axios</news:title>
+            <news:keywords>react, axios, http-client</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/http_cancel_feat.png</image:loc>
+            <image:caption>Introduction Axios is an amazing library for fetching...</image:caption>
+            <image:title>How to Cancel HTTP Requests in React using Axios</image:title>
+        </image:image>
+    </url>
+    
+    <!-- How to Mock an API in ONE minute -->
+    <url>
+        <loc>https://1saif.me/blog/mocking-an-api-in-dart</loc>
+        <lastmod>2022-12-17T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <news:news>
+            <news:publication>
+                <news:name>Saif Aljanahi</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2022-12-17T00:00:00+00:00</news:publication_date>
+            <news:title>How to Mock an API in ONE minute</news:title>
+            <news:keywords>api, testing</news:keywords>
+        </news:news>
+        <image:image>
+            <image:loc>https://1saif.me/articles/api_mock_feat.png</image:loc>
+            <image:caption>Tools and Libraries for Quickly Setting Up a Mock API</image:caption>
+            <image:title>How to Mock an API in ONE minute</image:title>
+        </image:image>
+    </url>
+    
+    <!-- RSS Feed -->
+    <url>
+        <loc>https://1saif.me/rss.xml</loc>
+        <lastmod>2025-10-24T00:00:00+00:00</lastmod>
+        <changefreq>daily</changefreq>
         <priority>0.7</priority>
     </url>
     
