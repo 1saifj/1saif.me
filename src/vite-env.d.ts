@@ -21,11 +21,6 @@ interface ImportMetaEnv {
   readonly VITE_NEWSLETTER_FROM_NAME: string
   readonly VITE_NEWSLETTER_FROM_EMAIL: string
 
-  // PWA Configuration
-  readonly VITE_PWA_NAME: string
-  readonly VITE_PWA_SHORT_NAME: string
-  readonly VITE_PWA_DESCRIPTION: string
-
   // Production Settings
   readonly VITE_APP_ENV: string
   readonly VITE_API_BASE_URL: string

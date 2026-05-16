@@ -13,16 +13,16 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Consolas', 'monospace'],
+        sans: ['Geist', 'sans-serif'],
+        mono: ['"Geist Mono"', 'monospace'],
       },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-out',
-        'fade-in-up': 'fadeInUp 0.4s ease-out',
-        'fade-in-down': 'fadeInDown 0.4s ease-out',
-        'fade-in-scale': 'fadeInScale 0.3s ease-out',
-        'slide-in-right': 'slideInRight 0.3s ease-out',
-        'slide-in-left': 'slideInLeft 0.3s ease-out',
+        'fade-in': 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+        'fade-in-down': 'fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+        'fade-in-scale': 'fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        'slide-in-right': 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        'slide-in-left': 'slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         'pulse-subtle': 'pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'shimmer': 'shimmer 2.5s linear infinite',
         'float': 'float 6s ease-in-out infinite',
@@ -35,7 +35,7 @@ export default {
         fadeInUp: {
           '0%': {
             opacity: '0',
-            transform: 'translateY(10px)',
+            transform: 'translateY(16px)',
           },
           '100%': {
             opacity: '1',
@@ -45,7 +45,7 @@ export default {
         fadeInDown: {
           '0%': {
             opacity: '0',
-            transform: 'translateY(-10px)',
+            transform: 'translateY(-16px)',
           },
           '100%': {
             opacity: '1',
@@ -55,7 +55,7 @@ export default {
         fadeInScale: {
           '0%': {
             opacity: '0',
-            transform: 'scale(0.98)',
+            transform: 'scale(0.96)',
           },
           '100%': {
             opacity: '1',
@@ -65,7 +65,7 @@ export default {
         slideInRight: {
           '0%': {
             opacity: '0',
-            transform: 'translateX(10px)',
+            transform: 'translateX(16px)',
           },
           '100%': {
             opacity: '1',
@@ -75,7 +75,7 @@ export default {
         slideInLeft: {
           '0%': {
             opacity: '0',
-            transform: 'translateX(-10px)',
+            transform: 'translateX(-16px)',
           },
           '100%': {
             opacity: '1',
