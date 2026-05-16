@@ -3,6 +3,7 @@ import { z } from 'zod'
 // Define languages directly without external import
 const languages = z.union([
   z.literal('typescript'),
+  z.literal('javascript'),
   z.literal('rust'),
   z.literal('haskell'),
   z.literal('go'),

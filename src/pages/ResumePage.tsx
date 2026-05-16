@@ -7,8 +7,8 @@ export const ResumePage: React.FC = () => {
   return (
     <>
       <SEOHead 
-        title="Resume - Saif Aljanahi | Full-Stack Software Engineer"
-        description="Professional resume of Saif Aljanahi, Full-Stack Software Engineer with 3+ years of experience in Golang, Python, Flutter, and system architecture."
+        title="Resume - Saif Aljanahi | Lead Software Engineer"
+        description="Professional resume of Saif Aljanahi, a lead software engineer with experience across startups and higher education in TypeScript, Go, Flutter, databases, and systems design."
         url="https://1saif.me/resume"
         type="website"
       />

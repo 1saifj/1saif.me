@@ -2,452 +2,358 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SAIF ALI ALJANAHI - CV</title>
+  <title>Saif Aljanahi | Resume</title>
   <style>
-    @page { size: A4; margin: 0.75in; }
-    body { 
-      font-family: "Arial", sans-serif; 
-      font-size: 11pt; 
-      color: #2c3e50; 
-      line-height: 1.6; 
-      max-width: 8.5in;
+    @page {
+      size: A4;
+      margin: 0.72in;
+    }
+
+    body {
+      font-family: "Arial", sans-serif;
+      font-size: 10.8pt;
+      line-height: 1.55;
+      color: #1f2937;
+      max-width: 8.27in;
       margin: 0 auto;
       background: #ffffff;
     }
-    
-    /* Header Section */
+
     .header {
-      text-align: center;
-      padding-bottom: 20pt;
-      margin-bottom: 25pt;
-      border-bottom: 2px solid #34495e;
+      border-bottom: 2px solid #111827;
+      padding-bottom: 16pt;
+      margin-bottom: 22pt;
     }
-    
-    h1 { 
-      font-size: 24pt; 
-      font-weight: bold;
-      margin: 0 0 8pt 0; 
-      color: #2c3e50;
-      letter-spacing: 1px;
+
+    h1 {
+      margin: 0;
+      font-size: 24pt;
+      letter-spacing: 0.5px;
+      color: #111827;
     }
-    
+
+    .headline {
+      margin-top: 6pt;
+      font-size: 12pt;
+      font-weight: 700;
+      color: #374151;
+    }
+
     .contact-info {
-      font-size: 10pt;
-      color: #34495e;
-      line-height: 1.4;
+      margin-top: 12pt;
+      font-size: 9.5pt;
+      color: #4b5563;
+      line-height: 1.5;
     }
-    
+
     .contact-line {
-      margin: 3pt 0;
+      margin: 2pt 0;
     }
-    
-    /* Section Headers */
-    h2 { 
-      font-size: 14pt; 
-      font-weight: bold;
-      margin: 20pt 0 10pt 0; 
-      color: #2c3e50; 
-      text-transform: uppercase; 
+
+    h2 {
+      margin: 18pt 0 10pt;
+      font-size: 12pt;
+      font-weight: 700;
       letter-spacing: 0.8px;
-      border-bottom: 1px solid #bdc3c7; 
+      text-transform: uppercase;
+      color: #111827;
+      border-bottom: 1px solid #d1d5db;
       padding-bottom: 4pt;
     }
-    
-    /* Content Styling */
-    p { margin: 0 0 8pt 0; }
-    ul { margin: 8pt 0 12pt 20pt; padding-left: 0; }
-    li { margin-bottom: 4pt; line-height: 1.5; }
-    
-    /* Experience and Education Blocks */
+
+    p {
+      margin: 0 0 8pt;
+    }
+
+    ul {
+      margin: 8pt 0 12pt 18pt;
+      padding-left: 0;
+    }
+
+    li {
+      margin-bottom: 4pt;
+    }
+
+    .summary-box {
+      background: #f8fafc;
+      border-left: 3px solid #111827;
+      padding: 12pt;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12pt 18pt;
+    }
+
+    .skill-category {
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 4pt;
+    }
+
+    .skill-items {
+      font-size: 9.8pt;
+      color: #374151;
+    }
+
     .content-block {
       margin-bottom: 16pt;
-      padding-bottom: 12pt;
     }
-    
+
     .position-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 6pt;
-    }
-    
-    .position-title { 
-      font-weight: bold; 
-      font-size: 12pt;
-      color: #2c3e50;
-    }
-    
-    .company-name { 
-      font-style: italic;
-      color: #34495e;
-      margin-bottom: 4pt;
-    }
-    
-    .date { 
-      font-size: 10pt; 
-      color: #7f8c8d;
-      font-weight: normal;
-      white-space: nowrap;
-    }
-    
-    .description {
-      font-style: italic;
-      color: #5a6c7d;
-      font-size: 10pt;
-      margin-bottom: 6pt;
-    }
-    
-    /* Sub-sections */
-    .sub-section {
-      font-weight: bold;
-      color: #2c3e50;
-      margin-top: 8pt;
+      gap: 12pt;
       margin-bottom: 4pt;
     }
 
-    .new-sub-section {
-      font-weight: bold;
-      color: #2c3e50;
-      margin-top: 8pt;
-      margin-bottom: 4pt;
+    .position-title {
+      font-size: 11.5pt;
+      font-weight: 700;
+      color: #111827;
     }
-    
-    /* Skills Section */
-    .skills-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15pt;
-      margin-top: 10pt;
+
+    .company-name {
+      color: #374151;
+      font-weight: 700;
+      margin-top: 2pt;
     }
-    
-    .skill-category { 
-      font-weight: bold; 
-      color: #2c3e50;
-      margin-bottom: 4pt;
+
+    .role-meta {
+      font-size: 9.4pt;
+      color: #6b7280;
+      margin-top: 2pt;
     }
-    
-    .skill-items {
-      font-size: 10pt;
-      color: #34495e;
-      line-height: 1.4;
+
+    .date {
+      font-size: 9.4pt;
+      color: #6b7280;
+      white-space: nowrap;
     }
-    
-    /* Publication Styling */
-    .publication {
-      background: #f8f9fa;
-      padding: 10pt;
-      border-left: 3px solid #3498db;
-      margin: 8pt 0;
+
+    .description {
+      font-size: 9.8pt;
+      color: #4b5563;
+      margin-bottom: 6pt;
     }
-    
-    .author-highlight {
-      font-weight: bold;
-    }
-    
-    /* Professional Summary */
-    .summary-box {
-      background: #f8f9fa;
-      padding: 12pt;
-      margin: 10pt 0;
-      border-left: 3px solid #27ae60;
-      text-align: justify;
-    }
-    
-    /* Projects Section */
+
     .project-item {
       margin-bottom: 12pt;
       padding-bottom: 8pt;
-      border-bottom: 1px dotted #bdc3c7;
+      border-bottom: 1px dotted #d1d5db;
     }
-    
+
     .project-item:last-child {
       border-bottom: none;
     }
-    
+
     .project-title {
-      font-weight: bold;
-      color: #2c3e50;
+      font-weight: 700;
+      color: #111827;
     }
-    
-    .project-tech {
-      font-style: italic;
-      color: #7f8c8d;
-      font-size: 10pt;
+
+    .project-context {
+      font-size: 9.3pt;
+      color: #6b7280;
+      margin-bottom: 4pt;
     }
-    
-    /* References Section */
-    .reference-block {
-      background: #f8f9fa;
-      padding: 8pt;
-      margin: 6pt 0;
-      border-radius: 3px;
-      border: 1px solid #dee2e6;
-    }
-    
-    .reference-name {
-      font-weight: bold;
-      color: #2c3e50;
-    }
-    
-    .reference-title {
-      font-style: italic;
-      color: #6c757d;
-      font-size: 10pt;
-    }
-    
-    /* Utility Classes */
-    .clearfix::after { 
-      content: ""; 
-      display: table; 
-      clear: both; 
-    }
-    
-    strong { font-weight: bold; color: #2c3e50; }
-    em { font-style: italic; color: #5a6c7d; }
-    
-    /* Responsive adjustments */
+
     @media screen and (max-width: 8.5in) {
       .position-header {
         flex-direction: column;
       }
-      
+
       .skills-grid {
         grid-template-columns: 1fr;
-        gap: 10pt;
       }
     }
   </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>SAIF ALI ALJANAHI</h1>
-  <div class="contact-info">
-    <div class="contact-line">Najaf, Iraq | +964 782 208 4101</div>
-    <div class="contact-line">saifalialjanahi@gmail.com</div>
-    <div class="contact-line">https://www.1saif.me | linkedin.com/in/1saifj | github.com/1saifj</div>
-  </div>
-</div>
-
-<!-- Professional Summary -->
-<section>
-  <h2>Professional Summary</h2>
-  <div class="summary-box">
-    <p>Electronic and communication Engineer with more than 3 years of practical software development experience. Currently serving as Assistant Engineer at University of Kufa, developing digital solutions for educational systems. Skilled in backend development, system design, and team collaboration. Published researcher with experience in both academic and commercial software projects, focused on creating reliable and user-friendly applications.  </div>
-</section>
-
-<!-- Technical Skills -->
-<section>
-  <h2>Technical Skills</h2>
-  <div class="skills-grid">
-    <div>
-      <div class="skill-category">Programming Languages</div>
-      <div class="skill-items">Go, Python, JavaScript, TypeScript, Dart, C#</div>
-    </div>
-    <div>
-      <div class="skill-category">Frontend Technologies</div>
-      <div class="skill-items">Flutter, React, Next.js, Tailwind CSS</div>
-    </div>
-    <div>
-      <div class="skill-category">Backend & Databases</div>
-      <div class="skill-items">PostgreSQL, Redis, RESTful APIs, Microservices</div>
-    </div>
-    <div>
-      <div class="skill-category">DevOps & Tools</div>
-      <div class="skill-items">Docker, CI/CD, Git, Unit Testing, System Design</div>
+  <div class="header">
+    <h1>SAIF ALJANAHI</h1>
+    <div class="headline">Lead Software Engineer</div>
+    <div class="contact-info">
+      <div class="contact-line">Najaf, Iraq | +964 782 208 4101</div>
+      <div class="contact-line">saifalialjanahi@gmail.com</div>
+      <div class="contact-line">https://www.1saif.me | linkedin.com/in/1saifj | github.com/1saifj</div>
     </div>
   </div>
-</section>
 
-<!-- Professional Experience -->
-<section>
-  <h2>Professional Experience</h2>
-  
-  <div class="content-block">
-    <div class="position-header">
+  <section>
+    <h2>Professional Summary</h2>
+    <div class="summary-box">
+      <p>
+        Lead software engineer with experience across startup and university environments. Currently contributing
+        part-time at Salasto and full-time at the University of Kufa, with stronger depth in backend systems and
+        hands-on work spanning TypeScript, Go, Flutter, databases, DevOps, and systems design.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Core Skills</h2>
+    <div class="skills-grid">
       <div>
-        <div class="position-title">Assistant Engineer - Software Development & Graduate Services</div>
-        <div class="company-name">University of Kufa, Najaf, Iraq</div>
+        <div class="skill-category">Languages</div>
+        <div class="skill-items">TypeScript, Go, Dart, JavaScript</div>
       </div>
-      <div class="date">April 2023 – Present</div>
-    </div>
-    <div class="description">Dual-role combining software development with graduate employment services</div>
-    <ul>
-      <li>Developed comprehensive graduate tracking platform for monitoring career outcomes</li>
-      <li>Created Information Bank Smart App for university contests and competitions</li>
-      <li>Built internal web applications for lab scheduling, inventory, and reporting using Django and React</li>
-      <li>Provided technical support in Electronic and Communications Engineering laboratories</li>
-    </ul>
-    
-    <div class="sub-section">Leadership & Mentoring</div>
-    <ul>
-      <li>Mentored <strong>three agile student teams</strong> (3 members each) on Transportation Management System project</li>
-      <li>Guided Git workflow, Go microservice patterns, and agile delivery to optimize campus bus routes</li>
-      <li><strong>Web Team:</strong> Introduced React and modern web development best practices</li>
-      <li><strong>Backend Team:</strong> Trained students on relational database design and C# REST API implementation</li>
-      <li><strong>Mobile Team:</strong> Coached UI/UX principles and Flutter development for cross-platform deployment</li>
-    </ul>
-  </div>
-
-  <div class="content-block">
-    <div class="position-header">
       <div>
-        <div class="position-title">Software Engineer / Backend Team Lead</div>
-        <div class="company-name">Al Qaseh for Financial Solutions and Electronic Payment, Najaf, Iraq</div>
+        <div class="skill-category">Frontend</div>
+        <div class="skill-items">Flutter, React, Next.js</div>
       </div>
-      <div class="date">August 2022 – June 1, 2025</div>
-    </div>
-    <div class="description">Building secure financial infrastructure for digital payment systems</div>
-    <ul>
-      <li>Specialized in backend development using Golang and PostgreSQL with strong focus on security and system robustness</li>
-      <li>Designed and maintained Go-based REST/gRPC microservices with PostgreSQL and Redis backends</li>
-      <li>Implemented encryption, JWT/mTLS authentication, RBAC, and PCI-DSS compliant 3-D Secure payment flows</li>
-      <li>Delivered 10+ projects including business portal for merchants and consumer mobile app</li>
-    </ul>
-    
-    <div class="new-sub-section">Backend Team Lead (October 2023 - July 2024)</div>
-    <ul>
-      <li>Led cross-functional backend squad of 3 developers for 10 months</li>
-      <li>Instituted pull-request reviews, issue triage, and sprint retrospectives</li>
-      <li>Drove secure API design, Golang best practices, and PostgreSQL optimization</li>
-      <li>Coordinated with mobile and web teams to align API contracts and release schedules</li>
-    </ul>
-  </div>
-
-  <div class="content-block">
-    <div class="position-header">
       <div>
-        <div class="position-title">Web Developer</div>
-        <div class="company-name">Morabaa Software Solutions, Najaf, Iraq</div>
+        <div class="skill-category">Backend &amp; Data</div>
+        <div class="skill-items">Express.js, Databases, BFF</div>
       </div>
-      <div class="date">January 2022 – July 2022</div>
-    </div>
-    <ul>
-      <li>Developed responsive web applications with focus on user experience and brand consistency</li>
-      <li>Built reusable component library that cut UI build time by 30% for subsequent projects</li>
-      <li>Ensured mobile-friendly layouts balancing functionality with aesthetic design</li>
-    </ul>
-  </div>
-
-  <div class="content-block">
-    <div class="position-header">
       <div>
-        <div class="position-title">Frontend Developer</div>
-        <div class="company-name">Al-Aaml, Najaf, Iraq</div>
+        <div class="skill-category">Engineering</div>
+        <div class="skill-items">DevOps, Systems Design, Security, Engineering Leadership, I2C</div>
       </div>
-      <div class="date">August 2021 – October 2021</div>
     </div>
-    <ul>
-      <li>Frontend development focusing on user interface design and implementation</li>
-    </ul>
-  </div>
-</section>
+  </section>
 
-<!-- Education -->
-<section>
-  <h2>Education</h2>
-  
-  <div class="content-block">
-    <div class="position-header">
-      <div>
-        <div class="position-title">Bachelor of Science in Electronic & Communications Engineering</div>
-        <div class="company-name">University of Kufa, Najaf, Iraq</div>
+  <section>
+    <h2>Professional Experience</h2>
+
+    <div class="content-block">
+      <div class="position-header">
+        <div>
+          <div class="position-title">Lead Software Engineer</div>
+          <div class="company-name">Salasto</div>
+          <div class="role-meta">Part-time | Remote</div>
+        </div>
+        <div class="date">Nov 2025 – Present</div>
       </div>
-      <div class="date">March 2017 – July 2021</div>
-    </div>
-    <p><strong>GPA:</strong> 81.256/100 | <strong>Ranked 3rd in Class</strong></p>
-    <ul>
-      <li><strong>Graduation Project:</strong> <em>Real-time Classification of Falls and Activities of Daily Living Using a CNN-LSTM Network</em> – Achieved A+ grade focusing on AI and deep learning applications</li>
-    </ul>
-  </div>
-  
-  <div class="content-block">
-    <div class="position-header">
-      <div>
-        <div class="position-title">Diploma in Computer Techniques Engineering</div>
-        <div class="company-name">Najaf Technical Institute, Al-Furat Al-Awsat Technical University, Najaf, Iraq</div>
+      <div class="description">
+        Part-time engineering leadership role focused on product delivery across TypeScript, Flutter, databases,
+        DevOps, and systems design.
       </div>
-      <div class="date">October 2015 – June 2017</div>
+      <ul>
+        <li>Lead engineering work across active product initiatives in a remote part-time capacity.</li>
+        <li>Contribute hands-on development across TypeScript and Flutter codebases.</li>
+        <li>Support delivery decisions spanning database work, DevOps, systems design, and engineering leadership.</li>
+      </ul>
     </div>
-    <p><strong>GPA:</strong> 87.85/100 | <strong>Valedictorian (Ranked 1st)</strong></p>
-    <ul>
-      <li><strong>Graduation Project:</strong> <em>Smart Home System Using IoT Intelligent Control</em> – Designed sensor-driven automation using ESP8266 and Node-RED</li>
-    </ul>
-  </div>
-</section>
 
-<!-- Notable Projects -->
-<section>
-  <h2>Notable Projects</h2>
-  
-  <div class="project-item">
-    <div class="project-title">Kufa Graduates Platform</div>
-    <div class="project-tech">Technologies: Go, PostgreSQL, Next.js, Docker | May 2023 – Present</div>
-    <p>User-friendly platform connecting University of Kufa graduates with employers, featuring personalized portfolios and job posting capabilities.</p>
-  </div>
-  
-  <div class="project-item">
-    <div class="project-title">Arabic Roman Conv</div>
-    <div class="project-tech">Technologies: Dart, Flutter | July 2023 – Present</div>
-    <p>Flutter package for converting Arabic names and phrases to Romanized English counterparts.</p>
-  </div>
-  
-  <div class="project-item">
-    <div class="project-title">Qaseh Consumer App Backend</div>
-    <div class="project-tech">Technologies: Go, PostgreSQL, RESTful API | August 2022 – January 2024</div>
-    <p>Backend infrastructure for consumer mobile app on iOS and Android, focusing on scalable APIs and secure financial solutions.</p>
-  </div>
-</section>
-
-<!-- Publications -->
-<section>
-  <h2>Publications</h2>
-  <div class="publication">
-    <p>Al-Majdi K., Al-Musawi R.S.H., Ali A.H., <span class="author-highlight">Aljanahi S.A.</span>, & Mezaal Y.S. "Real-time Classification of Various Types of Falls and Activities of Daily Living Based on a CNN-LSTM Network." <em>Periodicals of Engineering and Natural Sciences</em>, 9(3): 958-969, 2021.</p>
-  </div>
-</section>
-
-<!-- Community Service -->
-<section>
-  <h2>Community Service</h2>
-  <div class="content-block">
-    <div class="position-header">
-      <div>
-        <div class="position-title">Community Development Advocate</div>
-        <div class="company-name">Akitu Organization, Najaf, Iraq</div>
+    <div class="content-block">
+      <div class="position-header">
+        <div>
+          <div class="position-title">Software Engineer</div>
+          <div class="company-name">University of Kufa</div>
+          <div class="role-meta">Full-time | On-site | Al-Najaf, Iraq</div>
+        </div>
+        <div class="date">Apr 2023 – Present</div>
       </div>
-      <div class="date">September 2019 – September 2020</div>
+      <div class="description">
+        Dual-role position combining software engineering work with graduate services support at one of Iraq’s
+        leading universities.
+      </div>
+      <ul>
+        <li>Support graduate employment tracking and career development initiatives.</li>
+        <li>Assist graduate follow-up programs, rehabilitation services, and alumni support efforts.</li>
+        <li>Develop and maintain software applications used in university operations.</li>
+        <li>Provide technical support for Electronic and Communications Engineering laboratory initiatives.</li>
+        <li>Built the Kufa Grad Tracking Platform and the Information Bank Smart App to support graduate monitoring and university competitions.</li>
+      </ul>
     </div>
-    <ul>
-      <li>Led #SupportIraqiGoods campaign reaching 2,000+ citizens promoting local products</li>
-      <li>Organized infrastructure improvement projects: painted four school façades and two pedestrian bridges</li>
-      <li>Coordinated street-cleaning drives across three neighborhoods engaging 30+ youth volunteers</li>
-    </ul>
-  </div>
-</section>
 
-<!-- Languages -->
-<section>
-  <h2>Languages</h2>
-  <p><strong>Arabic:</strong> Native | <strong>English:</strong> Professional Working Proficiency (IELTS 6.0)</p>
-</section>
+    <div class="content-block">
+      <div class="position-header">
+        <div>
+          <div class="position-title">Software Engineer</div>
+          <div class="company-name">Al Qaseh</div>
+          <div class="role-meta">Full-time | On-site | Al-Najaf, Iraq</div>
+        </div>
+        <div class="date">Aug 2022 – Jul 2025</div>
+      </div>
+      <div class="description">
+        Full-time software engineering role spanning backend systems and user-facing product delivery for financial solutions.
+      </div>
+      <ul>
+        <li>Specialized in backend development with Go, PostgreSQL, and related databases, with a strong emphasis on security.</li>
+        <li>Worked across backend and frontend delivery using Flutter, React, and Next.js.</li>
+        <li>Built robust systems and applications designed to remain secure against operational and product risks.</li>
+        <li>Combined backend reliability with user-friendly interfaces to deliver practical software solutions for clients and end users.</li>
+      </ul>
+    </div>
 
-<!-- Academic References -->
-<section>
-  <h2>Academic References</h2>
-  
-  <div class="reference-block">
-    <div class="reference-name">Prof. Maher A.R.S. Al-Baghdadi, PhD</div>
-    <div class="reference-title">Professor, Department of Electronic & Communications Engineering</div>
-    <div>University of Kufa • mahirar.albaghdadi@uokufa.edu.iq</div>
-  </div>
-  
-  <div class="reference-block">
-    <div class="reference-name">Dr. Hasan M.A.S. Shlaka Al-Asadi, PhD</div>
-    <div class="reference-title">Assistant Professor, Department of Mathematics</div>
-    <div>University of Kufa • hasan.shlaka@uokufa.edu.iq</div>
-  </div>
-</section>
+    <div class="content-block">
+      <div class="position-header">
+        <div>
+          <div class="position-title">Backend Team Lead</div>
+          <div class="company-name">Al Qaseh</div>
+          <div class="role-meta">Part-time | On-site | Najaf, Iraq</div>
+        </div>
+        <div class="date">Oct 2023 – Jul 2024</div>
+      </div>
+      <div class="description">
+        Part-time leadership responsibility within the same organization, focused on backend execution and team development.
+      </div>
+      <ul>
+        <li>Guided the backend team in designing, building, and maintaining systems for financial solutions.</li>
+        <li>Set expectations for code quality, system reliability, and collaboration with adjacent teams.</li>
+        <li>Led development of scalable APIs and services aligned with changing client needs.</li>
+        <li>Mentored team members and supported a productive engineering environment.</li>
+      </ul>
+    </div>
+
+    <div class="content-block">
+      <div class="position-header">
+        <div>
+          <div class="position-title">Web Developer</div>
+          <div class="company-name">Morabaa Software Solutions</div>
+          <div class="role-meta">Full-time | On-site | Al-Najaf, Iraq</div>
+        </div>
+        <div class="date">Jan 2022 – Jul 2022</div>
+      </div>
+      <div class="description">
+        Frontend web development role focused on structure, usability, performance, and responsive implementation.
+      </div>
+      <ul>
+        <li>Structured and designed web pages with close attention to usability and clarity.</li>
+        <li>Built features to improve the user experience while balancing functional and visual design.</li>
+        <li>Optimized interfaces for smartphones and responsive behavior.</li>
+        <li>Developed reusable frontend code and maintained brand consistency across pages.</li>
+        <li>Improved page speed and scalability across web deliverables.</li>
+      </ul>
+    </div>
+
+    <div class="content-block">
+      <div class="position-header">
+        <div>
+          <div class="position-title">Frontend Developer</div>
+          <div class="company-name">Al-Aaml</div>
+          <div class="role-meta">Full-time | On-site | Al-Najaf, Iraq</div>
+        </div>
+        <div class="date">Aug 2021 – Oct 2021</div>
+      </div>
+      <div class="description">Early frontend role centered on Flutter-based interface development.</div>
+      <ul>
+        <li>Worked as a frontend developer in an on-site capacity.</li>
+        <li>Contributed Flutter-based interface implementation for product delivery.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Selected Projects</h2>
+
+    <div class="project-item">
+      <div class="project-title">Kufa Grad Tracking Platform</div>
+      <div class="project-context">University of Kufa</div>
+      <p>Graduate monitoring platform built to track career outcomes and support alumni development across university follow-up programs.</p>
+    </div>
+
+    <div class="project-item">
+      <div class="project-title">Information Bank Smart App</div>
+      <div class="project-context">University of Kufa</div>
+      <p>Application system for university contests and competitions, created to improve student engagement and support institutional activities.</p>
+    </div>
+  </section>
 
 </body>
 </html>

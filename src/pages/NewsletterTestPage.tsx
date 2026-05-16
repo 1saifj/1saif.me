@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { emailService, subscriberService, analyticsService } from '../services/newsletterService';
+import { Link } from 'react-router-dom';
+import { House } from '@phosphor-icons/react';
 
 const NewsletterTestPage: React.FC = () => {
   const [testEmail, setTestEmail] = useState('test@example.com');
@@ -80,149 +82,105 @@ const NewsletterTestPage: React.FC = () => {
     setWorkerHealth(null);
   };
 
-  const getStatusColor = (success: boolean) => {
-    return success ? 'text-green-600' : 'text-red-600';
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">
-            🧪 Newsletter Integration Test Page
-          </h1>
-          
-          <div className="mb-8">
-            <p className="text-gray-600 mb-4">
-              Test the Firebase + Cloudflare Workers newsletter integration.
-            </p>
-            
-            {/* Worker Status */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Cloudflare Worker Status</h3>
-                <div className="flex items-center space-x-2">
-                  {workerHealth === null && (
-                    <span className="text-gray-500">Unknown</span>
-                  )}
-                  {workerHealth === true && (
-                    <span className="text-green-600 flex items-center">
-                      <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                      Healthy
-                    </span>
-                  )}
-                  {workerHealth === false && (
-                    <span className="text-red-600 flex items-center">
-                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                      Unhealthy
-                    </span>
-                  )}
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 mt-2">
-                Worker URL: https://cloudflare-worker.1saifj.workers.dev
-              </p>
-            </div>
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] py-24 px-6 border-x border-slate-200 dark:border-zinc-800 flex justify-center">
+      <div className="w-full max-w-4xl pt-16">
+         <div className="flex items-center justify-between border-b border-slate-200 dark:border-zinc-800 pb-12 mb-12">
+            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white tracking-tighter uppercase">
+               Integration Test Console
+            </h1>
+            <Link to="/" className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-zinc-600 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-2">
+               <House weight="bold" /> Return
+            </Link>
+         </div>
 
-            {/* Test Email Input */}
-            <div className="mb-6">
-              <label htmlFor="testEmail" className="block text-sm font-medium text-gray-700 mb-2">
-                Test Email Address
-              </label>
-              <input
-                type="email"
-                id="testEmail"
-                value={testEmail}
-                onChange={(e) => setTestEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter test email address"
-              />
-            </div>
-
-            {/* Test Buttons */}
-            <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
-              <button
-                onClick={testWorkerHealth}
-                disabled={loading}
-                className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-              >
-                {loading ? 'Testing...' : '🔍 Test Worker Health'}
-              </button>
-              
-              <button
-                onClick={testSubscription}
-                disabled={loading || !testEmail}
-                className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-              >
-                {loading ? 'Testing...' : '📧 Test Subscription'}
-              </button>
-              
-              <button
-                onClick={testAnalytics}
-                disabled={loading}
-                className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-              >
-                {loading ? 'Testing...' : '📊 Test Analytics'}
-              </button>
-              
-              <button
-                onClick={clearResults}
-                className="px-3 sm:px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm sm:text-base"
-              >
-                🗑️ Clear Results
-              </button>
-            </div>
-          </div>
-
-          {/* Results Section */}
-          {results.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Test Results</h2>
-              <div className="space-y-4">
-                {results.map((result, index) => (
-                  <div 
-                    key={index}
-                    className={`p-4 rounded-lg border-l-4 ${
-                      result.success 
-                        ? 'bg-green-50 border-green-400' 
-                        : 'bg-red-50 border-red-400'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900">{result.test}</h3>
-                      <span className="text-sm text-gray-500">{result.timestamp}</span>
-                    </div>
-                    <p className={`font-medium ${getStatusColor(result.success)}`}>
-                      {result.success ? '✅' : '❌'} {result.message}
-                    </p>
-                    {result.data && (
-                      <details className="mt-2">
-                        <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
-                          View Data
-                        </summary>
-                        <pre className="mt-2 p-3 bg-gray-100 rounded text-xs overflow-x-auto">
-                          {JSON.stringify(result.data, null, 2)}
-                        </pre>
-                      </details>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Instructions */}
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-lg font-semibold text-blue-900 mb-2">Testing Instructions</h3>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>1. First, test worker health to ensure Cloudflare Worker is responding</li>
-              <li>2. Test email subscription to verify Firebase + Worker email flow</li>
-              <li>3. Check analytics to ensure data is being tracked properly</li>
-              <li>4. Check your email (if using a real address) for confirmation emails</li>
-              <li>5. Monitor Cloudflare Worker logs in the dashboard for debugging</li>
+         {/* Instructions Block */}
+         <div className="border border-slate-200 dark:border-zinc-800 p-8 mb-12 bg-slate-50 dark:bg-zinc-900/10">
+            <h3 className="text-[10px] font-bold tracking-widest uppercase text-slate-900 dark:text-white mb-4">Diagnostics Protocol</h3>
+            <ul className="text-sm font-medium text-slate-600 dark:text-zinc-400 space-y-2 list-decimal pl-4">
+               <li>Test worker health module.</li>
+               <li>Execute subscription parameters.</li>
+               <li>Verify analytics payload injection.</li>
+               <li>Monitor remote Cloudflare instances for debugging.</li>
             </ul>
-          </div>
-        </div>
+         </div>
+
+         {/* Tests block */}
+         <div className="flex flex-col gap-12 mb-16">
+            {/* Health Config */}
+            <div>
+               <div className="flex items-center justify-between border-b-2 border-slate-900 dark:border-white pb-4 mb-6">
+                  <h3 className="uppercase font-bold tracking-tight text-slate-900 dark:text-white text-xl">Cloudflare Worker</h3>
+                  <div className="text-[10px] uppercase tracking-widest font-bold">
+                     {workerHealth === null && <span className="text-slate-500">Uptime: Unknown</span>}
+                     {workerHealth === true && <span className="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1">Node Healthy</span>}
+                     {workerHealth === false && <span className="text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1">Critical Failure</span>}
+                  </div>
+               </div>
+               <span className="block text-xs uppercase tracking-widest text-slate-400 dark:text-zinc-500 font-mono mb-6">Endpoint: https://cloudflare-worker.1saifj.workers.dev</span>
+            </div>
+
+            {/* Email Payload */}
+            <div>
+               <label htmlFor="testEmail" className="block text-[10px] font-bold tracking-widest uppercase text-slate-900 dark:text-white mb-4">
+                  Target Address Payload
+               </label>
+               <input
+                 type="email"
+                 id="testEmail"
+                 value={testEmail}
+                 onChange={(e) => setTestEmail(e.target.value)}
+                 className="w-full bg-transparent border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white font-medium p-4 focus:outline-none focus:border-slate-900 dark:focus:border-white"
+                 placeholder="Enter payload email"
+               />
+            </div>
+         </div>
+
+         {/* Controls Array */}
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 border-t border-slate-200 dark:border-zinc-800 pt-8 mb-16">
+            <button onClick={testWorkerHealth} disabled={loading} className="p-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-[10px] uppercase tracking-widest hover:bg-slate-800 dark:hover:bg-slate-200 disabled:opacity-50 h-16 w-full truncate border border-transparent">
+               [1] Ping Worker
+            </button>
+            <button onClick={testSubscription} disabled={loading || !testEmail} className="p-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-[10px] uppercase tracking-widest hover:bg-slate-800 dark:hover:bg-slate-200 disabled:opacity-50 h-16 w-full truncate border border-transparent">
+               [2] Sub Payload
+            </button>
+            <button onClick={testAnalytics} disabled={loading} className="p-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-[10px] uppercase tracking-widest hover:bg-slate-800 dark:hover:bg-slate-200 disabled:opacity-50 h-16 w-full truncate border border-transparent">
+               [3] Fetch Data
+            </button>
+            <button onClick={clearResults} className="p-4 bg-white dark:bg-[#0a0a0a] text-slate-900 dark:text-white font-bold text-[10px] uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-zinc-900 h-16 w-full border border-slate-200 dark:border-zinc-800 truncate">
+               Clear Console
+            </button>
+         </div>
+
+         {/* Results Screen */}
+         {results.length > 0 && (
+           <div className="border border-slate-200 dark:border-zinc-800 p-8 bg-slate-50 dark:bg-[#050505]">
+             <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-600 mb-8 font-mono border-b border-slate-200 dark:border-zinc-800 pb-4">
+               Output Logs
+             </h2>
+             <div className="flex flex-col gap-4 font-mono text-xs">
+               {results.map((result, index) => (
+                 <div key={index} className="flex flex-col border-l-2 border-slate-300 dark:border-zinc-700 pl-4 py-1">
+                   <div className="flex items-center justify-between mb-2 opacity-70">
+                     <span className="uppercase tracking-wider font-bold">{result.test}</span>
+                     <span>{result.timestamp}</span>
+                   </div>
+                   <p className={`font-bold uppercase tracking-widest mb-2 ${result.success ? 'text-emerald-500' : 'text-red-500'}`}>
+                     [{result.success ? 'SUCCESS' : 'FAILED'}] {result.message}
+                   </p>
+                   {result.data && (
+                     <details className="mt-2 text-slate-500 dark:text-zinc-500 cursor-pointer">
+                       <summary>ATTACHED_PAYLOAD_DATA</summary>
+                       <pre className="mt-4 p-4 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0a0a0a] overflow-x-auto text-[10px]">
+                         {JSON.stringify(result.data, null, 2)}
+                       </pre>
+                     </details>
+                   )}
+                 </div>
+               ))}
+             </div>
+           </div>
+         )}
       </div>
     </div>
   );

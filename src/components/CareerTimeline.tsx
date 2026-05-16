@@ -1,5 +1,5 @@
 import React from 'react'
-import { Calendar, MapPin, Building, Users, TrendingUp, Award, GraduationCap } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 interface TimelineItem {
   id: string
@@ -7,258 +7,190 @@ interface TimelineItem {
   company: string
   location: string
   period: string
+  employmentType: string
+  workMode: string
   description: string
-  responsibilities: string[]
-  leadership?: string[]
-  technologies: string[]
-  achievements?: string[]
-  type: 'work' | 'education'
+  highlights: string[]
+  focusAreas: string[]
 }
 
 export const CareerTimeline: React.FC = () => {
   const timelineItems: TimelineItem[] = [
     {
-      id: '1',
-      title: 'Assistant Engineer - Software Development & Graduate Services',
+      id: 'salasto-lead',
+      title: 'Lead Software Engineer',
+      company: 'Salasto',
+      location: 'Remote',
+      period: 'Nov 2025 – Present',
+      employmentType: 'Part-time',
+      workMode: 'Remote',
+      description:
+        'Part-time engineering leadership role focused on product delivery across TypeScript, Flutter, databases, DevOps, and systems design.',
+      highlights: [
+        'Lead engineering work across active product initiatives in a remote part-time capacity.',
+        'Contribute hands-on development across TypeScript and Flutter codebases.',
+        'Support delivery decisions spanning database work, DevOps, systems design, and engineering leadership.',
+      ],
+      focusAreas: ['TypeScript', 'Flutter', 'Databases', 'DevOps', 'Systems Design', 'Engineering Leadership'],
+    },
+    {
+      id: 'uok-software-engineer',
+      title: 'Software Engineer',
       company: 'University of Kufa',
-      location: 'Najaf, Iraq',
-      period: 'April 2023 – Present',
-      description: 'Dual-role combining software development with graduate employment services',
-      responsibilities: [
-        'Developed comprehensive graduate tracking platform for monitoring career outcomes',
-        'Created Information Bank Smart App for university contests and competitions',
-        'Built internal web applications for lab scheduling, inventory, and reporting using Django and React',
-        'Provided technical support in Electronic and Communications Engineering laboratories'
+      location: 'Al-Najaf, Iraq',
+      period: 'Apr 2023 – Present',
+      employmentType: 'Full-time',
+      workMode: 'On-site',
+      description:
+        'Dual-role position combining software engineering work with graduate services support at one of Iraq’s leading universities.',
+      highlights: [
+        'Support graduate employment tracking and career development initiatives.',
+        'Assist graduate follow-up programs, rehabilitation services, and alumni support efforts.',
+        'Develop and maintain software applications used in university operations.',
+        'Provide technical support for Electronic and Communications Engineering laboratory initiatives.',
+        'Built the Kufa Grad Tracking Platform and the Information Bank Smart App to support graduate monitoring and university competitions.',
       ],
-      leadership: [
-        'Mentored three agile student teams (3 members each) on Transportation Management System project',
-        'Guided Git workflow, Go microservice patterns, and agile delivery to optimize campus bus routes',
-        'Web Team: Introduced React and modern web development best practices',
-        'Backend Team: Trained students on relational database design and C# REST API implementation',
-        'Mobile Team: Coached UI/UX principles and Flutter development for cross-platform deployment'
-      ],
-      technologies: ['Go', 'Django', 'React', 'PostgreSQL', 'Docker', 'C#', 'Flutter'],
-      type: 'work'
+      focusAreas: ['Graduate Tracking', 'University Systems', 'Career Services', 'Technical Support'],
     },
     {
-      id: '2',
-      title: 'Software Engineer / Backend Team Lead',
-      company: 'Al Qaseh for Financial Solutions and Electronic Payment',
-      location: 'Najaf, Iraq',
-      period: 'August 2022 – June 1, 2025',
-      description: 'Building secure financial infrastructure for digital payment systems',
-      responsibilities: [
-        'Specialized in backend development using Golang and PostgreSQL with strong focus on security and system robustness',
-        'Designed and maintained Go-based REST/gRPC microservices with PostgreSQL and Redis backends',
-        'Implemented encryption, JWT/mTLS authentication, RBAC, and PCI-DSS compliant 3-D Secure payment flows',
-        'Delivered 10+ projects including business portal for merchants and consumer mobile app'
+      id: 'alqaseh-software-engineer',
+      title: 'Software Engineer',
+      company: 'Al Qaseh',
+      location: 'Al-Najaf, Iraq',
+      period: 'Aug 2022 – Jul 2025',
+      employmentType: 'Full-time',
+      workMode: 'On-site',
+      description:
+        'Full-time software engineering role spanning backend systems and user-facing product delivery for financial solutions.',
+      highlights: [
+        'Specialized in backend development with Go, PostgreSQL, and related databases, with a strong emphasis on security.',
+        'Worked across backend and frontend delivery using Flutter, React, and Next.js.',
+        'Built robust systems and applications designed to remain secure against operational and product risks.',
+        'Combined backend reliability with user-friendly interfaces to deliver practical software solutions for clients and end users.',
       ],
-      leadership: [
-        'Led cross-functional backend squad of 3 developers for 10 months (October 2023 - July 2024)',
-        'Instituted pull-request reviews, issue triage, and sprint retrospectives',
-        'Drove secure API design, Golang best practices, and PostgreSQL optimization',
-        'Coordinated with mobile and web teams to align API contracts and release schedules'
-      ],
-      technologies: ['Go', 'PostgreSQL', 'Redis', 'gRPC', 'JWT', 'mTLS', 'PCI-DSS'],
-      type: 'work'
+      focusAreas: ['Go', 'PostgreSQL', 'Flutter', 'React', 'Next.js', 'Security'],
     },
     {
-      id: '3',
+      id: 'alqaseh-backend-team-lead',
+      title: 'Backend Team Lead',
+      company: 'Al Qaseh',
+      location: 'Najaf, Iraq',
+      period: 'Oct 2023 – Jul 2024',
+      employmentType: 'Part-time',
+      workMode: 'On-site',
+      description:
+        'Part-time leadership responsibility within the same organization, focused on backend execution and team development.',
+      highlights: [
+        'Guided the backend team in designing, building, and maintaining systems for financial solutions.',
+        'Set expectations for code quality, system reliability, and collaboration with adjacent teams.',
+        'Led development of scalable APIs and services aligned with changing client needs.',
+        'Mentored team members and supported a productive engineering environment.',
+      ],
+      focusAreas: ['Backend Leadership', 'APIs', 'System Reliability', 'Mentoring'],
+    },
+    {
+      id: 'morabaa-web-developer',
       title: 'Web Developer',
       company: 'Morabaa Software Solutions',
-      location: 'Najaf, Iraq',
-      period: 'January 2022 – July 2022',
-      description: 'Frontend and full-stack web development with focus on user experience',
-      responsibilities: [
-        'Developed responsive web applications with focus on user experience and brand consistency',
-        'Built reusable component library that cut UI build time by 30% for subsequent projects',
-        'Ensured mobile-friendly layouts balancing functionality with aesthetic design'
+      location: 'Al-Najaf, Iraq',
+      period: 'Jan 2022 – Jul 2022',
+      employmentType: 'Full-time',
+      workMode: 'On-site',
+      description:
+        'Frontend web development role focused on structure, usability, performance, and responsive implementation.',
+      highlights: [
+        'Structured and designed web pages with close attention to usability and clarity.',
+        'Built features to improve the user experience while balancing functional and visual design.',
+        'Optimized interfaces for smartphones and responsive behavior.',
+        'Developed reusable frontend code and maintained brand consistency across pages.',
+        'Improved page speed and scalability across web deliverables.',
       ],
-      technologies: ['React', 'JavaScript', 'CSS3', 'HTML5', 'Responsive Design'],
-      type: 'work'
+      focusAreas: ['JavaScript', 'React', 'HTML', 'CSS', 'Next.js', 'Svelte'],
     },
     {
-      id: '4',
+      id: 'alaaml-frontend-developer',
       title: 'Frontend Developer',
       company: 'Al-Aaml',
-      location: 'Najaf, Iraq',
-      period: 'August 2021 – October 2021',
-      description: 'Frontend development focusing on user interface design and implementation',
-      responsibilities: [
-        'Frontend development focusing on user interface design and implementation'
+      location: 'Al-Najaf, Iraq',
+      period: 'Aug 2021 – Oct 2021',
+      employmentType: 'Full-time',
+      workMode: 'On-site',
+      description: 'Early frontend role centered on Flutter-based interface development.',
+      highlights: [
+        'Worked as a frontend developer in an on-site capacity.',
+        'Contributed Flutter-based interface implementation for product delivery.',
       ],
-      technologies: ['JavaScript', 'CSS3', 'HTML5', 'UI/UX Design'],
-      type: 'work'
+      focusAreas: ['Flutter'],
     },
-    {
-      id: '5',
-      title: 'Bachelor of Science in Electronic & Communications Engineering',
-      company: 'University of Kufa',
-      location: 'Najaf, Iraq',
-      period: 'March 2017 – July 2021',
-      description: 'GPA: 81.256/100 | Ranked 3rd in Class',
-      responsibilities: [
-        'Graduation Project: Real-time Classification of Falls and Activities of Daily Living Using a CNN-LSTM Network',
-        'Achieved A+ grade focusing on AI and deep learning applications'
-      ],
-      technologies: ['AI', 'Deep Learning', 'CNN-LSTM', 'Python', 'Machine Learning'],
-      type: 'education'
-    },
-    {
-      id: '6',
-      title: 'Diploma in Computer Techniques Engineering',
-      company: 'Najaf Technical Institute, Al-Furat Al-Awsat Technical University',
-      location: 'Najaf, Iraq',
-      period: 'October 2015 – June 2017',
-      description: 'GPA: 87.85/100 | Valedictorian (Ranked 1st)',
-      responsibilities: [
-        'Graduation Project: Smart Home System Using IoT Intelligent Control',
-        'Designed sensor-driven automation using ESP8266 and Node-RED'
-      ],
-      technologies: ['IoT', 'ESP8266', 'Node-RED', 'Automation', 'Sensors'],
-      type: 'education'
-    }
   ]
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'work':
-        return Building
-      case 'education':
-        return GraduationCap
-      default:
-        return Building
-    }
-  }
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'work':
-        return 'from-blue-600 to-cyan-600'
-      case 'education':
-        return 'from-purple-600 to-pink-600'
-      default:
-        return 'from-blue-600 to-cyan-600'
-    }
-  }
-
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-4 xs:p-6 sm:p-8 border border-slate-200 dark:border-slate-700">
-      <div className="text-center mb-8 sm:mb-10 lg:mb-12">
-        <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
-          <Calendar className="w-4 h-4" />
-          <span>Career Journey</span>
-        </div>
-        <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-          Professional Timeline
-        </h3>
-        <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-          A journey through software engineering excellence, from academic foundations to industry leadership.
-        </p>
-      </div>
+    <div className="w-full border-t border-slate-200 dark:border-zinc-800">
+      <div className="flex flex-col">
+        {timelineItems.map((item, index) => (
+          <motion.article
+            key={item.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ type: 'spring', stiffness: 100, damping: 20, delay: index * 0.08 }}
+            className="group flex flex-col lg:flex-row border-b border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900/30 transition-colors"
+          >
+            <div className="relative lg:w-[280px] shrink-0 p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-zinc-800 flex flex-col gap-3">
+              <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 dark:text-zinc-500 block">
+                {item.period}
+              </span>
+              <span className="text-xs font-bold tracking-[0.18em] uppercase text-slate-900 dark:text-white block">
+                {item.company}
+              </span>
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-zinc-500">
+                {item.employmentType} · {item.workMode}
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-zinc-500">{item.location}</span>
+            </div>
 
-      <div className="relative">
-        {/* Vertical line */}
-        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-600 via-purple-600 to-green-600 rounded-full"></div>
+            <div className="p-8 lg:p-10 flex-1">
+              <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight mb-4 group-hover:translate-x-1 transition-transform duration-300">
+                {item.title}
+              </h3>
 
-        <div className="space-y-8 sm:space-y-10 lg:space-y-12">
-          {timelineItems.map((item, index) => {
-            const IconComponent = getTypeIcon(item.type)
-            const colorClass = getTypeColor(item.type)
-            
-            return (
-              <div key={item.id} className="relative flex items-start space-x-4 xs:space-x-6 sm:space-x-8">
-                {/* Timeline dot with icon */}
-                <div className={`relative z-10 bg-gradient-to-r ${colorClass} rounded-xl p-3 shadow-lg`}>
-                  <IconComponent className="w-6 h-6 text-white" />
-                </div>
+              <p className="text-sm md:text-base text-slate-600 dark:text-zinc-400 leading-relaxed mb-8 max-w-3xl">
+                {item.description}
+              </p>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 xs:p-4 sm:p-6 border border-slate-200 dark:border-slate-600">
-                    {/* Header */}
-                    <div className="mb-4">
-                      <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                        {item.title}
-                      </h4>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 dark:text-slate-300">
-                        <div className="flex items-center space-x-1">
-                          <Building className="w-4 h-4" />
-                          <span className="font-medium">{item.company}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <MapPin className="w-4 h-4" />
-                          <span>{item.location}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{item.period}</span>
-                        </div>
-                      </div>
-                      {item.description && (
-                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 italic">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Responsibilities */}
-                    <div className="mb-4">
-                      <h5 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center space-x-2">
-                        <TrendingUp className="w-4 h-4" />
-                        <span>{item.type === 'education' ? 'Academic Highlights' : 'Key Responsibilities'}</span>
-                      </h5>
-                      <ul className="space-y-2">
-                        {item.responsibilities.map((resp, i) => (
-                          <li key={i} className="text-slate-700 dark:text-slate-300 flex items-start space-x-2">
-                            <div className="w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-sm">{resp}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Leadership (only for work items with leadership) */}
-                    {item.leadership && item.leadership.length > 0 && (
-                      <div className="mb-4">
-                        <h5 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 flex items-center space-x-2">
-                          <Users className="w-4 h-4" />
-                          <span>Leadership & Mentoring</span>
-                        </h5>
-                        <ul className="space-y-1">
-                          {item.leadership.map((leader, i) => (
-                            <li key={i} className="text-sm text-slate-600 dark:text-slate-400 flex items-start space-x-2">
-                              <Award className="w-3 h-3 text-green-600 dark:text-green-400 mt-1 flex-shrink-0" />
-                              <span>{leader}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Technologies */}
-                    <div>
-                      <h5 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Technologies</h5>
-                      <div className="flex flex-wrap gap-2">
-                        {item.technologies.map((tech, i) => (
-                          <span
-                            key={i}
-                            className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full font-medium"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 gap-8">
+                <div>
+                  <span className="block text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 dark:text-zinc-600 mb-4">
+                    Key Highlights
+                  </span>
+                  <ul className="flex flex-col gap-3">
+                    {item.highlights.map((highlight, idx) => (
+                      <li
+                        key={idx}
+                        className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed flex items-start gap-3"
+                      >
+                        <span className="shrink-0 mt-1.5 w-1.5 h-1.5 bg-slate-300 dark:bg-zinc-600 rounded-full"></span>
+                        <span>{highlight}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-            )
-          })}
-        </div>
+
+              <div className="mt-8 pt-6 border-t border-slate-200/70 dark:border-zinc-800/70 flex flex-wrap gap-2">
+                {item.focusAreas.map((area) => (
+                  <span
+                    key={area}
+                    className="px-3 py-1.5 text-[10px] font-bold tracking-[0.16em] uppercase text-slate-700 dark:text-zinc-300 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800"
+                  >
+                    {area}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.article>
+        ))}
       </div>
-
-
     </div>
   )
-} 
+}

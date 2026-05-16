@@ -11,7 +11,6 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy'
 import NewsletterTestPage from './pages/NewsletterTestPage'
 import ImageOptimizationPage from './pages/ImageOptimizationPage'
 import { AdminDashboard } from './pages/AdminDashboard'
-import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { SkipLink } from './components/SkipLink'
 import AnalyticsProvider, { useAnalytics } from './components/Analytics'
 import PerformanceMonitor from './components/PerformanceMonitor'
@@ -72,7 +71,7 @@ function App() {
           <AnalyticsWrapper>
             <SkipLink />
             <PerformanceMonitor />
-            <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
+            <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/blog" element={<BlogListingPage />} />
@@ -86,7 +85,6 @@ function App() {
                 <Route path="/image-optimization" element={<ImageOptimizationPage />} />
                 <Route path="/admin" element={<AdminDashboard />} />
               </Routes>
-              <PWAInstallPrompt />
             </div>
           </AnalyticsWrapper>
         </AnalyticsProvider>

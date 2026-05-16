@@ -4,7 +4,7 @@ import app from './config/firebase';
 import { db } from './config/firebase';
 
 // Initialize Analytics (temporarily disabled to avoid content blockers)
-let analytics = null;
+const analytics = null;
 /*
 if (typeof window !== 'undefined' && import.meta.env.PROD) {
   try {
