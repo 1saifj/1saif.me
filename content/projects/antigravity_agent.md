@@ -7,6 +7,8 @@ language: typescript
 wip: false
 isPrivate: false
 sourceType: open-source
+role: Solo author
+impact: Tauri desktop app + VS Code extension; multi-account AI quota manager
 ---
 
 # Antigravity Agent

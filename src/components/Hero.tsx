@@ -136,11 +136,11 @@ export const Hero: React.FC = () => {
               initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 100, damping: 22, delay: 0.32 }}
-              className="mt-8 max-w-[58ch] text-base md:text-lg text-slate-600 dark:text-zinc-400 leading-relaxed border-l-2 border-slate-900 dark:border-white pl-5"
+              className="mt-8 max-w-[52ch] text-lg md:text-xl text-slate-700 dark:text-zinc-300 leading-snug border-l-2 border-slate-900 dark:border-white pl-5"
             >
-              Backend engineer working on the parts banks can't afford to get wrong —
-              payments, identity, ledgers. Go + Postgres, type-safe APIs, PCI-DSS in scope.
-              Leading backend at AlQaseh; contributing part-time at Salasto.
+              Backend engineer on the parts banks can't afford to get wrong.
+              Currently leading backend at <strong className="font-semibold text-slate-900 dark:text-white">AlQaseh</strong>,
+              contributing at <strong className="font-semibold text-slate-900 dark:text-white">Salasto</strong>.
             </motion.p>
 
             {/* Numeric readout — durable, verifiable signals */}

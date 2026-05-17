@@ -7,6 +7,8 @@ language: go
 wip: false
 isPrivate: true
 sourceType: company
+role: Backend Team Lead
+impact: Card-issuing & reconciliation on Go + Postgres, PCI-DSS in scope
 ---
 
 # Al Qaseh Financial Backend System

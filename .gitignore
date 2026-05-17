@@ -43,3 +43,10 @@ node_modules/
 
 # Added by Task Master AI
 # OS specific
+
+# Local audit / scratch artifacts
+audit-shots/
+shot.png
+shot-skills.png
+refactor.py
+format-radii.js
