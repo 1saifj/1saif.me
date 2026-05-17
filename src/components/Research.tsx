@@ -19,17 +19,22 @@ export const Research: React.FC = () => {
   }
 
   return (
-    <section id="research" className="py-24 md:py-32 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-200 dark:border-zinc-800">
+    <section id="research" className="py-16 md:py-24 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-200 dark:border-zinc-800">
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
-        
+
         {/* Header Block */}
-        <div className="mb-16 border-b border-slate-200 dark:border-zinc-800 pb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="mb-12 border-b border-slate-200 dark:border-zinc-800 pb-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div>
-            <h2 className="text-5xl sm:text-6xl md:text-8xl font-bold text-slate-900 dark:text-white tracking-tighter leading-none mb-6">
+            <div className="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500 dark:text-zinc-500 mb-6 flex items-center gap-3">
+              <span>§ 05 — Research</span>
+              <span className="h-px w-12 bg-slate-300 dark:bg-zinc-700" />
+              <span>Peer Reviewed</span>
+            </div>
+            <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-slate-900 dark:text-white tracking-tighter leading-[0.95] mb-6">
               Academic<br/>
-              Research.
+              <span className="text-slate-400 dark:text-zinc-600">Research.</span>
             </h2>
-            <p className="text-xl text-slate-600 dark:text-zinc-400 max-w-[50ch] leading-relaxed font-medium">
+            <p className="text-base md:text-lg text-slate-600 dark:text-zinc-400 max-w-[55ch] leading-relaxed font-medium mt-6">
               Contributions to machine learning and healthcare technology algorithms.
             </p>
           </div>

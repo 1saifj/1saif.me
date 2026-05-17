@@ -78,24 +78,25 @@ export const Resume: React.FC = () => {
   return (
     <section
       id="resume"
-      className="py-24 md:py-32 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-200 dark:border-zinc-800"
+      className="py-12 md:py-20 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-200 dark:border-zinc-800"
     >
       <div className="container mx-auto px-6 max-w-7xl">
         
         {/* Header Block */}
-        <div className="mb-16 border-b-2 border-slate-900 dark:border-white pb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div>
-            <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-zinc-500 font-mono block mb-6">
-              [ Document: Curriculum Vitae ]
-            </span>
-            <h2 className="text-5xl sm:text-6xl md:text-8xl font-bold text-slate-900 dark:text-white tracking-tighter leading-none mb-6">
+        <div className="mb-12 border-b-2 border-slate-900 dark:border-white pb-10 grid grid-cols-12 gap-6 items-end">
+          <div className="col-span-12 lg:col-span-8">
+            <div className="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500 dark:text-zinc-500 mb-6 flex items-center gap-3 flex-wrap">
+              <span>§ Document — CV</span>
+              <span className="h-px w-12 bg-slate-300 dark:bg-zinc-700" />
+              <span>Rev. {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</span>
+              <span className="h-px w-12 bg-slate-300 dark:bg-zinc-700" />
+              <span>Lead Software Engineer</span>
+            </div>
+            <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-slate-900 dark:text-white tracking-tighter leading-[0.95] mb-6">
               SAIF <br/>
-              ALJANAHI
+              <span className="text-slate-400 dark:text-zinc-600">ALJANAHI</span>
             </h2>
-            <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight uppercase mb-6">
-              Lead Software Engineer
-            </p>
-            <p className="text-lg text-slate-600 dark:text-zinc-400 max-w-[62ch] font-medium leading-relaxed border-l-4 border-slate-200 dark:border-zinc-800 pl-6">
+            <p className="text-base md:text-lg text-slate-600 dark:text-zinc-400 max-w-[62ch] font-medium leading-relaxed border-l-2 border-slate-200 dark:border-zinc-800 pl-5 mt-6">
               Lead software engineer with experience across startup and university environments. Currently
               contributing part-time at Salasto and full-time at the University of Kufa, with stronger depth
               in backend systems and hands-on work spanning TypeScript, Go, Flutter, databases, DevOps, and
@@ -103,14 +104,22 @@ export const Resume: React.FC = () => {
             </p>
           </div>
 
-          <button
-            onClick={handleDownloadResume}
-            className="group flex flex-col items-center justify-center gap-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 p-8 h-40 w-40 shrink-0 transition-all hover:bg-slate-800 dark:hover:bg-slate-200 hover:-translate-y-2 relative"
-          >
-            <DownloadSimple weight="bold" className="w-8 h-8" />
-            <span className="text-[10px] text-center font-bold tracking-[0.2em] uppercase">Export RAW</span>
-            <div className="absolute inset-0 border border-slate-900 dark:border-white translate-x-2 translate-y-2 -z-10 group-hover:translate-x-4 group-hover:translate-y-4 transition-transform duration-300"></div>
-          </button>
+          <div className="col-span-12 lg:col-span-4 flex flex-col gap-6 lg:items-end">
+            <div className="hidden lg:flex w-full flex-col gap-3 font-mono text-[10px] tracking-widest uppercase text-slate-500 dark:text-zinc-500 pl-6 border-l border-slate-200 dark:border-zinc-800">
+              <div className="flex justify-between"><span>Location</span><span className="text-slate-900 dark:text-white">Najaf, IQ</span></div>
+              <div className="flex justify-between"><span>Status</span><span className="text-slate-900 dark:text-white">Open</span></div>
+              <div className="flex justify-between"><span>Depth</span><span className="text-slate-900 dark:text-white">Backend</span></div>
+              <div className="flex justify-between"><span>Stack</span><span className="text-slate-900 dark:text-white">TS · Go · Flutter</span></div>
+            </div>
+            <button
+              onClick={handleDownloadResume}
+              className="group flex items-center justify-between gap-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-5 w-full lg:w-auto lg:self-end transition-all hover:bg-slate-800 dark:hover:bg-slate-200 hover:-translate-y-1 relative"
+            >
+              <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Export RAW</span>
+              <DownloadSimple weight="bold" className="w-4 h-4" />
+              <div className="absolute inset-0 border border-slate-900 dark:border-white translate-x-1.5 translate-y-1.5 -z-10 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform duration-300"></div>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-slate-200 dark:bg-zinc-800 border-x border-slate-200 dark:border-zinc-800">
