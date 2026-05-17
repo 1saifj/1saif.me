@@ -7,6 +7,8 @@ language: typescript
 wip: false
 isPrivate: true
 sourceType: company
+role: Backend Lead
+impact: PIN-based auth with SMS/OTP, Redis sessions, Drizzle ORM on Postgres
 ---
 
 # Salasto Backend

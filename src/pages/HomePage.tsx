@@ -1,6 +1,7 @@
 import React from 'react'
 import { Navigation } from '../components/Navigation'
 import { Hero } from '../components/Hero'
+import { Now } from '../components/Now'
 import { About } from '../components/About'
 
 import { Skills } from '../components/Skills'
@@ -22,6 +23,7 @@ export const HomePage: React.FC = () => {
         <section id="home" aria-labelledby="hero-heading" className="min-h-screen">
           <Hero />
         </section>
+        <Now />
         <section id="about" aria-labelledby="about-heading">
           <About />
         </section>

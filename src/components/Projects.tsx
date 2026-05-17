@@ -243,10 +243,21 @@ export const Projects: React.FC = () => {
                   
                   {/* Title & Desc */}
                   <div className="flex-1">
-                    <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-4 tracking-tighter leading-tight group-hover:-translate-y-1 transition-transform duration-300">
+                    <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-3 tracking-tighter leading-tight group-hover:-translate-y-1 transition-transform duration-300">
                       {project.name}
                       {wip && <span className="ml-3 text-[10px] align-top bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-sm tracking-widest uppercase font-bold">WIP</span>}
                     </h3>
+                    {project.role && (
+                      <div className="mb-3 flex items-baseline gap-2 font-mono text-[10px] tracking-[0.2em] uppercase">
+                        <span className="text-slate-900 dark:text-white">{project.role}</span>
+                        {project.impact && (
+                          <>
+                            <span className="text-slate-300 dark:text-zinc-700">·</span>
+                            <span className="text-slate-500 dark:text-zinc-500 normal-case tracking-normal font-sans text-xs">{project.impact}</span>
+                          </>
+                        )}
+                      </div>
+                    )}
                     <p className="text-slate-500 dark:text-zinc-500 text-sm leading-relaxed max-w-sm">
                       {project.description}
                     </p>

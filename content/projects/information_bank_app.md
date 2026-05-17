@@ -7,6 +7,8 @@ language: typescript
 wip: false
 isPrivate: true
 sourceType: company
+role: Engineer
+impact: Contest & competition platform for University of Kufa
 ---
 
 # Information Bank Smart App

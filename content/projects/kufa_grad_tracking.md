@@ -7,6 +7,8 @@ language: typescript
 wip: false
 isPrivate: false
 sourceType: open-source
+role: Engineering Lead
+impact: Graduate outcomes platform for the University of Kufa
 ---
 
 # Kufa Grad Tracking Platform

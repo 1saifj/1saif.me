@@ -7,6 +7,8 @@ language: typescript
 wip: false
 isPrivate: true
 sourceType: company
+role: Frontend Engineer
+impact: Internal web tooling; early-career role
 ---
 
 # Al-Aaml Frontend Development

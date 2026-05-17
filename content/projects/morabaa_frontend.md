@@ -7,6 +7,8 @@ language: typescript
 wip: false
 isPrivate: true
 sourceType: private
+role: Frontend Engineer
+impact: Client web apps; 7-month engagement
 ---
 
 # Morabaa Software Solutions Frontend Projects

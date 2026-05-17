@@ -25,7 +25,9 @@ export const projectSchema = z.object({
   language: languages,
   wip: z.boolean().optional().default(false),
   isPrivate: z.boolean().optional().default(false),
-  sourceType: sourceTypes.optional().default('open-source')
+  sourceType: sourceTypes.optional().default('open-source'),
+  role: z.string().optional(),
+  impact: z.string().optional(),
 })
 
 export type Project = z.infer<typeof projectSchema>

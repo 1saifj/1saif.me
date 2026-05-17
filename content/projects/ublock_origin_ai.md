@@ -7,6 +7,8 @@ language: javascript
 wip: true
 isPrivate: false
 sourceType: open-source
+role: Maintainer
+impact: LLM-assisted filter generation; experimental fork
 ---
 
 # uBlock Origin AI
