@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Calendar, Clock, Funnel, BookOpen, MagnifyingGlass, ArrowRight, Tag } from '@phosphor-icons/react';
+import { Calendar, Clock, Funnel, BookOpen, MagnifyingGlass, ArrowRight } from '@phosphor-icons/react';
 import { publishedBlogs } from '../data/blogs'
 import { createSlugFromTitle } from '../utils/slugUtils'
 
@@ -12,11 +12,18 @@ export const BlogListing: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
-  
+  const [showAllTags, setShowAllTags] = useState(false)
+
   const postsPerPage = 10
-  
-  // Extract all unique tags
-  const allTags = Array.from(new Set(publishedBlogs.flatMap(blog => blog.tags)))
+
+  // Extract all unique tags, ordered by frequency
+  const tagFrequency = publishedBlogs.flatMap(blog => blog.tags).reduce<Record<string, number>>((acc, t) => {
+    acc[t] = (acc[t] || 0) + 1
+    return acc
+  }, {})
+  const allTags = Object.keys(tagFrequency).sort((a, b) => tagFrequency[b] - tagFrequency[a])
+  const TOP_TAGS_LIMIT = 8
+  const visibleTags = showAllTags ? allTags : allTags.slice(0, TOP_TAGS_LIMIT)
   
   // Funnel and search logic
   const filteredBlogs = publishedBlogs.filter(blog => {
@@ -72,18 +79,30 @@ export const BlogListing: React.FC = () => {
   }
 
   return (
-    <div className="py-24 md:py-32 bg-white dark:bg-[#0a0a0a] min-h-[100dvh] relative border-b border-slate-200 dark:border-zinc-800">
+    <div className="py-16 md:py-24 bg-white dark:bg-[#0a0a0a] min-h-[100dvh] relative border-b border-slate-200 dark:border-zinc-800">
       <div className="container mx-auto px-6 max-w-7xl">
-        
+
         {/* Page Header */}
-        <div className="mb-16">
-          <h1 className="text-6xl md:text-8xl font-bold text-slate-900 dark:text-white mb-6 tracking-tighter leading-none border-b-8 border-slate-900 dark:border-white pb-6 inline-block">
-            Engineering<br />
-            Feed.
-          </h1>
-          <p className="text-xl md:text-2xl text-slate-600 dark:text-zinc-400 max-w-3xl leading-relaxed mt-4 font-medium">
-            Deep technical specifications, architecture blueprints, and engineering methodologies.
-          </p>
+        <div className="mb-12 grid grid-cols-12 gap-6 items-end border-b border-slate-200 dark:border-zinc-800 pb-10">
+          <div className="col-span-12 lg:col-span-8">
+            <div className="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500 dark:text-zinc-500 mb-6 flex items-center gap-3">
+              <span>§ Index — Writing</span>
+              <span className="h-px w-12 bg-slate-300 dark:bg-zinc-700" />
+              <span>{publishedBlogs.length.toString().padStart(3, '0')} Entries</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-white tracking-tighter leading-[0.95]">
+              Engineering<br />
+              <span className="text-slate-400 dark:text-zinc-600">Feed.</span>
+            </h1>
+            <p className="text-base md:text-lg text-slate-600 dark:text-zinc-400 max-w-[55ch] leading-relaxed mt-6 font-medium">
+              Deep technical specifications, architecture blueprints, and engineering methodologies.
+            </p>
+          </div>
+          <div className="hidden lg:flex col-span-4 flex-col gap-3 font-mono text-[10px] tracking-widest uppercase text-slate-500 dark:text-zinc-500 pl-6 border-l border-slate-200 dark:border-zinc-800">
+            <div className="flex justify-between"><span>Updated</span><span className="text-slate-900 dark:text-white">{new Date(Math.max(...publishedBlogs.map(b => b.updatedAt || b.createdAt))).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</span></div>
+            <div className="flex justify-between"><span>Topics</span><span className="text-slate-900 dark:text-white">{allTags.length}</span></div>
+            <div className="flex justify-between"><span>Status</span><span className="text-slate-900 dark:text-white">Indexed</span></div>
+          </div>
         </div>
 
         {/* Brutalist Controls Area */}
@@ -117,31 +136,40 @@ export const BlogListing: React.FC = () => {
         </div>
 
         {/* Tag Filters */}
-        <div className="flex flex-wrap gap-3 mb-16 pb-8 border-b border-slate-200 dark:border-zinc-800">
+        <div className="flex flex-wrap items-center gap-2 mb-12 pb-8 border-b border-slate-200 dark:border-zinc-800">
+           <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-400 dark:text-zinc-600 mr-2">Filter ↳</span>
            <button
              onClick={() => handleFilterChange('all')}
-             className={`px-4 py-2 font-bold text-[10px] tracking-widest uppercase transition-colors ${
-               selectedTag === 'all' 
-               ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' 
-               : 'bg-slate-100 text-slate-500 hover:text-slate-900 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:text-white'
+             className={`px-3 py-1.5 font-bold text-[10px] tracking-widest uppercase transition-colors border ${
+               selectedTag === 'all'
+               ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
+               : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300 dark:text-zinc-400 dark:hover:text-white dark:hover:border-zinc-700'
              }`}
            >
-             Global Feed
+             All
            </button>
-           {allTags.map(tag => (
+           {visibleTags.map(tag => (
              <button
                key={tag}
                onClick={() => handleFilterChange(tag)}
-               className={`px-4 py-2 font-bold text-[10px] tracking-widest uppercase transition-colors flex items-center gap-2 ${
-                 selectedTag === tag 
-                 ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' 
-                 : 'bg-slate-100 text-slate-500 hover:text-slate-900 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:text-white'
+               className={`px-3 py-1.5 font-bold text-[10px] tracking-widest uppercase transition-colors flex items-center gap-1.5 border ${
+                 selectedTag === tag
+                 ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
+                 : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300 dark:text-zinc-400 dark:hover:text-white dark:hover:border-zinc-700'
                }`}
              >
-               <Tag weight="bold" className="w-3 h-3" />
                {tag}
+               <span className="opacity-60">{tagFrequency[tag]}</span>
              </button>
            ))}
+           {allTags.length > TOP_TAGS_LIMIT && (
+             <button
+               onClick={() => setShowAllTags(s => !s)}
+               className="px-3 py-1.5 font-mono text-[10px] tracking-widest uppercase text-slate-900 dark:text-white underline underline-offset-4 decoration-dotted hover:decoration-solid"
+             >
+               {showAllTags ? `Collapse` : `+${allTags.length - TOP_TAGS_LIMIT} more`}
+             </button>
+           )}
         </div>
 
         {/* Status Bar */}

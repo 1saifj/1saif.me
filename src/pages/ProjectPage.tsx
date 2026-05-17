@@ -88,21 +88,36 @@ export const ProjectPage: React.FC = () => {
       </header>
 
       {/* Hero Header Area */}
-      <section className="pt-32 pb-16 relative">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <motion.div 
+      <section className="pt-24 md:pt-28 pb-12 relative">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, type: 'spring' }}
-            className="flex flex-col items-start"
+            className="grid grid-cols-12 gap-6 items-end"
           >
-            <h1 className="text-6xl md:text-8xl lg:text-[8rem] font-bold text-slate-900 dark:text-white mb-8 tracking-tighter leading-none border-b-8 border-slate-900 dark:border-white pb-6 inline-block">
-              {project.name}
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-slate-600 dark:text-zinc-400 font-medium leading-relaxed max-w-3xl mb-12">
-              {project.description}
-            </p>
+            <div className="col-span-12 lg:col-span-9">
+              <div className="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500 dark:text-zinc-500 mb-6 flex items-center gap-3">
+                <span>§ Case Study</span>
+                <span className="h-px w-10 bg-slate-300 dark:bg-zinc-700" />
+                <span>{project.language}</span>
+                <span className="h-px w-10 bg-slate-300 dark:bg-zinc-700" />
+                <span>{SourceConfig.label}</span>
+              </div>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-slate-900 dark:text-white tracking-tighter leading-[0.95] mb-6">
+                {project.name}
+              </h1>
+              <div className="h-px w-24 bg-slate-900 dark:bg-white mb-6" />
+              <p className="text-lg md:text-xl text-slate-600 dark:text-zinc-400 font-medium leading-relaxed max-w-[60ch] mb-10">
+                {project.description}
+              </p>
+            </div>
+            <div className="hidden lg:flex col-span-3 flex-col gap-3 font-mono text-[10px] tracking-widest uppercase text-slate-500 dark:text-zinc-500 pl-6 border-l border-slate-200 dark:border-zinc-800 pb-6">
+              <div className="flex justify-between"><span>Status</span><span className="text-slate-900 dark:text-white">{project.wip ? 'In Progress' : 'Shipped'}</span></div>
+              <div className="flex justify-between"><span>Source</span><span className="text-slate-900 dark:text-white">{SourceConfig.label}</span></div>
+              <div className="flex justify-between"><span>Stack</span><span className="text-slate-900 dark:text-white">{project.language}</span></div>
+            </div>
+            <div className="col-span-12">
 
             {/* Flat Action Buttons */}
             <div className="flex flex-col sm:flex-row border-y sm:border-r border-l border-slate-200 dark:border-zinc-800 w-full sm:w-auto">
@@ -135,6 +150,7 @@ export const ProjectPage: React.FC = () => {
                   <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Private Source</span>
                 </div>
               )}
+            </div>
             </div>
           </motion.div>
         </div>

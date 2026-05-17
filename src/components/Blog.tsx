@@ -35,28 +35,39 @@ export const Blog: React.FC = () => {
   }
 
   return (
-    <section id="blog" className="py-24 md:py-32 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-100 dark:border-zinc-900">
+    <section id="blog" className="py-16 md:py-24 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-100 dark:border-zinc-900">
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
-        
+
         {/* Header */}
-        <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div>
-            <motion.h2 
+        <div className="mb-12 grid grid-cols-12 gap-6 items-end">
+          <div className="col-span-12 lg:col-span-8">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500 dark:text-zinc-500 mb-6 flex items-center gap-3"
+            >
+              <span>§ 04 — Writing</span>
+              <span className="h-px w-12 bg-slate-300 dark:bg-zinc-700" />
+              <span>Recent Drops</span>
+            </motion.div>
+            <motion.h2
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, type: 'spring' }}
-              className="text-6xl md:text-8xl font-bold text-slate-900 dark:text-white tracking-tighter leading-none mb-6"
+              className="text-5xl sm:text-6xl md:text-7xl font-bold text-slate-900 dark:text-white tracking-tighter leading-[0.95] mb-6"
             >
               Engineering<br/>
-              <span className="text-slate-400 dark:text-zinc-600 border-b border-transparent">Writing.</span>
+              <span className="text-slate-400 dark:text-zinc-600">Writing.</span>
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1, type: 'spring' }}
-              className="text-lg text-slate-600 dark:text-zinc-400 max-w-[50ch] leading-relaxed mt-10"
+              className="text-base md:text-lg text-slate-600 dark:text-zinc-400 max-w-[55ch] leading-relaxed mt-6"
             >
               Technical articles on software architecture, system design, and the engineering practices that scale.
             </motion.p>
@@ -66,10 +77,11 @@ export const Blog: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            className="col-span-12 lg:col-span-4 lg:justify-self-end lg:pb-2"
           >
-            <Link 
-              to="/blog" 
-              className="group flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs tracking-widest uppercase transition-opacity hover:opacity-70"
+            <Link
+              to="/blog"
+              className="group inline-flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs tracking-widest uppercase transition-opacity hover:opacity-70 border-b border-slate-900 dark:border-white pb-1"
             >
               <span>Explore Archive</span>
               <ArrowUpRight strokeWidth="2" className="w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />

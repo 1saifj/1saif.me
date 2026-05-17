@@ -47,7 +47,7 @@ export const About: React.FC = () => {
   ]
 
   return (
-    <section id="about" className="py-24 md:py-32 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-100 dark:border-zinc-900">
+    <section id="about" className="py-16 md:py-24 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-100 dark:border-zinc-900">
       <div className="container mx-auto px-6 max-w-7xl">
         
         <motion.div 
@@ -58,10 +58,15 @@ export const About: React.FC = () => {
           className="grid grid-cols-1 lg:grid-cols-12"
         >
           {/* Left Column - Big Text & Narrative */}
-          <motion.div variants={itemVariants} className="lg:col-span-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-zinc-800 pb-16 lg:pb-0 lg:pr-16">
+          <motion.div variants={itemVariants} className="lg:col-span-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-zinc-800 pb-12 lg:pb-0 lg:pr-16">
             <div>
-              <motion.h2 
-                className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-white tracking-tighter leading-none mb-12"
+              <div className="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500 dark:text-zinc-500 mb-6 flex items-center gap-3">
+                <span>§ 01 — About</span>
+                <span className="h-px w-12 bg-slate-300 dark:bg-zinc-700" />
+                <span>Operating Manual</span>
+              </div>
+              <motion.h2
+                className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-white tracking-tighter leading-[0.95] mb-10"
               >
                 Lead.<br/>
                 <span className="text-slate-400 dark:text-zinc-600">Architect.</span><br/>

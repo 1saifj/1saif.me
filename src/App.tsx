@@ -7,7 +7,7 @@ import { ProjectPage } from './pages/ProjectPage'
 import { ResumePage } from './pages/ResumePage'
 import { ConfirmSubscriptionPage } from './pages/ConfirmSubscriptionPage'
 import { UnsubscribePage } from './pages/UnsubscribePage'
-import { PrivacyPolicy } from './pages/PrivacyPolicy'
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
 import NewsletterTestPage from './pages/NewsletterTestPage'
 import ImageOptimizationPage from './pages/ImageOptimizationPage'
 import { AdminDashboard } from './pages/AdminDashboard'
@@ -80,7 +80,7 @@ function App() {
                 <Route path="/resume" element={<ResumePage />} />
                 <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
                 <Route path="/unsubscribe" element={<UnsubscribePage />} />
-                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/privacy" element={<PrivacyPolicyPage />} />
                 <Route path="/newsletter-test" element={<NewsletterTestPage />} />
                 <Route path="/image-optimization" element={<ImageOptimizationPage />} />
                 <Route path="/admin" element={<AdminDashboard />} />

@@ -45,32 +45,57 @@ export const Skills: React.FC = () => {
   ]
 
   return (
-    <section id="skills" className="py-24 md:py-32 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-100 dark:border-zinc-900">
+    <section id="skills" className="py-16 md:py-24 bg-white dark:bg-[#0a0a0a] relative overflow-hidden border-t border-slate-100 dark:border-zinc-900">
       <div className="container mx-auto px-6 max-w-7xl">
         
         {/* Header */}
-        <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <motion.h2 
+        <div className="mb-12 grid grid-cols-12 gap-6 items-end">
+          <div className="col-span-12 lg:col-span-8">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="font-mono text-[10px] tracking-[0.25em] uppercase text-slate-500 dark:text-zinc-500 mb-6 flex items-center gap-3"
+            >
+              <span>§ 02 — Stack</span>
+              <span className="h-px w-12 bg-slate-300 dark:bg-zinc-700" />
+              <span>{skillCategories.reduce((acc, c) => acc + c.skills.length, 0).toString().padStart(2,'0')} Tools</span>
+            </motion.div>
+            <motion.h2
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, type: 'spring' }}
-              className="text-5xl sm:text-6xl md:text-8xl font-bold text-slate-900 dark:text-white tracking-tighter leading-none mb-6"
+              className="text-5xl sm:text-6xl md:text-7xl font-bold text-slate-900 dark:text-white tracking-tighter leading-[0.95] mb-6"
             >
               Technical<br/>
-              <span className="text-slate-400 dark:text-zinc-600 border-b border-transparent">Arsenal.</span>
+              <span className="text-slate-400 dark:text-zinc-600">Arsenal.</span>
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1, type: 'spring' }}
-              className="text-lg text-slate-600 dark:text-zinc-400 max-w-[50ch] leading-relaxed mt-10"
+              className="text-base md:text-lg text-slate-600 dark:text-zinc-400 max-w-[55ch] leading-relaxed mt-6"
             >
               The languages, frameworks, and infrastructure I leverage to build resilient, high-performance systems.
             </motion.p>
           </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="hidden lg:flex col-span-4 flex-col gap-3 font-mono text-[10px] tracking-widest uppercase text-slate-500 dark:text-zinc-500 pl-6 border-l border-slate-200 dark:border-zinc-800 pb-2"
+          >
+            {skillCategories.map(c => (
+              <div key={c.id} className="flex justify-between">
+                <span>{c.name.split('&')[0].trim().split(' ')[0]}</span>
+                <span className="text-slate-900 dark:text-white">{c.skills.length}</span>
+              </div>
+            ))}
+          </motion.div>
         </div>
 
         {/* Brutalist Skills List */}
