@@ -138,12 +138,12 @@ export const Hero: React.FC = () => {
               transition={{ type: 'spring', stiffness: 100, damping: 22, delay: 0.32 }}
               className="mt-8 max-w-[58ch] text-base md:text-lg text-slate-600 dark:text-zinc-400 leading-relaxed border-l-2 border-slate-900 dark:border-white pl-5"
             >
-              I build payment rails, identity systems, and the boring-on-purpose
-              backbones banks run on — typed Go, Postgres under load, PCI-DSS
-              checked. Currently leading backend at AlQaseh and contributing at Salasto.
+              Backend engineer working on the parts banks can't afford to get wrong —
+              payments, identity, ledgers. Go + Postgres, type-safe APIs, PCI-DSS in scope.
+              Leading backend at AlQaseh; contributing part-time at Salasto.
             </motion.p>
 
-            {/* Numeric readout — replaces tag chip cluster */}
+            {/* Numeric readout — durable, verifiable signals */}
             <motion.dl
               initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -151,16 +151,16 @@ export const Hero: React.FC = () => {
               className="mt-10 grid grid-cols-3 gap-px bg-slate-200 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-800 max-w-xl"
             >
               <div className="bg-white dark:bg-[#0a0a0a] p-5">
-                <dt className="font-mono text-[9px] tracking-[0.22em] uppercase text-slate-500 dark:text-zinc-500">Shipping</dt>
-                <dd className="mt-2 text-3xl font-bold tracking-tighter text-slate-900 dark:text-white tabular-nums">6<span className="text-slate-400 dark:text-zinc-700">yr</span></dd>
+                <dt className="font-mono text-[9px] tracking-[0.22em] uppercase text-slate-500 dark:text-zinc-500">Shipping since</dt>
+                <dd className="mt-2 text-3xl font-bold tracking-tighter text-slate-900 dark:text-white tabular-nums">2020</dd>
               </div>
               <div className="bg-white dark:bg-[#0a0a0a] p-5">
-                <dt className="font-mono text-[9px] tracking-[0.22em] uppercase text-slate-500 dark:text-zinc-500">P99 lat.</dt>
-                <dd className="mt-2 text-3xl font-bold tracking-tighter text-slate-900 dark:text-white tabular-nums">187<span className="text-slate-400 dark:text-zinc-700">ms</span></dd>
+                <dt className="font-mono text-[9px] tracking-[0.22em] uppercase text-slate-500 dark:text-zinc-500">Production systems</dt>
+                <dd className="mt-2 text-3xl font-bold tracking-tighter text-slate-900 dark:text-white tabular-nums">04</dd>
               </div>
               <div className="bg-white dark:bg-[#0a0a0a] p-5">
-                <dt className="font-mono text-[9px] tracking-[0.22em] uppercase text-slate-500 dark:text-zinc-500">Uptime</dt>
-                <dd className="mt-2 text-3xl font-bold tracking-tighter text-slate-900 dark:text-white tabular-nums">99.94<span className="text-slate-400 dark:text-zinc-700">%</span></dd>
+                <dt className="font-mono text-[9px] tracking-[0.22em] uppercase text-slate-500 dark:text-zinc-500">Peer-reviewed</dt>
+                <dd className="mt-2 text-3xl font-bold tracking-tighter text-slate-900 dark:text-white tabular-nums">01<span className="text-slate-400 dark:text-zinc-700"> paper</span></dd>
               </div>
             </motion.dl>
 
@@ -175,7 +175,7 @@ export const Hero: React.FC = () => {
                 to="/resume"
                 className="group inline-flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-4 transition-transform duration-200 hover:-translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-900 dark:focus-visible:ring-white dark:focus-visible:ring-offset-[#0a0a0a]"
               >
-                <span className="text-[10px] font-bold tracking-[0.22em] uppercase">Read Dossier</span>
+                <span className="text-[10px] font-bold tracking-[0.22em] uppercase">Open Résumé</span>
                 <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" weight="bold" />
               </Link>
 

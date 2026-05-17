@@ -24,23 +24,23 @@ export const Skills: React.FC = () => {
   const skillCategories = [
     {
       id: "languages",
-      name: "Programming Languages",
-      skills: ["Go", "Python", "JavaScript", "TypeScript", "Dart", "C#"],
+      name: "Daily Drivers",
+      skills: ["Go", "TypeScript", "Dart", "SQL"],
     },
     {
       id: "backend",
-      name: "Backend & Databases",
-      skills: ["PostgreSQL", "Redis", "REST APIs", "gRPC", "Node.js"],
+      name: "Services & Storage",
+      skills: ["PostgreSQL", "Redis", "gRPC", "OpenAPI", "Idempotency"],
     },
     {
       id: "frontend",
-      name: "Frontend Technologies",
-      skills: ["React", "Next.js", "Flutter", "HTML/CSS", "Tailwind CSS"],
+      name: "Product Surfaces",
+      skills: ["React", "Tailwind", "Flutter", "Design systems"],
     },
     {
       id: "tools",
-      name: "Tools & DevOps",
-      skills: ["Git", "Docker", "Linux", "PCI-DSS", "Architecture"],
+      name: "Delivery",
+      skills: ["Docker", "GitHub Actions", "Observability", "PCI-DSS"],
     }
   ]
 

@@ -21,28 +21,28 @@ const itemVariants = {
 export const About: React.FC = () => {
   const expertises = [
     {
-      title: "Full-Stack Development",
-      description: "Expert in Golang, TypeScript, React, and modern web technologies for building scalable applications"
+      title: "Backend systems",
+      description: "Go services on Postgres + Redis. Typed boundaries, idempotent writes, careful migrations."
     },
     {
-      title: "Backend Architecture", 
-      description: "Specialized in PostgreSQL, microservices, and clean architecture principles for enterprise systems"
+      title: "Payment infrastructure",
+      description: "Money-movement code: card issuing, reconciliation, dedup, PCI-DSS scope. Optimistic and pessimistic locking where each belongs."
     },
     {
-      title: "Security & Performance",
-      description: "PCI DSS compliance, end-to-end encryption, and performance optimization achieving 99.9% uptime"
+      title: "API design",
+      description: "REST + gRPC contracts with explicit schemas. OpenAPI for partners, generated clients, versioned without breaking callers."
     },
     {
-      title: "Team Leadership",
-      description: "Led teams of 5+ developers, mentored junior staff, and improved code quality by 60%"
+      title: "Team leadership",
+      description: "Backend team lead at AlQaseh. Code review, on-call rotation, hiring loops, technical mentorship."
     },
     {
-      title: "System Architecture",
-      description: "Designed systems handling 10,000+ concurrent users and $1M+ monthly transaction volume"
+      title: "Frontend depth",
+      description: "React + TypeScript for product UIs; Flutter for mobile. Design-system thinking and accessibility as defaults."
     },
     {
-      title: "DevOps & Testing",
-      description: "CI/CD pipelines, automated testing, and comprehensive E2E testing practices"
+      title: "DevOps & delivery",
+      description: "Docker, GitHub Actions, blue/green deploys, structured logs, alerting that paged me only when it should."
     }
   ]
 
@@ -73,29 +73,41 @@ export const About: React.FC = () => {
                 <span className="opacity-50" style={{ WebkitTextStroke: '1px', WebkitTextFillColor: 'transparent' }}>Execute.</span>
               </motion.h2>
               
-              <div className="space-y-8 text-base md:text-lg text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
+              <div className="space-y-6 text-base md:text-lg text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
                 <p>
-                  As a Full-Stack Engineer with deep expertise in <strong className="text-slate-900 dark:text-white">Golang, TypeScript, and Clean Architecture</strong>, 
-                  I specialize in building mission-critical financial systems that process millions of dollars 
-                  in transactions while maintaining the strictest security standards.
+                  I write the parts of the system that have to keep working — payment
+                  rails, identity, ledgers, the boundaries between services. Mostly
+                  <strong className="text-slate-900 dark:text-white"> Go and Postgres</strong>,
+                  with TypeScript on the edges and Flutter when something has to ship to a phone.
                 </p>
                 <p>
-                  Currently serving as Backend Team Lead at AlQaseh, I architect and maintain enterprise-grade 
-                  financial systems while mentoring developers and driving technical innovation. My absolute focus on 
-                  performance optimization has resulted in systems serving thousands of concurrent users with sub-200ms response times globally.
+                  Backend lead at <strong className="text-slate-900 dark:text-white">AlQaseh</strong>,
+                  building card-issuing and reconciliation infrastructure under PCI-DSS scope.
+                  Part-time at <strong className="text-slate-900 dark:text-white">Salasto</strong>
+                  {' '}on backend delivery and team support. Previously: graduate
+                  tracking platform for the University of Kufa, internal tooling, and one
+                  published paper on CNN-LSTM fall detection.
+                </p>
+                <p>
+                  Style: small reviewable PRs, strict types at the boundary, observability
+                  before optimization, no clever code where a boring solution works.
                 </p>
               </div>
             </div>
 
-            {/* Brutalist KPI Block */}
-            <div className="flex border-t border-l border-slate-200 dark:border-zinc-800 mt-16">
-              <div className="flex-1 p-8 border-r border-b border-slate-200 dark:border-zinc-800">
-                <div className="text-4xl font-bold text-slate-900 dark:text-white font-mono tracking-tighter mb-2">3+</div>
-                <div className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Years Expertise</div>
+            {/* Numeric anchor block — aligned with hero */}
+            <div className="grid grid-cols-3 border-t border-l border-slate-200 dark:border-zinc-800 mt-12">
+              <div className="p-6 border-r border-b border-slate-200 dark:border-zinc-800">
+                <div className="text-3xl font-bold text-slate-900 dark:text-white font-mono tracking-tighter mb-1 tabular-nums">2020</div>
+                <div className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Shipping since</div>
               </div>
-              <div className="flex-1 p-8 border-r border-b border-slate-200 dark:border-zinc-800">
-                <div className="text-4xl font-bold text-slate-900 dark:text-white font-mono tracking-tighter mb-2">99.9%</div>
-                <div className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">System Uptime</div>
+              <div className="p-6 border-r border-b border-slate-200 dark:border-zinc-800">
+                <div className="text-3xl font-bold text-slate-900 dark:text-white font-mono tracking-tighter mb-1 tabular-nums">2</div>
+                <div className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Concurrent roles</div>
+              </div>
+              <div className="p-6 border-r border-b border-slate-200 dark:border-zinc-800">
+                <div className="text-3xl font-bold text-slate-900 dark:text-white font-mono tracking-tighter mb-1 tabular-nums">Lead</div>
+                <div className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Backend team</div>
               </div>
             </div>
           </motion.div>
