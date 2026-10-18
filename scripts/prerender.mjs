@@ -47,6 +47,7 @@ const page = (url) => {
     .replace('<html lang="en"', arabic ? '<html lang="ar" dir="rtl"' : '<html lang="en"')
     .replace(/<script type="module" crossorigin src="[^"]+"><\/script>/, startAfterLoad)
     .replace(/\s*<link rel="modulepreload"[^>]*>/g, '')
+    .replace(/\s*<!-- The home portrait[^\n]*\n(\s*<link rel="preload" as="image"[^>]*>)+/, home ? '$&' : '')
     .replace('</head>', `${head}\n${home ? '' : stylesheet}\n</head>`)
     .replace('<div id="root"></div>', `<div id="root" data-route="${url}">${html}</div>`)
 }

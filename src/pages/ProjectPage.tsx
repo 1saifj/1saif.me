@@ -8,6 +8,7 @@ import { projects as projectList } from '../data/projects'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import { enhanceCodeBlocks } from '../utils/codeBlocks'
 import SEOHead from '../components/SEOHead'
+import { BreadcrumbStructuredData } from '../components/StructuredData'
 import { ContentSkeleton } from '../components/ContentSkeleton'
 import { comma, Language, pick, useLanguage } from '../i18n/language'
 
@@ -77,6 +78,7 @@ export const ProjectPage: React.FC = () => {
   return (
     <div className="site-shell site-project-page">
       <SEOHead title={`${name} | ${language === 'ar' ? 'سيف الجناحي' : 'Saif Aljanahi'}`} description={description} url={`https://1saif.me/project/${slug}`} image="/sj_image.jpeg" />
+      <BreadcrumbStructuredData items={[[language === 'ar' ? 'الرئيسية' : 'Home', language === 'ar' ? '/ar' : '/'], [name, `${language === 'ar' ? '/ar' : ''}/project/${slug}`]]} />
       <SiteHeader current="work" />
 
       <main id="main-content" className="site-container plain-page">
