@@ -7,7 +7,6 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    // Unit tests only: e2e/ is Playwright, cloudflare-worker/ has its own runner.
     include: ['src/**/*.test.{ts,tsx}'],
     css: true,
     coverage: {
