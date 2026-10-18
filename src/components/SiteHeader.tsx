@@ -35,7 +35,7 @@ export const LanguageButton: React.FC = () => {
 export const BrandLink: React.FC = () => {
   const { language } = useLanguage()
 
-  return <Link to="/" className="notebook-brand" aria-label={labels[language].home} dir="ltr">saif.me</Link>
+  return <Link to="/" className="notebook-brand" aria-label={labels[language].home} dir="ltr">saif<span className="notebook-brand-dot">.</span>me</Link>
 }
 
 type Section = 'work' | 'blog' | 'resume'

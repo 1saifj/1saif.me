@@ -244,44 +244,13 @@
   }
 }
 
-/* Portfolio refresh: a calm, LinkedIn-blue editorial system with a dark canvas option. */
-:root {
-  --portfolio-canvas: #f4f7fb;
-  --portfolio-surface: #ffffff;
-  --portfolio-surface-soft: #edf3f9;
-  --portfolio-ink: #132238;
-  --portfolio-muted: #61738b;
-  --portfolio-faint: #8ea0b5;
-  --portfolio-line: #dbe5ef;
-  --portfolio-brand: #0a66c2;
-  --portfolio-brand-dark: #0757a6;
-  --portfolio-brand-soft: #e4f0fb;
-  --portfolio-mint: #16a67a;
-  --portfolio-violet: #7454d6;
-  --portfolio-shadow: 0 24px 60px rgba(25, 58, 92, 0.12);
-}
-
-html.dark {
-  --portfolio-canvas: #071321;
-  --portfolio-surface: #0d1e31;
-  --portfolio-surface-soft: #10263d;
-  --portfolio-ink: #f4f8fc;
-  --portfolio-muted: #a2b5ca;
-  --portfolio-faint: #738aa3;
-  --portfolio-line: #203953;
-  --portfolio-brand: #64b5ff;
-  --portfolio-brand-dark: #8ccaff;
-  --portfolio-brand-soft: #133b5e;
-  --portfolio-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
-}
-
-/* Quiet editorial portfolio layer */
+/* Inner pages. The values match .notebook-shell in index.html, so every page has one palette: ink on paper and one blue. */
 .site-shell {
   --site-bg: #ffffff;
   --site-surface: #f7f9fb;
   --site-ink: #10161d;
-  --site-muted: #4a5866;
-  --site-faint: #6b7885;
+  --site-muted: #46525e;
+  --site-faint: #5b6875;
   --site-line: #e3e8ee;
   --site-blue: #0a66c2;
   --site-blue-dark: #084e96;
@@ -291,9 +260,9 @@ html.dark {
   background: var(--site-bg);
   font-family: 'Geist Sans', ui-sans-serif, system-ui, sans-serif;
 }
-html.dark .site-shell { --site-bg: #0d1117; --site-surface: #1a222c; --site-ink: #e8edf3; --site-muted: #9aa8b6; --site-faint: #8b99a8; --site-line: #2a3441; --site-blue: #4c9fe8; --site-blue-dark: #7bbaf0; }
+html.dark .site-shell { --site-bg: #0d1117; --site-surface: #161b22; --site-ink: #e6ebf1; --site-muted: #a9b4c0; --site-faint: #8f9baa; --site-line: #262f3a; --site-blue: #5aa7ec; --site-blue-dark: #7bbaf0; }
 .site-container { width: min(100% - 56px, 1200px); margin-inline: auto; }
-.site-wordmark { display: inline-flex; align-items: center; color: var(--site-ink); font-size: 19px; font-weight: 750; letter-spacing: -.055em; text-decoration: none; }
+.site-wordmark { display: inline-flex; align-items: center; color: var(--site-ink); font-size: 19px; font-weight: 600; letter-spacing: -.03em; text-decoration: none; }
 .site-wordmark span { color: var(--site-blue); }
 .site-button svg { width: 15px; height: 15px; flex: 0 0 auto; }
 .site-button { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 17px; border: 1px solid var(--site-blue); border-radius: 5px; color: #fff; background: var(--site-blue); font: inherit; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background .18s ease, border-color .18s ease, transform .18s ease; }

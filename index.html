@@ -2,10 +2,11 @@
 <html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=2" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <title>Saif Aljanahi | Lead Software Engineer in Al-Najaf, Iraq</title>
@@ -63,6 +64,8 @@ html.dark .notebook-shell { --nb-bg: #0d1117; --nb-line: #262f3a; --nb-ink: #e6e
 .notebook-header { position: sticky; z-index: 20; top: 0; border-bottom: 1px solid var(--nb-line); background: color-mix(in srgb, var(--nb-bg) 92%, transparent); backdrop-filter: blur(12px); }
 .notebook-header-inner { display: flex; align-items: center; gap: 28px; width: min(calc(100% - 48px), 960px); min-height: 60px; margin-inline: auto; }
 .notebook-brand { color: var(--nb-ink); font-weight: 600; text-decoration: none; }
+/* The wordmark's dot is the favicon's dot: the one accent mark next to the ink. */
+.notebook-brand-dot { color: var(--nb-accent); }
 .notebook-desktop-nav { display: flex; gap: 22px; margin-inline-start: auto; }
 .notebook-desktop-nav a, .notebook-mobile-nav a { color: var(--nb-ink-2); font-size: 14px; text-decoration: none; }
 .notebook-desktop-nav a:hover, .notebook-mobile-nav a:hover, .notebook-desktop-nav a.is-active, .notebook-mobile-nav a.is-active { color: var(--nb-ink); }
