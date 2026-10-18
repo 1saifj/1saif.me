@@ -96,11 +96,7 @@
   Content-Type: text/css; charset=utf-8
   Cross-Origin-Resource-Policy: cross-origin
 
-# Manifest & Service Worker
-/manifest.json
-  Cache-Control: public, max-age=86400
-  Content-Type: application/manifest+json
-
+# Service worker kill switch: always revalidate so old installs pick it up
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
   Content-Type: application/javascript; charset=utf-8

@@ -1,94 +1,79 @@
-import React, { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { lazy, Suspense, type ComponentType } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
-import { BlogPost } from './pages/BlogPost'
-import { BlogListingPage } from './pages/BlogListingPage'
-import { ProjectPage } from './pages/ProjectPage'
-import { ResumePage } from './pages/ResumePage'
-import { ConfirmSubscriptionPage } from './pages/ConfirmSubscriptionPage'
-import { UnsubscribePage } from './pages/UnsubscribePage'
-import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
-import NewsletterTestPage from './pages/NewsletterTestPage'
-import ImageOptimizationPage from './pages/ImageOptimizationPage'
-import { AdminDashboard } from './pages/AdminDashboard'
 import { SkipLink } from './components/SkipLink'
-import AnalyticsProvider, { useAnalytics } from './components/Analytics'
-import PerformanceMonitor from './components/PerformanceMonitor'
-import { ThemeProvider } from './design-system'
-import { v4 as uuidv4 } from 'uuid'
+import { isArabicPath, LanguageProvider } from './i18n/language'
 
-function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
-  const location = useLocation()
-  const { trackPageView } = useAnalytics()
+// Each page chunk also waits for the route stylesheet, so a page never paints unstyled.
+// Once loaded, a page renders directly instead of suspending: main.tsx loads the current route
+// before mounting, so the prerendered HTML is never swapped for the loading fallback.
+const page = <M,>(load: () => Promise<M>, pick: (module: M) => ComponentType) => {
+  let Loaded: ComponentType | undefined
+  const loadComponent = () => Promise.all([import('./index.css'), load()]).then(([, module]) => (Loaded = pick(module)))
+  const Lazy = lazy(() => loadComponent().then(Component => ({ default: Component })))
+  const preload = (): Promise<void> => loadComponent().then(() => undefined)
+  const Page = () => (Loaded ? <Loaded /> : <Lazy />)
 
-  useEffect(() => {
-    // Function to get or create a persistent user ID
-    const getClarityUserId = (): string => {
-      let userId = localStorage.getItem('clarityUserId')
-      if (!userId) {
-        userId = uuidv4()
-        localStorage.setItem('clarityUserId', userId)
-      }
-      return userId
-    }
+  return Object.assign(Page, { preload })
+}
 
-    // Initialize Microsoft Clarity with error handling
-    try {
-      // Dynamically import Clarity to handle blocking gracefully
-      import('@microsoft/clarity').then((ClarityModule) => {
-        const Clarity = ClarityModule.default
-        if (Clarity) {
-          const clarityId = import.meta.env.VITE_CLARITY_PROJECT_ID || 's10i1oa5td'
-          Clarity.init(clarityId)
-          const userId = getClarityUserId()
-          Clarity.identify(userId, undefined, undefined, 'Anonymous User')
-          
-          const pageCategory = location.pathname.split('/')[1] || 'home'
-          Clarity.setTag('pageCategory', pageCategory)
+const BlogPost = page(() => import('./pages/BlogPost'), m => m.BlogPost)
 
-          console.log(`Microsoft Clarity initialized for user ${userId}`)
-        }
-      }).catch((error) => {
-        // Silently handle the case where Clarity is blocked by ad blockers
-        console.log('Microsoft Clarity blocked or unavailable (this is normal with ad blockers)')
-      })
-    } catch (error) {
-      // Fallback error handling
-      console.log('Microsoft Clarity initialization failed (this is normal with ad blockers)')
-    }
+const BlogListingPage = page(() => import('./pages/BlogListingPage'), m => m.BlogListingPage)
 
-    trackPageView(location.pathname, document.title)
-  }, [location, trackPageView])
+const ProjectPage = page(() => import('./pages/ProjectPage'), m => m.ProjectPage)
 
-  return <>{children}</>
+const ResumePage = page(() => import('./pages/ResumePage'), m => m.ResumePage)
+
+const PrivacyPolicyPage = page(() => import('./pages/PrivacyPolicyPage'), m => m.PrivacyPolicyPage)
+
+const NotFoundPage = page(() => import('./pages/NotFoundPage'), m => m.NotFoundPage)
+
+export const preloadRoute = (pathname: string): Promise<void> => {
+  const path = pathname.replace(/\/+$/, '') || '/'
+
+  if (path === '/') return Promise.resolve()
+
+  if (path === '/blog') return BlogListingPage.preload()
+
+  if (path.startsWith('/blog/')) return BlogPost.preload()
+
+  if (path.startsWith('/project/')) return ProjectPage.preload()
+
+  if (path === '/resume') return ResumePage.preload()
+
+  if (path === '/privacy') return PrivacyPolicyPage.preload()
+
+  return NotFoundPage.preload()
+}
+
+// Shown only if a route chunk takes longer than 200 ms (see .route-skeleton in index.html).
+function RouteSkeleton() {
+  const arabic = document.documentElement.lang === 'ar'
+
+  return <div className="route-skeleton" role="status"><span className="sr-only">{arabic ? 'جارٍ التحميل' : 'Loading'}</span><span className="route-skeleton-title" /><span style={{ width: '48%' }} /><span /><span style={{ width: '80%' }} /></div>
 }
 
 function App() {
+  const arabic = isArabicPath(window.location.pathname)
+
+  // Under /ar the router's basename adds the prefix to every link, so pages stay unaware of it.
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <ThemeProvider>
-        <AnalyticsProvider>
-          <AnalyticsWrapper>
-            <SkipLink />
-            <PerformanceMonitor />
-            <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/blog" element={<BlogListingPage />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/project/:slug" element={<ProjectPage />} />
-                <Route path="/resume" element={<ResumePage />} />
-                <Route path="/confirm-subscription" element={<ConfirmSubscriptionPage />} />
-                <Route path="/unsubscribe" element={<UnsubscribePage />} />
-                <Route path="/privacy" element={<PrivacyPolicyPage />} />
-                <Route path="/newsletter-test" element={<NewsletterTestPage />} />
-                <Route path="/image-optimization" element={<ImageOptimizationPage />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-              </Routes>
-            </div>
-          </AnalyticsWrapper>
-        </AnalyticsProvider>
-      </ThemeProvider>
+    <Router basename={arabic ? '/ar' : undefined} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <LanguageProvider language={arabic ? 'ar' : 'en'}>
+          <SkipLink />
+          <Suspense fallback={<RouteSkeleton />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/blog" element={<BlogListingPage />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/project/:slug" element={<ProjectPage />} />
+              <Route path="/resume" element={<ResumePage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
+      </LanguageProvider>
     </Router>
   )
 }

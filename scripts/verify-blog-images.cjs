@@ -6,9 +6,11 @@
  */
 
 const fs = require('fs');
+
 const path = require('path');
 
 const contentDir = path.join(__dirname, '../content/articles');
+
 const publicDir = path.join(__dirname, '../public');
 
 // Get all markdown files
@@ -17,7 +19,9 @@ const markdownFiles = fs.readdirSync(contentDir).filter(file => file.endsWith('.
 console.log('🔍 Verifying blog featured images...\n');
 
 let totalChecked = 0;
+
 let missingImages = [];
+
 let validImages = [];
 
 for (const file of markdownFiles) {
@@ -26,6 +30,7 @@ for (const file of markdownFiles) {
   
   // Extract frontmatter
   const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
+
   if (!frontmatterMatch) continue;
   
   const frontmatter = frontmatterMatch[1];
@@ -48,8 +53,11 @@ for (const file of markdownFiles) {
 }
 
 console.log(`\n📊 Summary:`);
+
 console.log(`Total articles checked: ${totalChecked}`);
+
 console.log(`Valid images: ${validImages.length}`);
+
 console.log(`Missing images: ${missingImages.length}`);
 
 if (missingImages.length > 0) {

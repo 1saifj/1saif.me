@@ -1,9 +1,9 @@
 ---
 title: "Cherry-Pick: A Useful GitHub Tool for Managing Commits"
-description: "Learn how to use the cherry-pick feature in GitHub Desktop to efficiently manage commits across branches."
+description: "How to copy a single commit to another branch with cherry-pick in GitHub Desktop, and when a merge or a rebase is the better choice."
 createdAt: "2024-07-13"
 updatedAt: 2024-07-13
-featuredImage: "/articles/git_cherry_pick_feat.png"
+featuredImage: "/articles/git_cherry_pick_feat.jpg"
 tags:
   - github
   - version-control
@@ -11,9 +11,7 @@ tags:
   - development
 ---
 
-# Introduction
-
-In software development, version control is crucial for maintaining code integrity and facilitating collaboration. GitHub Desktop, a user-friendly interface for Git, offers numerous features to streamline version control processes. One such feature is cherry-pick, which allows developers to select specific commits from one branch and apply them to another. This article will explore the cherry-pick feature in GitHub Desktop, explaining its benefits and providing a step-by-step guide on how to use it.
+Sometimes you need one commit from another branch, not the whole branch. A hotfix that landed on `develop` and has to go to `main` today, or a small fix someone made on their feature branch that you need now. That's what cherry-pick is for, and GitHub Desktop makes it a drag and drop. Here's how it works and when to use it.
 
 # What is Cherry-Picking?
 
@@ -73,8 +71,8 @@ Cherry-picking is particularly useful for applying hotfixes. Suppose you have a 
 
 If a new feature developed in a feature branch is also needed in an older release branch, you can cherry-pick the commit(s) related to the feature without merging other unrelated changes.
 
-# Conclusion
+# When not to cherry-pick
 
-The cherry-pick feature in GitHub Desktop is a powerful tool for managing commits across branches, providing flexibility and precision in your version control workflow. By allowing you to select and apply specific commits, cherry-picking helps streamline the development process, reduce conflicts, and maintain a clean codebase. Whether you're applying hotfixes or backporting features, mastering cherry-picking can significantly enhance your productivity as a developer.
+Cherry-pick copies a commit. It doesn't move it. The new commit has a different hash, so if you later merge the original branch, Git sees the same change twice. Usually it merges cleanly, but not always. For a hotfix or a backport, that's a fair price. If you find yourself cherry-picking most of a branch, merge or rebase it instead.
 
 For more detailed information, refer to the [official GitHub documentation](https://docs.github.com/en/desktop/managing-commits/cherry-picking-a-commit-in-github-desktop).

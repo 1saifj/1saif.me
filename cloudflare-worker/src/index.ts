@@ -238,20 +238,23 @@ async function sendEmail(to: string, subject: string, html: string, text: string
 
 		if (!response.ok) {
 			console.error('Mailtrap API error:', response.status, responseText);
+
 			return false;
 		}
 
 		console.log(`Email sent successfully to ${to}: ${subject}`);
+
 		return true;
 	} catch (error) {
 		console.error('Email sending error:', error);
+
 		return false;
 	}
 }
 
 // Main request handler
 export default {
-	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+	async fetch(request: Request, env: Env): Promise<Response> {
 		// Handle OPTIONS for CORS preflight
 		if (request.method === 'OPTIONS') {
 			return new Response(null, { headers: corsHeaders });
@@ -263,6 +266,7 @@ export default {
 			if (url.pathname === '/send-confirmation') {
 				if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 				const { email, confirmationToken } = await request.json<ConfirmationEmailRequest>();
+
 				if (!email || !confirmationToken) return new Response('Missing email or token', { status: 400 });
 				
 				const { subject, html, text } = emailTemplates.confirmation(email, confirmationToken, env.WEBSITE_DOMAIN);
@@ -274,6 +278,7 @@ export default {
 			if (url.pathname === '/send-welcome') {
 				if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 				const { email, unsubscribeToken } = await request.json<WelcomeEmailRequest>();
+
 				if (!email || !unsubscribeToken) return new Response('Missing email or unsubscribe token', { status: 400 });
 
 				const { subject, html, text } = emailTemplates.welcome(email, unsubscribeToken, env.WEBSITE_DOMAIN);
@@ -285,6 +290,7 @@ export default {
 			if (url.pathname === '/send-unsubscribe') {
 				if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 				const { email } = await request.json<UnsubscribeEmailRequest>();
+
 				if (!email) return new Response('Missing email', { status: 400 });
 
 				const template = emailTemplates.unsubscribe(email);
@@ -425,6 +431,7 @@ export default {
 
 		} catch (error) {
 			console.error('Worker error:', error);
+
 			return new Response(JSON.stringify({
 				error: 'Internal server error',
 				message: error instanceof Error ? error.message : 'Unknown error'
