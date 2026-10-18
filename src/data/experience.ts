@@ -24,7 +24,7 @@ export const experience: Experience[] = [
       'Main author of the backend: integrations with partner platforms, billing callbacks, a content API, and reporting.',
       'Built the Google Cloud infrastructure as code with Pulumi, and a Go service that terminates TLS at the edge.',
       'Set up CI that runs only the affected database tests, k6 load tests before launches, and production alerting.',
-      'Built partner dashboards and timed apps in Arabic, English, and Kurdish.',
+      'Built partner dashboards and timed quiz apps in Arabic, English, and Kurdish.',
     ],
     skills: ['TypeScript', 'Go', 'PostgreSQL', 'Google Cloud', 'Pulumi', 'Next.js'],
     ar: {
@@ -37,7 +37,7 @@ export const experience: Experience[] = [
         'المطوّر الرئيسي للأنظمة الخلفية: التكامل مع منصات الشركاء، واستدعاءات الفوترة، وواجهة برمجية للمحتوى، والتقارير.',
         'بنيت البنية التحتية على Google Cloud ككود باستخدام Pulumi، وخدمة بلغة Go تتولّى TLS على الحافة.',
         'أعددت مسار تكامل مستمر (CI) يشغّل اختبارات قاعدة البيانات المتأثرة بالتغيير فقط، واختبارات حمل بـ k6 قبل كل إطلاق، وتنبيهات للإنتاج.',
-        'بنيت لوحات تحكم للشركاء، وتطبيقات بمؤقّت زمني بالعربية والإنجليزية والكردية.',
+        'بنيت لوحات تحكم للشركاء، وتطبيقات مسابقات بعدّ تنازلي بالعربية والإنجليزية والكردية.',
       ],
     },
   },

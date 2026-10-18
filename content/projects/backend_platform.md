@@ -18,7 +18,7 @@ I lead engineering for a product that partners and their customers use every day
 - Infrastructure as code on Google Cloud with Pulumi: Cloud Run services, Valkey, GitHub OIDC federation, preview environments for pull requests, and production alerts.
 - A Go TLS service at the edge. It reloads its certificate when the files change, and it has k6 load tests.
 - A partner-facing edge API with circuit breakers and scripted deploys and rollbacks.
-- Partner dashboards and timed apps in Arabic, English and Kurdish, with right-to-left layouts.
+- Partner dashboards and timed quiz apps in Arabic, English and Kurdish, with right-to-left layouts.
 
 ## How I work on it
 
@@ -29,4 +29,4 @@ I lead engineering for a product that partners and their customers use every day
 
 ## Stack
 
-TypeScript, Express, PostgreSQL with Drizzle, Redis, Zod, OpenAPI, Next.js, React, Go, Pulumi, Google Cloud, Docker, k6, Playwright, Vitest.
+TypeScript, Express, PostgreSQL with Drizzle, Valkey (Redis-compatible), Zod, OpenAPI, Next.js, React, Go, Pulumi, Google Cloud, Docker, k6, Playwright, Vitest.
