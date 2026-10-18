@@ -14,9 +14,11 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Fonts, images and icons keep their names when they change, so they get a week.
+# Fonts get a year: rename the file whenever its contents change.
 /fonts/*
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images and icons keep their names when they change, so they get a week.
 
 /*.jpg
   Cache-Control: public, max-age=604800
