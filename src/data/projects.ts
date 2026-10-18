@@ -38,6 +38,24 @@ export const projects: Project[] = [
     }
   },
   {
+    "order": 3,
+    "name": "Wusool",
+    "description": "Smart campus transport for University of Kufa students and staff: live bus tracking, digital tickets and clear routes, with a Flutter passenger app, a Flutter driver app that scans QR tickets, and a .NET API.",
+    "url": "https://wusool.to/en",
+    "language": "dart",
+    "wip": true,
+    "isPrivate": true,
+    "sourceType": "private",
+    "role": "Tech lead and founding engineer",
+    "impact": "Took it from the idea and the plan to the product and its launch, inside the University of Kufa technology incubator, and trained its 15-student team",
+    "ar": {
+      "name": "وصول",
+      "description": "نقل جامعي ذكي لطلبة جامعة الكوفة ومنتسبيها: تتبّع مباشر للحافلات، وتذاكر رقمية، ومسارات واضحة، عبر تطبيق Flutter للركّاب، وتطبيق Flutter للسائقين يمسح التذاكر برمز QR، وواجهة برمجية بـ .NET.",
+      "role": "قائد تقني ومهندس مؤسس",
+      "impact": "أخذته من الفكرة والخطة إلى المنتج والإطلاق، ضمن الحاضنة التكنولوجية في جامعة الكوفة، ودرّبت فريقه المكوّن من 15 طالباً"
+    }
+  },
+  {
     "order": 1,
     "name": "Kufa Grad Tracking Platform",
     "description": "Graduate tracking and jobs platform for the University of Kufa: a Go API with notifications, chat and scheduled jobs, a bilingual Next.js web app, and a QA portal for testers.",
@@ -88,23 +106,6 @@ export const projects: Project[] = [
       "description": "المنصة التي يُدار بها هاكاثون جامعة الكوفة: تسجيل الفرق، وتسليم المشاريع، وتوزيع المحكّمين، والإشعارات.",
       "role": "المطوّر الوحيد",
       "impact": "Next.js وSupabase، وتحديثات فورية عبر Realtime وإشعارات FCM، مع اختبارات وحدات واختبارات طرف إلى طرف"
-    }
-  },
-  {
-    "order": 3,
-    "name": "Campus Bus Transit System",
-    "description": "Bus tracking for a university campus: a .NET API, a Flutter passenger app, and a Flutter driver app with QR ticket scanning.",
-    "language": "dart",
-    "wip": false,
-    "isPrivate": true,
-    "sourceType": "company",
-    "role": "Team member",
-    "impact": "Main contributor to the Flutter driver app; hardened identity and authentication on the API",
-    "ar": {
-      "name": "نظام الحافلات الجامعية",
-      "description": "نظام لتتبّع الحافلات في حرم جامعي: واجهة برمجية بـ .NET، وتطبيق Flutter للركّاب، وتطبيق Flutter للسائقين يمسح التذاكر برمز QR.",
-      "role": "عضو في الفريق",
-      "impact": "المساهم الرئيسي في تطبيق السائقين بـ Flutter، وتحصين الهوية والمصادقة في الواجهة البرمجية"
     }
   },
   {
