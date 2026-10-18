@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { toggleTheme } from '../utils/theme'
 import { useLanguage } from '../i18n/language'
 import { InterfaceIcon } from './InterfaceIcon'
+import { SearchButton } from './SearchButton'
 
 const labels = {
   en: { light: 'Light', dark: 'Dark', work: 'Work', blog: 'Writing', resume: 'Résumé', contact: 'Contact', nav: 'Site', switchTo: 'عربي', switchLabel: 'اقرأ بالعربية', home: 'saif.me home' },
@@ -55,7 +56,7 @@ export const SiteHeader: React.FC<{ current?: Section }> = ({ current }) => {
       <div className="notebook-header-inner">
         <BrandLink />
         {renderNav('notebook-desktop-nav')}
-        <div className="notebook-header-actions"><LanguageButton /><ThemeButton /></div>
+        <div className="notebook-header-actions"><SearchButton /><LanguageButton /><ThemeButton /></div>
       </div>
       {renderNav('notebook-mobile-nav')}
     </header>

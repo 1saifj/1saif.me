@@ -4,13 +4,12 @@ import { PersonStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
 import { BrandLink, LanguageButton, ThemeButton } from '../components/SiteHeader'
 import { PostThumb } from '../components/PostThumb'
-import { InterfaceIcon } from '../components/InterfaceIcon'
+import { SearchButton } from '../components/SearchButton'
 import { projects } from '../data/projects'
+import { formatMonth, Job, jobs } from '../data/experience'
 import { postText, publishedBlogs } from '../data/blogs'
 import { createSlugFromTitle } from '../utils/slugUtils'
 import { comma, dateLocale, Language, pick, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
-
-const SearchBox = React.lazy(() => import('../components/SearchBox').then(({ SearchBox: Component }) => ({ default: Component })))
 
 const copy = {
   en: {
@@ -19,12 +18,15 @@ const copy = {
     about: 'About',
     contact: 'Contact',
     menuLabel: 'Sections',
-    search: 'Search',
     name: 'Saif Aljanahi',
     intro: 'I’m a lead software engineer in Al-Najaf, Iraq. I build backend systems, the cloud infrastructure they run on, and the web and mobile apps that use them.',
     bio: <>Since 2021 I have worked on financial software, platforms for the <a href="https://grads.uokufa.edu.iq" target="_blank" rel="noreferrer">University of Kufa</a>, and backend platforms for partner businesses. I also <a href="#blog">write about</a> databases and Go, and I maintain <a href="https://github.com/1saifj/relayrook" target="_blank" rel="noreferrer">RelayRook</a>, an open-source tool for coding agents.</>,
     resume: 'Résumé',
     email: 'Email',
+    experience: 'Experience',
+    projects: 'Projects',
+    present: 'Present',
+    fullResume: 'Full résumé',
     moreWork: 'Other projects',
     allPosts: 'All posts',
     postsNote: '',
@@ -46,12 +48,15 @@ const copy = {
     about: 'عنّي',
     contact: 'التواصل',
     menuLabel: 'الأقسام',
-    search: 'بحث',
     name: 'سيف الجناحي',
     intro: 'قائد هندسة برمجيات في النجف بالعراق. أبني الأنظمة الخلفية والبنية السحابية التي تعمل عليها، وتطبيقات الويب والأجهزة المحمولة التي تستخدمها.',
     bio: <>عملت منذ عام 2021 على برمجيات مالية، ومنصات لـ<a href="https://grads.uokufa.edu.iq" target="_blank" rel="noreferrer">جامعة الكوفة</a>، ومنصات خلفية لشركات شريكة. <a href="#blog">وأكتب</a> عن قواعد البيانات وGo، وأطوّر <a href="https://github.com/1saifj/relayrook" target="_blank" rel="noreferrer">RelayRook</a>، وهي أداة مفتوحة المصدر لوكلاء البرمجة.</>,
     resume: 'السيرة الذاتية',
     email: 'البريد الإلكتروني',
+    experience: 'الخبرة',
+    projects: 'المشاريع',
+    present: 'حتى الآن',
+    fullResume: 'السيرة الذاتية كاملة',
     moreWork: 'مشاريع أخرى',
     allPosts: 'كل المقالات',
     postsNote: 'المقالات مكتوبة بالإنجليزية.',
@@ -79,34 +84,17 @@ function formatDate(timestamp: number, language: Language): string {
 
 export const HomePage: React.FC = () => {
   const { language } = useLanguage()
-  const [searchOpen, setSearchOpen] = useState(false)
   // 'top' is the intro: no nav link is current there.
   const [activeSection, setActiveSection] = useState<(typeof sectionIds)[number] | 'top'>('top')
   const t: Copy = copy[language]
   const visiblePosts = useMemo(() => publishedBlogs.slice(0, 6), [])
-  const featuredProjects = projects.slice(0, 2)
-  const otherProjects = projects.slice(2)
+  const featuredProjects = projects.slice(0, 4)
+  const otherProjects = projects.slice(4)
 
   useEffect(() => {
     const id = window.location.hash.slice(1)
 
     if (id) document.getElementById(id)?.scrollIntoView({ block: 'start' })
-  }, [])
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault()
-        void import('../index.css')
-        setSearchOpen(true)
-      }
-
-      if (event.key === 'Escape') setSearchOpen(false)
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-
-    return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
   useEffect(() => {
@@ -138,11 +126,6 @@ export const HomePage: React.FC = () => {
     window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}#${id}`)
   }
 
-  const openSearch = () => {
-    void import('../index.css')
-    setSearchOpen(true)
-  }
-
   const renderNav = (className: string) => <nav className={className} aria-label={t.menuLabel}>
     {sectionIds.map(id => <a key={id} href={`#${id}`} className={activeSection === id ? 'is-active' : ''} onClick={event => { event.preventDefault(); goTo(id) }}>{t[id]}</a>)}
   </nav>
@@ -157,7 +140,7 @@ export const HomePage: React.FC = () => {
           <BrandLink />
           {renderNav('notebook-desktop-nav')}
           <div className="notebook-header-actions">
-            <button type="button" className="notebook-search-trigger" aria-label={t.search} onClick={openSearch}><InterfaceIcon name="search" /><span>{t.search}</span></button>
+            <SearchButton />
             <LanguageButton />
             <ThemeButton />
           </div>
@@ -189,6 +172,14 @@ export const HomePage: React.FC = () => {
 
           <section id="work" className="notebook-section" aria-labelledby="work-title">
             <h2 id="work-title" className="notebook-section-title">{t.work}</h2>
+            <div className="notebook-section-head">
+              <h3 className="notebook-subtitle notebook-subtitle-first">{t.experience}</h3>
+              <Link to="/resume">{t.fullResume}</Link>
+            </div>
+            <ol className="notebook-timeline">
+              {jobs.map(job => <JobRow key={job.company} job={job} t={t} language={language} />)}
+            </ol>
+            <h3 className="notebook-subtitle">{t.projects}</h3>
             <div className="notebook-work-featured">
               {featuredProjects.map(project => <WorkFeature key={project.name} project={project} t={t} language={language} />)}
             </div>
@@ -236,10 +227,23 @@ export const HomePage: React.FC = () => {
         <p>© {new Date().getFullYear()} {t.name}. {t.footer}</p>
         <p className="notebook-footer-links"><a href="https://github.com/1saifj" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.linkedin.com/in/1saifj" target="_blank" rel="noreferrer">LinkedIn</a><a href="/rss.xml">RSS</a><Link to="/privacy">{t.privacy}</Link></p>
       </footer>
-      {searchOpen && <React.Suspense fallback={null}><SearchBox isOpen={searchOpen} onClose={() => setSearchOpen(false)} /></React.Suspense>}
     </div>
   )
 }
+
+const JobRow: React.FC<{ job: Job; t: Copy; language: Language }> = ({ job, t, language }) => (
+  <li className={job.end ? undefined : 'is-current'}>
+    <p className="notebook-timeline-period"><time dateTime={job.start}>{formatMonth(job.start, language)}</time> – {job.end ? <time dateTime={job.end}>{formatMonth(job.end, language)}</time> : t.present}</p>
+    <div>
+      <h4>{pick(language, job.company, job.companyAr)}</h4>
+      {job.roles.map((role, index) => <p key={role.role} className="notebook-timeline-role">
+        {pick(language, role.role, role.ar.role)}
+        <span> · {pick(language, role.mode, role.ar.mode)}{index > 0 && <> · {formatMonth(role.start, language)} – {role.end ? formatMonth(role.end, language) : t.present}</>}</span>
+      </p>)}
+      <p className="notebook-timeline-summary">{pick(language, job.roles[0].summary, job.roles[0].ar.summary)}</p>
+    </div>
+  </li>
+)
 
 const WorkFeature: React.FC<{ project: (typeof projects)[number]; t: Copy; language: Language }> = ({ project, t, language }) => (
   <article className="notebook-feature">
