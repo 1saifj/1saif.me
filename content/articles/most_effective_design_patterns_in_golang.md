@@ -1,35 +1,15 @@
 ---
 title: Most Effective Design Patterns In Golang
-description: A quick review of the useability of design patterns in Golang.
+description: "Two classic design patterns that still earn their place in Go, Observer and Singleton, with Go code for each."
 createdAt: "2023-06-25"
 updatedAt: 2023-06-25
-featuredImage: "/articles/go_design_patterns_feat.png"
+featuredImage: "/articles/go_design_patterns_feat.jpg"
 tags:
-  - Golang
-  - Design-patterns
-  - Observer pattern
-  - Singleton pattern
-  - Factory Pattern
-  - Builder Pattern
-  - Facade Design
+  - golang
+  - design-patterns
 ---
 
-# Introduction (still writing it)
-
-In the scope of software development. Design patterns are typical solutions to commonly occurring problems in software design.
-They are like pre-made blueprints that you can customize to solve a recurring design problem in your code.
-
-In this article, we will have a quick review of the most effective patterns to be used when coding with Golang.
-
-the most effective ones in my opinion are:
-
-- Observer Pattern
-- Singleton Pattern
-- Factory Pattern
-- Builder Pattern
-- Facade Pattern
-
-
+Design patterns are common answers to problems that keep coming back in software design. Go doesn't need most of the classic catalog, because interfaces, closures and goroutines already cover a lot of it. Two patterns I keep reaching for anyway are Observer and Singleton, so this post covers those two, with Go code for each.
 
 # Observer Pattern
 The Observer pattern is a software design pattern that defines a one-to-many dependency between objects. When one object changes its state, all its dependents are notified and updated automatically.

@@ -1,0 +1,9 @@
+# Old case-study URLs that were renamed or removed. Applied by Cloudflare Pages, so the names never ship in the app.
+/project/subscription-platform-and-cloud-infrastructure /project/backend-platform-and-cloud-infrastructure 301
+/project/salasto-backend-infrastructure /project/backend-platform-and-cloud-infrastructure 301
+/project/al-qaseh-financial-backend-system /project/al-qaseh-financial-services 301
+/project/antigravity-agent / 301
+/project/ublock-origin-ai / 301
+/project/information-bank-smart-app / 301
+/project/morabaa-software-solutions-frontend / 301
+/project/al-aaml-frontend-development / 301

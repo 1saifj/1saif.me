@@ -1,9 +1,9 @@
 ---
 title: "Flutter State Management: Comparing Provider, Riverpod, and Bloc"
-description: "A comprehensive comparison of popular state management solutions for Flutter applications."
+description: "Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app."
 createdAt: "2024-03-10"
 updatedAt: 2024-03-10
-featuredImage: "/articles/flutter_state_mgt_feat.png"
+featuredImage: "/articles/flutter_state_mgt_feat.jpg"
 tags:
   - mobile
   - flutter
@@ -13,11 +13,11 @@ tags:
 
 # Flutter State Management: Comparing Provider, Riverpod, and Bloc
 
-State management is one of the most critical aspects of building Flutter applications. In this article, I'll compare three popular state management solutions — Provider, Riverpod, and Bloc — based on my experience implementing them in real-world projects.
+Every Flutter project I start comes to the same question early: how do we manage state? I've used Provider, Riverpod and Bloc in real projects, and each one fits a different kind of app. Here's how they compare.
 
 ## The Importance of State Management
 
-Before diving into specific solutions, let's understand why state management matters. Flutter applications can have various types of state:
+First, what kind of state are we talking about? Flutter applications can have various types of state:
 
 - **Ephemeral state**: Short-lived state that belongs to a single widget (e.g., animation state)
 - **App state**: State shared across multiple widgets (e.g., user authentication status)
@@ -204,15 +204,15 @@ ElevatedButton(
 Based on my experience:
 
 - **Use Provider** for simple to medium complexity apps
-- **Use Riverpod** when you need more robust state management with type safety
+- **Use Riverpod** when you want type safety and state that does not depend on the widget tree
 - **Use Bloc** for large applications with complex business logic, especially in teams
 
 ## Performance Considerations
 
 In my testing, I've found that for most applications, performance differences between these solutions are negligible. The choice should be based on your project needs and team familiarity rather than performance alone.
 
-## Conclusion
+## Which one I'd pick
 
-There's no one-size-fits-all solution for state management in Flutter. Each approach has its strengths and weaknesses. I recommend starting with Provider for simpler applications and considering Riverpod or Bloc as your application grows in complexity.
+There's no single right answer. I recommend starting with Provider for simpler applications and considering Riverpod or Bloc as your application grows in complexity.
 
-Remember, the best state management solution is the one that makes your code more maintainable and understandable for your specific use case. 
+Whichever you pick, pick it early and use it the same way everywhere. A project with two state management styles is harder to work on than one with the "wrong" one used consistently. 

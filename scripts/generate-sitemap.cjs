@@ -1,8 +1,11 @@
 const fs = require('fs');
+
 const path = require('path');
 
 const SITE_URL = 'https://1saif.me';
+
 const CONTENT_DIR = path.join(__dirname, '../content/articles');
+
 const OUTPUT_FILE = path.join(__dirname, '../public/sitemap.xml');
 
 // Read markdown files and extract metadata
@@ -21,7 +24,7 @@ function parseMarkdownMetadata(filePath) {
   metadataLines.forEach(line => {
     if (line.includes(':') && !line.startsWith(' ')) {
       const [key, ...valueParts] = line.split(':');
-      const value = valueParts.join(':').trim().replace(/['"]/g, '');
+      const value = valueParts.join(':').trim().replace(/^(['"])(.*)\1$/, '$2');
       
       if (value) {
         metadata[key.trim()] = value;
@@ -38,9 +41,9 @@ function parseMarkdownMetadata(filePath) {
   return metadata;
 }
 
-// Generate slug from filename
-function getSlugFromFilename(filename) {
-  return filename.replace('.md', '').replace(/_/g, '-');
+// Same rule as src/utils/slugUtils.ts, so feed links match the site's routes
+function slugify(title) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
 // Get all blog posts
@@ -54,7 +57,7 @@ function getBlogPosts() {
       const metadata = parseMarkdownMetadata(filePath);
       
       if (metadata) {
-        const slug = getSlugFromFilename(file);
+        const slug = slugify(metadata.title || file.replace('.md', ''));
         const stats = fs.statSync(filePath);
         
         posts.push({
@@ -79,11 +82,8 @@ function generateSitemap(posts) {
   
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
     
     <!-- Homepage -->
     <url>
@@ -106,14 +106,6 @@ function generateSitemap(posts) {
         <priority>0.9</priority>
     </url>
     
-    <!-- Projects -->
-    <url>
-        <loc>${SITE_URL}/projects</loc>
-        <lastmod>${now}T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
     <!-- Resume -->
     <url>
         <loc>${SITE_URL}/resume</loc>
@@ -122,36 +114,38 @@ function generateSitemap(posts) {
         <priority>0.7</priority>
     </url>
     
-    <!-- Contact -->
+    <!-- Privacy -->
     <url>
-        <loc>${SITE_URL}/contact</loc>
+        <loc>${SITE_URL}/privacy</loc>
         <lastmod>${now}T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
     </url>
 `;
+
+  // Add project case studies
+  const projectsSource = fs.readFileSync(path.join(__dirname, '../src/data/projects.ts'), 'utf-8');
+  [...projectsSource.matchAll(/^    "name": "(.*)",$/gm)].forEach(([, name]) => {
+    xml += `
+    <url>
+        <loc>${SITE_URL}/project/${slugify(name)}</loc>
+        <lastmod>${now}T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+`;
+  });
 
   // Add blog posts
   posts.forEach(post => {
     const imageUrl = post.featuredImage ? `${SITE_URL}${post.featuredImage}` : '';
-    const keywords = post.tags.join(', ');
     
     xml += `    
-    <!-- ${post.title} -->
     <url>
         <loc>${SITE_URL}/blog/${post.slug}</loc>
         <lastmod>${post.updatedAt}T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-        <news:news>
-            <news:publication>
-                <news:name>Saif Aljanahi</news:name>
-                <news:language>en</news:language>
-            </news:publication>
-            <news:publication_date>${post.createdAt}T00:00:00+00:00</news:publication_date>
-            <news:title>${escapeXml(post.title)}</news:title>
-            <news:keywords>${escapeXml(keywords)}</news:keywords>
-        </news:news>${imageUrl ? `
+        <priority>0.8</priority>${imageUrl ? `
         <image:image>
             <image:loc>${escapeXml(imageUrl)}</image:loc>
             <image:caption>${escapeXml(post.description)}</image:caption>
@@ -191,7 +185,10 @@ try {
   const posts = getBlogPosts();
   console.log(`Found ${posts.length} blog posts`);
   
-  const sitemap = generateSitemap(posts);
+  // Every page also exists in Arabic under /ar; list each one next to its English entry.
+  const sitemap = generateSitemap(posts).replace(/(\s*<url>\s*<loc>)https:\/\/1saif\.me(\/[^<]*)(<\/loc>[\s\S]*?<\/url>)/g, (entry, open, page, rest) =>
+    page.endsWith('.xml') ? entry : `${entry}${open}${SITE_URL}/ar${page === '/' ? '' : page}${rest}`);
+
   fs.writeFileSync(OUTPUT_FILE, sitemap);
   
   console.log(`✅ Sitemap generated successfully at ${OUTPUT_FILE}`);

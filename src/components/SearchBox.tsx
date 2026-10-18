@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { MagnifyingGlass, X, FileText, User, Briefcase, Command, ArrowRight, Clock, Tag } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom'
-import { useAnalytics } from './Analytics'
 import { publishedBlogs } from '../data/blogs'
 import { projects } from '../data/projects'
 import { createSlugFromTitle } from '../utils/slugUtils'
@@ -22,7 +21,6 @@ interface SearchBoxProps {
 }
 
 export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
- const { trackEvent } = useAnalytics()
  const navigate = useNavigate()
  const [query, setQuery] = useState('')
  const [results, setResults] = useState<SearchResult[]>([])
@@ -50,7 +48,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  title: project.name,
  type: 'project' as const,
  description: project.description,
- url: `/projects#${project.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+ url: `/project/${project.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`,
  tags: [project.language, project.sourceType, 'code', 'development', 'portfolio', 'project'].filter(Boolean),
  priority: 9
  })),
@@ -69,7 +67,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  title: 'Projects Portfolio',
  type: 'page',
  description: 'Explore my portfolio of software projects, technical implementations, and creative solutions. See real-world applications and code examples.',
- url: '/#projects',
+ url: '/#work',
  tags: ['portfolio', 'code', 'development', 'showcase', 'work', 'implementations', 'solutions', 'applications', 'projects'],
  priority: 8
  },
@@ -371,7 +369,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  const queryWords = queryLower.split(' ').filter(word => word.length > 0)
  
  return searchData
- .map(item => {
+ .flatMap(item => {
  let score = 0
  const titleLower = item.title.toLowerCase()
  const descLower = item.description.toLowerCase()
@@ -391,6 +389,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  // Individual word matching in title (for multi-word queries)
  queryWords.forEach(word => {
  if (titleLower.includes(word)) score += 150
+
  if (descLower.includes(word)) score += 50
  })
  
@@ -398,7 +397,9 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  if (item.tags) {
  item.tags.forEach(tag => {
  const tagLower = tag.toLowerCase()
+
  if (tagLower === queryLower) score += 400
+
  if (tagLower.includes(queryLower)) score += 150
  queryWords.forEach(word => {
  if (tagLower.includes(word)) score += 75
@@ -414,12 +415,15 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  if (titleWord.startsWith(queryWord.substring(0, Math.min(3, queryWord.length)))) {
  score += 50
  }
+
  // Similar length words with character overlap
  if (Math.abs(titleWord.length - queryWord.length) <= 2) {
  let overlap = 0
+
  for (let i = 0; i < Math.min(titleWord.length, queryWord.length); i++) {
  if (titleWord[i] === queryWord[i]) overlap++
  }
+
  if (overlap >= Math.min(titleWord.length, queryWord.length) * 0.6) {
  score += 30
  }
@@ -430,9 +434,8 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  // Add priority bonus
  score += item.priority * 5
  
- return { ...item, score }
+ return score > 0 ? [{ ...item, score }] : []
  })
- .filter(item => item.score > 0)
  .sort((a, b) => b.score - a.score)
  .slice(0, 8) // Increased from 6 to 8 for more results
  }, [])
@@ -441,16 +444,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  const searchResults = searchFunction(searchQuery)
  setResults(searchResults)
  setSelectedIndex(0)
- 
- if (searchQuery.trim()) {
- trackEvent({
- action: 'search',
- category: 'navigation',
- label: searchQuery,
- value: searchResults.length
- })
- }
- }, [searchFunction, trackEvent])
+ }, [searchFunction])
 
  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
  const value = e.target.value
@@ -465,15 +459,11 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  query,
  ...recentSearches.filter(s => s !== query)
  ].slice(0, 5)
+
  setRecentSearches(newRecentSearches)
  localStorage.setItem('portfolio-recent-searches', JSON.stringify(newRecentSearches))
  }
  
- trackEvent({
- action: 'search_result_click',
- category: 'navigation',
- label: `${result.type}:${result.title}`
- })
  
  navigate(result.url)
  onClose()
@@ -491,9 +481,11 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  break
  case 'Enter':
  e.preventDefault()
+
  if (results[selectedIndex]) {
  handleResultClick(results[selectedIndex])
  }
+
  break
  case 'Escape':
  onClose()
@@ -524,6 +516,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ isOpen, onClose }) => {
  // Load recent searches on mount
  useEffect(() => {
  const saved = localStorage.getItem('portfolio-recent-searches')
+
  if (saved) {
  try {
  setRecentSearches(JSON.parse(saved))

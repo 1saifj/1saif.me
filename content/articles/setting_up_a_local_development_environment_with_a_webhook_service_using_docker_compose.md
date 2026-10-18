@@ -1,9 +1,9 @@
 ---
 title: Setting Up a Local Development Environment with a Webhook Service using Docker Compose
-description: Learn how to set up a local development environment for a Node.js application with a webhook service using Docker Compose, including MongoDB and Nginx as a reverse proxy.
+description: "One docker-compose file that runs a Node.js app, a webhook service, MongoDB and Nginx as a reverse proxy, so every developer starts the same stack with one command."
 createdAt: "2024-09-02"
 updatedAt: 2023-09-02
-featuredImage: "/articles/docker_feat.png"
+featuredImage: "/articles/docker_feat.jpg"
 tags:
   - docker
   - docker-compose
@@ -12,9 +12,7 @@ tags:
   - development
 ---
 
-# Introduction
-
-In modern web development, webhooks play a crucial role in enabling real-time communication between different services. Setting up a local development environment that includes a webhook service can be daunting due to multiple dependencies and configurations. Docker Compose simplifies this process by managing multiple services through a single configuration file. This guide will walk you through setting up a local development environment for a Node.js application that includes a webhook service, MongoDB, and Nginx as a reverse proxy.
+Working on an app that sends or receives webhooks means running more than one thing locally: the app, the service that handles the webhooks, a database, and usually a proxy in front. Starting them by hand in four terminals gets old fast, and every new developer sets them up a little differently. Docker Compose puts all of it in one file. Here's the setup I use for a Node.js app with a webhook service, MongoDB, and Nginx as a reverse proxy.
 
 # The problem we want to solve
 
@@ -273,11 +271,9 @@ docker-compose up --build
 
 This command will build and start all defined services.
 
-# Conclusion
+# Wrapping it up
 
-Using Docker Compose to set up your local development environment simplifies the process of managing multiple services and their dependencies. The outlined steps provide a clear path for creating a robust environment, ensuring smooth and efficient development workflows. By following this guide, you now have a reliable setup with a Node.js application, webhook service, MongoDB, and Nginx as a reverse proxy.
-
-Feel free to customize and extend this setup to fit your specific needs.
+Now `docker-compose up --build` starts the whole stack, and `docker-compose down` stops it. Every developer gets the same versions and the same ports, and a new person on the team is running in minutes instead of an afternoon. Add services to the file as the project grows, like Redis or a mail catcher for testing emails.
 
 # References
 

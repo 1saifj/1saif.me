@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Saif Aljanahi Blog</title>
-  <subtitle>Full-Stack Software Engineer specializing in Golang, Python, Flutter, and modern web technologies</subtitle>
+  <subtitle>Notes from a lead software engineer in Al-Najaf, Iraq, on backend platforms, Go, PostgreSQL, cloud infrastructure and Flutter.</subtitle>
   <link href="https://1saif.me/blog" rel="alternate"/>
   <link href="https://1saif.me/atom.xml" rel="self"/>
   <id>https://1saif.me/blog</id>
-  <updated>2025-04-10T00:00:00.000Z</updated>
+  <updated>2026-03-14T00:00:00.000Z</updated>
   <author>
     <name>Saif Aljanahi</name>
     <email>saifalialjanahi@gmail.com</email>
@@ -15,18 +15,298 @@
   <icon>https://1saif.me/favicon.png</icon>
 
   <entry>
+    <title>Locking Down a Small VM Without Spending Money</title>
+    <link href="https://1saif.me/blog/locking-down-a-small-vm-without-spending-money" rel="alternate"/>
+    <id>https://1saif.me/blog/locking-down-a-small-vm-without-spending-money</id>
+    <published>2026-03-14T00:00:00.000Z</published>
+    <updated>2026-03-14T00:00:00.000Z</updated>
+    <summary>The baseline I use for production VMs. SSH keys, no root login, a private WireGuard path for admin access, fail2ban, a firewall, and a way back in if I lock myself out.</summary>
+    <content type="html"><![CDATA[
+      <p>The baseline I use for production VMs. SSH keys, no root login, a private WireGuard path for admin access, fail2ban, a firewall, and a way back in if I lock myself out.</p>
+      <img src="https://1saif.me/articles/locking_down_vm_feat.jpg" alt="Locking Down a Small VM Without Spending Money" />
+      <p><a href="https://1saif.me/blog/locking-down-a-small-vm-without-spending-money">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="security"/>
+    <category term="linux"/>
+    <category term="devops"/>
+    <category term="wireguard"/>
+    <category term="ssh"/>
+  </entry>
+
+  <entry>
+    <title>My Coding Agent Was Slow, and It Was grep</title>
+    <link href="https://1saif.me/blog/my-coding-agent-was-slow-and-it-was-grep" rel="alternate"/>
+    <id>https://1saif.me/blog/my-coding-agent-was-slow-and-it-was-grep</id>
+    <published>2026-02-07T00:00:00.000Z</published>
+    <updated>2026-06-29T00:00:00.000Z</updated>
+    <summary>I blamed the model, the context window and the API. The real problem was the search tool the agent used for code search. What I changed, why aliasing grep needs care, and why the harness matters more than the model.</summary>
+    <content type="html"><![CDATA[
+      <p>I blamed the model, the context window and the API. The real problem was the search tool the agent used for code search. What I changed, why aliasing grep needs care, and why the harness matters more than the model.</p>
+      <img src="https://1saif.me/articles/agent_ripgrep_feat.jpg" alt="My Coding Agent Was Slow, and It Was grep" />
+      <p><a href="https://1saif.me/blog/my-coding-agent-was-slow-and-it-was-grep">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="ai"/>
+    <category term="developer-tools"/>
+    <category term="productivity"/>
+    <category term="macos"/>
+  </entry>
+
+  <entry>
+    <title>API Errors in Arabic and English with RFC 9457</title>
+    <link href="https://1saif.me/blog/api-errors-in-arabic-and-english-with-rfc-9457" rel="alternate"/>
+    <id>https://1saif.me/blog/api-errors-in-arabic-and-english-with-rfc-9457</id>
+    <published>2025-12-16T00:00:00.000Z</published>
+    <updated>2025-12-16T00:00:00.000Z</updated>
+    <summary>How I return errors that a user can read in their own language and a developer can still trace, using Problem Details, a small message catalog and the Accept-Language header.</summary>
+    <content type="html"><![CDATA[
+      <p>How I return errors that a user can read in their own language and a developer can still trace, using Problem Details, a small message catalog and the Accept-Language header.</p>
+      <img src="https://1saif.me/articles/rfc9457_errors_feat.jpg" alt="API Errors in Arabic and English with RFC 9457" />
+      <p><a href="https://1saif.me/blog/api-errors-in-arabic-and-english-with-rfc-9457">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="api"/>
+    <category term="backend"/>
+    <category term="i18n"/>
+    <category term="nodejs"/>
+    <category term="typescript"/>
+  </entry>
+
+  <entry>
+    <title>Give Every Request an ID You Can Follow</title>
+    <link href="https://1saif.me/blog/give-every-request-an-id-you-can-follow" rel="alternate"/>
+    <id>https://1saif.me/blog/give-every-request-an-id-you-can-follow</id>
+    <published>2025-11-10T00:00:00.000Z</published>
+    <updated>2025-11-10T00:00:00.000Z</updated>
+    <summary>When a strange bug shows up in production, the first question is what happened to that one request. A request ID in the context, a logger that carries it, and cancellation that actually stops work.</summary>
+    <content type="html"><![CDATA[
+      <p>When a strange bug shows up in production, the first question is what happened to that one request. A request ID in the context, a logger that carries it, and cancellation that actually stops work.</p>
+      <img src="https://1saif.me/articles/request_id_feat.jpg" alt="Give Every Request an ID You Can Follow" />
+      <p><a href="https://1saif.me/blog/give-every-request-an-id-you-can-follow">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="golang"/>
+    <category term="backend"/>
+    <category term="observability"/>
+    <category term="logging"/>
+  </entry>
+
+  <entry>
+    <title>Getting Your Work Back After git reset --hard</title>
+    <link href="https://1saif.me/blog/getting-your-work-back-after-git-reset-hard" rel="alternate"/>
+    <id>https://1saif.me/blog/getting-your-work-back-after-git-reset-hard</id>
+    <published>2025-10-07T00:00:00.000Z</published>
+    <updated>2025-10-07T00:00:00.000Z</updated>
+    <summary>Git keeps more than you think. How to use the reflog to undo a reset, what it can&apos;t bring back, and a few habits that make these moments boring.</summary>
+    <content type="html"><![CDATA[
+      <p>Git keeps more than you think. How to use the reflog to undo a reset, what it can&apos;t bring back, and a few habits that make these moments boring.</p>
+      <img src="https://1saif.me/articles/git_reflog_feat.jpg" alt="Getting Your Work Back After git reset --hard" />
+      <p><a href="https://1saif.me/blog/getting-your-work-back-after-git-reset-hard">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="git"/>
+    <category term="version-control"/>
+    <category term="developer-tools"/>
+  </entry>
+
+  <entry>
+    <title>A Simple CI/CD Pipeline for a Small VPS</title>
+    <link href="https://1saif.me/blog/a-simple-ci-cd-pipeline-for-a-small-vps" rel="alternate"/>
+    <id>https://1saif.me/blog/a-simple-ci-cd-pipeline-for-a-small-vps</id>
+    <published>2025-08-26T00:00:00.000Z</published>
+    <updated>2026-10-18T00:00:00.000Z</updated>
+    <summary>The pipeline I used for the University of Kufa graduate tracking system. GitHub Actions builds the image, GHCR stores it, Watchtower deploys it, Shoutrrr tells me what happened, and Infisical keeps the secrets out of the repo.</summary>
+    <content type="html"><![CDATA[
+      <p>The pipeline I used for the University of Kufa graduate tracking system. GitHub Actions builds the image, GHCR stores it, Watchtower deploys it, Shoutrrr tells me what happened, and Infisical keeps the secrets out of the repo.</p>
+      <img src="https://1saif.me/articles/vps_pipeline_feat.jpg" alt="A Simple CI/CD Pipeline for a Small VPS" />
+      <p><a href="https://1saif.me/blog/a-simple-ci-cd-pipeline-for-a-small-vps">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="devops"/>
+    <category term="ci-cd"/>
+    <category term="docker"/>
+    <category term="github-actions"/>
+  </entry>
+
+  <entry>
+    <title>Audit Logs Are Built for a Different Job</title>
+    <link href="https://1saif.me/blog/audit-logs-are-built-for-a-different-job" rel="alternate"/>
+    <id>https://1saif.me/blog/audit-logs-are-built-for-a-different-job</id>
+    <published>2025-07-23T00:00:00.000Z</published>
+    <updated>2025-07-23T00:00:00.000Z</updated>
+    <summary>Who did what, to which record, and when. How an audit log differs from application logs, a PostgreSQL design that records every change in the same transaction, and how to keep the log append-only.</summary>
+    <content type="html"><![CDATA[
+      <p>Who did what, to which record, and when. How an audit log differs from application logs, a PostgreSQL design that records every change in the same transaction, and how to keep the log append-only.</p>
+      <img src="https://1saif.me/articles/audit_log_feat.jpg" alt="Audit Logs Are Built for a Different Job" />
+      <p><a href="https://1saif.me/blog/audit-logs-are-built-for-a-different-job">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="security"/>
+    <category term="postgresql"/>
+    <category term="backend"/>
+    <category term="compliance"/>
+  </entry>
+
+  <entry>
+    <title>Keeping Flutter Smooth with Isolates</title>
+    <link href="https://1saif.me/blog/keeping-flutter-smooth-with-isolates" rel="alternate"/>
+    <id>https://1saif.me/blog/keeping-flutter-smooth-with-isolates</id>
+    <published>2025-06-10T00:00:00.000Z</published>
+    <updated>2025-06-10T00:00:00.000Z</updated>
+    <summary>Heavy work on the main isolate freezes the UI. When to move it off with Isolate.run, what you can and can&apos;t send across, a long-lived worker for repeated jobs, and the web caveat.</summary>
+    <content type="html"><![CDATA[
+      <p>Heavy work on the main isolate freezes the UI. When to move it off with Isolate.run, what you can and can&apos;t send across, a long-lived worker for repeated jobs, and the web caveat.</p>
+      <img src="https://1saif.me/articles/flutter_isolates_feat.jpg" alt="Keeping Flutter Smooth with Isolates" />
+      <p><a href="https://1saif.me/blog/keeping-flutter-smooth-with-isolates">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="flutter"/>
+    <category term="dart"/>
+    <category term="performance"/>
+    <category term="mobile"/>
+  </entry>
+
+  <entry>
+    <title>What Happens When Your Database Crashes Mid-Transaction</title>
+    <link href="https://1saif.me/blog/what-happens-when-your-database-crashes-mid-transaction" rel="alternate"/>
+    <id>https://1saif.me/blog/what-happens-when-your-database-crashes-mid-transaction</id>
+    <published>2025-05-31T00:00:00.000Z</published>
+    <updated>2025-05-31T00:00:00.000Z</updated>
+    <summary>The write-ahead log is why a committed transaction survives a power cut. How PostgreSQL uses it to recover, why it has no undo step, and how the same log powers replication and tools like Supabase Realtime.</summary>
+    <content type="html"><![CDATA[
+      <p>The write-ahead log is why a committed transaction survives a power cut. How PostgreSQL uses it to recover, why it has no undo step, and how the same log powers replication and tools like Supabase Realtime.</p>
+      <img src="https://1saif.me/articles/wal_recovery_feat.jpg" alt="What Happens When Your Database Crashes Mid-Transaction" />
+      <p><a href="https://1saif.me/blog/what-happens-when-your-database-crashes-mid-transaction">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="postgresql"/>
+    <category term="database"/>
+    <category term="backend"/>
+  </entry>
+
+  <entry>
+    <title>git checkout, switch, or restore?</title>
+    <link href="https://1saif.me/blog/git-checkout-switch-or-restore" rel="alternate"/>
+    <id>https://1saif.me/blog/git-checkout-switch-or-restore</id>
+    <published>2025-04-15T00:00:00.000Z</published>
+    <updated>2025-04-15T00:00:00.000Z</updated>
+    <summary>git checkout does two unrelated jobs, and that&apos;s why it surprises people. What git switch and git restore split out, the commands you&apos;ll actually use, and the one checkout habit worth dropping.</summary>
+    <content type="html"><![CDATA[
+      <p>git checkout does two unrelated jobs, and that&apos;s why it surprises people. What git switch and git restore split out, the commands you&apos;ll actually use, and the one checkout habit worth dropping.</p>
+      <img src="https://1saif.me/articles/git_switch_restore_feat.jpg" alt="git checkout, switch, or restore?" />
+      <p><a href="https://1saif.me/blog/git-checkout-switch-or-restore">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="git"/>
+    <category term="version-control"/>
+    <category term="developer-tools"/>
+  </entry>
+
+  <entry>
+    <title>Metaprogramming in Go: Generate, Reflect, or Generics</title>
+    <link href="https://1saif.me/blog/metaprogramming-in-go-generate-reflect-or-generics" rel="alternate"/>
+    <id>https://1saif.me/blog/metaprogramming-in-go-generate-reflect-or-generics</id>
+    <published>2025-04-15T00:00:00.000Z</published>
+    <updated>2025-04-15T00:00:00.000Z</updated>
+    <summary>Go has no macros, but it does have three ways to write code that works on other code. What go generate, the reflect package and generics are each good at, with a small example of each.</summary>
+    <content type="html"><![CDATA[
+      <p>Go has no macros, but it does have three ways to write code that works on other code. What go generate, the reflect package and generics are each good at, with a small example of each.</p>
+      <img src="https://1saif.me/articles/go_metaprogramming_feat.jpg" alt="Metaprogramming in Go: Generate, Reflect, or Generics" />
+      <p><a href="https://1saif.me/blog/metaprogramming-in-go-generate-reflect-or-generics">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="golang"/>
+    <category term="code-generation"/>
+    <category term="software-design"/>
+  </entry>
+
+  <entry>
+    <title>Interfaces in Go: Keep Them Small</title>
+    <link href="https://1saif.me/blog/interfaces-in-go-keep-them-small" rel="alternate"/>
+    <id>https://1saif.me/blog/interfaces-in-go-keep-them-small</id>
+    <published>2025-04-13T00:00:00.000Z</published>
+    <updated>2025-04-13T00:00:00.000Z</updated>
+    <summary>A refactor that started with a nine-method IKeycloakConfig interface. What was wrong with it, what replaced it, and the Go habits behind the change.</summary>
+    <content type="html"><![CDATA[
+      <p>A refactor that started with a nine-method IKeycloakConfig interface. What was wrong with it, what replaced it, and the Go habits behind the change.</p>
+      <img src="https://1saif.me/articles/go_interfaces_feat.jpg" alt="Interfaces in Go: Keep Them Small" />
+      <p><a href="https://1saif.me/blog/interfaces-in-go-keep-them-small">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="golang"/>
+    <category term="software-design"/>
+    <category term="refactoring"/>
+  </entry>
+
+  <entry>
+    <title>Being Good at Code Isn&apos;t Enough</title>
+    <link href="https://1saif.me/blog/being-good-at-code-isn-t-enough" rel="alternate"/>
+    <id>https://1saif.me/blog/being-good-at-code-isn-t-enough</id>
+    <published>2025-04-12T00:00:00.000Z</published>
+    <updated>2025-04-12T00:00:00.000Z</updated>
+    <summary>Every team wants clean code and strong delivery. The part that gets ignored is being easy to work with. What that looks like in code reviews, and why it decides how a team performs.</summary>
+    <content type="html"><![CDATA[
+      <p>Every team wants clean code and strong delivery. The part that gets ignored is being easy to work with. What that looks like in code reviews, and why it decides how a team performs.</p>
+      <img src="https://1saif.me/articles/teamwork_review_feat.jpg" alt="Being Good at Code Isn&apos;t Enough" />
+      <p><a href="https://1saif.me/blog/being-good-at-code-isn-t-enough">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="engineering-culture"/>
+    <category term="teamwork"/>
+    <category term="code-review"/>
+  </entry>
+
+  <entry>
     <title>Preventing Duplicate Transactions with Database Locking Strategies in Financial Systems</title>
-    <link href="https://1saif.me/blog/prevent-duplicates-trx-with-database-locking-strategies" rel="alternate"/>
-    <id>https://1saif.me/blog/prevent-duplicates-trx-with-database-locking-strategies</id>
+    <link href="https://1saif.me/blog/preventing-duplicate-transactions-with-database-locking-strategies-in-financial-systems" rel="alternate"/>
+    <id>https://1saif.me/blog/preventing-duplicate-transactions-with-database-locking-strategies-in-financial-systems</id>
     <published>2025-04-10T00:00:00.000Z</published>
     <updated>2025-04-10T00:00:00.000Z</updated>
-    <summary>Introduction
-
-When building financial systems, processing transactions exactly once is critical. Too often, developers overlook the complexities of concurrent processing, leading to duplicate transactions that can have serious consequences. In this article, I&apos;ll share how we solved a challenging...</summary>
+    <summary>A card-issuing service that sometimes processed the same request twice. How optimistic and pessimistic locking stopped the duplicates, and when to use each.</summary>
     <content type="html"><![CDATA[
-      <p>Learn how to solve race conditions in financial applications using optimistic and pessimistic locking techniques with a real-world case study of a card issuing system.</p>
-      <img src="https://1saif.me/articles/database-locking/db_locks_feat.png" alt="Preventing Duplicate Transactions with Database Locking Strategies in Financial Systems" />
-      <p><a href="https://1saif.me/blog/prevent-duplicates-trx-with-database-locking-strategies">Read more...</a></p>
+      <p>A card-issuing service that sometimes processed the same request twice. How optimistic and pessimistic locking stopped the duplicates, and when to use each.</p>
+      <img src="https://1saif.me/articles/database-locking/db_locks_feat.jpg" alt="Preventing Duplicate Transactions with Database Locking Strategies in Financial Systems" />
+      <p><a href="https://1saif.me/blog/preventing-duplicate-transactions-with-database-locking-strategies-in-financial-systems">Read more...</a></p>
     ]]></content>
     <author>
       <name>Saif Aljanahi</name>
@@ -40,18 +320,171 @@ When building financial systems, processing transactions exactly once is critica
   </entry>
 
   <entry>
-    <title>Database Migrations Done Right: Git-Style Version Control for Your Schema</title>
-    <link href="https://1saif.me/blog/best-cicd-for-databases-migrations" rel="alternate"/>
-    <id>https://1saif.me/blog/best-cicd-for-databases-migrations</id>
-    <published>2025-01-22T00:00:00.000Z</published>
-    <updated>2025-01-22T00:00:00.000Z</updated>
-    <summary>The Database Migration Crisis Every Developer Faces
-
-Picture this: It&apos;s Friday evening, you&apos;re about to deploy your feature to production, and suddenly you realize three different developers have made conflicting database changes. Sarah added a new user profile table, Mike modified the orders sch...</summary>
+    <title>Running a Cron Job Once When You Have Many Instances</title>
+    <link href="https://1saif.me/blog/running-a-cron-job-once-when-you-have-many-instances" rel="alternate"/>
+    <id>https://1saif.me/blog/running-a-cron-job-once-when-you-have-many-instances</id>
+    <published>2025-04-08T00:00:00.000Z</published>
+    <updated>2025-04-08T00:00:00.000Z</updated>
+    <summary>Scale a Go service to three instances and every scheduled job runs three times. How a Redis key fixes that, the two holes in the simple SETNX version, and why the job should still be safe to run twice.</summary>
     <content type="html"><![CDATA[
-      <p>Transform your database deployment chaos into elegant, version-controlled workflows. Learn battle-tested strategies for managing schema changes across teams and environments with zero downtime.</p>
-      <img src="https://1saif.me/articles/db_cicd_feat.png" alt="Database Migrations Done Right: Git-Style Version Control for Your Schema" />
-      <p><a href="https://1saif.me/blog/best-cicd-for-databases-migrations">Read more...</a></p>
+      <p>Scale a Go service to three instances and every scheduled job runs three times. How a Redis key fixes that, the two holes in the simple SETNX version, and why the job should still be safe to run twice.</p>
+      <img src="https://1saif.me/articles/cron_lock_feat.jpg" alt="Running a Cron Job Once When You Have Many Instances" />
+      <p><a href="https://1saif.me/blog/running-a-cron-job-once-when-you-have-many-instances">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="golang"/>
+    <category term="redis"/>
+    <category term="backend"/>
+    <category term="concurrency"/>
+  </entry>
+
+  <entry>
+    <title>Stress Testing a REST API with k6</title>
+    <link href="https://1saif.me/blog/stress-testing-a-rest-api-with-k6" rel="alternate"/>
+    <id>https://1saif.me/blog/stress-testing-a-rest-api-with-k6</id>
+    <published>2025-04-03T00:00:00.000Z</published>
+    <updated>2025-04-03T00:00:00.000Z</updated>
+    <summary>How I use k6 to find out where an API breaks before users do. A first script, stages and thresholds that fail the build, the difference between virtual users and requests per second, and what to watch while it runs.</summary>
+    <content type="html"><![CDATA[
+      <p>How I use k6 to find out where an API breaks before users do. A first script, stages and thresholds that fail the build, the difference between virtual users and requests per second, and what to watch while it runs.</p>
+      <img src="https://1saif.me/articles/k6_load_feat.jpg" alt="Stress Testing a REST API with k6" />
+      <p><a href="https://1saif.me/blog/stress-testing-a-rest-api-with-k6">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="testing"/>
+    <category term="performance"/>
+    <category term="backend"/>
+    <category term="api"/>
+  </entry>
+
+  <entry>
+    <title>Transaction Isolation Levels in PostgreSQL, With Examples</title>
+    <link href="https://1saif.me/blog/transaction-isolation-levels-in-postgresql-with-examples" rel="alternate"/>
+    <id>https://1saif.me/blog/transaction-isolation-levels-in-postgresql-with-examples</id>
+    <published>2025-04-02T00:00:00.000Z</published>
+    <updated>2025-04-02T00:00:00.000Z</updated>
+    <summary>Strange bugs from concurrent requests often come down to how the database isolates transactions. What each PostgreSQL level protects you from, a lost update you can reproduce in two terminals, and how to retry when the database says no.</summary>
+    <content type="html"><![CDATA[
+      <p>Strange bugs from concurrent requests often come down to how the database isolates transactions. What each PostgreSQL level protects you from, a lost update you can reproduce in two terminals, and how to retry when the database says no.</p>
+      <img src="https://1saif.me/articles/isolation_levels_feat.jpg" alt="Transaction Isolation Levels in PostgreSQL, With Examples" />
+      <p><a href="https://1saif.me/blog/transaction-isolation-levels-in-postgresql-with-examples">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="postgresql"/>
+    <category term="database"/>
+    <category term="concurrency"/>
+    <category term="golang"/>
+  </entry>
+
+  <entry>
+    <title>Idempotency Keys, or How Not to Charge Someone Twice</title>
+    <link href="https://1saif.me/blog/idempotency-keys-or-how-not-to-charge-someone-twice" rel="alternate"/>
+    <id>https://1saif.me/blog/idempotency-keys-or-how-not-to-charge-someone-twice</id>
+    <published>2025-03-23T00:00:00.000Z</published>
+    <updated>2025-03-23T00:00:00.000Z</updated>
+    <summary>A customer taps &quot;Pay&quot;, the connection drops, and they tap again. How idempotency keys make that retry safe, and the race in the obvious implementation that lets the double charge through anyway.</summary>
+    <content type="html"><![CDATA[
+      <p>A customer taps &quot;Pay&quot;, the connection drops, and they tap again. How idempotency keys make that retry safe, and the race in the obvious implementation that lets the double charge through anyway.</p>
+      <img src="https://1saif.me/articles/idempotency_feat.jpg" alt="Idempotency Keys, or How Not to Charge Someone Twice" />
+      <p><a href="https://1saif.me/blog/idempotency-keys-or-how-not-to-charge-someone-twice">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="backend"/>
+    <category term="golang"/>
+    <category term="postgresql"/>
+    <category term="payments"/>
+    <category term="system-design"/>
+  </entry>
+
+  <entry>
+    <title>Retry Strategies That Don&apos;t Make Outages Worse</title>
+    <link href="https://1saif.me/blog/retry-strategies-that-don-t-make-outages-worse" rel="alternate"/>
+    <id>https://1saif.me/blog/retry-strategies-that-don-t-make-outages-worse</id>
+    <published>2025-03-20T00:00:00.000Z</published>
+    <updated>2025-03-20T00:00:00.000Z</updated>
+    <summary>Fixed delay, linear and exponential backoff, and why jitter matters most of all. With a small Go retry function and the rules that decide when you should retry in the first place.</summary>
+    <content type="html"><![CDATA[
+      <p>Fixed delay, linear and exponential backoff, and why jitter matters most of all. With a small Go retry function and the rules that decide when you should retry in the first place.</p>
+      <img src="https://1saif.me/articles/retry_jitter_feat.jpg" alt="Retry Strategies That Don&apos;t Make Outages Worse" />
+      <p><a href="https://1saif.me/blog/retry-strategies-that-don-t-make-outages-worse">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="golang"/>
+    <category term="backend"/>
+    <category term="reliability"/>
+    <category term="system-design"/>
+  </entry>
+
+  <entry>
+    <title>Rate Limiting with a Token Bucket</title>
+    <link href="https://1saif.me/blog/rate-limiting-with-a-token-bucket" rel="alternate"/>
+    <id>https://1saif.me/blog/rate-limiting-with-a-token-bucket</id>
+    <published>2025-02-10T00:00:00.000Z</published>
+    <updated>2025-02-10T00:00:00.000Z</updated>
+    <summary>How the token bucket allows short bursts while holding a steady average rate, a twenty-line Go version to understand it, and what to use in production when you have more than one instance.</summary>
+    <content type="html"><![CDATA[
+      <p>How the token bucket allows short bursts while holding a steady average rate, a twenty-line Go version to understand it, and what to use in production when you have more than one instance.</p>
+      <img src="https://1saif.me/articles/token_bucket_feat.jpg" alt="Rate Limiting with a Token Bucket" />
+      <p><a href="https://1saif.me/blog/rate-limiting-with-a-token-bucket">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="golang"/>
+    <category term="backend"/>
+    <category term="rate-limiting"/>
+    <category term="system-design"/>
+  </entry>
+
+  <entry>
+    <title>OpenTelemetry in Go: Traces You Can Actually Read</title>
+    <link href="https://1saif.me/blog/opentelemetry-in-go-traces-you-can-actually-read" rel="alternate"/>
+    <id>https://1saif.me/blog/opentelemetry-in-go-traces-you-can-actually-read</id>
+    <published>2025-02-03T00:00:00.000Z</published>
+    <updated>2025-02-03T00:00:00.000Z</updated>
+    <summary>What OpenTelemetry is, what traces, metrics, logs and baggage each give you, and a small Go setup that sends traces to a local Jaeger in a few minutes.</summary>
+    <content type="html"><![CDATA[
+      <p>What OpenTelemetry is, what traces, metrics, logs and baggage each give you, and a small Go setup that sends traces to a local Jaeger in a few minutes.</p>
+      <img src="https://1saif.me/articles/otel_traces_feat.jpg" alt="OpenTelemetry in Go: Traces You Can Actually Read" />
+      <p><a href="https://1saif.me/blog/opentelemetry-in-go-traces-you-can-actually-read">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>saifalialjanahi@gmail.com</email>
+    </author>
+    <category term="golang"/>
+    <category term="observability"/>
+    <category term="opentelemetry"/>
+    <category term="devops"/>
+  </entry>
+
+  <entry>
+    <title>Database Migrations Done Right: Git-Style Version Control for Your Schema</title>
+    <link href="https://1saif.me/blog/database-migrations-done-right-git-style-version-control-for-your-schema" rel="alternate"/>
+    <id>https://1saif.me/blog/database-migrations-done-right-git-style-version-control-for-your-schema</id>
+    <published>2025-01-22T00:00:00.000Z</published>
+    <updated>2025-07-22T00:00:00.000Z</updated>
+    <summary>Keep every schema change in Git next to the code, apply it with a migration tool, and test it in CI before it touches production. The tools, the rules that keep migrations safe, and the PostgreSQL details that bite.</summary>
+    <content type="html"><![CDATA[
+      <p>Keep every schema change in Git next to the code, apply it with a migration tool, and test it in CI before it touches production. The tools, the rules that keep migrations safe, and the PostgreSQL details that bite.</p>
+      <img src="https://1saif.me/articles/db_cicd_feat.jpg" alt="Database Migrations Done Right: Git-Style Version Control for Your Schema" />
+      <p><a href="https://1saif.me/blog/database-migrations-done-right-git-style-version-control-for-your-schema">Read more...</a></p>
     ]]></content>
     <author>
       <name>Saif Aljanahi</name>
@@ -59,13 +492,9 @@ Picture this: It&apos;s Friday evening, you&apos;re about to deploy your feature
     </author>
     <category term="database"/>
     <category term="migrations"/>
-    <category term="version-control"/>
+    <category term="postgresql"/>
     <category term="devops"/>
-    <category term="flyway"/>
-    <category term="liquibase"/>
     <category term="ci-cd"/>
-    <category term="zero-downtime"/>
-    <category term="schema-management"/>
   </entry>
 
   <entry>
@@ -74,12 +503,10 @@ Picture this: It&apos;s Friday evening, you&apos;re about to deploy your feature
     <id>https://1saif.me/blog/setting-up-a-local-development-environment-with-a-webhook-service-using-docker-compose</id>
     <published>2024-09-02T00:00:00.000Z</published>
     <updated>2023-09-02T00:00:00.000Z</updated>
-    <summary>Introduction
-
-In modern web development, webhooks play a crucial role in enabling real-time communication between different services. Setting up a local development environment that includes a webhook service can be daunting due to multiple dependencies and configurations. Docker Compose simplifi...</summary>
+    <summary>One docker-compose file that runs a Node.js app, a webhook service, MongoDB and Nginx as a reverse proxy, so every developer starts the same stack with one command.</summary>
     <content type="html"><![CDATA[
-      <p>Learn how to set up a local development environment for a Node.js application with a webhook service using Docker Compose, including MongoDB and Nginx as a reverse proxy.</p>
-      <img src="https://1saif.me/articles/docker_feat.png" alt="Setting Up a Local Development Environment with a Webhook Service using Docker Compose" />
+      <p>One docker-compose file that runs a Node.js app, a webhook service, MongoDB and Nginx as a reverse proxy, so every developer starts the same stack with one command.</p>
+      <img src="https://1saif.me/articles/docker_feat.jpg" alt="Setting Up a Local Development Environment with a Webhook Service using Docker Compose" />
       <p><a href="https://1saif.me/blog/setting-up-a-local-development-environment-with-a-webhook-service-using-docker-compose">Read more...</a></p>
     ]]></content>
     <author>
@@ -95,17 +522,15 @@ In modern web development, webhooks play a crucial role in enabling real-time co
 
   <entry>
     <title>Cherry-Pick: A Useful GitHub Tool for Managing Commits</title>
-    <link href="https://1saif.me/blog/cherry-pick-github-tool-for-managing-commits" rel="alternate"/>
-    <id>https://1saif.me/blog/cherry-pick-github-tool-for-managing-commits</id>
+    <link href="https://1saif.me/blog/cherry-pick-a-useful-github-tool-for-managing-commits" rel="alternate"/>
+    <id>https://1saif.me/blog/cherry-pick-a-useful-github-tool-for-managing-commits</id>
     <published>2024-07-13T00:00:00.000Z</published>
     <updated>2024-07-13T00:00:00.000Z</updated>
-    <summary>Introduction
-
-In software development, version control is crucial for maintaining code integrity and facilitating collaboration. GitHub Desktop, a user-friendly interface for Git, offers numerous features to streamline version control processes. One such feature is cherry-pick, which allows devel...</summary>
+    <summary>How to copy a single commit to another branch with cherry-pick in GitHub Desktop, and when a merge or a rebase is the better choice.</summary>
     <content type="html"><![CDATA[
-      <p>Learn how to use the cherry-pick feature in GitHub Desktop to efficiently manage commits across branches.</p>
-      <img src="https://1saif.me/articles/git_cherry_pick_feat.png" alt="Cherry-Pick: A Useful GitHub Tool for Managing Commits" />
-      <p><a href="https://1saif.me/blog/cherry-pick-github-tool-for-managing-commits">Read more...</a></p>
+      <p>How to copy a single commit to another branch with cherry-pick in GitHub Desktop, and when a merge or a rebase is the better choice.</p>
+      <img src="https://1saif.me/articles/git_cherry_pick_feat.jpg" alt="Cherry-Pick: A Useful GitHub Tool for Managing Commits" />
+      <p><a href="https://1saif.me/blog/cherry-pick-a-useful-github-tool-for-managing-commits">Read more...</a></p>
     ]]></content>
     <author>
       <name>Saif Aljanahi</name>
@@ -119,17 +544,15 @@ In software development, version control is crucial for maintaining code integri
 
   <entry>
     <title>Microservices Architecture with Go and Docker</title>
-    <link href="https://1saif.me/blog/microservices-architecture-with-go" rel="alternate"/>
-    <id>https://1saif.me/blog/microservices-architecture-with-go</id>
+    <link href="https://1saif.me/blog/microservices-architecture-with-go-and-docker" rel="alternate"/>
+    <id>https://1saif.me/blog/microservices-architecture-with-go-and-docker</id>
     <published>2024-04-22T00:00:00.000Z</published>
     <updated>2024-04-22T00:00:00.000Z</updated>
-    <summary>Microservices Architecture with Go and Docker
-
-Microservices architecture has become increasingly popular for building complex, scalable applications. In this post, I&apos;ll share insights from my experience implementing microservices using Go and Docker, with practical examples and best practices....</summary>
+    <summary>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.</summary>
     <content type="html"><![CDATA[
-      <p>Explore how to design and implement a microservices architecture using Go and containerization with Docker.</p>
-      <img src="https://1saif.me/articles/go_micro_feat.png" alt="Microservices Architecture with Go and Docker" />
-      <p><a href="https://1saif.me/blog/microservices-architecture-with-go">Read more...</a></p>
+      <p>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.</p>
+      <img src="https://1saif.me/articles/go_micro_feat.jpg" alt="Microservices Architecture with Go and Docker" />
+      <p><a href="https://1saif.me/blog/microservices-architecture-with-go-and-docker">Read more...</a></p>
     ]]></content>
     <author>
       <name>Saif Aljanahi</name>
@@ -143,17 +566,15 @@ Microservices architecture has become increasingly popular for building complex,
 
   <entry>
     <title>Flutter State Management: Comparing Provider, Riverpod, and Bloc</title>
-    <link href="https://1saif.me/blog/flutter-state-management-comparison" rel="alternate"/>
-    <id>https://1saif.me/blog/flutter-state-management-comparison</id>
+    <link href="https://1saif.me/blog/flutter-state-management-comparing-provider-riverpod-and-bloc" rel="alternate"/>
+    <id>https://1saif.me/blog/flutter-state-management-comparing-provider-riverpod-and-bloc</id>
     <published>2024-03-10T00:00:00.000Z</published>
     <updated>2024-03-10T00:00:00.000Z</updated>
-    <summary>Flutter State Management: Comparing Provider, Riverpod, and Bloc
-
-State management is one of the most critical aspects of building Flutter applications. In this article, I&apos;ll compare three popular state management solutions — Provider, Riverpod, and Bloc — based on my experience implementing them...</summary>
+    <summary>Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app.</summary>
     <content type="html"><![CDATA[
-      <p>A comprehensive comparison of popular state management solutions for Flutter applications.</p>
-      <img src="https://1saif.me/articles/flutter_state_mgt_feat.png" alt="Flutter State Management: Comparing Provider, Riverpod, and Bloc" />
-      <p><a href="https://1saif.me/blog/flutter-state-management-comparison">Read more...</a></p>
+      <p>Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app.</p>
+      <img src="https://1saif.me/articles/flutter_state_mgt_feat.jpg" alt="Flutter State Management: Comparing Provider, Riverpod, and Bloc" />
+      <p><a href="https://1saif.me/blog/flutter-state-management-comparing-provider-riverpod-and-bloc">Read more...</a></p>
     ]]></content>
     <author>
       <name>Saif Aljanahi</name>
@@ -171,16 +592,10 @@ State management is one of the most critical aspects of building Flutter applica
     <id>https://1saif.me/blog/managing-multiple-database-schemas-with-gorm</id>
     <published>2023-07-09T00:00:00.000Z</published>
     <updated>2023-07-09T00:00:00.000Z</updated>
-    <summary>Introduction
-
-Gorm is an exceptional Object-Relational Mapping (ORM) library for Golang, equipped with a wide range of features.
-
-Identifying the Issue
-
-Although the Gorm documentation is comprehensive, it does not always include all the minor details that a developer might need. I encountered...</summary>
+    <summary>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.</summary>
     <content type="html"><![CDATA[
-      <p>This tutorial will guide you through the process of handling multiple database schemas using Gorm in one connection</p>
-      <img src="https://1saif.me/articles/gorm_schema_feat.png" alt="Managing Multiple Database Schemas with Gorm" />
+      <p>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.</p>
+      <img src="https://1saif.me/articles/gorm_schema_feat.jpg" alt="Managing Multiple Database Schemas with Gorm" />
       <p><a href="https://1saif.me/blog/managing-multiple-database-schemas-with-gorm">Read more...</a></p>
     ]]></content>
     <author>
@@ -198,43 +613,31 @@ Although the Gorm documentation is comprehensive, it does not always include all
     <id>https://1saif.me/blog/most-effective-design-patterns-in-golang</id>
     <published>2023-06-25T00:00:00.000Z</published>
     <updated>2023-06-25T00:00:00.000Z</updated>
-    <summary>Introduction (still writing it)
-
-In the scope of software development. Design patterns are typical solutions to commonly occurring problems in software design.
-They are like pre-made blueprints that you can customize to solve a recurring design problem in your code.
-
-In this article, we will have...</summary>
+    <summary>Two classic design patterns that still earn their place in Go, Observer and Singleton, with Go code for each.</summary>
     <content type="html"><![CDATA[
-      <p>A quick review of the useability of design patterns in Golang.</p>
-      <img src="https://1saif.me/articles/go_design_patterns_feat.png" alt="Most Effective Design Patterns In Golang" />
+      <p>Two classic design patterns that still earn their place in Go, Observer and Singleton, with Go code for each.</p>
+      <img src="https://1saif.me/articles/go_design_patterns_feat.jpg" alt="Most Effective Design Patterns In Golang" />
       <p><a href="https://1saif.me/blog/most-effective-design-patterns-in-golang">Read more...</a></p>
     ]]></content>
     <author>
       <name>Saif Aljanahi</name>
       <email>saifalialjanahi@gmail.com</email>
     </author>
-    <category term="Golang"/>
-    <category term="Design-patterns"/>
-    <category term="Observer pattern"/>
-    <category term="Singleton pattern"/>
-    <category term="Factory Pattern"/>
-    <category term="Builder Pattern"/>
-    <category term="Facade Design"/>
+    <category term="golang"/>
+    <category term="design-patterns"/>
   </entry>
 
   <entry>
     <title>An Introduction to API Management with Apiman</title>
-    <link href="https://1saif.me/blog/getting-started with-apimaan-Introduction-to-api-management" rel="alternate"/>
-    <id>https://1saif.me/blog/getting-started with-apimaan-Introduction-to-api-management</id>
+    <link href="https://1saif.me/blog/an-introduction-to-api-management-with-apiman" rel="alternate"/>
+    <id>https://1saif.me/blog/an-introduction-to-api-management-with-apiman</id>
     <published>2023-05-26T00:00:00.000Z</published>
     <updated>2023-05-26T00:00:00.000Z</updated>
-    <summary>Getting Started with Apiman: An Introduction to API Management
-
-APIs (Application Programming Interfaces) have become an integral part of modern software development, enabling seamless integration between different applications and systems. As your organization grows and your API ecosystem expand...</summary>
+    <summary>What an API manager does, how Apiman models it with organizations, plans, client apps and contracts, and what you get from putting a gateway in front of your APIs.</summary>
     <content type="html"><![CDATA[
-      <p>Learn how to install and utilize Apiman as an API management platform to streamline your API development and documentation.</p>
-      <img src="https://1saif.me/articles/api_mgt_feat.png" alt="An Introduction to API Management with Apiman" />
-      <p><a href="https://1saif.me/blog/getting-started with-apimaan-Introduction-to-api-management">Read more...</a></p>
+      <p>What an API manager does, how Apiman models it with organizations, plans, client apps and contracts, and what you get from putting a gateway in front of your APIs.</p>
+      <img src="https://1saif.me/articles/api_mgt_feat.jpg" alt="An Introduction to API Management with Apiman" />
+      <p><a href="https://1saif.me/blog/an-introduction-to-api-management-with-apiman">Read more...</a></p>
     ]]></content>
     <author>
       <name>Saif Aljanahi</name>
@@ -242,27 +645,20 @@ APIs (Application Programming Interfaces) have become an integral part of modern
     </author>
     <category term="apiman"/>
     <category term="api-management"/>
-    <category term="postman"/>
-    <category term="api-portal"/>
+    <category term="api-gateway"/>
   </entry>
 
   <entry>
     <title>How to Cancel HTTP Requests in React using Axios</title>
-    <link href="https://1saif.me/blog/cancel-http-requests-in-react" rel="alternate"/>
-    <id>https://1saif.me/blog/cancel-http-requests-in-react</id>
+    <link href="https://1saif.me/blog/how-to-cancel-http-requests-in-react-using-axios" rel="alternate"/>
+    <id>https://1saif.me/blog/how-to-cancel-http-requests-in-react-using-axios</id>
     <published>2023-01-22T00:00:00.000Z</published>
     <updated>2023-03-12T00:00:00.000Z</updated>
-    <summary>Introduction
-
-Axios is an amazing library for fetching and processing HTTP requests and sometimes comes in handy to use a cancel feature in specific situations.
-
-The problem we want to solve
-
-For me, I struggled with a function that gets products by their categories, and these categories are ju...</summary>
+    <summary>Stop stale requests when a user clicks quickly between categories. How to cancel Axios requests with AbortController in React, so old responses never overwrite new ones.</summary>
     <content type="html"><![CDATA[
-      <p>Introduction Axios is an amazing library for fetching...</p>
-      <img src="https://1saif.me/articles/http_cancel_feat.png" alt="How to Cancel HTTP Requests in React using Axios" />
-      <p><a href="https://1saif.me/blog/cancel-http-requests-in-react">Read more...</a></p>
+      <p>Stop stale requests when a user clicks quickly between categories. How to cancel Axios requests with AbortController in React, so old responses never overwrite new ones.</p>
+      <img src="https://1saif.me/articles/http_cancel_feat.jpg" alt="How to Cancel HTTP Requests in React using Axios" />
+      <p><a href="https://1saif.me/blog/how-to-cancel-http-requests-in-react-using-axios">Read more...</a></p>
     ]]></content>
     <author>
       <name>Saif Aljanahi</name>
@@ -275,15 +671,15 @@ For me, I struggled with a function that gets products by their categories, and 
 
   <entry>
     <title>How to Mock an API in ONE minute</title>
-    <link href="https://1saif.me/blog/mocking-an-api-in-dart" rel="alternate"/>
-    <id>https://1saif.me/blog/mocking-an-api-in-dart</id>
+    <link href="https://1saif.me/blog/how-to-mock-an-api-in-one-minute" rel="alternate"/>
+    <id>https://1saif.me/blog/how-to-mock-an-api-in-one-minute</id>
     <published>2022-12-17T00:00:00.000Z</published>
     <updated>2022-12-17T00:00:00.000Z</updated>
-    <summary>Mocking an API can be useful when you want to test your application&apos;s integration with an API, but you don&apos;t have access to the real API or you don&apos;t want to make real API calls during testing. In this article, we&apos;ll show you how to quickly set up a mock API using modern tools in JavaScript, Go, Da...</summary>
+    <summary>Quick ways to stand up a mock API for tests and development: JSON Server for JavaScript, httptest in Go, mockito in Dart, and unittest.mock in Python.</summary>
     <content type="html"><![CDATA[
-      <p>Tools and Libraries for Quickly Setting Up a Mock API</p>
-      <img src="https://1saif.me/articles/api_mock_feat.png" alt="How to Mock an API in ONE minute" />
-      <p><a href="https://1saif.me/blog/mocking-an-api-in-dart">Read more...</a></p>
+      <p>Quick ways to stand up a mock API for tests and development: JSON Server for JavaScript, httptest in Go, mockito in Dart, and unittest.mock in Python.</p>
+      <img src="https://1saif.me/articles/api_mock_feat.jpg" alt="How to Mock an API in ONE minute" />
+      <p><a href="https://1saif.me/blog/how-to-mock-an-api-in-one-minute">Read more...</a></p>
     ]]></content>
     <author>
       <name>Saif Aljanahi</name>

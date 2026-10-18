@@ -141,4 +141,5 @@ class FrontendEngineeringServer {
 }
 
 const server = new FrontendEngineeringServer();
+
 server.run().catch(console.error);
