@@ -14,4 +14,4 @@ name: Kufa Hackathon Platform
 
 ## التقنيات
 
-Next.js، Supabase، Tailwind CSS، TanStack Query، Jest، Playwright. ويضم المستودع 127 ملف اختبار.
+Next.js، Supabase، Tailwind CSS، TanStack Query، Jest، Playwright.
