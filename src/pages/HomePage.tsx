@@ -8,7 +8,7 @@ import { InterfaceIcon } from '../components/InterfaceIcon'
 import { projects } from '../data/projects'
 import { postText, publishedBlogs } from '../data/blogs'
 import { createSlugFromTitle } from '../utils/slugUtils'
-import { comma, dateLocale, Language, pick, useLanguage } from '../i18n/language'
+import { comma, dateLocale, Language, pick, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
 
 const SearchBox = React.lazy(() => import('../components/SearchBox').then(({ SearchBox: Component }) => ({ default: Component })))
 
@@ -74,7 +74,7 @@ type Copy = (typeof copy)['en']
 const sectionIds = ['work', 'blog', 'about', 'contact'] as const
 
 function formatDate(timestamp: number, language: Language): string {
-  return new Intl.DateTimeFormat(dateLocale(language), { month: 'short', year: 'numeric' }).format(new Date(timestamp))
+  return new Intl.DateTimeFormat(dateLocale(language), { month: 'short', year: 'numeric', timeZone: SITE_TIME_ZONE }).format(new Date(timestamp))
 }
 
 export const HomePage: React.FC = () => {

@@ -39,6 +39,10 @@ export function useLanguage(): LanguageState {
 }
 
 // Latin digits in both languages, so years and counts read the same everywhere.
+// Post dates are stored as midnight in Iraq. Formatting them there keeps the prerendered page (built in UTC)
+// and every visitor on the same day, so hydration matches.
+export const SITE_TIME_ZONE = 'Asia/Baghdad'
+
 export const dateLocale = (language: Language) => language === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-GB'
 
 export const pick = <T,>(language: Language, en: T, ar: T | undefined): T => language === 'ar' && ar !== undefined ? ar : en
