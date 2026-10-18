@@ -11,9 +11,9 @@ tags:
   - golang
 ---
 
-Ever run into a bug that only happens under load? A balance that ends up wrong, a counter that skips, a booking that goes through twice, and you can't reproduce it on your machine because on your machine there is only one request at a time.
+Some bugs only happen under load. A balance ends up wrong, a counter skips, or a booking goes through twice. You can't reproduce it on your machine, because on your machine there is only one request at a time.
 
-A lot of these bugs come from how the database handles concurrent transactions. PostgreSQL gives you isolation levels that decide how much one transaction can see of another, and each level protects you from a different set of problems. Knowing which one you're running, and what it does and doesn't promise, saves a lot of guessing.
+Many of these bugs come from how the database handles concurrent transactions. PostgreSQL isolation levels decide how much one transaction can see of another. Each level protects you from a different set of problems. Knowing which level you run, and what it does and does not promise, saves a lot of guessing.
 
 ## The problems
 
@@ -125,4 +125,4 @@ What works well in practice:
 - Write updates so the database does the math, and use `FOR UPDATE` where the app must decide between a read and a write.
 - Use Serializable, with a retry loop, for the few transactions where correctness depends on several rows together: booking, money movement, inventory, anything with a rule like "at least one" or "no more than".
 
-If your app does bookings or financial transactions, understanding these levels is a must. Many of the bugs they prevent only appear under concurrent load, which is why they rarely show up on a developer's machine.
+If your app does bookings or financial transactions, you need to understand these levels. Many of the bugs they prevent only appear under concurrent load, which is why they rarely show up on a developer's machine.

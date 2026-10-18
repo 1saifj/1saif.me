@@ -174,6 +174,7 @@ void handleProblem(Map<String, dynamic> problem) {
   switch (problem['code']) {
     case 'auth.session_expired':
       router.go('/login');
+      break;
     default:
       showError(problem['detail'] as String? ?? 'Something went wrong');
   }

@@ -10,8 +10,6 @@ tags:
   - api-gateway
 ---
 
-# Getting Started with Apiman: An Introduction to API Management
-
 When you have one API and one client, you don't need an API manager. You put a token check in your code and move on. It gets harder when several teams or partners call several APIs. Each partner needs its own key. One of them needs a lower rate limit. Another should only reach two endpoints. Someone asks how many requests partner X made last month. If all of that lives inside every service, every service ends up with its own slightly different copy of it.
 
 An API manager moves those rules out of your services and into a gateway that sits in front of them. I looked at Apiman for this, and these are my notes.
@@ -42,7 +40,7 @@ You can also publish an API as public, with no contracts and no keys. That's use
 
 ## What you get from it
 
-**Access control in one place.** A partner is off-boarded by breaking their contract, not by deleting keys from three services.
+**Access control in one place.** You cut off a partner by removing their contract, not by deleting keys from three services.
 
 **Limits per client.** The same API can be cheap for one client and generous for another, without a single `if` in your code.
 

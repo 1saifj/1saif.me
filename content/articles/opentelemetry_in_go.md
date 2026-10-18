@@ -13,11 +13,11 @@ tags:
 
 If you build or maintain applications, you need to know what happens inside them, especially when a request is slow and you don't know why. OpenTelemetry (OTel) is an open-source project from the CNCF that gives you one standard way to collect that information: traces, metrics and logs.
 
-The reason it matters is that it's vendor neutral. You instrument your code once, with one API, and you send the data wherever you want: Jaeger, Grafana, Datadog, Honeycomb, or something you host yourself. Switching backends later means changing configuration, not rewriting instrumentation. It has backing from companies like Google, Red Hat and IBM, and most observability vendors accept its data directly.
+It matters because it is vendor neutral. You instrument your code once, with one API, and send the data wherever you want: Jaeger, Grafana, Datadog, Honeycomb, or a backend you host yourself. Switching backends later means changing configuration, not rewriting instrumentation. Companies such as Google, Red Hat and IBM support the project, and most observability vendors accept its data directly.
 
 ## The four pieces
 
-**Traces** show the path of one request through your system. A trace is a tree of spans. Each span is one piece of work with a start, an end and attributes: the HTTP handler, the database query inside it, the call to another service. When a request takes two seconds, the trace shows you which of those pieces took them.
+**Traces** show the path of one request through your system. A trace is a tree of spans. Each span is one piece of work with a start, an end and attributes: the HTTP handler, the database query inside it, the call to another service. When a request takes two seconds, the trace shows which piece took that time.
 
 **Metrics** are numbers over time: request rate, error rate, latency percentiles, CPU, memory, queue length. Metrics show that something is slow. Traces show which step is slow.
 
@@ -96,7 +96,7 @@ A few choices in that setup:
 
 - `WithBatcher` sends spans in the background in batches. The synchronous exporter is only for debugging.
 - The sampler keeps 10% of new traces. `ParentBased` means that if the caller already decided to sample a request, you follow that decision, so a trace is never half recorded across services. In development, use `sdktrace.AlwaysSample()`.
-- The propagators decide which headers carry the context between services. W3C Trace Context is the standard, and every OTel SDK in every language understands it.
+- The propagators decide which headers carry the context between services. W3C Trace Context is the standard, and every official OTel SDK understands it.
 
 ## Spans for your own code
 
@@ -125,7 +125,7 @@ For calls to other services, wrap the HTTP client's transport, and the trace con
 client := &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 ```
 
-Database drivers and Redis clients have OTel instrumentation packages too, so queries show up as spans without writing them by hand.
+Database drivers and Redis clients have OTel instrumentation packages too, so their calls show up as spans without extra code.
 
 ## Connect logs to traces
 
@@ -147,4 +147,4 @@ If you already put a request ID in your logs, this is the same idea, but the ID 
 
 In production you usually don't send data straight from each service to the backend. You run the OpenTelemetry Collector next to your services. It receives traces, metrics and logs, can sample, filter or scrub sensitive attributes, and forwards them to whatever backend you use. Your services only ever talk to the collector, which keeps the backend choice in one config file.
 
-Start with traces on one service, look at a few slow requests, and you'll quickly see which parts of your system deserve their own spans. That's usually where the next performance fix comes from.
+Start with traces on one service. Look at a few slow requests, and you will quickly see which parts of your system need their own spans. That is usually where the next performance fix comes from.

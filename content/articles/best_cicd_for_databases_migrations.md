@@ -14,7 +14,7 @@ tags:
 
 Your application code goes through Git, review and CI. Then someone adds a column on staging by hand, or runs a fix on production from their laptop, and it never makes it back into the repo. A month later staging and production have different schemas and nobody can say which one is right.
 
-I wrote a short LinkedIn post about this: you can make database changes behave like Git flow. Every change is a file in the repo, it gets reviewed like code, and the same files run in every environment in the same order. This is the longer version, with the parts that the post didn't have room for.
+I wrote a short LinkedIn post about this: you can make database changes behave like the rest of your code in Git. Every change is a file in the repo, it gets reviewed like code, and the same files run in every environment in the same order. This is the longer version, with the parts that the post didn't have room for.
 
 ## What a migration tool does
 
@@ -58,7 +58,7 @@ The tool is the easy part. Most of the trouble comes from how migrations are wri
 
 **Never edit a migration after it has run anywhere.** If `V3` is wrong, write `V4` that fixes it. Editing `V3` means the databases that already ran it will never see your change, and the checksum check will fail on them.
 
-**Plan to go forward, not back.** Down migrations are great in development. In production, rolling back a schema change often means losing data that was written after it. If you add a column and users fill it for an hour, dropping it throws that away. Fix forward with a new migration, and keep a backup or point-in-time recovery for the real disasters. Also note that Flyway's undo migrations are not in the free edition.
+**Plan to go forward, not back.** Down migrations are great in development. In production, rolling back a schema change often means losing data that was written after it. If you add a column and users fill it for an hour, dropping it throws that away. Fix forward with a new migration, and keep a backup or point-in-time recovery for the real disasters. Also, Flyway's undo migrations need a paid edition.
 
 **Keep the old code working with the new schema.** During a deploy, the old version of your app is still running while the migration runs, and sometimes for minutes after. So a migration must not break the code that's currently live. A rename is the usual trap. Renaming a column in one step breaks every running instance that still uses the old name. Do it in steps instead:
 
@@ -72,9 +72,9 @@ It's slower, but at no point is there a version of the app that the schema can't
 
 ## The PostgreSQL details that bite
 
-A migration is a statement on a live database, and some statements take locks that stop your app.
+A migration runs on a live database, and some statements take locks that block your app.
 
-**Set a lock timeout.** `ALTER TABLE` needs a strong lock on the table. If a long query is holding the table, the `ALTER` waits, and every new query on that table queues behind the `ALTER`. A two-second schema change becomes a full outage. Start risky migrations with:
+**Set a lock timeout.** `ALTER TABLE` needs a strong lock on the table. If a long query is holding the table, the `ALTER` waits, and every new query on that table queues behind the `ALTER`. A quick schema change can turn into a full outage. Start risky migrations with:
 
 ```sql
 SET lock_timeout = '5s';

@@ -15,7 +15,7 @@ You're working on a service. Requests come in, everything runs normally, and the
 
 You open the logs and find thousands of lines from hundreds of requests, all mixed together. The line that says "payment failed" is there, but nothing tells you which request it belongs to, or what that request did before it failed.
 
-This is where the request context matters. Most of the work your server does for a request needs to carry some information about that request with it: an ID, who the user is, and whether the client is still waiting. With that, you can follow one request from start to end. Without it, when something goes wrong, you're lost.
+This is where the request context matters. Most of the work your server does for a request needs information about that request: an ID, who the user is, and whether the client is still waiting. With that, you can follow one request from start to end. Without it, when something goes wrong, you're lost.
 
 ## One ID per request
 
@@ -62,6 +62,7 @@ A few choices here:
 - If a proxy or the client already sent an `X-Request-ID`, keep it, so the ID in the load balancer logs matches the ID in yours. But check it first. A header is user input, and you don't want someone writing newlines or a megabyte of text into your logs.
 - The ID goes back in the response header. When the mobile app shows an error, it can show the ID too, and a user's screenshot becomes a search query.
 - The context key is an unexported struct type, so no other package can collide with it by accident.
+- `rand.Text()` comes from `crypto/rand` and needs Go 1.24. On older versions, hex-encode 16 random bytes.
 
 ## A logger that already knows the ID
 
@@ -147,6 +148,6 @@ A request ID in the logs takes an hour to add and covers most debugging in a sin
 
 ## Why it matters
 
-The value shows most in bigger systems, or when you start having problems that are hard to explain to the other developers on your team. Once you rely on the request context, even if you forgot something or an error happened, you can go back and see what happened step by step.
+The value shows most in bigger systems, or when bugs are hard to explain to the rest of your team. Once the request context carries the ID, you can go back and see what happened step by step, even when something failed.
 
-It's a little extra code, and sometimes it saves you hours of investigation. If you have another approach that helps with tracing and debugging, share it. I'd like to learn from it too.
+It's a little extra code, and sometimes it saves you hours of investigation. If you have another approach to tracing and debugging, I'd like to hear it.

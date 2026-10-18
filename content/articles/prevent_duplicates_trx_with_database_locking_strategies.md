@@ -12,13 +12,13 @@ tags:
   - redis
 ---
 
-# Introduction
+## Introduction
 
-When building financial systems, processing transactions exactly once is critical. Too often, developers overlook the complexities of concurrent processing, leading to duplicate transactions that can have serious consequences. In this article, I'll share how we solved a challenging race condition in a card issuance system using a combination of locking strategies.
+In a financial system, each transaction must be processed exactly once. Concurrent processing makes that hard, and a mistake can have serious consequences. This article describes how we fixed a race condition in a card issuance system by combining several locking strategies.
 
-# The problem we want to solve
+## The problem we want to solve
 
-Recently, I was debugging a particularly tricky issue in our card issuing platform. We noticed something alarming in our logs:
+Recently, I was debugging a tricky issue in our card issuing platform. We noticed something wrong in our logs:
 
 ```
 144609,2025-04-10 16:08:52.637252 +00:00,39407,Pending
@@ -27,17 +27,17 @@ Recently, I was debugging a particularly tricky issue in our card issuing platfo
 144618,2025-04-10 16:09:01.356295 +00:00,39407,Approved
 ```
 
-The same order (ID 39407) was being approved three times within a one-second window! This was happening despite having a Redis-based distributed locking mechanism already in place.
+The same order (ID 39407) was approved three times in about 1.2 seconds. This happened even though we already had a Redis-based distributed lock.
 
-The consequences were severe - each "approval" potentially created a separate physical card, resulting in multiple cards being issued to the same customer. Besides the obvious financial implications, this created a confusing experience for customers who received multiple cards.
+The consequences were serious. Each approval could create a separate physical card, so one customer could receive several cards. That cost money, and it confused customers.
 
-The issue occurred when multiple cron job instances would run nearly simultaneously. Each would check if an order was in "Pending" status before approving it, but they'd all read the status before any could write their updates. This classic race condition was happening at the database transaction level, beyond what our Redis job lock could prevent.
+The problem happened when several cron job instances ran at nearly the same time. Each one checked whether an order was "Pending" before it approved the order. All of them read the status before any of them wrote an update. This race condition happened at the database transaction level, which our Redis job lock could not prevent.
 
-# The solution
+## The solution
 
-After analyzing the problem, I realized we needed a multi-layered approach to ensure transaction integrity. Let's walk through the solution step by step.
+After analyzing the problem, I realized we needed a multi-layered approach to keep transactions correct. The steps below cover each layer.
 
-## Understanding Locking Strategies
+### Understanding Locking Strategies
 
 There are two primary approaches to handling concurrent database access:
 
@@ -59,7 +59,7 @@ if err := tx.Model(&order).Updates(map[string]interface{}{
 }
 ```
 
-This approach locks the record during reading, but it doesn't prevent the scenario where multiple processes each select and lock different copies of the same record before updating.
+This approach locks the row while the transaction runs. But the "Pending" check happened earlier, outside this transaction, and the code does not check the status again once it holds the lock. So a second process that waits for the lock still approves the order.
 
 **Optimistic Locking**
 ```go
@@ -78,6 +78,9 @@ result := tx.Model(&model.CardOrder{}).
     })
 
 // Check if update was successful
+if result.Error != nil {
+    return nil, utility.NewError(result.Error, "FAILED_TO_UPDATE_STATUS", "UPDATE-ORDER-STATUS")
+}
 if result.RowsAffected == 0 {
     return nil, utility.NewError(
         fmt.Errorf("order status was changed by another process"),
@@ -108,7 +111,7 @@ func (r *cardOrderRepository) UpdateOrderStatus(
         if err := tx.Select("status").First(&currentOrder, orderID).Error; err != nil {
             return nil, utility.NewError(err, "FAILED_TO_FETCH_CURRENT_STATUS", "UPDATE-ORDER-STATUS")
         }
-        
+
         // 2. Only proceed if it's not already the target status (idempotency)
         if currentOrder.Status == status {
             // Status already at target value, load the full order and return
@@ -121,7 +124,7 @@ func (r *cardOrderRepository) UpdateOrderStatus(
             }
             return &order, nil
         }
-        
+
         // 3. Apply optimistic locking: only update if status hasn't changed
         result := tx.Model(&model.CardOrder{}).
             Where("id = ? AND status = ?", orderID, currentOrder.Status).
@@ -129,7 +132,10 @@ func (r *cardOrderRepository) UpdateOrderStatus(
                 "status":     status,
                 "updated_at": time.Now(),
             })
-        
+
+        if result.Error != nil {
+            return nil, utility.NewError(result.Error, "FAILED_TO_UPDATE_STATUS", "UPDATE-ORDER-STATUS")
+        }
         if result.RowsAffected == 0 {
             return nil, utility.NewError(
                 fmt.Errorf("order status was changed by another process"),
@@ -141,6 +147,9 @@ func (r *cardOrderRepository) UpdateOrderStatus(
         // Create status history and reload order...
         return &updatedOrder, nil
     }, "UPDATE_ORDER_STATUS")
+    if err != nil {
+        return nil, utility.NewError(err, "FAILED_TO_UPDATE_ORDER_STATUS", "UPDATE-ORDER-STATUS")
+    }
 
     return result.(*model.CardOrder), nil
 }
@@ -161,63 +170,67 @@ orderLockTTL := 30 * time.Second
 ctx := context.Background()
 orderLockAcquired, err := s.redisClient.SetNX(ctx, orderLockKey, "1", orderLockTTL).Result()
 if err != nil {
-    s.logger.Warn("Failed to acquire Redis lock for order, proceeding with caution", 
-        "order_id", order.ID, 
+    s.logger.Warn("Failed to acquire Redis lock for order, proceeding with caution",
+        "order_id", order.ID,
         "error", err)
     // Continue processing - the database optimistic locking is our safety net
 } else if !orderLockAcquired {
-    s.logger.Info("Order is being processed by another instance, skipping", 
+    s.logger.Info("Order is being processed by another instance, skipping",
         "order_id", order.ID)
     return nil
+} else {
+    // Release the lock only when this instance took it
+    defer func() {
+        if err := s.redisClient.Del(ctx, orderLockKey).Err(); err != nil {
+            s.logger.Warn("Failed to release order lock", "order_id", order.ID, "error", err)
+        }
+    }()
 }
-
-// Ensure lock release with defer
-defer func() {
-    if err := s.redisClient.Del(ctx, orderLockKey).Err(); err != nil {
-        s.logger.Warn("Failed to release order lock", "order_id", order.ID, "error", err)
-    }
-}()
 ```
+
+One gap is left here: the `Del` is unconditional. If the work takes longer than the 30-second TTL, the lock expires, another instance takes it, and this `Del` removes their lock. Store a random token as the value and delete the key only when it still holds that token, with a small Lua script, if the work can ever run that long.
 
 ### 3. Graceful Concurrency Error Handling
 
-Finally, I updated our error handling to gracefully manage concurrency conflicts:
+Finally, I changed the error handling so that a concurrency conflict is not treated as a failure:
 
 ```go
-updatedOrder, err := s.orderUsecase.UpdateOrderStatus(order.ID, enums.CardStatusApproved)
-if err != nil {
+if _, err := s.orderUsecase.UpdateOrderStatus(order.ID, enums.CardStatusApproved); err != nil {
     // Check for concurrent modification error and handle it gracefully
     if cErr, ok := err.(coerr.StringError); ok && cErr.GetErrorCode() == "CONCURRENT_MODIFICATION" {
-        s.logger.Info("Order status was modified by another process, skipping", 
+        s.logger.Info("Order status was modified by another process, skipping",
             "order_id", order.ID,
             "error", err.Error())
         return nil // Not an error case, just a race condition
     }
-    
+
     return fmt.Errorf("card creation failed for order %d: %v", order.ID, err)
 }
 ```
 
 ## The Results
 
-After implementing these changes, our system started handling concurrent processing correctly. Even when multiple cron job instances ran simultaneously, each order was processed exactly once. The logs now showed a clean progression from "Pending" to "Approved" without duplicates.
+After these changes, concurrent processing worked as intended. Even when multiple cron job instances ran simultaneously, each order was processed exactly once. The logs now showed a clean progression from "Pending" to "Approved" without duplicates.
 
 ![Two cron instances: the Redis lock stops the second one, and the status check in the UPDATE stops it again if Redis fails](/articles/database-locking/db_locks.jpg)
 
 The multi-layered approach provided several benefits:
+
 1. If Redis failed, the database optimistic locking still prevented duplicates
 2. If a cron job crashed, the short TTL on the Redis lock allowed others to take over
 3. When concurrent modifications occurred, they were properly logged without raising alarms
 
-# When to Choose Each Locking Strategy
+## When to Choose Each Locking Strategy
 
 **Use Optimistic Locking When:**
+
 - Conflicts are rare (like our scenario)
 - Transactions are short-lived
 - You need high throughput
 - The system is distributed
 
 **Use Pessimistic Locking When:**
+
 - Conflicts happen frequently
 - Transactions are long-running
 - The cost of retrying transactions is high
@@ -225,9 +238,9 @@ The multi-layered approach provided several benefits:
 
 In our case, optimistic locking was ideal because we had relatively low contention (multiple cron jobs occasionally overlapping) and simple, short transactions.
 
-# References:
+## References
 
 - [GORM Transactions Documentation](https://gorm.io/docs/transactions.html)
 - [Redis SETNX Command](https://redis.io/commands/setnx/)
 - [Martin Fowler on Optimistic Offline Lock](https://martinfowler.com/eaaCatalog/optimisticOfflineLock.html)
-- [AWS Database Blog: Optimistic Locking in Databases](https://aws.amazon.com/blogs/database/optimistic-locking-in-amazon-dynamodb/)
+- [AWS Database Blog: Optimistic locking in Amazon DynamoDB](https://aws.amazon.com/blogs/database/optimistic-locking-in-amazon-dynamodb/)
