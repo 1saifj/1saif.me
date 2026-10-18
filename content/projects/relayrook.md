@@ -8,7 +8,7 @@ wip: false
 isPrivate: false
 sourceType: open-source
 role: Author
-impact: Activity-based watchdogs, one permission vocabulary across five CLIs, 226 tests
+impact: Activity-based watchdogs, one permission vocabulary across five CLIs, end-to-end tested
 ---
 
 # RelayRook
@@ -23,6 +23,6 @@ RelayRook is an open-source Agent Skill and CLI. One coding agent uses it to han
 
 ## Quality
 
-About 8,600 lines of Node.js with 226 tests, including end-to-end tests against a fake CLI. Workers also run on Windows.
+Written in Node.js, with end-to-end tests that run each worker against a simulated CLI. Workers also run on Windows.
 
 The source is on GitHub.

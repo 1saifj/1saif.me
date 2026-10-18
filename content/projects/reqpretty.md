@@ -8,7 +8,7 @@ wip: true
 isPrivate: false
 sourceType: open-source
 role: Author
-impact: Open-source Go library, 12 GitHub stars
+impact: Open-source Go middleware for readable request and response logs
 ---
 
 # reqpretty

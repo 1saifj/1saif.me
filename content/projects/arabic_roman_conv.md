@@ -8,7 +8,7 @@ wip: true
 isPrivate: false
 sourceType: open-source
 role: Author
-impact: Published on pub.dev, 8 GitHub stars
+impact: Published on pub.dev
 ---
 
 # arabic_roman_conv
