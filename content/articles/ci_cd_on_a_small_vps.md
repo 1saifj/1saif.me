@@ -13,7 +13,7 @@ tags:
 
 > Update, October 2026: the original Watchtower project (`containrrr/watchtower`) was archived in December 2025. Its last image also fails on Docker Engine 29 with "client version 1.25 is too old", because Docker raised the minimum API version. Setting `DOCKER_API_VERSION=1.44` on the Watchtower container works around it, and there are maintained forks. For a new setup, pick a maintained updater. The rest of this post is the setup as I described it in August 2025.
 
-Automated deploys are normal for big teams with a cluster and a platform team. The challenge is when you have one VPS with limited resources, maybe on government infrastructure, or a startup that wants a solid setup with the least cost and the simplest tools.
+Automated deploys are normal for big teams with a cluster and a platform team. The challenge is a single VPS with limited resources. That might be government infrastructure, or a startup that wants a solid setup at the lowest cost with the simplest tools.
 
 That was my situation with the graduate tracking system at the University of Kufa. The backend runs in Docker on a single server. I wanted a pipeline that gives me:
 
@@ -59,7 +59,7 @@ jobs:
             ghcr.io/your-org/grad-api:${{ github.sha }}
 ```
 
-Two tags on purpose. `latest` is what the server follows. The commit SHA tag means every version stays in the registry, so going back to an older build is one `docker pull` away. Write the image name in lowercase. GHCR rejects uppercase, and `${{ github.repository }}` keeps whatever case your org name has.
+Two tags on purpose. `latest` is what the server follows. The commit SHA tag means every version stays in the registry, so going back to an older build is one `docker pull` away. Write the image name in lowercase. GHCR rejects uppercase names, and `${{ github.repository }}` keeps the case of your org name.
 
 ## 2. Let Watchtower deploy it
 
@@ -91,8 +91,8 @@ services:
 A few details worth knowing:
 
 - The image is private, so Watchtower needs to log in to GHCR. Run `docker login ghcr.io` once on the server, as the user that runs your deploys (`deploy` here), with a token that only has `read:packages`. Then mount the `config.json` it creates into the container like above.
-- `WATCHTOWER_LABEL_ENABLE` means Watchtower only touches containers with the label. Without it, it will happily update your database image too, and you don't want a Postgres major version arriving by surprise.
-- It's a stop and start, not a rolling update. There are a few seconds where the API is down. For a lot of systems that's acceptable. If it isn't for yours, you need two containers behind a proxy, and at that point you're building a small orchestrator.
+- `WATCHTOWER_LABEL_ENABLE` means Watchtower only touches containers with the label. Without it, Watchtower also updates your database image, and you don't want a Postgres major version arriving by surprise.
+- It's a stop and start, not a rolling update. There are a few seconds where the API is down. For many systems that's acceptable. If it isn't for yours, you need two containers behind a proxy, and at that point you're building a small orchestrator.
 - Mounting the Docker socket gives the container full control of Docker on that host. Only do it with an image you trust.
 
 ## 3. Notifications with Shoutrrr
@@ -122,7 +122,7 @@ Between the two, I get a message when a deploy lands and a message when one neve
 
 The biggest risk in a setup like this is secrets. Database passwords and API keys end up in a `.env` file on the server, then in a backup, then in someone's laptop.
 
-I moved them to Infisical. The server authenticates with a machine identity, and the containers get their environment from Infisical at start:
+I moved them to Infisical. The server authenticates with a machine identity. You start the stack through the Infisical CLI, which loads the secrets for that environment:
 
 ```bash
 infisical run --env=prod -- docker compose up -d
@@ -132,7 +132,7 @@ infisical run --env=prod -- docker compose up -d
 
 Rotating a secret is then a change in the Infisical dashboard and a restart, with no file to edit and nothing to commit. Access is per person and per environment, and there's an audit log of who changed what.
 
-One thing to keep in mind with Watchtower: when it recreates a container, it reuses the environment the container already had. A new image gets the old secrets, which is what you want. A changed secret still needs that restart through `infisical run`.
+One thing to keep in mind with Watchtower: when it recreates a container, it reuses the environment the container already had. So the new container keeps the secrets the old one had, which is what you want during an update. A changed secret still needs a restart through `infisical run`.
 
 ## What I got out of it
 

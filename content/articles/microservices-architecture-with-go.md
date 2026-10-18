@@ -1,6 +1,6 @@
 ---
 title: "Microservices Architecture with Go and Docker"
-description: "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer."
+description: "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer."
 createdAt: "2024-04-22"
 updatedAt: 2024-04-22
 featuredImage: "/articles/go_micro_feat.jpg"
@@ -11,13 +11,11 @@ tags:
   - docker
 ---
 
-# Microservices Architecture with Go and Docker
-
-Microservices architecture has become increasingly popular for building complex, scalable applications. In this post, I'll share insights from my experience implementing microservices using Go and Docker, with practical examples and best practices.
+This post covers how I split a system into Go services, run them with Docker, and let them talk to each other.
 
 ## Why Go for Microservices?
 
-Go (Golang) has emerged as an excellent choice for microservices development. Here's why:
+Go suits microservices for a few reasons:
 
 1. **Lightweight concurrency model** - Goroutines make handling concurrent requests efficient
 2. **Fast compilation** - Quick feedback loop during development
@@ -27,7 +25,7 @@ Go (Golang) has emerged as an excellent choice for microservices development. He
 
 ## Design Principles for Microservices
 
-When designing microservices, I follow these key principles:
+When I design microservices, I follow these principles:
 
 ### Single Responsibility
 
@@ -38,7 +36,6 @@ Each microservice should focus on a specific business capability:
 package main
 
 import (
-    "net/http"
     "github.com/gin-gonic/gin"
 )
 
@@ -76,6 +73,9 @@ func (c *UserClient) GetUser(id string) (*User, error) {
         return nil, err
     }
     defer resp.Body.Close()
+    if resp.StatusCode != http.StatusOK {
+        return nil, fmt.Errorf("get user %s: status %d", id, resp.StatusCode)
+    }
     
     var user User
     if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
@@ -127,9 +127,9 @@ CMD ["./main"]
 
 This multi-stage build produces a minimal image with just your application binary, reducing security risks and image size.
 
-## Service Discovery and Configuration
+## Service Discovery
 
-For service discovery, I've found Consul to be effective:
+For service discovery, I've found Consul effective:
 
 ```go
 package main
@@ -165,7 +165,7 @@ func registerService() {
 
 ## Inter-Service Communication
 
-For synchronous communication, gRPC provides type-safe, efficient communication:
+For synchronous calls, gRPC gives you type-safe, efficient communication. Define the service in a `.proto` file:
 
 ```protobuf
 // user.proto

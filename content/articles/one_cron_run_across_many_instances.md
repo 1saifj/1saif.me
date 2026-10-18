@@ -21,13 +21,13 @@ There are a few ways out. You can move the jobs to a separate service with one r
 
 Before a job does its work, it tries to take a key in Redis. Only one instance can take it. The others see that the key is taken and skip this run.
 
-When I first wrote about this on LinkedIn, I kept it short: `SETNX` to take the key, do the work, `DEL` to give it back. That version works most of the time, and it has two holes that are worth knowing before you copy it.
+I first posted about this on LinkedIn in a short form: `SETNX` to take the key, do the work, `DEL` to give it back. That version works most of the time. It has two holes, and you should know them before you copy it.
 
 ## Hole 1: a crash leaves the key forever
 
 If the instance that holds the key crashes, or gets killed during a deploy, nobody deletes the key. Every run after that sees a taken key and skips. The job silently stops running, and you find out days later.
 
-The fix is to always set an expiry when you take the key. Plain `SETNX` can't do that in one step, but `SET` with `NX` and `PX` can, and that's what go-redis sends when you pass an expiration to `SetNX`:
+The fix is to always set an expiry when you take the key. Plain `SETNX` can't do that in one step. `SET` with `NX` and an expiry (`EX` or `PX`) can. go-redis sends that form when you pass an expiration to `SetNX`:
 
 ```go
 ok, err := rdb.SetNX(ctx, key, instanceID, 10*time.Minute).Result()
@@ -55,7 +55,7 @@ func (s *Scheduler) RunOnce(ctx context.Context, job string, every time.Duration
 }
 ```
 
-Use `Round`, not `Truncate`. A scheduler can fire a few milliseconds before the boundary, and then `Truncate` puts that run in the previous slot, so the 09:00 job runs twice and the 10:00 job not at all. `Round` gives the same slot as long as the trigger is within half an interval of the boundary.
+Use `Round`, not `Truncate`. A scheduler can fire a few milliseconds before the boundary. With `Truncate`, that run lands in the previous slot. That slot is already taken, so the 10:00 job is skipped. `Round` gives the right slot as long as the trigger is within half an interval of the boundary.
 
 The expiry is twice the interval, so the key is still there when the slowest instance shows up, and Redis cleans it up later without anyone deleting anything.
 

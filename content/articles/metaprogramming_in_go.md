@@ -34,9 +34,9 @@ const (
 )
 ```
 
-Run `go generate ./...` and you get a `status_string.go` file with a `String()` method. Now `fmt.Println(order.StatusApproved)` prints `Approved` instead of `1`, and you never wrote or maintained that switch by hand.
+Run `go generate ./...` and you get a `status_string.go` file with a `String()` method. Now `fmt.Println(order.StatusApproved)` prints `Approved` instead of `1`, and you never wrote or maintained that method by hand.
 
-The same mechanism is behind most code generation in Go: mocks with `mockgen`, protobuf and gRPC code with `protoc`, type-safe SQL with `sqlc`, and API clients from OpenAPI specs.
+The same idea drives other generators in Go: mocks with `mockgen`, protobuf and gRPC code with `protoc`, type-safe SQL with `sqlc`, and API clients from OpenAPI specs.
 
 What you get is ordinary Go code. It's type-checked, as fast as handwritten code, and you can open it and read it when something goes wrong. The cost is a build step, and someone has to remember to run it. A CI check that runs `go generate ./...` and fails if `git diff` isn't empty takes care of that.
 
@@ -67,6 +67,9 @@ func LoadEnv(dst any) error {
 		}
 
 		field := v.Field(i)
+		if !field.CanSet() { // unexported fields can't be set through reflection
+			continue
+		}
 		switch field.Kind() {
 		case reflect.String:
 			field.SetString(raw)
@@ -84,7 +87,7 @@ func LoadEnv(dst any) error {
 }
 ```
 
-It works for any struct. That's the power of reflection, and it's needed when the types really aren't known ahead of time: serializers, ORMs, validation libraries, dependency injection.
+It works for any struct with `env` tags. That's the power of reflection, and it's needed when the types really aren't known ahead of time: serializers, ORMs, validation libraries, dependency injection.
 
 But look at what it costs. The compiler can't check any of this, so a wrong type shows up as an error at runtime, or a panic if you forget a check. It's slower than direct field access. And it's harder to read. Ten lines of setting fields directly would be clearer for one config struct. Reflection pays off when you'd otherwise write the same code for many types.
 
@@ -116,8 +119,6 @@ It's checked at compile time, and you keep one copy to maintain.
 - **go generate**, when you'd otherwise write a lot of repetitive code from some source of truth: an enum, a schema, an interface you need to mock. You get fast, readable, type-safe code.
 - **reflect**, when the types truly aren't known until runtime, and usually inside a library rather than your application code.
 
-Go's philosophy shows here. It prefers the explicit tools, code generation and generics, over runtime magic, because they keep the code simple to read, safe at compile time, and fast.
-
-So yes, Go does metaprogramming, mostly at compile time.
+That matches Go's design. It prefers explicit tools, code generation and generics over runtime magic, because they keep code simple to read, safe at compile time, and fast.
 
 What are your favorite uses of `go generate` or `reflect`?

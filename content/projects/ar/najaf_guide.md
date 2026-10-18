@@ -7,7 +7,7 @@ name: Najaf Guide
 ## ما الذي أبنيه
 
 - واجهة برمجية بـ NestJS بتصميم موجَّه بالنطاق (DDD)، مع Drizzle، وBetter Auth بجلسات على Redis، ومراقبة عبر New Relic.
-- تطبيق Flutter بمعمارية نظيفة مع BLoC وFirebase، يتضمن صندوقاً للإشعارات.
+- تطبيق Flutter بمعمارية نظيفة مع BLoC وFirebase، يتضمن صندوق إشعارات.
 - تطبيق ويب وصفحة هبوط بـ Next.js بالعربية والإنجليزية، منشوران على Cloudflare.
 - ملفات ترجمة مفتوحة المصدر على GitHub.
 

@@ -6,8 +6,8 @@ import { InterfaceIcon } from './InterfaceIcon'
 import { SearchButton } from './SearchButton'
 
 const labels = {
-  en: { light: 'Light', dark: 'Dark', work: 'Work', blog: 'Writing', resume: 'Résumé', contact: 'Contact', nav: 'Site', switchTo: 'عربي', switchLabel: 'اقرأ بالعربية', home: 'saif.me home' },
-  ar: { light: 'فاتح', dark: 'داكن', work: 'الأعمال', blog: 'المقالات', resume: 'السيرة الذاتية', contact: 'التواصل', nav: 'التنقّل', switchTo: 'EN', switchLabel: 'Read in English', home: 'الصفحة الرئيسية لـ saif.me' },
+  en: { light: 'Light', dark: 'Dark', work: 'Work', blog: 'Writing', resume: 'Résumé', contact: 'Contact', nav: 'Site navigation', switchTo: 'عربي', switchLabel: 'اقرأ بالعربية', home: 'saif.me home' },
+  ar: { light: 'فاتح', dark: 'داكن', work: 'الأعمال', blog: 'المقالات', resume: 'السيرة الذاتية', contact: 'التواصل', nav: 'تنقّل الموقع', switchTo: 'EN', switchLabel: 'Read in English', home: 'الصفحة الرئيسية لـ saif.me' },
 }
 
 export const ThemeButton: React.FC = () => {

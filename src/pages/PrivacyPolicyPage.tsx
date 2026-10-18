@@ -11,7 +11,7 @@ const copy = {
   en: {
     seoTitle: 'Privacy | Saif Aljanahi',
     seoDescription: "A clear explanation of the personal data collected by Saif Aljanahi's portfolio website and how it is used.",
-    updated: 'Last updated',
+    updated: 'Last updated:',
     title: 'Privacy policy',
     intro: 'This policy describes what happens to information shared with Saif Aljanahi through this personal portfolio. The site is designed to collect as little as possible and to make every use clear.',
     sections: ['Introduction', 'Data collected', 'How it is used', 'Services', 'Your rights', 'Contact'],

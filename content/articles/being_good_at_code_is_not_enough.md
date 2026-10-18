@@ -12,18 +12,18 @@ tags:
 
 Every development team wants clean code, good standards and strong delivery. There's another piece that matters just as much, and it often gets ignored: being open. Being easy to work with. Being able to take feedback.
 
-I've seen really smart engineers create big problems, not because they weren't skilled, but because of how they worked with others. The patterns are usually the same:
+I've seen smart engineers create big problems, not because they weren't skilled, but because of how they worked with others. The patterns are usually the same:
 
 - They hold others to standards they don't follow themselves.
 - They push back on every bit of feedback.
 - They avoid real collaboration and work alone on things that affect everyone.
 - They get defensive the second they're challenged.
 
-It usually comes from a place of insecurity. But the reason doesn't change the result. If nobody says anything, it slowly breaks the team.
+It usually comes from insecurity. But the reason doesn't change the result. If nobody says anything, it slowly breaks the team.
 
 ## Where it shows: code review
 
-Code review is where this becomes visible every day, so it's a good place to look at what "open" means in practice.
+Code review shows this every day, so it's a good place to see what "open" means in practice.
 
 **Separate the code from yourself.** A comment on your pull request is about the code, not about you. "This query runs once per item" describes the code.
 
@@ -39,10 +39,10 @@ Code review is where this becomes visible every day, so it's a good place to loo
 
 A double standard costs a team's trust quickly. The senior engineer who skips tests, merges without review "because it's urgent", or ignores the conventions they enforce on others teaches everyone that the rules are for other people.
 
-The best developers don't just talk about best practices. They live them, especially when nobody is checking. And when they break their own rule, they say so, and they fix it.
+The best developers don't just talk about best practices. They follow them, especially when nobody is checking. And when they break their own rule, they say so, and they fix it.
 
 ## It's a skill
 
 This doesn't mean you agree with everything. Strong opinions are fine. Saying "I think this is wrong, and here's why" is part of the job. The difference is whether you can also hear "I think you're wrong" and actually consider it.
 
-Let's build teams where everyone is held to the same standard and no one's ego gets in the way.
+Teams work best when everyone is held to the same standard and no one's ego gets in the way.

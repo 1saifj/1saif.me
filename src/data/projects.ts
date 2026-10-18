@@ -23,7 +23,7 @@ export const projects: Project[] = [
   {
     "order": 4,
     "name": "Al Qaseh Financial Services",
-    "description": "Go and PostgreSQL services for financial operations, card issuing among them, and a year leading the backend team. A Redis lock per order with optimistic locking in PostgreSQL stopped duplicate approvals across instances.",
+    "description": "Go and PostgreSQL services for financial operations, card issuing among them, and time as backend team lead. A Redis lock per order with optimistic locking in PostgreSQL stopped duplicate approvals across instances.",
     "language": "go",
     "wip": false,
     "isPrivate": true,
@@ -32,7 +32,7 @@ export const projects: Project[] = [
     "impact": "Go and PostgreSQL services, 2022 to 2025",
     "ar": {
       "name": "برمجيات مالية في القاصّة",
-      "description": "خدمات بـ Go وPostgreSQL للعمليات المالية، ومنها إصدار البطاقات، وعامٌ في قيادة فريق الأنظمة الخلفية. أوقف قفلٌ في Redis لكل طلب، مع قفل تفاؤلي في PostgreSQL، تكرارَ الموافقات بين النسخ.",
+      "description": "خدمات بـ Go وPostgreSQL للعمليات المالية، ومنها إصدار البطاقات، وفترةً في قيادة فريق الأنظمة الخلفية. أوقف قفلُ Redis لكل طلب، مع القفل التفاؤلي في PostgreSQL، تكرارَ الموافقات بين النسخ.",
       "role": "مهندس برمجيات، وقائد فريق الأنظمة الخلفية",
       "impact": "خدمات بـ Go وPostgreSQL، من 2022 إلى 2025"
     }

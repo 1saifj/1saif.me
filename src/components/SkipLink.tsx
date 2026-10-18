@@ -5,5 +5,5 @@ import { useLanguage } from '../i18n/language'
 export const SkipLink: React.FC = () => {
   const { language } = useLanguage()
 
-  return <a href="#main-content" className="sr-only">{language === 'ar' ? 'انتقل إلى المحتوى' : 'Skip to main content'}</a>
+  return <a href="#main-content" className="sr-only">{language === 'ar' ? 'انتقل إلى المحتوى الرئيسي' : 'Skip to main content'}</a>
 }

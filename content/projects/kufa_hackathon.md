@@ -11,7 +11,6 @@ role: Sole author
 impact: Next.js and Supabase, realtime updates and FCM push notifications, unit and end-to-end tests
 ---
 
-# Kufa Hackathon Platform
 This platform runs the University of Kufa hackathon. I wrote all of it.
 
 ## What it does

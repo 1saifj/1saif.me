@@ -96,6 +96,13 @@ describe('markdown code blocks', () => {
     expect(block).not.toContain('<br>')
   })
 
+  it('keeps a # comment on a later line of code out of the headings', async () => {
+    const html = await render('```ini\n[Peer]\n# my laptop\nAllowedIPs = 10.8.0.2/32\n```')
+
+    expect(html).toContain('<span class="line">[Peer]</span>\n<span class="line"># my laptop</span>\n<span class="line">AllowedIPs')
+    expect(html).not.toMatch(/<h[1-6]/)
+  })
+
   it('renders code as escaped plain text without Shiki for the first paint', async () => {
     const html = await render('```go\nif a < b {}\n```')
 

@@ -25,7 +25,7 @@ git switch -                    # go back to the previous branch
 git switch --detach v1.4.0      # look at a tag or commit without a branch
 ```
 
-If you have uncommitted changes that would be overwritten, it refuses, just like `checkout` does. Nothing new there. The difference is that `switch` never touches files any other way.
+If uncommitted changes would be overwritten, it refuses, just as `checkout` does. Nothing new there. The difference is that `switch` only touches files as part of changing branch.
 
 ## git restore: files
 
@@ -38,7 +38,7 @@ git restore --source=HEAD~3 go.mod  # bring back go.mod as it was 3 commits ago
 git restore .                       # throw away all unstaged changes
 ```
 
-The `--staged` version replaces `git reset HEAD <file>`, which never made much sense to people as "unstage". And `--source` makes it obvious where the file content comes from.
+`git restore --staged` replaces `git reset HEAD <file>`, a command many people never understood as "unstage". `--source` also shows where the file content comes from.
 
 ## Why it matters
 
@@ -46,7 +46,7 @@ With `checkout`, the same word does both, and Git guesses which one you meant fr
 
 `git checkout main` switches branches. But if you also have a file or folder called `main`, Git silently picks the branch. Add `--` and a path, and the same command overwrites files instead. And `git checkout -- .` looks innocent but throws away every unstaged change in the current directory, with no confirmation and no reflog entry to save you. Those changes were never committed, so Git has no copy of them.
 
-The new commands make the risk clear. `switch` moves you between branches. `restore` overwrites files, and you should pause before you press enter.
+The new commands make the risk clear: `switch` moves you between branches, and `restore` overwrites files. Pause before you run `restore`.
 
 ## Command map
 
@@ -58,6 +58,6 @@ The new commands make the risk clear. `switch` moves you between branches. `rest
 | Unstage a file | `git reset HEAD file` | `git restore --staged file` |
 | Old version of a file | `git checkout abc123 -- file` | `git restore --source=abc123 file` |
 
-`git checkout` still works and isn't going away, so old scripts and old habits keep working. But for daily use, use `switch` for branches and `restore` for files. Less confusion, fewer mistakes.
+`git checkout` still works, so old scripts keep running. For daily work, use `switch` for branches and `restore` for files.
 
 What do you use day to day?

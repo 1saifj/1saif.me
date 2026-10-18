@@ -41,7 +41,7 @@ k6 run -e BASE_URL=https://staging.example.com load.js
 
 k6 starts 50 virtual users. Each one runs the default function in a loop: one request, a check, one second of rest. When it finishes, you get a summary with the request rate, the failure rate and latency percentiles.
 
-Look at `p(95)` and `p(99)`, not the average. An average of 150 ms can hide the 5% of users who wait two seconds.
+Look at `p(95)` and `p(99)`, not the average. An average of 150 ms can hide the slowest 5% of requests, which may take two seconds.
 
 ## Stages: find where it breaks
 
@@ -106,7 +106,7 @@ export const options = {
 };
 ```
 
-Now k6 starts 200 requests every second, no matter how slow the responses get, and adds virtual users as needed to keep that rate. This is much better at showing what happens when you fall behind.
+Now k6 starts 200 requests every second, no matter how slow the responses get, and adds virtual users, up to `maxVUs`, to keep that rate. This is much better at showing what happens when you fall behind.
 
 ## Testing real flows
 
@@ -134,7 +134,7 @@ Test the flows that matter, not only the cheapest endpoint. A list endpoint that
 ## A few things to watch out for
 
 - **Don't run it against production** unless everyone knows and you have a way to stop it fast. Use a staging environment that looks like production, with similar data volume. A query that's fast on 500 rows can be slow on 5 million.
-- **Run k6 from a separate machine.** If it runs on the same server as the API, they fight for CPU and your numbers mean nothing. Also check that the machine running k6 isn't the bottleneck itself.
+- **Run k6 from a separate machine.** If it runs on the same server as the API, they fight for CPU, and your numbers are unreliable. Also check that the machine running k6 isn't the bottleneck itself.
 - **Watch the server while it runs**, not only the k6 output. CPU, memory, database connections, slow query logs. Server metrics explain the latency that k6 reports.
 - **Be careful with rate limits and caches.** If your test hits the same URL with the same user, you might be testing the cache or the rate limiter instead of the API.
 

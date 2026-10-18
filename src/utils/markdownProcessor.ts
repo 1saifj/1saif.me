@@ -30,7 +30,17 @@ export const convertMarkdownToHtml = (markdown: string): string => {
     return `\n\n<!--code-block-->${block}<!--/code-block-->\n\n`
   })
 
-  // Step 1b: Headings, after code blocks are out of the way (a `# comment` in code is not a heading).
+  // Step 1b: Hide code blocks from every later step, headings included
+  const protectedBlocks: { placeholder: string; content: string }[] = []
+  // Explicit markers: a regex on </div> stopped at the header and left the code exposed to the newline-to-<br> step.
+  html = html.replace(/<!--code-block-->[\s\S]*?<!--\/code-block-->/g, (match) => {
+    const placeholder = `___PROTECTED_BLOCK_${protectedBlocks.length}___`
+    protectedBlocks.push({ placeholder, content: match })
+
+    return placeholder
+  })
+
+  // Step 2: Headings, now that code blocks are hidden (a `# comment` in code is not a heading).
   // Each heading is its own block, so the text right under it becomes a paragraph.
   const used = new Map<string, number>()
   const heading = (level: number) => (_match: string, text: string) => {
@@ -51,16 +61,6 @@ export const convertMarkdownToHtml = (markdown: string): string => {
     .replace(/^### (.*$)/gm, heading(3 + shift))
     .replace(/^## (.*$)/gm, heading(2 + shift))
     .replace(/^# (.*$)/gm, heading(2))
-
-  // Step 2: Protect code blocks from further processing
-  const protectedBlocks: { placeholder: string; content: string }[] = []
-  // Explicit markers: a regex on </div> stopped at the header and left the code exposed to the newline-to-<br> step.
-  html = html.replace(/<!--code-block-->[\s\S]*?<!--\/code-block-->/g, (match) => {
-    const placeholder = `___PROTECTED_BLOCK_${protectedBlocks.length}___`
-    protectedBlocks.push({ placeholder, content: match })
-
-    return placeholder
-  })
 
   // Inline code is escaped and set aside before the other inline rules, so `a<<b` or `**x**` stay literal.
   // An unescaped "<" here once opened a tag that the browser carried past the article and broke hydration.
