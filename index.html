@@ -180,7 +180,7 @@ html.dark .theme-when-dark { display: inline-flex; }
   .notebook-section { padding: 48px 0; }
   .notebook-work-featured { grid-template-columns: 1fr; gap: 28px; }
   .notebook-timeline > li { grid-template-columns: 1fr; gap: 4px; }
-  .notebook-post-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  html .notebook-post-row, html[dir='rtl'] .notebook-post-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .notebook-post-row time { order: 2; }
   .notebook-post-thumb { display: none; }
   .route-skeleton { width: calc(100% - 32px); }
