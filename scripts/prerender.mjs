@@ -11,9 +11,10 @@ const dist = path.join(root, process.argv[2] || 'dist')
 
 const ssrOut = path.join(root, 'node_modules/.cache/prerender')
 
-await build({ root, logLevel: 'warn', ssr: { noExternal: ['react-helmet-async'] }, build: { ssr: 'src/entry-server.tsx', outDir: ssrOut, emptyOutDir: true, minify: false, copyPublicDir: false, rollupOptions: { output: { entryFileNames: 'entry-server.js', chunkFileNames: '[name].js' } } } })
+// .mjs, because package.json has no "type": "module" and Node before 22 reads a .js file as CommonJS.
+await build({ root, logLevel: 'warn', ssr: { noExternal: ['react-helmet-async'] }, build: { ssr: 'src/entry-server.tsx', outDir: ssrOut, emptyOutDir: true, minify: false, copyPublicDir: false, rollupOptions: { output: { entryFileNames: 'entry-server.mjs', chunkFileNames: '[name].mjs' } } } })
 
-const { prepare, render, routes } = await import(path.join(ssrOut, 'entry-server.js'))
+const { prepare, render, routes } = await import(path.join(ssrOut, 'entry-server.mjs'))
 
 const template = await fs.readFile(path.join(dist, 'index.html'), 'utf8')
 
