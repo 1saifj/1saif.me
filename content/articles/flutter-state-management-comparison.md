@@ -124,6 +124,19 @@ ElevatedButton(
 )
 ```
 
+This is Riverpod 2 code. In Riverpod 3, `StateNotifierProvider` moved to `package:flutter_riverpod/legacy.dart`, and the main API uses `Notifier` with `NotifierProvider` instead:
+
+```dart
+class CounterNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void increment() => state++;
+}
+
+final counterProvider = NotifierProvider<CounterNotifier, int>(CounterNotifier.new);
+```
+
 ### Pros of Riverpod
 - Type-safe, with compile-time checks
 - Providers can be overridden for testing

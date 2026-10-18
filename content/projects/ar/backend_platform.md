@@ -10,7 +10,7 @@ name: Backend Platform and Cloud Infrastructure
 - بنية تحتية مكتوبة ككود على Google Cloud باستخدام Pulumi: خدمات Cloud Run، وValkey، وربط هويات GitHub عبر OIDC، وبيئات معاينة لطلبات السحب (pull requests)، وتنبيهات الإنتاج.
 - خدمة بلغة Go تعمل بـ TLS على الحافة، تعيد تحميل شهادتها عند تغيّر ملفاتها، ولها اختبارات حمل بـ k6.
 - واجهة برمجية على الحافة موجّهة للشركاء، مع قواطع الدائرة (circuit breakers) ونشر وتراجع مؤتمتَين.
-- لوحات تحكم للشركاء، وتطبيقات بمؤقّت زمني بالعربية والإنجليزية والكردية، بتخطيطات من اليمين إلى اليسار.
+- لوحات تحكم للشركاء، وتطبيقات مسابقات بعدّ تنازلي بالعربية والإنجليزية والكردية، بتخطيطات من اليمين إلى اليسار.
 
 ## كيف أعمل عليها
 
@@ -21,4 +21,4 @@ name: Backend Platform and Cloud Infrastructure
 
 ## التقنيات
 
-TypeScript، Express، PostgreSQL مع Drizzle، Redis، Zod، OpenAPI، Next.js، React، Go، Pulumi، Google Cloud، Docker، k6، Playwright، Vitest.
+TypeScript، Express، PostgreSQL مع Drizzle، Valkey (متوافق مع Redis)، Zod، OpenAPI، Next.js، React، Go، Pulumi، Google Cloud، Docker، k6، Playwright، Vitest.
