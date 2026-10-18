@@ -1,0 +1,39 @@
+/* Search dialog. It sits inside .notebook-shell, so it inherits the site's light and dark colours. */
+.search-dialog { width: min(640px, calc(100vw - 32px)); max-height: min(560px, calc(100dvh - 96px)); margin: 12vh auto auto; padding: 0; border: 1px solid var(--nb-line); border-radius: 12px; background: var(--nb-surface); color: var(--nb-ink); box-shadow: 0 24px 64px rgba(9, 13, 18, .28); overflow: hidden; }
+.search-dialog[open] { display: flex; flex-direction: column; }
+.search-dialog::backdrop { background: rgba(9, 13, 18, .45); backdrop-filter: blur(2px); }
+
+.search-field { display: flex; flex: none; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--nb-line); }
+.search-field svg { flex: none; width: 18px; height: 18px; color: var(--nb-ink-3); }
+.search-field input { flex: 1; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; font-size: 17px; }
+.search-field input::placeholder { color: var(--nb-ink-3); }
+/* The field is the dialog's only input and always focused, so an accent line replaces the site's focus ring. */
+.notebook-shell .search-field input:focus-visible, .site-shell .search-field input:focus-visible { outline: none; }
+.search-field:focus-within { box-shadow: inset 0 -2px 0 var(--nb-accent); }
+.search-field input::-webkit-search-cancel-button { display: none; }
+
+.search-dialog kbd { display: inline-block; min-width: 1.6em; padding: 1px 5px; border: 1px solid var(--nb-line); border-radius: 5px; color: var(--nb-ink-3); font: 500 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: center; }
+.search-hints kbd + kbd { margin-inline-start: 3px; }
+
+.search-results { flex: 1; overflow-y: auto; padding: 4px 8px 10px; overscroll-behavior: contain; }
+.search-group-title { margin: 12px 10px 4px; color: var(--nb-ink-3); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+html[dir='rtl'] .search-group-title { letter-spacing: 0; }
+
+.search-item { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 9px 10px; border-radius: 8px; color: inherit; text-decoration: none; }
+.search-item[aria-selected='true'] { background: color-mix(in srgb, var(--nb-accent) 12%, transparent); }
+.search-item[aria-selected='true'] .search-item-title { color: var(--nb-accent); }
+.search-item-title { min-width: 0; overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.search-item-detail { flex: none; max-width: 45%; overflow: hidden; color: var(--nb-ink-3); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+
+.search-empty { margin: 18px 10px; color: var(--nb-ink-2); font-size: 15px; line-height: 1.6; }
+.search-hints { flex: none; margin: 0; padding: 9px 16px; border-top: 1px solid var(--nb-line); color: var(--nb-ink-3); font-size: 12px; }
+
+@media (max-width: 620px) {
+  .search-dialog { margin-top: 8px; max-height: calc(100dvh - 16px); }
+  .search-hints { display: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .search-dialog[open] { animation: search-in 140ms ease-out; }
+  @keyframes search-in { from { opacity: 0; transform: translateY(-6px); } }
+}

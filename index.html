@@ -96,6 +96,17 @@ html.dark .notebook-shell { --nb-bg: #0d1117; --nb-line: #262f3a; --nb-ink: #e6e
 .notebook-section-note { margin: -18px 0 22px; color: var(--nb-ink-3); font-size: 15px; }
 .notebook-subtitle { margin: 44px 0 6px; color: var(--nb-ink-2); font-size: 1rem; font-weight: 600; }
 .notebook-muted { color: var(--nb-ink-3); }
+.notebook-subtitle.notebook-subtitle-first { margin-top: 0; }
+.notebook-subtitle + .notebook-work-featured { margin-top: 18px; }
+.notebook-timeline { margin: 4px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--nb-line); }
+.notebook-timeline > li { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--nb-line); }
+.notebook-timeline-period { margin: 3px 0 0; color: var(--nb-ink-3); font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* A small accent dot marks the roles that are still current. */
+.notebook-timeline > li.is-current .notebook-timeline-period::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-inline-end: 8px; border-radius: 50%; background: var(--nb-accent); vertical-align: 1px; }
+.notebook-timeline h4 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.notebook-timeline-role { margin: 4px 0 0; font-size: 15px; }
+.notebook-timeline-role span { color: var(--nb-ink-3); font-size: 14px; }
+.notebook-timeline-summary { margin: 6px 0 0; max-width: 62ch; color: var(--nb-ink-2); font-size: 15px; line-height: 1.55; }
 
 /* Work */
 .notebook-work-featured { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; }
@@ -166,6 +177,7 @@ html.dark .theme-when-dark { display: inline-flex; }
   .notebook-portrait img { border-radius: 50%; aspect-ratio: 1; }
   .notebook-section { padding: 48px 0; }
   .notebook-work-featured { grid-template-columns: 1fr; gap: 28px; }
+  .notebook-timeline > li { grid-template-columns: 1fr; gap: 4px; }
   .notebook-post-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .notebook-post-row time { order: 2; }
   .notebook-post-thumb { display: none; }
