@@ -4,9 +4,9 @@ import { SiteHeader } from './SiteHeader'
 import { PostThumb } from './PostThumb'
 import { postText, publishedBlogs } from '../data/blogs'
 import { createSlugFromTitle } from '../utils/slugUtils'
-import { dateLocale, Language, useLanguage } from '../i18n/language'
+import { dateLocale, Language, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
 
-const formatDate = (timestamp: number, language: Language) => new Intl.DateTimeFormat(dateLocale(language), { year: 'numeric', month: 'short', day: 'numeric' }).format(timestamp)
+const formatDate = (timestamp: number, language: Language) => new Intl.DateTimeFormat(dateLocale(language), { year: 'numeric', month: 'short', day: 'numeric', timeZone: SITE_TIME_ZONE }).format(timestamp)
 
 const copy = {
   en: {
