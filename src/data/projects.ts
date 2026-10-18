@@ -65,11 +65,11 @@ export const projects: Project[] = [
     "isPrivate": false,
     "sourceType": "open-source",
     "role": "Author",
-    "impact": "Activity-based watchdogs, one permission vocabulary across five CLIs, 226 tests",
+    "impact": "Activity-based watchdogs, one permission vocabulary across five CLIs, end-to-end tested",
     "ar": {
       "description": "مهارة وكيل (Agent Skill) وأداة سطر أوامر تتيح لوكيل برمجة واحد إسناد العمل إلى Claude Code أو Codex أو Kiro أو OpenCode أو Devin، واحتجاز طلبات الأذونات، واستلام نتائج محدّدة الأنواع.",
       "role": "المطوّر",
-      "impact": "مراقبة تعتمد على نشاط الأداة، ومفردات أذونات موحّدة لخمس أدوات، و226 اختباراً"
+      "impact": "مراقبة تعتمد على نشاط الأداة، ومفردات أذونات موحّدة لخمس أدوات، واختبارات طرف إلى طرف"
     }
   },
   {
@@ -82,12 +82,12 @@ export const projects: Project[] = [
     "isPrivate": true,
     "sourceType": "company",
     "role": "Sole author",
-    "impact": "Next.js and Supabase, realtime plus FCM notifications, 127 test files",
+    "impact": "Next.js and Supabase, realtime updates and FCM push notifications, unit and end-to-end tests",
     "ar": {
       "name": "منصة هاكاثون جامعة الكوفة",
       "description": "المنصة التي يُدار بها هاكاثون جامعة الكوفة: تسجيل الفرق، وتسليم المشاريع، وتوزيع المحكّمين، والإشعارات.",
       "role": "المطوّر الوحيد",
-      "impact": "Next.js وSupabase، وإشعارات فورية عبر Realtime وFCM، و127 ملف اختبار"
+      "impact": "Next.js وSupabase، وتحديثات فورية عبر Realtime وإشعارات FCM، مع اختبارات وحدات واختبارات طرف إلى طرف"
     }
   },
   {
@@ -99,12 +99,12 @@ export const projects: Project[] = [
     "isPrivate": true,
     "sourceType": "company",
     "role": "Team member",
-    "impact": "Top human committer on the driver app; identity hardening on the API",
+    "impact": "Main contributor to the Flutter driver app; hardened identity and authentication on the API",
     "ar": {
       "name": "نظام الحافلات الجامعية",
       "description": "نظام لتتبّع الحافلات في حرم جامعي: واجهة برمجية بـ .NET، وتطبيق Flutter للركّاب، وتطبيق Flutter للسائقين يمسح التذاكر برمز QR.",
       "role": "عضو في الفريق",
-      "impact": "أكثر أعضاء الفريق مساهمةً في تطبيق السائقين، وتحصين الهوية والمصادقة في الواجهة البرمجية"
+      "impact": "المساهم الرئيسي في تطبيق السائقين بـ Flutter، وتحصين الهوية والمصادقة في الواجهة البرمجية"
     }
   },
   {
@@ -134,11 +134,11 @@ export const projects: Project[] = [
     "isPrivate": false,
     "sourceType": "open-source",
     "role": "Author",
-    "impact": "Open-source Go library, 12 GitHub stars",
+    "impact": "Open-source Go middleware for readable request and response logs",
     "ar": {
       "description": "وسيط (middleware) بلغة Go يسجّل طلبات HTTP واستجاباتها بصيغة منظّمة سهلة القراءة.",
       "role": "المطوّر",
-      "impact": "مكتبة Go مفتوحة المصدر، 12 نجمة على GitHub"
+      "impact": "مكتبة Go مفتوحة المصدر لسجلات طلبات واستجابات مقروءة"
     }
   },
   {
@@ -151,11 +151,11 @@ export const projects: Project[] = [
     "isPrivate": false,
     "sourceType": "open-source",
     "role": "Author",
-    "impact": "Published on pub.dev, 8 GitHub stars",
+    "impact": "Published on pub.dev",
     "ar": {
       "description": "حزمة Flutter تكتب الأسماء والعبارات العربية بالحروف اللاتينية، فتحوّل مثلاً «سيف» إلى Saif.",
       "role": "المطوّر",
-      "impact": "منشورة على pub.dev، و8 نجوم على GitHub"
+      "impact": "منشورة على pub.dev"
     }
   }
 ]

@@ -7,11 +7,11 @@ wip: false
 isPrivate: true
 sourceType: company
 role: Team member
-impact: Top human committer on the driver app; identity hardening on the API
+impact: Main contributor to the Flutter driver app; hardened identity and authentication on the API
 ---
 
 # Campus Bus Transit System
-A team built this bus system for a university campus. I worked on all three parts, and I am the top human committer on the driver app.
+A team built this bus system for a university campus. I worked on all three parts and was the main contributor to the driver app.
 
 ## My part
 

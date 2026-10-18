@@ -8,7 +8,7 @@ wip: false
 isPrivate: true
 sourceType: company
 role: Sole author
-impact: Next.js and Supabase, realtime plus FCM notifications, 127 test files
+impact: Next.js and Supabase, realtime updates and FCM push notifications, unit and end-to-end tests
 ---
 
 # Kufa Hackathon Platform
@@ -24,4 +24,4 @@ This platform runs the University of Kufa hackathon. I wrote all of it.
 
 ## Stack
 
-Next.js, Supabase, Tailwind CSS, TanStack Query, Jest, Playwright. The repository has 127 test files.
+Next.js, Supabase, Tailwind CSS, TanStack Query, Jest, Playwright.
