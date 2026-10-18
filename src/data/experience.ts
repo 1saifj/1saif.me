@@ -18,8 +18,9 @@ export const experience: Experience[] = [
     location: 'Remote',
     role: 'Lead Software Engineer',
     mode: 'Part-time',
-    summary: 'I lead engineering for the company’s backend, its cloud infrastructure, and the web and mobile products built on them.',
+    summary: 'I own engineering end to end: the backend, the cloud platform under it, and the web and mobile apps on top. I also run the planning, work directly with partners and stakeholders, and lead the migrations.',
     highlights: [
+      'Run the engineering plan: the roadmap, the Jira board, migration plans, and the day-to-day contact with partners and other teams.',
       'Main author of the backend: integrations with partner platforms, billing callbacks, a content API, and reporting.',
       'Built the Google Cloud infrastructure as code with Pulumi, and a Go service that terminates TLS at the edge.',
       'Set up CI that runs only the affected database tests, k6 load tests before launches, and production alerting.',
@@ -30,8 +31,9 @@ export const experience: Experience[] = [
       location: 'عن بُعد',
       role: 'قائد هندسة البرمجيات',
       mode: 'دوام جزئي',
-      summary: 'أقود الهندسة للأنظمة الخلفية للشركة، وبنيتها السحابية، ومنتجات الويب والأجهزة المحمولة المبنية عليها.',
+      summary: 'أتولّى الهندسة من البداية إلى النهاية: الأنظمة الخلفية، والمنصة السحابية التي تعمل عليها، وتطبيقات الويب والأجهزة المحمولة المبنية فوقها. وأتولّى أيضاً التخطيط، وأعمل مباشرةً مع الشركاء والجهات المعنية، وأقود عمليات الترحيل.',
       highlights: [
+        'أدير خطة العمل الهندسي: خارطة الطريق، ولوحة Jira، وخطط الترحيل، والتواصل اليومي مع الشركاء والفرق الأخرى.',
         'المطوّر الرئيسي للأنظمة الخلفية: التكامل مع منصات الشركاء، واستدعاءات الفوترة، وواجهة برمجية للمحتوى، والتقارير.',
         'بنيت البنية التحتية على Google Cloud ككود باستخدام Pulumi، وخدمة بلغة Go تتولّى TLS على الحافة.',
         'أعددت مسار تكامل مستمر (CI) يشغّل اختبارات قاعدة البيانات المتأثرة بالتغيير فقط، واختبارات حمل بـ k6 قبل كل إطلاق، وتنبيهات للإنتاج.',
