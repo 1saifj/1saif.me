@@ -151,7 +151,7 @@
   
   .article-content code:not(pre code) {
     @apply px-1.5 py-0.5 rounded text-sm font-mono;
-    @apply bg-slate-100 dark:bg-slate-800 text-pink-600 dark:text-pink-400;
+    @apply bg-slate-100 dark:bg-slate-800 text-pink-700 dark:text-pink-400;
     @apply border border-slate-200 dark:border-slate-700;
   }
   
@@ -329,7 +329,7 @@ html[dir='rtl'] .site-shell svg[data-icon='arrow-right'], html[dir='rtl'] .site-
 .site-article-content.article-content a { color: var(--site-blue); }
 .site-article-content.article-content blockquote { margin: 2em 0; padding: 1em 1.3em; border-inline-start: 3px solid var(--site-blue); color: var(--site-muted); background: var(--site-surface); }
 .site-article-content.article-content pre { overflow-x: auto; margin: 2em 0; padding: 20px; border: 1px solid var(--site-line); border-radius: 5px; background: var(--site-surface); }
-.site-article-content.article-content code { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .84em; }
+.site-article-content.article-content code { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
 .site-article-related { background: var(--site-surface); }
 .site-article-related h2 { margin: 5px 0 8px; font-family: ui-serif, Georgia, serif; font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 500; letter-spacing: -.045em; }
 @media (max-width: 760px) {
@@ -351,7 +351,7 @@ html[dir='rtl'] .site-shell svg[data-icon='arrow-right'], html[dir='rtl'] .site-
 .site-project-content.article-content strong { color: var(--site-ink); }
 .site-project-content.article-content a { color: var(--site-blue); }
 .site-project-content.article-content pre { overflow-x: auto; padding: 20px; border: 1px solid var(--site-line); border-radius: 5px; background: var(--site-surface); }
-.site-project-content.article-content code { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; }
+.site-project-content.article-content code { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
 
 /* Resume keeps the same editorial system while giving the career story room to breathe. */
 .site-resume-page > .site-footer { display: flex; justify-content: space-between; gap: 20px; padding: 24px 0; color: var(--site-faint); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }

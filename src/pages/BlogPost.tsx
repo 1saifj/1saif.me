@@ -8,7 +8,7 @@ import { ArticleStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
 import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import { enhanceCodeBlocks } from '../utils/codeBlocks'
-import { dateLocale, useLanguage } from '../i18n/language'
+import { dateLocale, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
 import { ContentSkeleton } from '../components/ContentSkeleton'
 
 // Filled by entry-server before prerendering. In the browser, the prerendered body is read back
@@ -92,8 +92,8 @@ export const BlogPost: React.FC = () => {
           {/* On Arabic pages the head is Arabic, laid out in the same column as the English body below it. */}
           <header className="site-container plain-page plain-article-head">
             {ar
-              ? <div lang="ar" dir="rtl"><p className="plain-back"><Link to="/blog">→ كل المقالات</Link></p><h1>{text.title}</h1><p className="plain-lede">{text.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString(dateLocale(language), { year: 'numeric', month: 'long', day: 'numeric' })}</time> · {arabicMinutes(readTime)} قراءة · <button type="button" className="plain-button" onClick={() => void share()}>مشاركة</button></p><p className="site-translation-note">المقال مكتوب بالإنجليزية، وعنوانه الأصلي: <bdi lang="en">{blog.title}</bdi></p></div>
-              : <><p className="plain-back"><Link to="/blog">← All posts</Link></p><h1>{blog.title}</h1><p className="plain-lede">{blog.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' })}</time> · {readTime} min read · <button type="button" className="plain-button" onClick={() => void share()}>Share</button></p></>}
+              ? <div lang="ar" dir="rtl"><p className="plain-back"><Link to="/blog">→ كل المقالات</Link></p><h1>{text.title}</h1><p className="plain-lede">{text.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString(dateLocale(language), { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {arabicMinutes(readTime)} قراءة · <button type="button" className="plain-button" onClick={() => void share()}>مشاركة</button></p><p className="site-translation-note">المقال مكتوب بالإنجليزية، وعنوانه الأصلي: <bdi lang="en">{blog.title}</bdi></p></div>
+              : <><p className="plain-back"><Link to="/blog">← All posts</Link></p><h1>{blog.title}</h1><p className="plain-lede">{blog.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {readTime} min read · <button type="button" className="plain-button" onClick={() => void share()}>Share</button></p></>}
           </header>
           <div className="site-container plain-article-body">{htmlContent ? <div ref={body} className="site-article-content article-content" data-article={slug} dangerouslySetInnerHTML={{ __html: htmlContent }} /> : <ContentSkeleton />}</div>
         </article>
