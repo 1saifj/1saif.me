@@ -23,7 +23,7 @@ Picture a bucket that holds tokens:
 
 Walk through it with those numbers. A user starts with a full bucket and sends 10 requests at once. All 10 go through, and the bucket is empty. After that they can send about 5 requests per second, because that's how fast tokens come back. If they stop for 2 seconds, the bucket refills by 10, and they can burst again.
 
-The refill rate sets the average. The capacity sets the largest burst. That separation is why the token bucket fits real clients so well. A mobile app opening a screen often fires several requests at the same moment and then goes quiet. A strict "5 per second" limit would reject half of that screen. The bucket lets the burst through and still holds the average.
+The refill rate sets the average. The capacity sets the largest burst. That separation is why the token bucket fits real clients so well. A mobile app opening a screen often fires several requests at the same moment and then goes quiet. A strict "5 per second" limit would reject some of those requests. The bucket lets the burst through and still holds the average.
 
 ## A simple implementation
 
@@ -81,6 +81,10 @@ type clientLimiters struct {
 	limiters map[string]*rate.Limiter
 }
 
+func newClientLimiters() *clientLimiters {
+	return &clientLimiters{limiters: make(map[string]*rate.Limiter)}
+}
+
 func (c *clientLimiters) get(key string) *rate.Limiter {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -110,7 +114,7 @@ Return `429 Too Many Requests` with a `Retry-After` header. Well-behaved clients
 
 ## More than one instance
 
-An in-memory limiter is per process. If you run three instances behind a load balancer, each one allows 5 per second, and the client effectively gets 15.
+An in-memory limiter is per process. If you run three instances behind a load balancer, each one allows 5 per second, so the client can get up to 15 per second.
 
 Sometimes that's fine. If the goal is to protect each instance from overload, a local limit is exactly right, and it costs nothing. If the limit is a promise, like "100 requests per minute on the free plan", you need shared state. The usual answer is Redis: keep the token count and the last refill time in a key, and do the refill-and-take step in a small Lua script so it's atomic. Some API gateways and proxies also do this for you, so check what's in front of your service before you build it.
 

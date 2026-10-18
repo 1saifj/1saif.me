@@ -1,7 +1,7 @@
 ---
 order: 4
 name: Al Qaseh Financial Services
-description: Backend engineering on financial software at Al Qaseh, including a year leading the backend team.
+description: Backend engineering on financial software at Al Qaseh, including time as backend team lead.
 language: go
 wip: false
 isPrivate: true
@@ -10,7 +10,6 @@ role: Software engineer, backend team lead
 impact: Go and PostgreSQL services, 2022 to 2025
 ---
 
-# Al Qaseh Financial Services
 I worked at Al Qaseh from August 2022 to July 2025 on backend services for financial software. From October 2023 to July 2024 I also led the backend team.
 
 ## What I did

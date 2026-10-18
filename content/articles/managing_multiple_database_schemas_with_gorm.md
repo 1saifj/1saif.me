@@ -1,6 +1,6 @@
 ---
 title: Managing Multiple Database Schemas with Gorm
-description: "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes."
+description: "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names."
 createdAt: "2023-07-09"
 updatedAt: 2023-07-09
 featuredImage: "/articles/gorm_schema_feat.jpg"
@@ -10,21 +10,21 @@ tags:
   - database
 ---
 
-# Introduction
+## Introduction
 
-Gorm is an exceptional Object-Relational Mapping (ORM) library for Golang, equipped with a wide range of features.
+GORM is an Object-Relational Mapping (ORM) library for Go with a wide range of features.
 
-# Identifying the Issue
+## Identifying the Issue
 
-Although the Gorm documentation is comprehensive, it does not always include all the minor details that a developer might need. I encountered a specific problem where I needed to manage two schemas with one database, as illustrated below. The aim was to maintain a schema of APP and another schema of AUTH within the same database. This separation can be useful for breaking down the application into smaller services or for managing the app database from a different viewpoint.
+The GORM documentation is thorough, but it does not cover every detail. I needed to manage two schemas in one database, as the diagram below shows. The aim was to keep a schema named APP and another named AUTH in the same database. This separation helps when you split the application into smaller services, or when you want to manage the app database from a different viewpoint.
 
-![image](https://i.imgur.com/2p8e8GV.png)
+![Diagram of the app and auth schemas in one database](https://i.imgur.com/2p8e8GV.png)
 
-Upon reading the Gorm documentation, I did not find a direct solution to my problem. However, by exploring the Gorm [source code](https://github.com/go-gorm/gorm/blob/master/schema/schema.go#L98), I was able to devise a solution.
+The GORM documentation did not give a direct answer to my problem. However, reading the [source code](https://github.com/go-gorm/gorm/blob/master/schema/schema.go#L98) showed me a solution.
 
-# The Solution
+## The Solution
 
-To enable Gorm to manage multiple schemas within one database, we can use table naming for each table model we create.
+To let GORM manage multiple schemas in one database, set a table name for each model.
 
 ```go
 type TablerWithNamer interface {
@@ -32,29 +32,11 @@ type TablerWithNamer interface {
 }
 ```
 
-Here, TableName is an interface used to modify the given name for a table. To employ this function, we need to define a custom struct that implements this interface.
+`TablerWithNamer` is GORM's interface for this. Its `TableName` method takes GORM's naming strategy (`Namer`) and returns the table name. The example below uses the simpler `TableName() string` method, which takes no argument.
+
+The full example follows the diagram above. It gives each table its schema name, and it uses a clause to preload associations.
 
 ```go
-
-// CustomTabler is a custom struct that implements TablerWithNamer
-type CustomTabler struct {
-	gorm.Tabler
-}
-```
-
-```go
-// TableName returns the custom table name based on the struct name
-func (ct *CustomTabler) TableName() string {
-	// Generate and return the custom table name based on your logic
-	// Example: return "custom_table_name"
-	return "custom_table_name"
-}
-```
-
-Now let's implement our database schemas as per the diagram above, using a full code example that utilizes Gorm's table renaming, scopes, and clauses.
-
-```go
-
 package main
 
 import (
@@ -85,6 +67,7 @@ type Order struct {
 	ID     uint
 	Name   string
 	UserID uint
+	User   User
 }
 
 // TableName returns the custom table name for the Order model
@@ -132,13 +115,12 @@ func main() {
 	db.Preload(clause.Associations).Find(&appOrdersWithUser)
 	fmt.Println("App Orders with User:", appOrdersWithUser)
 }
-
 ```
 
-We begin by creating our models, such as the user and order models. We establish a database connection and ensure our database includes these schemas, creating them if necessary. clause.Associations are used to specify associations to be preloaded or eager-loaded when querying the database. It allows you to load related associations in a single query to minimize the number of database round-trips and improve performance.
+The example defines the models first. Then it connects to the database and creates both schemas if they do not exist. `Preload(clause.Associations)` tells GORM to load every association of the model. GORM runs one extra query per association, instead of one query per row, so you avoid the N+1 query problem.
 
-That's it! Thank you for reading this blog, and stay tuned for future posts.
+Thanks for reading.
 
-# source code
+## Source code
 
-[Github](https://github.com/1saifj/gorm_multipe_schemas)
+[GitHub](https://github.com/1saifj/gorm_multipe_schemas)

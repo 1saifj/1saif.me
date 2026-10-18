@@ -25,14 +25,7 @@ export const convertMarkdownToHtml = (markdown: string): string => {
     return `<!--code-block-->${block}<!--/code-block-->`
   })
 
-  // Step 1b: Headings, after code blocks are out of the way (a `# comment` in code is not a heading)
-  html = html
-    // Convert headers (with improved styling and dark mode support)
-    .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mt-8 mb-4 pb-2 border-b border-slate-200 dark:border-slate-700">$1</h3>')
-    .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-10 mb-6 pb-3 border-b-2 border-blue-100 dark:border-blue-800">$1</h2>')
-    .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold text-slate-900 dark:text-white mt-12 mb-8 pb-4 border-b-2 border-blue-200 dark:border-blue-700">$1</h1>')
-
-  // Step 3: Protect Shiki code blocks from further processing
+  // Step 1b: Hide code blocks from every later step, headings included
   const protectedBlocks: { placeholder: string; content: string }[] = []
   // Explicit markers: a regex on </div> stopped at the header and left the code exposed to the newline-to-<br> step.
   html = html.replace(/<!--code-block-->[\s\S]*?<!--\/code-block-->/g, (match) => {
@@ -41,6 +34,13 @@ export const convertMarkdownToHtml = (markdown: string): string => {
 
     return placeholder
   })
+
+  // Step 2: Headings, now that code blocks are hidden (a `# comment` in code is not a heading)
+  html = html
+    // Convert headers (with improved styling and dark mode support)
+    .replace(/^### (.*$)/gm, '<h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mt-8 mb-4 pb-2 border-b border-slate-200 dark:border-slate-700">$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mt-10 mb-6 pb-3 border-b-2 border-blue-100 dark:border-blue-800">$1</h2>')
+    .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold text-slate-900 dark:text-white mt-12 mb-8 pb-4 border-b-2 border-blue-200 dark:border-blue-700">$1</h1>')
 
   // Step 4: Continue with other markdown processing
   html = html

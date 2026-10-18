@@ -13,7 +13,7 @@ The personal site of Saif Aljanahi: work, writing and résumé, in English and A
 
 - Articles are Markdown files in `content/articles/`, listed in `src/data/blogs.ts`
 - Case studies are Markdown files in `content/projects/`, with Arabic versions in `content/projects/ar/`
-- The sitemap and the RSS/Atom feeds are generated on every build
+- The sitemap and the RSS, Atom and JSON feeds are generated on every build
 
 ## Commands
 

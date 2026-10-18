@@ -10,21 +10,23 @@ tags:
   - http-client
 ---
 
-# Introduction
+## Introduction
 
-Axios is an amazing library for fetching and processing HTTP requests and sometimes comes in handy to use a cancel feature in specific situations.
+Axios is a popular HTTP client. It can also cancel a request, which helps in some situations.
 
-# The problem we want to solve
+## The problem we want to solve
 
-For me, I struggled with a function that gets products by their categories, and these categories are just mapped into a scrolling pane where the user can click any category and the products view will update according to a new HTTP request that fetches these products by the category id. the problem is shown when the user clicks a category and the HTTP request gets pending due to a slow internet connection then while this request is pending the user attempt to click another category and another HTTP request is fired to get a different product from a different category. while the previous category products are still pending and the current category is still pending too, the products view will get updated only from the first request that gets resolved, which means that a wired behavior will happen to the products view because for one second the products view will show the wrong products for the current category and when the proper request is resolved the products view will be updated with the correct category clicked previously.
+I had a function that gets products by category. The categories are shown in a scrolling pane. When the user clicks a category, the app sends an HTTP request for that category's products and shows the result in the products view.
 
-so this behavior is not likable in such practices where the user can play around and click whatever he wants from the categories pane. so the HTTP request should be handled properly to prevent any data leak or data conflicts between categories and products.
+The problem appears on a slow connection. The user clicks a category, and its request stays pending. Then the user clicks another category, and a second request starts. Both requests are pending at the same time. Each response updates the view when it arrives. If the response for the first category arrives first, the wrong products show until the second response arrives. If it arrives last, the wrong products stay on screen.
 
-# The solution
+Users click around freely, so the app must handle this. Old requests should be cancelled, so that an old response never overwrites the data for a newer click.
 
-Fortunately, Axios came out of the box with so many features, and this feature is called Cancellation which is built upon fetch API.
+## The solution
 
-so for me, I have this function which gets products:
+Axios supports cancellation through the `signal` option. The signal comes from `AbortController`, which is part of the fetch API.
+
+This is the function that gets products:
 
 ```js
 const getProducts = async (id, scrolling) => {
@@ -48,7 +50,7 @@ const getProducts = async (id, scrolling) => {
     return setProducts(cache.current[cacheKey])
   } else {
     try {
-      const { data } = await Axios.get(url)
+      const { data } = await axios.get(url)
       if (data) {
         setLoading(false)
         setHasMore(data.length >= 25)
@@ -68,29 +70,22 @@ const getProducts = async (id, scrolling) => {
 }
 ```
 
-so this the function that's gets fired when a category is clicked and it gets fired as long the user keeps clicking on categories, we want to make this function only fires once and cancel the previous request.
+This function runs on every category click. We want each click to cancel the request from the previous click.
 
-What we will do is declare a variable a the top of our main code called controller that will be as a token for each request we fire.
-
-```js
-const controller = new AbortController()
-```
-
-and we will modify the axios.get call to be like this:
+First, declare a variable at the top of the module to hold the controller for the request in flight:
 
 ```js
-const { data } = await Axios.get(url, {
-  signal: controller.signal
-})
+let controller = null
 ```
 
-and the final function would be like this:
+Then, in `getProducts`, abort the previous controller, create a new one, and pass its signal to Axios. The final function looks like this:
 
 ```js
 const getProducts = async (id, scrolling) => {
   if (controller) {
     controller.abort()
   }
+  controller = new AbortController()
   const limit = 25
   let url
 
@@ -111,7 +106,7 @@ const getProducts = async (id, scrolling) => {
     return setProducts(cache.current[cacheKey])
   } else {
     try {
-      const { data } = await Axios.get(url)
+      const { data } = await axios.get(url, { signal: controller.signal })
       if (data) {
         setLoading(false)
         setHasMore(data.length >= 25)
@@ -131,14 +126,16 @@ const getProducts = async (id, scrolling) => {
 }
 ```
 
-So now whenever this function gets called twice, it will cancel the previous request and process the later (current) request only.
+Each new call cancels the request before it. Axios rejects a cancelled request with an error that `axios.isCancel` recognizes, so the catch block only logs it and does not show an error to the user.
+
+A new controller is needed for each call. An aborted controller stays aborted. If you reuse it, every later request is cancelled at once.
 
 ![image](https://cdn.hashnode.com/res/hashnode/image/upload/v1655291347326/rDpwetZhe.png?auto=compress,format&format=webp)
 
-It is a handy feature that benefits us in many different ways, first, we saved our backend from too many requests (not likable, also not performant choice), secondly, we kept our UI delivering concise data without any conflicts or data-leak.
+This helps in two ways. The backend gets fewer requests that nobody needs, and the products view only shows data for the latest click.
 
-this also can be used in a search function where you want to cancel previous queries and handle only the last query entered by the end-user.
+The same approach works for a search box, where only the last query matters.
 
-# References:
+## References
 
-- axios-http.com/docs/cancellation
+- [Axios cancellation](https://axios-http.com/docs/cancellation)

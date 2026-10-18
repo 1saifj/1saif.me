@@ -50,7 +50,7 @@ const copy = {
     menuLabel: 'الأقسام',
     name: 'سيف الجناحي',
     intro: 'قائد هندسة برمجيات في النجف بالعراق. أبني الأنظمة الخلفية والبنية السحابية التي تعمل عليها، وتطبيقات الويب والأجهزة المحمولة التي تستخدمها.',
-    bio: <>عملت منذ عام 2021 على برمجيات مالية، ومنصات لـ<a href="https://grads.uokufa.edu.iq" target="_blank" rel="noreferrer">جامعة الكوفة</a>، ومنصات خلفية لشركات شريكة. <a href="#blog">وأكتب</a> عن قواعد البيانات وGo، وأطوّر <a href="https://github.com/1saifj/relayrook" target="_blank" rel="noreferrer">RelayRook</a>، وهي أداة مفتوحة المصدر لوكلاء البرمجة.</>,
+    bio: <>أعمل منذ عام 2021 على برمجيات مالية، ومنصات لـ<a href="https://grads.uokufa.edu.iq" target="_blank" rel="noreferrer">جامعة الكوفة</a>، ومنصات خلفية لشركات شريكة. <a href="#blog">وأكتب</a> عن قواعد البيانات وGo، وأتولّى صيانة <a href="https://github.com/1saifj/relayrook" target="_blank" rel="noreferrer">RelayRook</a>، وهي أداة مفتوحة المصدر لوكلاء البرمجة.</>,
     resume: 'السيرة الذاتية',
     email: 'البريد الإلكتروني',
     experience: 'الخبرة',

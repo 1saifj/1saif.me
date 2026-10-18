@@ -11,7 +11,6 @@ role: Main author
 impact: Built and maintained since 2023: Go API, Next.js app, FastAPI QA portal, Sentry, Playwright
 ---
 
-# Kufa Grad Tracking Platform
 The University of Kufa uses this platform to follow its graduates and connect them with jobs. I have built and maintained it since 2023, and I wrote most of the code.
 
 ## What I built

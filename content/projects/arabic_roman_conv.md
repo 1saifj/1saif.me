@@ -11,7 +11,6 @@ role: Author
 impact: Published on pub.dev
 ---
 
-# arabic_roman_conv
 arabic_roman_conv is a Flutter package that romanizes Arabic names and phrases into Latin script. For example, it turns سيف into Saif and سيف الدين into Saif Aldeen. It is published on pub.dev.
 
 ## Why

@@ -92,11 +92,11 @@ AFTER INSERT OR UPDATE OR DELETE ON refunds
 FOR EACH ROW EXECUTE FUNCTION audit_row();
 ```
 
-When a change comes from outside the app, `actor_id` is empty. That's useful information too: it tells you someone changed production data by hand.
+When a change comes from outside the app, `actor_id` is empty. That's useful information too: it tells you someone changed the data by hand, for example from a SQL console.
 
 ## Keep it append-only
 
-An audit log that can be edited isn't worth much. At minimum, the database role your application uses should only be able to insert:
+An audit log that can be edited isn't worth much. At minimum, the database role your application uses should only be able to insert and read:
 
 ```sql
 REVOKE UPDATE, DELETE, TRUNCATE ON audit_log FROM app_user;

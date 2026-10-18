@@ -10,9 +10,7 @@ tags:
   - backend
 ---
 
-What happens when your database crashes in the middle of a transaction?
-
-This question came up in a job interview I had, and it reminded me why database internals aren't just academic. The answer explains why a committed payment survives a power cut. It also explains settings that trade safety for speed, and how real-time features get changes without polling.
+In a job interview, I was asked what happens when a database crashes in the middle of a transaction. The question reminded me why database internals aren't just academic. The answer explains why a committed payment survives a power cut. It also explains settings that trade safety for speed, and how real-time features get changes without polling.
 
 ## The write-ahead log
 
@@ -30,7 +28,7 @@ When PostgreSQL starts after a crash, it finds the last checkpoint. That's a poi
 
 What about transactions that were running and never committed? Their changes may have been replayed too. Many databases, following the classic ARIES design, recover in three steps: analysis (what was happening at the crash), redo (repeat the history), and undo (roll back what didn't commit).
 
-PostgreSQL doesn't need the undo step, because of MVCC. Every row version records which transaction created it, and a separate status log records whether each transaction committed. After the crash, those unfinished transactions are simply marked as aborted, and their row versions are invisible to every query from then on. Vacuum cleans them up later. No rollback is needed, because no query can see those rows.
+PostgreSQL doesn't need the undo step, because of MVCC. Every row version records which transaction created it, and a separate status log records whether each transaction committed. After the crash, PostgreSQL treats those unfinished transactions as aborted, because they have no commit record. Their row versions are invisible to every query from then on. Vacuum cleans them up later. No rollback is needed, because no query can see those rows.
 
 ## Settings that trade safety for speed
 
@@ -47,6 +45,8 @@ Once every change is in a log, you can send that log somewhere else. That's how 
 With `wal_level = logical`, PostgreSQL can also decode the WAL into row changes: this row was inserted, this column changed from this to that. You can see it yourself:
 
 ```sql
+CREATE TABLE orders (id int PRIMARY KEY, status text);
+
 SELECT pg_create_logical_replication_slot('demo', 'test_decoding');
 
 INSERT INTO orders (id, status) VALUES (1, 'pending');
@@ -61,9 +61,9 @@ SELECT pg_drop_replication_slot('demo');
 
 This is what change data capture tools build on, and it's how Supabase Realtime works. It creates a replication slot, reads the decoded changes, turns them into JSON, and pushes them over WebSockets to the clients that subscribed. The server side is built with Elixir and Phoenix, which is a good fit for holding a huge number of open connections.
 
-It's impressive engineering. It catches every change, no matter where it came from. An update from your API, from a migration script, or from someone in the database console all go through the WAL, so every client sees them. You don't add triggers to each table, and you don't run into the 8000-byte payload limit of PostgreSQL's `NOTIFY`. I used it for a collaborative dashboard for a client, where several people needed to see each other's changes without refreshing the page, and it saved a lot of work compared to building it ourselves.
+It catches every change to the published tables, no matter where it came from. An update from your API, from a migration script, or from someone in the database console all go through the WAL, so every client sees them. You don't add triggers to each table, and you don't run into the 8000-byte payload limit of PostgreSQL's `NOTIFY`. I used it for a collaborative dashboard for a client, where several people needed to see each other's changes without refreshing the page, and it saved a lot of work compared to building it ourselves.
 
-One warning if you play with this. A replication slot keeps every WAL segment that its consumer hasn't read yet. If you create a slot and forget it, PostgreSQL keeps WAL forever and eventually fills the disk. That's why the example above drops it. In production, monitor `pg_replication_slots`.
+One warning if you play with this. A replication slot keeps every WAL segment that its consumer hasn't read yet. If you create a slot and forget it, PostgreSQL keeps all the WAL that the slot has not confirmed, and the disk can fill up. That's why the example above drops it. In production, monitor `pg_replication_slots`.
 
 ## And with more than one database
 

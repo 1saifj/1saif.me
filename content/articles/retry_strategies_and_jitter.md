@@ -11,7 +11,7 @@ tags:
   - system-design
 ---
 
-No system is perfect. A network blips, a downstream service restarts, a database gets overloaded for a few seconds. The worst thing you can do is turn every short failure into an error screen. The second worst thing is to retry in a way that keeps the struggling service down.
+Networks blip, downstream services restart, and databases get overloaded for a few seconds. The worst thing you can do is turn every short failure into an error screen. The second worst thing is to retry in a way that keeps the struggling service down.
 
 A good retry strategy does both jobs. It hides short failures from your users, and it backs off enough that the thing you depend on can recover.
 
@@ -29,7 +29,7 @@ A good retry strategy does both jobs. It hides short failures from your users, a
 
 Picture a service with a thousand clients. It goes down for a moment, and all thousand requests fail at the same second. With plain exponential backoff, they all wait exactly 1 second and retry together. Then they fail together, wait exactly 2 seconds, and retry together again.
 
-The backoff grows, but the traffic still arrives in spikes of a thousand requests, and each spike can knock the service over as it tries to come back. This is the thundering herd problem.
+The backoff grows, but each retry still arrives as a spike of a thousand requests, and each spike can knock the service over as it tries to come back. This is the thundering herd problem.
 
 Jitter spreads them out. If each client waits a random time between 0 and the backoff, the thousand retries arrive across the whole window instead of in one instant. The average load stays the same, and the spikes go away. AWS has a well-known write-up comparing the variants, and "full jitter" (a random value between zero and the backoff) does very well for how simple it is.
 
