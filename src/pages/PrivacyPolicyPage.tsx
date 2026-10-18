@@ -1,11 +1,11 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { SiteHeader } from '../components/SiteHeader'
 import SEOHead from '../components/SEOHead'
+import { SiteFooter } from '../components/SiteFooter'
 import { dateLocale, useLanguage } from '../i18n/language'
 
 // Change this date whenever the policy text changes.
-const lastUpdated = new Date('2026-10-17T00:00:00')
+const lastUpdated = new Date('2026-10-19T00:00:00')
 
 const copy = {
   en: {
@@ -20,14 +20,13 @@ const copy = {
     dataTypes: [
       ['Contact details', 'Name, email address, and anything you choose to include when you get in touch.', 'To reply to your message or provide a requested service.', 'Three years from the last contact.'],
       ['Anonymous analytics', 'Page views, session duration, device type, and broad usage patterns.', 'To understand what is useful and improve the site.', 'Twenty-four months.'],
-      ['Newsletter address', 'The email address you provide when subscribing to updates.', 'To send new writing and project notes.', 'Until you unsubscribe.'],
       ['Technical data', 'IP address, browser type, and referring website.', 'To keep the site secure and diagnose delivery issues.', 'Twelve months.'],
     ],
-    uses: ['Reply to contact messages and provide requested information.', 'Send newsletter updates when you have subscribed.', 'Understand site usage and improve performance and clarity.', 'Protect the site from abuse and keep the service reliable.', 'Meet legal obligations when they apply.'],
-    services: [['Email service', 'Delivers contact replies and newsletter messages.'], ['Analytics service', 'Provides privacy-focused, aggregate usage information when enabled.'], ['Hosting provider', 'Serves the site and its static assets.'], ['Legal requirements', 'Information may be shared when required by law or to protect rights.']],
+    uses: ['Reply to contact messages and provide requested information.', 'Understand site usage and improve performance and clarity.', 'Protect the site from abuse and keep the service reliable.', 'Meet legal obligations when they apply.'],
+    services: [['Email service', 'Delivers replies to contact messages.'], ['Analytics service', 'Provides privacy-focused, aggregate usage information when enabled.'], ['Hosting provider', 'Serves the site and its static assets.'], ['Legal requirements', 'Information may be shared when required by law or to protect rights.']],
     rights: [['Access', 'Ask what personal data is held about you.'], ['Rectification', 'Ask for inaccurate information to be corrected.'], ['Erasure', 'Ask for your personal data to be deleted.'], ['Portability', 'Request a copy of your data in a machine-readable format.'], ['Object', 'Object to particular types of processing.'], ['Restriction', 'Ask for how your data is used to be limited.']],
     contactBody: 'If you want to ask about this policy or exercise one of these rights, email me. I aim to respond within 30 days.',
-    name: 'Saif Aljanahi', resume: 'Resume',
+    name: 'Saif Aljanahi',
   },
   ar: {
     seoTitle: 'الخصوصية | سيف الجناحي',
@@ -41,14 +40,13 @@ const copy = {
     dataTypes: [
       ['بيانات التواصل', 'الاسم، وعنوان البريد الإلكتروني، وأي معلومات تختار إرسالها عند التواصل.', 'للرد على رسالتك أو تقديم خدمة طلبتها.', 'ثلاث سنوات من آخر تواصل.'],
       ['تحليلات مجهولة الهوية', 'مشاهدات الصفحات، ومدة الجلسة، ونوع الجهاز، وأنماط الاستخدام العامة.', 'لفهم ما يفيد الزوّار وتحسين الموقع.', 'أربعة وعشرون شهراً.'],
-      ['عنوان النشرة البريدية', 'عنوان البريد الإلكتروني الذي تقدّمه عند الاشتراك في التحديثات.', 'لإرسال المقالات الجديدة وملاحظات المشاريع.', 'حتى تلغي اشتراكك.'],
       ['البيانات التقنية', 'عنوان IP، ونوع المتصفح، والموقع الذي أحالك.', 'لحماية الموقع وتشخيص مشكلات التحميل.', 'اثنا عشر شهراً.'],
     ],
-    uses: ['الرد على رسائل التواصل وتقديم المعلومات المطلوبة.', 'إرسال تحديثات النشرة البريدية عند اشتراكك.', 'فهم طريقة استخدام الموقع وتحسين أدائه ووضوحه.', 'حماية الموقع من إساءة الاستخدام والحفاظ على موثوقيته.', 'الوفاء بالالتزامات القانونية عند انطباقها.'],
-    services: [['خدمة البريد الإلكتروني', 'تُرسل ردود التواصل ورسائل النشرة البريدية.'], ['خدمة التحليلات', 'تقدّم بيانات استخدام إجمالية تحترم الخصوصية عند تفعيلها.'], ['مزوّد الاستضافة', 'يقدّم الموقع وملفاته الثابتة.'], ['المتطلبات القانونية', 'قد تُشارك المعلومات عندما يفرض القانون ذلك أو لحماية الحقوق.']],
+    uses: ['الرد على رسائل التواصل وتقديم المعلومات المطلوبة.', 'فهم طريقة استخدام الموقع وتحسين أدائه ووضوحه.', 'حماية الموقع من إساءة الاستخدام والحفاظ على موثوقيته.', 'الوفاء بالالتزامات القانونية عند انطباقها.'],
+    services: [['خدمة البريد الإلكتروني', 'تُرسل الردود على رسائل التواصل.'], ['خدمة التحليلات', 'تقدّم بيانات استخدام إجمالية تحترم الخصوصية عند تفعيلها.'], ['مزوّد الاستضافة', 'يقدّم الموقع وملفاته الثابتة.'], ['المتطلبات القانونية', 'قد تُشارك المعلومات عندما يفرض القانون ذلك أو لحماية الحقوق.']],
     rights: [['الاطّلاع', 'أن تسأل عن البيانات الشخصية المحفوظة عنك.'], ['التصحيح', 'أن تطلب تصحيح المعلومات غير الدقيقة.'], ['الحذف', 'أن تطلب حذف بياناتك الشخصية.'], ['قابلية النقل', 'أن تطلب نسخة من بياناتك بصيغة يقرؤها الحاسوب.'], ['الاعتراض', 'أن تعترض على أنواع معيّنة من المعالجة.'], ['التقييد', 'أن تطلب تقييد طريقة استخدام بياناتك.']],
     contactBody: 'إذا أردت الاستفسار عن هذه السياسة أو ممارسة أحد هذه الحقوق، راسلني عبر البريد الإلكتروني. أسعى للرد خلال 30 يوماً.',
-    name: 'سيف الجناحي', resume: 'السيرة الذاتية',
+    name: 'سيف الجناحي',
   },
 }
 
@@ -64,11 +62,11 @@ export const PrivacyPolicyPage: React.FC = () => {
         <SiteHeader />
 
         <main id="main-content">
-          <article className="site-container plain-page">
+          <article className="plain-page">
             <header>
               <h1>{t.title}</h1>
+              <p className="plain-lede">{t.intro}</p>
               <p className="plain-meta">{t.updated} {lastUpdated.toLocaleDateString(dateLocale(language), { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-              <p>{t.intro}</p>
             </header>
 
             <section className="plain-section" aria-labelledby={ids[0]}>
@@ -131,10 +129,7 @@ export const PrivacyPolicyPage: React.FC = () => {
           </article>
         </main>
 
-        <footer className="site-container plain-footer">
-          <span>© {new Date().getFullYear()} {t.name}</span>
-          <Link to="/resume">{t.resume}</Link>
-        </footer>
+        <SiteFooter />
       </div>
     </>
   )

@@ -15,6 +15,8 @@ export default defineConfig(({ isSsrBuild }) => ({
   define: {
     global: 'globalThis',
   },
+  // Plain CSS, no PostCSS plugins. Explicit, so Vite never picks up a postcss.config from a parent folder.
+  css: { postcss: {} },
   optimizeDeps: {
     exclude: [],
   },

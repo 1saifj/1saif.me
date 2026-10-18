@@ -7,8 +7,9 @@ describe('markdown basics', () => {
   it('renders headings, emphasis, inline code, links and quotes', async () => {
     const html = await render('# Title\n\n## Section\n\nSome **bold**, *italic* and `code` with a [link](https://example.com).\n\n> quoted')
 
-    expect(html).toMatch(/<h1[^>]*>Title<\/h1>/)
-    expect(html).toMatch(/<h2[^>]*>Section<\/h2>/)
+    // the page shows the title, so the Markdown title line is dropped
+    expect(html).not.toContain('<h1')
+    expect(html).toMatch(/<h2 id="section">Section<a class="heading-anchor" href="#section"[^>]*>#<\/a><\/h2>/)
     expect(html).toMatch(/<strong[^>]*>bold<\/strong>/)
     expect(html).toMatch(/<em[^>]*>italic<\/em>/)
     expect(html).toMatch(/<code[^>]*>code<\/code>/)
@@ -18,6 +19,37 @@ describe('markdown basics', () => {
     expect(link).toContain('target="_blank"')
     expect(link).toContain('rel="noopener noreferrer"')
     expect(html).toMatch(/<blockquote[^>]*>quoted<\/blockquote>/)
+  })
+
+  it('wraps text right under a heading in a paragraph, and gives repeated headings unique ids', async () => {
+    const html = await render('# Title\nLead text.\n\n## Setup\nFirst.\n\n## Setup\nSecond.')
+
+    expect(html.startsWith('<p>Lead text.</p>')).toBe(true)
+    expect(html).toContain('</h2><p>First.</p>')
+    expect(html).toContain('id="setup"')
+    expect(html).toContain('id="setup-2"')
+  })
+
+  it('never puts a block inside a paragraph or leaves an empty one', async () => {
+    const html = await render('Intro\n\n\n\n```go\nx := 1\n```\n\n| a |\n|---|\n| 1 |\n\n![Diagram](/d.png)\n\nEnd')
+
+    expect(html).not.toMatch(/<p>\s*<(div|figure|table)/)
+    expect(html).not.toContain('<p></p>')
+    expect(html).toContain('<p>End</p>')
+  })
+
+  it('moves headings down a level when the body uses # for its sections', async () => {
+    const html = await render('# Title\n\nIntro.\n\n# Part\n\n## Detail\n\nText.')
+
+    expect(html).not.toContain('<h1')
+    expect(html).toContain('<h2 id="part">')
+    expect(html).toContain('<h3 id="detail">')
+  })
+
+  it('escapes inline code and keeps Markdown inside it literal', async () => {
+    const html = await render('`HTTPError` comes first. Keep `base<<i` small, and `**x**` is not bold.')
+
+    expect(html).toBe('<p><code>HTTPError</code> comes first. Keep <code>base&lt;&lt;i</code> small, and <code>**x**</code> is not bold.</p>')
   })
 
   it('renders a table without stray line breaks inside it', async () => {
@@ -59,7 +91,7 @@ describe('markdown code blocks', () => {
     const block = html.slice(html.indexOf('code-block-container'), html.lastIndexOf('</pre>'))
 
     expect(block).toContain('data-lang="bash"')
-    expect(block).toContain('# install it\nbrew install ripgrep')
+    expect(block).toContain('<span class="line"># install it</span>\n<span class="line">brew install ripgrep</span>')
     expect(block).not.toContain('<h1')
     expect(block).not.toContain('<br>')
   })
@@ -70,6 +102,16 @@ describe('markdown code blocks', () => {
     expect(html).toContain('if a &lt; b {}')
     expect(html).not.toContain('class="shiki')
     expect(html).not.toContain('<br>')
+  })
+
+  it('numbers blocks of 8 lines or more, and folds blocks longer than 30 lines', async () => {
+    const block = (n: number) => render('```go\n' + Array.from({ length: n }, (_, i) => `line${i}`).join('\n') + '\n```')
+
+    expect(block(7)).not.toContain('data-numbered')
+    expect(block(8)).toContain('data-numbered')
+    expect(block(30)).not.toContain('data-collapsed')
+    expect(block(31)).toContain('data-collapsed')
+    expect(block(31)).toContain('Show all 31 lines')
   })
 
   it('keeps $$ and $1 in code exactly as written', async () => {

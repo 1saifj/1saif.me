@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { SiteHeader } from '../components/SiteHeader'
 import SEOHead from '../components/SEOHead'
+import { SiteFooter } from '../components/SiteFooter'
 import { comma, useLanguage } from '../i18n/language'
 import { experience, formatMonth } from '../data/experience'
 
@@ -22,7 +23,6 @@ const copy = {
       ['/project/kufa-grad-tracking-platform', 'Kufa Grad Tracking Platform'],
       ['/project/relayrook', 'RelayRook'],
     ],
-    privacy: 'Privacy',
   },
   ar: {
     seoTitle: 'السيرة الذاتية | سيف الجناحي، قائد هندسة البرمجيات',
@@ -40,7 +40,6 @@ const copy = {
       ['/project/kufa-grad-tracking-platform', 'منصة متابعة خريجي جامعة الكوفة'],
       ['/project/relayrook', 'RelayRook'],
     ],
-    privacy: 'الخصوصية',
   },
 }
 
@@ -55,14 +54,14 @@ export const ResumePage: React.FC = () => {
       <div className="site-shell site-resume-page">
         <SiteHeader current="resume" />
 
-        <main id="main-content" className="site-container plain-page">
+        <main id="main-content" className="plain-page">
           <h1>{t.name}</h1>
           <p className="plain-lede">{t.lede}</p>
           <p className="plain-links" aria-label={t.contactLinks}>
             <a href="mailto:hello@1saif.me" dir="ltr">hello@1saif.me</a>
             <a href="https://www.linkedin.com/in/1saifj/" target="_blank" rel="noreferrer">LinkedIn</a>
             <a href="https://github.com/1saifj" target="_blank" rel="noreferrer">GitHub</a>
-            <a href="/cv.html" target="_blank" rel="noreferrer">{t.downloadCv}</a>
+            <a href="/cv.html" target="_blank" rel="noreferrer" className="plain-print-hide">{t.downloadCv}</a>
           </p>
 
           <h2>{t.experience}</h2>
@@ -71,11 +70,14 @@ export const ResumePage: React.FC = () => {
 
             return (
               <article className="plain-role" key={`${item.company}-${item.role}-${item.start}`}>
-                <h3>{text.role}{comma(language)}{language === 'ar' && item.companyAr ? item.companyAr : item.company}</h3>
-                <p className="plain-meta">{formatMonth(item.start, language)} – {item.end ? formatMonth(item.end, language) : t.present} · {text.mode} · {text.location}</p>
-                <p>{text.summary}</p>
-                <ul>{text.highlights.map(highlight => <li key={highlight}>{highlight}</li>)}</ul>
-                <p className="plain-meta">{t.skills}: <span dir="ltr">{item.skills.join(', ')}</span></p>
+                <p className="plain-role-period"><time dateTime={item.start}>{formatMonth(item.start, language)}</time> – {item.end ? <time dateTime={item.end}>{formatMonth(item.end, language)}</time> : t.present}</p>
+                <div>
+                  <h3>{text.role}{comma(language)}{language === 'ar' && item.companyAr ? item.companyAr : item.company}</h3>
+                  <p className="plain-meta">{text.mode} · {text.location}</p>
+                  <p>{text.summary}</p>
+                  <ul>{text.highlights.map(highlight => <li key={highlight}>{highlight}</li>)}</ul>
+                  <ul className="plain-skills" aria-label={t.skills}>{item.skills.map(skill => <li key={skill} dir="ltr">{skill}</li>)}</ul>
+                </div>
               </article>
             )
           })}
@@ -86,10 +88,7 @@ export const ResumePage: React.FC = () => {
           </ul>
         </main>
 
-        <footer className="site-container plain-footer">
-          <span>© {new Date().getFullYear()} {t.name}</span>
-          <Link to="/privacy">{t.privacy}</Link>
-        </footer>
+        <SiteFooter />
       </div>
     </>
   )

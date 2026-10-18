@@ -35,31 +35,21 @@ Launch GitHub Desktop and ensure you are connected to the repository where you w
 
 Select the branch that contains the commit(s) you want to cherry-pick from the repository's branch menu.
 
-![Select Branch](https://docs.github.com/assets/images/help/desktop/branch-menu.png)
-
 ## Step 3: View Commit History
 
 Click on "History" to view the commit history of the selected branch. Locate the commit you wish to cherry-pick.
-
-![View Commit History](https://docs.github.com/assets/images/help/desktop/history-tab.png)
 
 ## Step 4: Cherry-Pick the Commit
 
 Right-click on the desired commit and select "Cherry-pick commit" from the context menu.
 
-![Cherry-Pick Commit](https://docs.github.com/assets/images/help/desktop/cherry-pick-commit.png)
-
 ## Step 5: Select Target Branch
 
 After selecting "Cherry-pick commit," GitHub Desktop will prompt you to choose the target branch where you want to apply the commit. Select the appropriate branch from the dropdown menu.
 
-![Select Target Branch](https://docs.github.com/assets/images/help/desktop/choose-target-branch.png)
-
 ## Step 6: Complete Cherry-Pick
 
 Click "Continue" to proceed. GitHub Desktop will apply the selected commit to the target branch. If there are any conflicts, you will be prompted to resolve them.
-
-![Complete Cherry-Pick](https://docs.github.com/assets/images/help/desktop/complete-cherry-pick.png)
 
 # Practical Use Cases
 

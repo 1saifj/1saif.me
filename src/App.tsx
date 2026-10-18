@@ -1,5 +1,5 @@
-import { lazy, Suspense, type ComponentType } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { lazy, Suspense, useEffect, useRef, type ComponentType } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
 import { SkipLink } from './components/SkipLink'
 import { isArabicPath, LanguageProvider } from './i18n/language'
@@ -54,6 +54,22 @@ function RouteSkeleton() {
   return <div className="route-skeleton" role="status"><span className="sr-only">{arabic ? 'جارٍ التحميل' : 'Loading'}</span><span className="route-skeleton-title" /><span style={{ width: '48%' }} /><span /><span style={{ width: '80%' }} /></div>
 }
 
+// After an in-site link: start the new page at the top (a #section link scrolls itself),
+// and mark the document so the new page fades in. The first load is never marked.
+function RouteChange() {
+  const { pathname, hash } = useLocation()
+  const last = useRef(pathname)
+
+  useEffect(() => {
+    if (last.current === pathname) return
+    last.current = pathname
+    document.documentElement.dataset.nav = ''
+    if (!hash) window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [pathname, hash])
+
+  return null
+}
+
 function App() {
   const arabic = isArabicPath(window.location.pathname)
 
@@ -62,6 +78,7 @@ function App() {
     <Router basename={arabic ? '/ar' : undefined} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <LanguageProvider language={arabic ? 'ar' : 'en'}>
           <SkipLink />
+          <RouteChange />
           <Suspense fallback={<RouteSkeleton />}>
             <Routes>
               <Route path="/" element={<HomePage />} />

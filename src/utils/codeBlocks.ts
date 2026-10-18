@@ -1,8 +1,10 @@
 import { highlightCode } from './syntaxHighlighter'
 
+const shells = new Set(['bash', 'sh', 'shell', 'zsh'])
+
 // Article and project bodies render as plain HTML (prerendered, so the text paints at once).
 // This adds the interactive parts in place, without re-rendering the prose: syntax colors for
-// each code block as it nears the viewport, and the Copy buttons.
+// each code block as it nears the viewport, the Copy buttons, and Show all for folded blocks.
 export function enhanceCodeBlocks(root: HTMLElement): () => void {
   const highlight = async (pre: HTMLElement) => {
     const language = pre.dataset.lang
@@ -14,8 +16,9 @@ export function enhanceCodeBlocks(root: HTMLElement): () => void {
     template.innerHTML = await highlightCode(pre.textContent ?? '', language)
     const colored = template.content.firstElementChild
 
-    if (!colored || !pre.isConnected) return
+    if (!(colored instanceof HTMLElement) || !pre.isConnected) return
     colored.classList.add(...pre.classList)
+    Object.assign(colored.dataset, pre.dataset)
     pre.replaceWith(colored)
   }
 
@@ -36,15 +39,42 @@ export function enhanceCodeBlocks(root: HTMLElement): () => void {
     else void highlight(block)
   }
 
-  const onClick = (event: MouseEvent) => {
-    const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('.copy-button') : null
-    const code = button?.closest('.code-block-container')?.querySelector('pre')
+  const copy = (button: HTMLButtonElement) => {
+    const pre = button.closest('.code-block-container')?.querySelector('pre')
 
-    if (!button || !code || !navigator.clipboard) return
-    void navigator.clipboard.writeText(code.textContent ?? '').then(() => {
+    if (!pre || !navigator.clipboard) return
+    const text = pre.textContent ?? ''
+
+    // Shell examples copy as commands: a leading "$ " prompt is left out.
+    void navigator.clipboard.writeText(shells.has(pre.dataset.lang ?? '') ? text.replace(/^\$ /gm, '') : text).then(() => {
       button.textContent = 'Copied'
-      setTimeout(() => { button.textContent = 'Copy' }, 1500)
+      button.dataset.copied = ''
+      setTimeout(() => {
+        button.textContent = 'Copy'
+        delete button.dataset.copied
+      }, 1500)
     })
+  }
+
+  const toggle = (button: HTMLButtonElement) => {
+    const block = button.closest<HTMLElement>('.code-block-container')
+
+    if (!block) return
+    const open = block.hasAttribute('data-collapsed')
+
+    block.toggleAttribute('data-collapsed', !open)
+    button.setAttribute('aria-expanded', String(open))
+    button.textContent = open ? 'Show less' : `Show all ${button.dataset.lines} lines`
+    // Folding again from below would leave the reader past the block, so bring its top back into view.
+    if (!open && block.getBoundingClientRect().top < 0) block.scrollIntoView({ block: 'start' })
+  }
+
+  const onClick = (event: MouseEvent) => {
+    const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('.copy-button, .code-expand') : null
+
+    if (!button) return
+    if (button.classList.contains('copy-button')) copy(button)
+    else toggle(button)
   }
 
   root.addEventListener('click', onClick)
