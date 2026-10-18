@@ -23,7 +23,6 @@ npm run dev          # dev server
 npm run build        # sitemap, feeds, Vite build, prerender into dist/
 npm run preview      # serve dist/ on port 4173
 npm test             # unit tests (Vitest)
-npm run test:e2e     # Playwright
 npm run typecheck
 npm run lint
 ```

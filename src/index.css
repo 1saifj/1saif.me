@@ -18,18 +18,8 @@
   }
 }
 
-/* Refined Minimalist component styles */
-@layer components {
-  
-  .card {
-    @apply bg-white dark:bg-[#0a0a0a] rounded-2xl border border-slate-100 dark:border-zinc-900 overflow-hidden transition-all duration-300 hover:border-slate-300 dark:hover:border-zinc-700;
-  }
-}
-
 /* Custom utility classes */
 @layer utilities {
-  
-  /* Code blocks - removed old styles as we're using inline styles now */
   
   /* Minimal scrollbar for code blocks */
   .code-content::-webkit-scrollbar {
