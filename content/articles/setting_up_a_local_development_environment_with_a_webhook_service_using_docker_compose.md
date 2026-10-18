@@ -2,7 +2,7 @@
 title: Setting Up a Local Development Environment with a Webhook Service using Docker Compose
 description: "One docker-compose file that runs a Node.js app, a webhook service, MongoDB and Nginx as a reverse proxy, so every developer starts the same stack with one command."
 createdAt: "2024-09-02"
-updatedAt: 2023-09-02
+updatedAt: "2024-09-02"
 featuredImage: "/articles/docker_feat.jpg"
 tags:
   - docker
@@ -14,17 +14,17 @@ tags:
 
 Working on an app that sends or receives webhooks means running more than one thing locally: the app, the service that handles the webhooks, a database, and usually a proxy in front. Starting them by hand in four terminals gets old fast, and every new developer sets them up a little differently. Docker Compose puts all of it in one file. Here's the setup I use for a Node.js app with a webhook service, MongoDB, and Nginx as a reverse proxy.
 
-# The problem we want to solve
+## The problem
 
-Configuring and managing multiple services such as web apps, databases, and webhooks manually is complex and error-prone. Developers often face issues with version mismatches, conflicting ports, and cumbersome setup steps.
+Setting up several services by hand is error-prone. Versions drift between machines, ports conflict, and setup steps are easy to get wrong.
 
-# The solution
+## The solution
 
-Using Docker Compose, we will define a multi-service environment with clear separation, easy management, and simplified communication. We’ll create a Node.js application that interacts with a webhook service, MongoDB for database management, and Nginx for routing.
+With Docker Compose, you define all of these services in one file. This example runs a Node.js app, a webhook service, MongoDB, and Nginx for routing.
 
-# Step-by-Step Guide
+## Step-by-step guide
 
-## Step 1: Create Your Project Directory
+### Step 1: Create Your Project Directory
 
 Start by creating a new directory for your project and navigating into it:
 
@@ -33,13 +33,11 @@ mkdir node_webhook_project
 cd node_webhook_project
 ```
 
-## Step 2: Create Your Docker Compose File
+### Step 2: Create Your Docker Compose File
 
-Compose a `docker-compose.yaml` file to define your services:
+Create a `docker-compose.yaml` file to define your services:
 
 ```yaml
-version: '3.8'
-
 services:
   app:
     build:
@@ -67,9 +65,7 @@ services:
     ports:
       - 4000:4000
     networks:
-      - app_network
-    networks:
-      default:
+      app_network:
       webhook_net:
         aliases:
           - webhook.local
@@ -98,6 +94,7 @@ services:
       - app_network
     depends_on:
       - app
+      - webhook
 
 volumes:
   mongo_data:
@@ -109,23 +106,23 @@ networks:
     driver: bridge
 ```
 
-### Explanation
+#### Explanation
 
 - **app**: The main Node.js application.
-- **webhook**: The webhook service.
+- **webhook**: The webhook service. It joins `app_network` so Nginx can reach it.
 - **mongodb**: The MongoDB database service.
 - **nginx**: Nginx used as a reverse proxy.
 - **Volumes**: Persistent storage for MongoDB.
-- **Networks**: Custom network for isolating services.
+- **Networks**: Custom networks for isolating services.
 
-## Step 3: Create Dockerfiles
+### Step 3: Create Dockerfiles
 
-### Main Application Dockerfile
+#### Main Application Dockerfile
 
 Create a `Dockerfile` for the main Node.js application:
 
 ```Dockerfile
-FROM node:14
+FROM node:20
 
 WORKDIR /usr/src/app
 
@@ -139,12 +136,12 @@ EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
-### Webhook Service Dockerfile
+#### Webhook Service Dockerfile
 
 Create a `Dockerfile.webhook` for the webhook service:
 
 ```Dockerfile
-FROM node:14
+FROM node:20
 
 WORKDIR /usr/src/app
 
@@ -158,7 +155,7 @@ EXPOSE 4000
 CMD ["npm", "run", "webhook"]
 ```
 
-## Step 4: Create Nginx Configuration
+### Step 4: Create Nginx Configuration
 
 Create an `nginx.conf` file for Nginx configuration:
 
@@ -188,13 +185,13 @@ http {
 }
 ```
 
-### Explanation
+#### Explanation
 
 This Nginx configuration defines how incoming requests are routed to either the main application or the webhook service based on the URL path.
 
-## Step 5: Create Node.js Application and Webhook Service
+### Step 5: Create Node.js Application and Webhook Service
 
-### Application (index.js)
+#### Application (index.js)
 
 Create an `index.js` file for the main Node.js application:
 
@@ -212,7 +209,7 @@ app.listen(port, () => {
 });
 ```
 
-### Webhook Service (webhook.js)
+#### Webhook Service (webhook.js)
 
 Create a `webhook.js` file for the webhook service:
 
@@ -234,7 +231,7 @@ app.listen(port, () => {
 });
 ```
 
-### package.json
+#### package.json
 
 Create a `package.json` file to manage dependencies:
 
@@ -257,11 +254,11 @@ Create a `package.json` file to manage dependencies:
 }
 ```
 
-### Explanation
+#### Explanation
 
 Both the app and webhook service are defined, each with its route handlers. The `package.json` file includes scripts to start each service.
 
-## Step 6: Build and Run Your Services
+### Step 6: Build and Run Your Services
 
 To build and run your Docker Compose setup, execute the following command:
 
@@ -269,13 +266,13 @@ To build and run your Docker Compose setup, execute the following command:
 docker-compose up --build
 ```
 
-This command will build and start all defined services.
+This command builds and starts all defined services.
 
-# Wrapping it up
+## Wrapping up
 
-Now `docker-compose up --build` starts the whole stack, and `docker-compose down` stops it. Every developer gets the same versions and the same ports, and a new person on the team is running in minutes instead of an afternoon. Add services to the file as the project grows, like Redis or a mail catcher for testing emails.
+Now `docker-compose up --build` starts the whole stack, and `docker-compose down` stops it. Every developer gets the same versions and the same ports, and a new person on the team can be running in minutes instead of an afternoon. Add services to the file as the project grows, such as Redis or a mail catcher for testing email.
 
-# References
+## References
 
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
 - [Node.js Documentation](https://nodejs.org/en/docs/)

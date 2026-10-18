@@ -65,11 +65,11 @@ export const experience: Experience[] = [
       summary: 'أبني برمجيات الجامعة، وأحوّل الإجراءات الورقية إلى أنظمة تعمل، وأدرّس البرمجة.',
       highlights: [
         'اقترحت فكرة هاكاثون الكوفة، وهو مسابقة على مستوى الجامعة لطلبتها وخريجيها في أربعة محاور: الطاقة المتجددة، والذكاء الاصطناعي، والأمن السيبراني، وإنترنت الأشياء، وكنت عضواً في لجنته المركزية المنظِّمة.',
-        'بنيت منصة الهاكاثون: تسجيل الفرق، وتقديم الحلول، وتوزيع المحكّمين، والإشعارات.',
+        'بنيت منصة الهاكاثون: تسجيل الفرق، وتسليم المشاريع، وتوزيع المحكّمين، والإشعارات.',
         'تلجأ إليّ الأقسام بإجراءات ورقية، فأحوّلها إلى برمجيات تعمل بها.',
         'بنيت منصة متابعة الخريجين (واجهة Go، وتطبيق Next.js، وبوابة لضمان الجودة) وتطبيق مسابقات للطلبة، وأتولّى صيانة أدوات متابعة توظيف الخريجين.',
         'درّستُ مختبر البرمجة لطلبة المرحلة الأولى بلغة Python، إلى جانب عملي مهندساً.',
-        'أقدّم الدعم التقني لمبادرات مختبرات هندسة الإلكترونيك والاتصالات.',
+        'أقدّم الدعم التقني لمبادرات المختبرات في هندسة الإلكترونيك والاتصالات.',
       ],
     },
   },
@@ -94,7 +94,7 @@ export const experience: Experience[] = [
       mode: 'دوام كامل · حضوري',
       summary: 'هندسة الأنظمة الخلفية والمنتجات لبرمجيات مالية آمنة.',
       highlights: [
-        'بنيت خدمات بـ Go وPostgreSQL للعمليات المالية وأدمتها، ومنها إصدار البطاقات.',
+        'بنيت خدمات بـ Go وPostgreSQL للعمليات المالية وصُنتُها، ومنها إصدار البطاقات.',
         'أوقفت تكرار الموافقات في مهمة إصدار البطاقات التي تعمل على عدة نسخ، بقفل في Redis لكل طلب وقفل تفاؤلي في PostgreSQL.',
         'عملت على تطبيقات Flutter وReact وNext.js حتى تتوافق الخدمات مع الواجهات.',
       ],
@@ -111,7 +111,7 @@ export const experience: Experience[] = [
     summary: 'Backend leadership focused on reliable APIs, quality, and team growth.',
     highlights: [
       'Ran design and code reviews for the backend team and mentored its developers.',
-      'Set the team’s expectations for code quality and reliability of the financial services.',
+      'Set the team’s standards for code quality and the reliability of the financial services.',
     ],
     skills: ['Backend leadership', 'APIs', 'Reliability', 'Mentoring'],
     ar: {
@@ -134,7 +134,7 @@ export const experience: Experience[] = [
     mode: 'Full-time · On-site',
     summary: 'Responsive frontend development with a focus on structure, usability, and speed.',
     highlights: [
-      'Built reusable interfaces across JavaScript, React, Next.js, and Svelte.',
+      'Built reusable interfaces with JavaScript, React, Next.js, and Svelte.',
       'Improved smartphone experiences, page speed, and visual consistency across deliverables.',
     ],
     skills: ['JavaScript', 'React', 'HTML', 'CSS', 'Next.js', 'Svelte'],
@@ -144,7 +144,7 @@ export const experience: Experience[] = [
       mode: 'دوام كامل · حضوري',
       summary: 'تطوير واجهات أمامية متجاوبة مع التركيز على البنية وسهولة الاستخدام والسرعة.',
       highlights: [
-        'بنيت واجهات قابلة لإعادة الاستخدام باستخدام JavaScript وReact وNext.js وSvelte.',
+        'بنيت واجهات قابلة لإعادة الاستخدام بـ JavaScript وReact وNext.js وSvelte.',
         'حسّنت التجربة على الهواتف الذكية، وسرعةَ الصفحات، والاتساقَ البصري في المشاريع المسلَّمة.',
       ],
     },
@@ -157,7 +157,7 @@ export const experience: Experience[] = [
     role: 'Frontend Developer',
     mode: 'Full-time · On-site',
     summary: 'Flutter interface development for product delivery.',
-    highlights: ['Contributed Flutter-based interface implementation in an on-site product team.'],
+    highlights: ['Helped build Flutter interfaces in an on-site product team.'],
     skills: ['Flutter'],
     ar: {
       location: 'النجف، العراق',

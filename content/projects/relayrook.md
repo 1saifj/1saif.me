@@ -11,14 +11,13 @@ role: Author
 impact: Activity-based watchdogs, one permission vocabulary across five CLIs, end-to-end tested
 ---
 
-# RelayRook
 RelayRook is an open-source Agent Skill and CLI. One coding agent uses it to hand implementation, code review or security review to the other coding CLIs on the same machine.
 
 ## What it does
 
 - Starts and keeps sessions with Claude Code, Codex, Kiro, OpenCode and Devin.
-- Holds each permission prompt so that the parent agent decides, and maps one permission vocabulary onto the system of each CLI.
-- Decides whether a turn is still working by watching what the backend does, so slow work keeps running and stuck work gets stopped.
+- Holds each permission prompt so that the parent agent decides, and maps one permission vocabulary onto the permission system of each CLI.
+- Decides whether a turn is still working by watching what the worker does, so slow work keeps running and stuck work gets stopped.
 - Returns typed results to the parent agent.
 
 ## Quality

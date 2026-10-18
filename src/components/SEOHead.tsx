@@ -18,7 +18,7 @@ interface SEOHeadProps {
 
 const SEOHead: React.FC<SEOHeadProps> = ({ title, description, url, image = '/sj_image.jpeg', type = 'website', publishedTime, modifiedTime, tags = [], noIndex = false }) => {
   const { language } = useLanguage()
-  const fullTitle = title.includes('Saif Aljanahi') || title.includes('سيف الجناحي') ? title : `${title} | Saif Aljanahi`
+  const fullTitle = title.includes('Saif Aljanahi') || title.includes('سيف الجناحي') ? title : `${title} | ${language === 'ar' ? 'سيف الجناحي' : 'Saif Aljanahi'}`
   // Pages pass their English URL; the Arabic page is the same path under /ar. Each version names itself canonical.
   const baseUrl = url.split('?')[0]
   const path = baseUrl.slice(SITE.length) || '/'

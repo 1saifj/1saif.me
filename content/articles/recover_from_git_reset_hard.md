@@ -10,11 +10,11 @@ tags:
   - developer-tools
 ---
 
-This has happened to me more than once. A `git reset --hard` by mistake, and commits disappear from `git log`. Every time, I'm reminded that the fix is simple and most people don't know it: `git reflog`.
+This has happened to me more than once. A `git reset --hard` by mistake, and commits disappear from `git log`. The fix is simple, and most people don't know it: `git reflog`.
 
 ## What the reflog is
 
-Every time `HEAD` moves in your repository, Git writes a line in a log. A commit, a checkout, a rebase, a reset, a merge, a pull. That log is the reflog. It's like a time machine for your local repository, and it remembers where you were even after the commits are gone from every branch.
+Every time `HEAD` moves in your repository, Git writes a line in a log. A commit, a checkout, a rebase, a reset, a merge, a pull. That log is the reflog. It remembers where HEAD was, even after the commits are gone from every branch.
 
 ```
 $ git reflog
@@ -58,7 +58,7 @@ Not forever. Reflog entries for commits that are still reachable from a branch a
 
 So commits lost to a reset stay in the reflog for about 30 days. If you lose something, get it back soon.
 
-The reflog is also local. It lives in your `.git` folder and never gets pushed. A fresh clone has an empty reflog, and your teammate's reflog won't help you with your commits.
+The reflog is also local. It lives in your `.git` folder and never gets pushed. A fresh clone starts with a short reflog, and your teammate's reflog won't help you with your commits.
 
 ## What the reflog can't bring back
 
@@ -70,7 +70,7 @@ If you had run `git add` on them, there is still a chance. Staged files are stor
 git fsck --lost-found
 ```
 
-It writes the dangling objects to `.git/lost-found/other/`. They have no file names, just content, so you'll be opening files and searching for something you recognize. Not fun, but much better than writing the code again.
+It writes dangling blobs to `.git/lost-found/other/` and dangling commits to `.git/lost-found/commit/`. Blobs have no file names, just content, so you'll be opening files and searching for something you recognize. Not fun, but much better than writing the code again.
 
 If you never staged them, Git can't help. Your editor might. VS Code has a Local History view (Timeline), and IntelliJ-based editors have Local History. Both keep copies of files you saved, and they help in more cases than you'd expect.
 
@@ -83,7 +83,7 @@ git show <hash>
 
 ## Habits that make this boring
 
-- **Commit or stash before anything risky.** `git stash` takes a second. A work-in-progress commit is fine too, you can squash it later. After that, the reflog can recover it.
+- **Commit or stash before anything risky.** `git stash` takes a second. A work-in-progress commit also works, and you can squash it later. Either way, the reflog can bring it back.
 - **Make a backup branch before a big change.** Before a rebase, a reset, or a history cleanup, run `git branch backup/before-rebase`. I always do this. If it goes wrong, the old state is one `reset` away, no reflog reading required.
 - **Use `git reset --keep` to move a branch back.** It refuses to reset if that would throw away local changes, which is usually what you want. For a single file, `git restore` is the right tool.
 - **Never use `--hard` on a shared branch and push the result.** On a branch other people use, rewriting history breaks their clones. If you really need to force push, tell your team first, and use `git push --force-with-lease`. It refuses to push if someone else pushed in the meantime, so you can't silently delete their work.

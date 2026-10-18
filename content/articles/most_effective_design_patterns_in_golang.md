@@ -9,17 +9,17 @@ tags:
   - design-patterns
 ---
 
-Design patterns are common answers to problems that keep coming back in software design. Go doesn't need most of the classic catalog, because interfaces, closures and goroutines already cover a lot of it. Two patterns I keep reaching for anyway are Observer and Singleton, so this post covers those two, with Go code for each.
+Design patterns are common answers to problems that keep coming back in software design. Go doesn't need most of the classic catalog, because interfaces, closures and goroutines already cover a lot of it. I still reach for two patterns, Observer and Singleton, so this post covers those two, with Go code for each.
 
-# Observer Pattern
+## Observer Pattern
 The Observer pattern is a software design pattern that defines a one-to-many dependency between objects. When one object changes its state, all its dependents are notified and updated automatically.
 
-Why we should use **Observer Pattern**? 
+Why use the **Observer pattern**?
 
-* Loose coupling: The Observer pattern allows us to create a system where a change in one object results in an automatic change in other objects.
-* Broadcast communication: When an event happens to an object, all its dependents get notified without needing to know who these dependents are.
-* Dynamic relationships: The Observer pattern allows us to add or remove observers dynamically at runtime, offering greater flexibility.
-* Event management: It's excellent for event monitoring and handling situations where action must trigger additional actions.
+* Loose coupling: a change in one object updates the others automatically, without tight references between them.
+* Broadcast: when an object changes, all its dependents are notified, and the object does not need to know who they are.
+* Dynamic relationships: you can add and remove observers at runtime.
+* Event handling: it fits situations where one action should trigger other actions.
 
 
 ```go
@@ -35,12 +35,10 @@ type Observer interface {
 
 ```
 
-The above interfaces are the main block to implementing this pattern, the subject interface is responsible for registering or deregistering observers and it is 
-responsible for notifying them about changes, and the update method in Observer is called when a notification is sent.
+The two interfaces above form the core of the pattern. `Subject` registers and deregisters observers, and it notifies them of changes. The `Update` method on `Observer` runs each time a notification is sent.
 
 
 ```go
-
 type ConcreteSubject struct {
     Observers []Observer
 }
@@ -50,7 +48,12 @@ func (cs *ConcreteSubject) Register(observer Observer) {
 }
 
 func (cs *ConcreteSubject) Deregister(observer Observer) {
-    // Implementation of deregistration
+    for i, o := range cs.Observers {
+        if o == observer {
+            cs.Observers = append(cs.Observers[:i], cs.Observers[i+1:]...)
+            return
+        }
+    }
 }
 
 func (cs *ConcreteSubject) Notify() {
@@ -62,14 +65,8 @@ func (cs *ConcreteSubject) Notify() {
 type ConcreteObserver struct {
     ID int
 }
-// This line is a compile-time check to ensure that the ConcreteSubject struct 
-// implements the Subject interface. If ConcreteSubject does not satisfy all the 
-// methods declared in Subject, the code will fail to compile. This is useful 
-// to catch any inadvertent changes that may cause ConcreteSubject to no longer 
-// implement the Subject interface. The variable is discarded (hence the underscore) 
-// because we don't need it for anything - we're only interested in the side effect 
-// of the type check.
 
+// Compile-time check that *ConcreteSubject implements Subject.
 var _ Subject = (*ConcreteSubject)(nil)
 
 func (co *ConcreteObserver) Update() {
@@ -77,13 +74,9 @@ func (co *ConcreteObserver) Update() {
 }
 ```
 
+### Real-world example
 
-Real World Example:
-
-
-
-Consider you're running a blog and have a list of subscribers who want to be notified whenever a new blog post is published.
-In this scenario, the blog is the Subject (or Publisher), and the subscribers are the Observers.
+Consider a blog with a list of subscribers who want to know when a new post is published. In this case, the blog is the Subject (or Publisher), and the subscribers are the Observers.
 
 ```go
 
@@ -127,16 +120,14 @@ func main() {
 	blog.Subscribe(user1)
 	blog.Subscribe(user2)
 
-	blog.Publish("Introduction to the Observer Pattern in Golang")
+	blog.Publish("Introduction to the Observer Pattern in Go")
 }
 
 ```
 
-# Singleton Pattern
+## Singleton Pattern
 
-The Singleton pattern ensures that a class only has one instance and provides a global point of access to it.
-This pattern is useful when exactly one object is needed to coordinate actions across the system. Golang, being a language that emphasizes simplicity,
-does not support classes. However, we can still implement a Singleton pattern by using package-level variables.
+The Singleton pattern ensures that a type has only one instance, and it provides a global point of access to that instance. Use it when exactly one object must coordinate actions across the system. Go has no classes, but you can still build a singleton with a package-level variable and `sync.Once`.
 
 ```go
 package singleton
@@ -160,6 +151,5 @@ func Instance() *singleton {
 	return instance
 }
 ```
-By invoking the Instance() function multiple times, we can observe the Singleton pattern in action - the function will instantiate the singleton once, and subsequent calls will retrieve the already-created instance from memory.
 
-
+Each call to `Instance()` returns the same pointer. `once.Do` creates the singleton on the first call, and later calls return the stored instance.

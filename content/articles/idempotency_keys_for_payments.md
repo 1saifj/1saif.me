@@ -171,7 +171,7 @@ Three outcomes:
 
 ## Things to decide
 
-**What if the server crashes in the middle?** The row stays with `response_status = NULL`, and every retry gets "still processing" forever. You need a timeout: if a row has been in progress for longer than any payment could take, let a new request take it over. That's only safe if the call to the payment provider is itself idempotent, and most providers accept an idempotency key for exactly this reason. Pass your key through, so a takeover can't charge twice at the provider either.
+**What if the server crashes in the middle?** The row stays with `response_status = NULL`, and every retry gets "still processing" forever. You need a timeout: if a row has been in progress for longer than any payment could take, let a new request take it over. That's only safe if the call to the payment provider is itself idempotent, and many providers accept an idempotency key for exactly this reason. Pass your key through, so a takeover can't charge twice at the provider either.
 
 **Do you store failures?** If the card was declined, store it. A retry should get the same decline and not a second attempt. But if your service failed before it reached the provider, it's better to delete the row, so the client can retry with the same key and actually get processed.
 

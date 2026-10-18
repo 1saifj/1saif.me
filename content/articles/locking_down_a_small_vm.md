@@ -14,9 +14,9 @@ tags:
 
 I was setting up one of my production servers when I asked myself a simple question: how secure is a basic VM if you don't spend a single extra dollar on it?
 
-A lot of people treat security as something for later, once the project is bigger or the budget is better. I understand why. But this question stayed with me since last year, after seeing how quickly an exposed server becomes an easy target when SSH and access are left too open. Give a new VM a public IP and look at `/var/log/auth.log` the next day. It is full of login attempts for `root`, `admin`, `ubuntu` and every other default user name.
+A lot of people treat security as something for later, once the project is bigger or the budget is better. I understand why. But this question stayed with me since last year, after seeing how quickly an exposed server becomes an easy target when SSH and access are left too open. Give a new VM a public IP and look at `/var/log/auth.log` the next day. It is full of login attempts for `root`, `admin`, `ubuntu` and many other common user names.
 
-None of what follows costs money. Every tool here is free and already in the package manager. The hard part is doing it before something goes wrong, while the server is still empty and you can break things without consequences.
+None of what follows costs money. Every tool here is free and available in the default apt repositories. The hard part is doing it before something goes wrong, while the server is still empty and you can break things without consequences.
 
 This is the checklist I go through now, in this order.
 
@@ -178,7 +178,7 @@ Test `sudo -k && sudo true` in a new session before you trust it.
 
 Every step above makes it harder to get in, including for you. Before you finish:
 
-- Know where your cloud provider's web console is. Most providers give you a serial console that works even when SSH and the network are broken.
+- Know where your cloud provider's web console is. Many providers offer a serial console that works even when SSH and the network are broken.
 - Save the TOTP recovery codes somewhere that isn't the server.
 - Write down the WireGuard keys and config in your password manager.
 

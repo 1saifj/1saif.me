@@ -142,4 +142,4 @@ When I shared this on LinkedIn, the "better" example also had a `ConfigProvider`
 
 Before you write an interface, ask: is there a second implementation today, or a test that needs a fake? If not, use the struct directly and add the interface later, at the place that needs it. Go makes that cheap, because nothing has to change on the implementing side.
 
-What's your experience with interface design in Go? Have you run into similar refactoring challenges?
+What's your experience with interface design in Go? Have you run into similar problems while refactoring?

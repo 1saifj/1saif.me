@@ -11,7 +11,7 @@ tags:
   - mobile
 ---
 
-Ever wondered why some map and navigation apps stay smooth while others freeze for a second when they calculate a route? Most of the time the difference is where the heavy work runs.
+Some map and navigation apps stay smooth, while others freeze for a second when they calculate a route. Most of the time, the difference is where the heavy work runs.
 
 I've been working on Flutter guide apps lately, the kind with maps, places and routes between them. The lesson that made the biggest difference was about isolates.
 

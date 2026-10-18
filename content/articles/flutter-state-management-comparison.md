@@ -11,8 +11,6 @@ tags:
   - state-management
 ---
 
-# Flutter State Management: Comparing Provider, Riverpod, and Bloc
-
 Every Flutter project I start comes to the same question early: how do we manage state? I've used Provider, Riverpod and Bloc in real projects, and each one fits a different kind of app. Here's how they compare.
 
 ## The Importance of State Management
@@ -24,7 +22,7 @@ First, what kind of state are we talking about? Flutter applications can have va
 - **Navigation state**: The current route/screen in your application
 - **Form state**: Data entered by users in forms
 
-Proper state management ensures your application remains maintainable as it grows in complexity.
+Good state management keeps an app easy to maintain as it grows.
 
 ## Provider: Simple Yet Powerful
 
@@ -34,11 +32,12 @@ Provider is built on top of InheritedWidget but simplifies its usage considerabl
 
 ```dart
 // Define your model
-class Counter {
+class Counter extends ChangeNotifier {
   int value = 0;
   
   void increment() {
     value++;
+    notifyListeners();
   }
 }
 
@@ -79,7 +78,6 @@ ElevatedButton(
 
 ### Cons of Provider
 - Can become unwieldy for complex state relationships
-- No built-in support for async operations
 - Provider nesting can become verbose
 
 ## Riverpod: Provider Evolved

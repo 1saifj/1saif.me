@@ -11,7 +11,7 @@ const copy = {
   en: {
     seoTitle: 'Privacy | Saif Aljanahi',
     seoDescription: "A clear explanation of the personal data collected by Saif Aljanahi's portfolio website and how it is used.",
-    updated: 'Last updated',
+    updated: 'Last updated:',
     title: 'Privacy policy',
     intro: 'This policy describes what happens to information shared with Saif Aljanahi through this personal portfolio. The site is designed to collect as little as possible and to make every use clear.',
     sections: ['Introduction', 'Data collected', 'How it is used', 'Services', 'Your rights', 'Contact'],
@@ -26,7 +26,7 @@ const copy = {
     services: [['Email service', 'Delivers replies to contact messages.'], ['Analytics service', 'Provides privacy-focused, aggregate usage information when enabled.'], ['Hosting provider', 'Serves the site and its static assets.'], ['Legal requirements', 'Information may be shared when required by law or to protect rights.']],
     rights: [['Access', 'Ask what personal data is held about you.'], ['Rectification', 'Ask for inaccurate information to be corrected.'], ['Erasure', 'Ask for your personal data to be deleted.'], ['Portability', 'Request a copy of your data in a machine-readable format.'], ['Object', 'Object to particular types of processing.'], ['Restriction', 'Ask for how your data is used to be limited.']],
     contactBody: 'If you want to ask about this policy or exercise one of these rights, email me. I aim to respond within 30 days.',
-    name: 'Saif Aljanahi', resume: 'Resume',
+    name: 'Saif Aljanahi', resume: 'Résumé',
   },
   ar: {
     seoTitle: 'الخصوصية | سيف الجناحي',

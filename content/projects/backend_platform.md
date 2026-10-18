@@ -10,8 +10,6 @@ role: Lead engineer
 impact: TypeScript and Go services, Pulumi infrastructure on Google Cloud, load tests before launch
 ---
 
-# Backend Platform and Cloud Infrastructure
-
 I lead engineering for a product that partners and their customers use every day. This page describes the work in general terms, and the code, the partners and the numbers stay private.
 
 ## What I build
