@@ -50,3 +50,6 @@ shot.png
 shot-skills.png
 refactor.py
 format-radii.js
+# Playwright output
+playwright-report/
+test-results/
