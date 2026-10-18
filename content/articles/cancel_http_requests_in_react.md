@@ -1,9 +1,9 @@
 ---
 title: How to Cancel HTTP Requests in React using Axios
-description: Introduction Axios is an amazing library for fetching...
+description: "Stop stale requests when a user clicks quickly between categories. How to cancel Axios requests with AbortController in React, so old responses never overwrite new ones."
 createdAt: "2023-01-22"
 updatedAt: 2023-03-12
-featuredImage: "/articles/http_cancel_feat.png"
+featuredImage: "/articles/http_cancel_feat.jpg"
 tags:
   - react
   - axios

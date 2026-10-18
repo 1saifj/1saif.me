@@ -20,77 +20,14 @@
 
 /* Refined Minimalist component styles */
 @layer components {
-  .btn-primary {
-    @apply bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-full font-medium transition-transform duration-300 hover:scale-[1.02] active:scale-95;
-  }
-  
-  .btn-secondary {
-    @apply bg-transparent text-slate-900 dark:text-white px-6 py-3 rounded-full font-medium border border-slate-200 dark:border-zinc-800 hover:border-slate-400 dark:hover:border-zinc-600 transition-all duration-300 active:scale-95;
-  }
   
   .card {
     @apply bg-white dark:bg-[#0a0a0a] rounded-2xl border border-slate-100 dark:border-zinc-900 overflow-hidden transition-all duration-300 hover:border-slate-300 dark:hover:border-zinc-700;
-  }
-  
-  .card-dark {
-    @apply bg-[#0a0a0a] dark:bg-[#050505] rounded-2xl border border-zinc-900 dark:border-zinc-800 overflow-hidden transition-all duration-300 hover:border-zinc-700;
-  }
-  
-  .input-field {
-    @apply w-full px-4 py-3 bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-slate-900 dark:focus:border-white focus:ring-0 transition-all duration-300 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-600;
-  }
-  
-  .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium tracking-wide;
-  }
-  
-  .badge-primary {
-    @apply badge bg-slate-900 dark:bg-white text-white dark:text-slate-900;
-  }
-  
-  .badge-secondary {
-    @apply badge bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800;
-  }
-  
-  .badge-success {
-    @apply badge bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/50;
-  }
-  
-  .badge-warning {
-    @apply badge bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/50;
-  }
-  
-  .badge-error {
-    @apply badge bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/50;
   }
 }
 
 /* Custom utility classes */
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-  
-  .transform-style-3d {
-    transform-style: preserve-3d;
-  }
-  
-  .backface-hidden {
-    backface-visibility: hidden;
-  }
   
   /* Code blocks - removed old styles as we're using inline styles now */
   
@@ -122,13 +59,6 @@
   }
   
   /* Code Block Container Styling */
-  .code-block-wrapper {
-    @apply my-6 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700;
-  }
-  
-  .code-block-content {
-    @apply bg-slate-50 dark:bg-slate-900;
-  }
   
   /* Shiki Dual Theme Support */
   .shiki {
@@ -140,7 +70,7 @@
   
   .shiki code {
     background-color: transparent !important;
-    font-family: 'SF Mono', Monaco, Consolas, 'Courier New', monospace !important;
+    font-family: 'Geist Mono', 'SF Mono', Monaco, Consolas, 'Courier New', monospace !important;
     font-size: 0.875rem !important;
     line-height: 1.7 !important;
   }
@@ -284,15 +214,6 @@
     }
   }
   
-  .animate-float {
-    animation: float 20s ease-in-out infinite;
-  }
-  
-  .animate-float-delayed {
-    animation: float-delayed 25s ease-in-out infinite;
-    animation-delay: 5s;
-  }
-  
   @keyframes slide-up {
     from {
       transform: translateY(100%);
@@ -304,10 +225,6 @@
     }
   }
   
-  .animate-slide-up {
-    animation: slide-up 0.3s ease-out;
-  }
-  
   @keyframes fade-out {
     from {
       opacity: 1;
@@ -315,10 +232,6 @@
     to {
       opacity: 0;
     }
-  }
-  
-  .animate-fade-out {
-    animation: fade-out 0.3s ease-out forwards;
   }
   
   @keyframes spin-slow {
@@ -329,8 +242,249 @@
       transform: rotate(360deg);
     }
   }
-  
-  .animate-spin-slow {
-    animation: spin-slow 3s linear infinite;
-  }
 }
+
+/* Portfolio refresh: a calm, LinkedIn-blue editorial system with a dark canvas option. */
+:root {
+  --portfolio-canvas: #f4f7fb;
+  --portfolio-surface: #ffffff;
+  --portfolio-surface-soft: #edf3f9;
+  --portfolio-ink: #132238;
+  --portfolio-muted: #61738b;
+  --portfolio-faint: #8ea0b5;
+  --portfolio-line: #dbe5ef;
+  --portfolio-brand: #0a66c2;
+  --portfolio-brand-dark: #0757a6;
+  --portfolio-brand-soft: #e4f0fb;
+  --portfolio-mint: #16a67a;
+  --portfolio-violet: #7454d6;
+  --portfolio-shadow: 0 24px 60px rgba(25, 58, 92, 0.12);
+}
+
+html.dark {
+  --portfolio-canvas: #071321;
+  --portfolio-surface: #0d1e31;
+  --portfolio-surface-soft: #10263d;
+  --portfolio-ink: #f4f8fc;
+  --portfolio-muted: #a2b5ca;
+  --portfolio-faint: #738aa3;
+  --portfolio-line: #203953;
+  --portfolio-brand: #64b5ff;
+  --portfolio-brand-dark: #8ccaff;
+  --portfolio-brand-soft: #133b5e;
+  --portfolio-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+/* Quiet editorial portfolio layer */
+.site-shell {
+  --site-bg: #ffffff;
+  --site-surface: #f7f9fb;
+  --site-ink: #10161d;
+  --site-muted: #4a5866;
+  --site-faint: #6b7885;
+  --site-line: #e3e8ee;
+  --site-blue: #0a66c2;
+  --site-blue-dark: #084e96;
+  min-height: 100svh;
+  overflow: clip;
+  color: var(--site-ink);
+  background: var(--site-bg);
+  font-family: 'Geist Sans', ui-sans-serif, system-ui, sans-serif;
+}
+html.dark .site-shell { --site-bg: #0d1117; --site-surface: #1a222c; --site-ink: #e8edf3; --site-muted: #9aa8b6; --site-faint: #8b99a8; --site-line: #2a3441; --site-blue: #4c9fe8; --site-blue-dark: #7bbaf0; }
+.site-container { width: min(100% - 56px, 1200px); margin-inline: auto; }
+.site-wordmark { display: inline-flex; align-items: center; color: var(--site-ink); font-size: 19px; font-weight: 750; letter-spacing: -.055em; text-decoration: none; }
+.site-wordmark span { color: var(--site-blue); }
+.site-button svg { width: 15px; height: 15px; flex: 0 0 auto; }
+.site-button { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 17px; border: 1px solid var(--site-blue); border-radius: 5px; color: #fff; background: var(--site-blue); font: inherit; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background .18s ease, border-color .18s ease, transform .18s ease; }
+.site-button:hover { border-color: var(--site-blue-dark); background: var(--site-blue-dark); transform: translateY(-1px); }
+html.dark .site-button { border-color: #2868a8; background: #2868a8; }
+html.dark .site-button:hover { border-color: #1d4e7f; background: #1d4e7f; }
+.site-section { padding: 110px 0; border-top: 1px solid var(--site-line); }
+.site-footer { border-top: 1px solid var(--site-line); background: var(--site-bg); }
+.site-footer-main { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; gap: 20px; padding: 28px 0; }
+.site-footer-main p { margin: 0; color: var(--site-muted); font-size: 12px; text-align: center; }
+.site-footer-links { display: flex; justify-content: end; gap: 18px; }
+.site-footer-links a { display: inline-flex; align-items: center; gap: 5px; color: var(--site-muted); font-size: 12px; text-decoration: none; }
+.site-footer-links a:hover { color: var(--site-blue); }
+html[dir='rtl'] .site-shell { font-family: "IBM Plex Sans Arabic", 'Geist Sans', 'Geist', Tahoma, sans-serif; }
+html[dir='rtl'] .site-shell svg[data-icon='arrow-right'], html[dir='rtl'] .site-shell svg[data-icon='arrow-up-right'] { transform: scaleX(-1); }
+.site-shell :focus-visible { outline: 3px solid color-mix(in srgb, var(--site-blue) 72%, white); outline-offset: 3px; }
+@media (max-width: 760px) {
+  .site-container { width: min(100% - 36px, 1200px); }
+  .site-section { padding: 76px 0; }
+  .site-footer-main { grid-template-columns: 1fr; justify-items: start; gap: 16px; }
+  .site-footer-main p { text-align: start; }
+  .site-footer-links { justify-content: start; flex-wrap: wrap; }
+}
+
+/* Long-form reading */
+.site-article-content { min-width: 0; }
+.site-article-content.article-content { font-size: 18px; line-height: 1.72; }
+.site-article-content.article-content h1 { display: none; }
+.site-article-content.article-content h2 { margin-top: 3.3em; padding-bottom: .35em; border-bottom: 1px solid var(--site-line); color: var(--site-ink); font-family: ui-serif, Georgia, serif; font-size: clamp(2rem, 3.8vw, 3.2rem); font-weight: 500; letter-spacing: -.05em; }
+.site-article-content.article-content h3 { margin-top: 2.2em; color: var(--site-ink); font-size: 1.3rem; }
+.site-article-content.article-content p, .site-article-content.article-content li { color: var(--site-muted); }
+.site-article-content.article-content strong { color: var(--site-ink); }
+.site-article-content.article-content a { color: var(--site-blue); }
+.site-article-content.article-content blockquote { margin: 2em 0; padding: 1em 1.3em; border-inline-start: 3px solid var(--site-blue); color: var(--site-muted); background: var(--site-surface); }
+.site-article-content.article-content pre { overflow-x: auto; margin: 2em 0; padding: 20px; border: 1px solid var(--site-line); border-radius: 5px; background: var(--site-surface); }
+.site-article-content.article-content code { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .84em; }
+.site-article-related { background: var(--site-surface); }
+.site-article-related h2 { margin: 5px 0 8px; font-family: ui-serif, Georgia, serif; font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 500; letter-spacing: -.045em; }
+@media (max-width: 760px) {
+  .site-article-content.article-content { font-size: 16px; }
+}
+
+/* Blog index */
+@media (prefers-reduced-motion: reduce) {
+  .site-shell *, .site-shell *::before, .site-shell *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+/* Case-study pages share the homepage's quiet reading rhythm. */
+.site-project-content { min-width: 0; }
+.site-project-content.article-content { font-size: 17px; line-height: 1.7; }
+.site-project-content.article-content h1 { display: none; }
+.site-project-content.article-content h2 { margin-top: 3.3em; padding-bottom: .35em; border-bottom: 1px solid var(--site-line); color: var(--site-ink); font-family: ui-serif, Georgia, serif; font-size: clamp(1.9rem, 3.5vw, 3rem); font-weight: 500; letter-spacing: -.05em; }
+.site-project-content.article-content h3 { margin-top: 2.3em; color: var(--site-ink); font-size: 1.25rem; }
+.site-project-content.article-content p, .site-project-content.article-content li { color: var(--site-muted); }
+.site-project-content.article-content strong { color: var(--site-ink); }
+.site-project-content.article-content a { color: var(--site-blue); }
+.site-project-content.article-content pre { overflow-x: auto; padding: 20px; border: 1px solid var(--site-line); border-radius: 5px; background: var(--site-surface); }
+.site-project-content.article-content code { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; }
+
+/* Resume keeps the same editorial system while giving the career story room to breathe. */
+.site-resume-page > .site-footer { display: flex; justify-content: space-between; gap: 20px; padding: 24px 0; color: var(--site-faint); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.site-resume-page > .site-footer a { color: inherit; text-decoration: none; }
+.site-resume-page > .site-footer a:hover { color: var(--site-blue); }
+@media (max-width: 760px) {
+  .site-resume-page > .site-footer { flex-wrap: wrap; }
+}
+
+/* Bespoke identity object: the real portrait is textured onto a restrained 3D frame. */
+
+/* Privacy is a readable document, not a control panel. */
+.site-privacy-table { border-top: 1px solid var(--site-line); }
+.site-privacy-row { display: grid; grid-template-columns: minmax(150px, .42fr) minmax(0, 1fr); gap: 30px; padding: 22px 0; border-bottom: 1px solid var(--site-line); }
+.site-privacy-row h3 { margin: 0; color: var(--site-ink); font-size: 15px; font-weight: 600; }
+.site-privacy-row p { margin: 0 0 6px; font-size: 14px; }
+.site-privacy-row p:last-child { margin-bottom: 0; }
+.site-privacy-row strong { color: var(--site-ink); font-weight: 600; }
+.site-privacy-list { display: grid; gap: 13px; margin: 0; padding: 0; list-style: none; }
+.site-privacy-list li { position: relative; padding-inline-start: 18px; color: var(--site-muted); font-size: 15px; line-height: 1.55; }
+.site-privacy-list li::before { position: absolute; inset-inline-start: 0; top: .65em; width: 5px; height: 5px; border-radius: 50%; background: var(--site-blue); content: ''; }
+.site-privacy-services { border-top: 1px solid var(--site-line); }
+.site-privacy-services p { display: grid; grid-template-columns: minmax(150px, .42fr) minmax(0, 1fr); gap: 30px; margin: 0; padding: 18px 0; border-bottom: 1px solid var(--site-line); }
+.site-privacy-services strong { color: var(--site-ink); font-size: 14px; }
+.site-privacy-services span { color: var(--site-muted); font-size: 14px; }
+.site-privacy-rights { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.site-privacy-rights > div { padding-top: 16px; border-top: 1px solid var(--site-line); }
+.site-privacy-rights h3 { margin: 0 0 7px; color: var(--site-ink); font-size: 15px; font-weight: 600; }
+.site-privacy-rights p { margin: 0; font-size: 14px; }
+.site-privacy-page > .site-footer { display: flex; justify-content: space-between; gap: 20px; max-width: 1040px; margin-inline: auto; padding: 24px 0; color: var(--site-faint); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.site-privacy-page > .site-footer a { color: inherit; text-decoration: none; }
+.site-privacy-page > .site-footer a:hover { color: var(--site-blue); }
+@media (max-width: 760px) {
+  .site-privacy-row, .site-privacy-services p { grid-template-columns: 1fr; gap: 8px; }
+  .site-privacy-rights { grid-template-columns: 1fr; gap: 24px; }
+  .site-privacy-page > .site-footer { flex-wrap: wrap; width: min(100% - 40px, 1040px); }
+}
+
+.site-shell > main, .site-footer { position: relative; z-index: 1; }
+.site-button { min-height: 48px; padding-inline: 19px; border-radius: 9px; box-shadow: 0 8px 24px color-mix(in srgb, var(--site-blue) 15%, transparent); }
+.site-button:hover { transform: translateY(-2px); box-shadow: 0 12px 30px color-mix(in srgb, var(--site-blue) 24%, transparent); }
+.site-section { padding: 124px 0; scroll-margin-top: 78px; }
+.site-footer-main { padding-top: 32px; }
+html[dir='rtl'] .site-shell { font-family: "IBM Plex Sans Arabic", 'Geist Sans', 'Geist', Tahoma, sans-serif; }
+@media (max-width: 760px) {
+  .site-container { width: min(calc(100% - 36px), 1200px); }
+  .site-section { padding: 86px 0; }
+}
+
+/* Arabic headings: the Latin serif display style (tight leading, negative tracking) crowds Arabic letters. */
+html[dir='rtl'] .site-shell :is(h1, h2, h3):not([lang='en'], [lang='en'] *) { font-family: 'IBM Plex Sans Arabic', 'Geist Sans', Tahoma, sans-serif; font-weight: 600; letter-spacing: 0; line-height: 1.3; }
+html[dir='rtl'] .site-shell h1:not([lang='en'], [lang='en'] *) { font-size: clamp(2.6rem, 6vw, 4.6rem); }
+html[dir='rtl'] .site-shell :is(p, li):not([lang='en'] *) { line-height: 1.85; }
+/* Markdown items draw their own bullet or number, so the list itself shows no marker. */
+.article-content ul.md-list { list-style: none; margin: 0 0 1.5rem; padding: 0; }
+/* Arabic article bodies: markdown bullets and numbers sit on the right. */
+.article-content[dir='rtl'] ul.md-list > li { margin-left: 0; margin-right: 1.75rem; }
+.article-content[dir='rtl'] ul.md-list > li > span:first-child { left: auto; right: -1.75rem; }
+
+/* Code blocks: one panel that follows the site theme; token colours come from Shiki's dual-theme variables. */
+.code-block-container { box-shadow: none !important; border-color: var(--site-line) !important; }
+.code-surface { background: #ffffff; }
+html.dark .code-surface { background: #0d1117; }
+.code-block-container pre { margin: 0 !important; padding: 18px 20px !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; }
+html:not(.dark) .code-surface pre code { color: #24292e; }
+html.dark .code-surface pre code { color: #e1e4e8; }
+
+/* ---- One visual language with the home page (keep this block last) ---- */
+/* Headings: Geist like the home page, replacing the earlier serif display style. Arabic rules above still win. */
+.site-shell h1, .site-shell h2 { font-family: 'Geist Sans', ui-sans-serif, system-ui, sans-serif; font-weight: 600; letter-spacing: -.035em; }
+.site-shell h1 { font-size: clamp(2.6rem, 5.6vw, 4.8rem); line-height: 1.04; }
+.site-article-content h2, .site-project-content h2 { font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1.2; }
+
+/* Blog rows: open list like the home page, no boxed cards. */
+/* Body text on Geist too; the Arabic font stack above has higher specificity and still applies in RTL. */
+.site-shell { font-family: 'Geist Sans', ui-sans-serif, system-ui, sans-serif; }
+/* Article titles are long sentences, so they get a smaller display size than page titles. */
+/* English titles and teasers inside Arabic pages: each paragraph takes its own direction, so punctuation stays in place. */
+html[dir='rtl'] [lang='en']:not(article) :is(h2, h3, p) { unicode-bidi: plaintext; text-align: right; }
+
+/* ---- Plain pages: résumé, case studies, writing, articles, privacy (keep last) ---- */
+.plain-page { width: min(calc(100% - 48px), 960px); margin-inline: auto; padding: 56px 0 72px; }
+.plain-page h1 { margin: 0; font-size: clamp(2rem, 4.4vw, 3rem); line-height: 1.12; letter-spacing: -.025em; }
+.plain-page h2, .plain-section-title { margin: 48px 0 16px; font-size: 1.4rem; line-height: 1.3; letter-spacing: -.01em; }
+.plain-page h3 { margin: 0; font-size: 1.08rem; font-weight: 600; line-height: 1.4; }
+.plain-page .notebook-post-row h2 { margin: 0; font-size: 1.08rem; letter-spacing: 0; }
+.plain-page p, .plain-page li { max-width: 720px; color: var(--site-muted); font-size: 1rem; line-height: 1.7; }
+.plain-page a, .site-article-related a { color: var(--site-ink); text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; }
+.plain-page a:hover, .site-article-related a:hover { text-decoration-color: currentColor; }
+.plain-page .plain-lede { margin: 14px 0 0; font-size: 1.15rem; color: var(--site-ink); }
+.plain-page .plain-meta { margin: 6px 0 0; font-size: 14px; color: var(--site-faint); }
+.plain-page .plain-back { margin: 0 0 24px; font-size: 14px; }
+.plain-back a { color: var(--site-muted); text-decoration: none; }
+.plain-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 18px 0 0; }
+.plain-role { padding: 20px 0; border-bottom: 1px solid var(--site-line); }
+.plain-role p { margin: 8px 0 0; }
+.plain-role ul { margin: 10px 0 0; padding-inline-start: 1.2em; }
+.plain-list { margin: 0; padding-inline-start: 1.2em; }
+.plain-list li { margin: 6px 0; }
+.plain-page .plain-next { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--site-line); }
+.plain-body { margin-top: 36px; }
+.plain-section { margin-top: 8px; }
+.plain-article-head { padding-bottom: 8px; }
+.plain-article-body { width: min(calc(100% - 48px), 960px); margin-inline: auto; padding-bottom: 48px; }
+.plain-article-body .article-content { max-width: 720px; }
+/* The Arabic head of an English post: right-aligned inside the same 720px column as the body. */
+.plain-article-head > [dir='rtl'] { max-width: 720px; }
+.plain-button { padding: 0; border: 0; color: var(--site-blue); background: none; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.plain-filters { margin: 28px 0 8px; }
+.plain-filters input { width: 100%; max-width: 420px; padding: 10px 12px; border: 1px solid var(--site-line); border-radius: 6px; color: var(--site-ink); background: var(--site-bg); font: inherit; }
+.plain-filters input:focus { outline: 2px solid var(--site-blue); outline-offset: 1px; }
+.plain-page .plain-tags { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 14px 0 0; }
+.plain-tags button { padding: 2px 0; border: 0; color: var(--site-muted); background: none; font: inherit; font-size: 14px; cursor: pointer; }
+.plain-tags button[aria-pressed='true'] { color: var(--site-ink); text-decoration: underline; text-underline-offset: 4px; }
+.plain-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; width: min(calc(100% - 48px), 960px); margin-inline: auto; padding: 24px 0 40px; border-top: 1px solid var(--site-line); color: var(--site-faint); font-size: 14px; }
+.plain-footer a { color: var(--site-muted); }
+.site-shell .site-article-related { padding: 8px 0 56px; }
+.site-article-related .site-container { width: min(calc(100% - 48px), 960px); }
+@media (max-width: 760px) {
+  .plain-page, .plain-article-body, .plain-footer, .site-article-related .site-container { width: calc(100% - 32px); }
+  .plain-page { padding-top: 36px; }
+}
+.plain-page a.notebook-post-row { text-decoration: none; }
+.plain-role ul, .plain-page .plain-list { list-style: disc; }
+.plain-page.plain-article-head { padding-bottom: 36px; }
+/* Headings inside articles and case studies match the plain page headings. */
+.site-shell .plain-body h2, .site-shell .plain-article-body .article-content h2 { font-family: 'Geist Sans', ui-sans-serif, system-ui, sans-serif; font-weight: 600; letter-spacing: -.01em; margin: 40px 0 12px; padding: 0; border: 0; font-size: 1.4rem; line-height: 1.3; }
+.site-shell .plain-body h3, .site-shell .plain-article-body .article-content h3 { font-family: 'Geist Sans', ui-sans-serif, system-ui, sans-serif; font-weight: 600; margin: 28px 0 8px; padding: 0; border: 0; font-size: 1.12rem; }
+.article-content ul.md-list li > span:first-child { color: var(--site-faint); }
+.code-header svg { display: none; }
+.site-shell .plain-body p, .site-shell .plain-body ul { max-width: 720px; }
+.article-content .table-container { overflow-x: auto; margin: 1.75em 0; }
+.article-content .table-container table { margin: 0; }
+.article-content :is(th, td) code { white-space: nowrap; }
+.article-content th { text-transform: none; letter-spacing: 0; font-size: .875rem; }
+@media (max-width: 640px) { .article-content :is(th, td) { padding: .6rem .75rem; } }

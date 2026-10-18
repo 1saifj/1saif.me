@@ -1,13 +1,21 @@
 const fs = require('fs');
+
 const path = require('path');
 
 const SITE_URL = 'https://1saif.me';
+
 const SITE_NAME = 'Saif Aljanahi';
-const SITE_DESCRIPTION = 'Full-Stack Software Engineer specializing in Golang, Python, Flutter, and modern web technologies';
+
+const SITE_DESCRIPTION = 'Notes from a lead software engineer in Al-Najaf, Iraq, on backend platforms, Go, PostgreSQL, cloud infrastructure and Flutter.';
+
 const AUTHOR_EMAIL = 'saifalialjanahi@gmail.com';
+
 const CONTENT_DIR = path.join(__dirname, '../content/articles');
+
 const RSS_OUTPUT = path.join(__dirname, '../public/rss.xml');
+
 const ATOM_OUTPUT = path.join(__dirname, '../public/atom.xml');
+
 const JSON_OUTPUT = path.join(__dirname, '../public/feed.json');
 
 // Read markdown files and extract metadata
@@ -26,7 +34,7 @@ function parseMarkdownMetadata(filePath) {
   metadataLines.forEach(line => {
     if (line.includes(':') && !line.startsWith(' ')) {
       const [key, ...valueParts] = line.split(':');
-      const value = valueParts.join(':').trim().replace(/['"]/g, '');
+      const value = valueParts.join(':').trim().replace(/^(['"])(.*)\1$/, '$2');
       
       if (value) {
         metadata[key.trim()] = value;
@@ -42,6 +50,7 @@ function parseMarkdownMetadata(filePath) {
   
   // Extract content after frontmatter
   const contentAfterMatter = content.replace(/^---\n[\s\S]*?\n---\n/, '');
+
   const excerpt = contentAfterMatter
     .substring(0, 300)
     .replace(/#+\s/g, '')
@@ -55,9 +64,9 @@ function parseMarkdownMetadata(filePath) {
   return metadata;
 }
 
-// Generate slug from filename
-function getSlugFromFilename(filename) {
-  return filename.replace('.md', '').replace(/_/g, '-');
+// Same rule as src/utils/slugUtils.ts, so feed links match the site's routes
+function slugify(title) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
 // Get all blog posts
@@ -71,7 +80,7 @@ function getBlogPosts() {
       const metadata = parseMarkdownMetadata(filePath);
       
       if (metadata) {
-        const slug = getSlugFromFilename(file);
+        const slug = slugify(metadata.title || file.replace('.md', ''));
         const stats = fs.statSync(filePath);
         
         posts.push({
@@ -95,6 +104,7 @@ function getBlogPosts() {
 // Escape XML special characters
 function escapeXml(unsafe) {
   if (!unsafe) return '';
+
   return unsafe
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -147,7 +157,7 @@ function generateRSS(posts) {
     rss += `
     <item>
       <title>${escapeXml(post.title)}</title>
-      <description>${escapeXml(post.excerpt)}</description>
+      <description>${escapeXml(post.description)}</description>
       <content:encoded><![CDATA[${contentHtml}]]></content:encoded>
       <link>${postUrl}</link>
       <guid isPermaLink="true">${postUrl}</guid>
@@ -207,7 +217,7 @@ function generateAtom(posts) {
     <id>${postUrl}</id>
     <published>${published}</published>
     <updated>${updated}</updated>
-    <summary>${escapeXml(post.excerpt)}</summary>
+    <summary>${escapeXml(post.description)}</summary>
     <content type="html"><![CDATA[${contentHtml}]]></content>
     <author>
       <name>${SITE_NAME}</name>
@@ -246,7 +256,7 @@ function generateJSONFeed(posts) {
       url: `${SITE_URL}/blog/${post.slug}`,
       title: post.title,
       content_html: post.description,
-      summary: post.excerpt,
+      summary: post.description,
       image: post.featuredImage ? `${SITE_URL}${post.featuredImage}` : null,
       date_published: new Date(post.createdAt).toISOString(),
       date_modified: new Date(post.updatedAt).toISOString(),

@@ -1,15 +1,15 @@
 ---
 title: How to Mock an API in ONE minute
-description: Tools and Libraries for Quickly Setting Up a Mock API
+description: "Quick ways to stand up a mock API for tests and development: JSON Server for JavaScript, httptest in Go, mockito in Dart, and unittest.mock in Python."
 createdAt: "2022-12-17"
 updatedAt: 2022-12-17
-featuredImage: "/articles/api_mock_feat.png"
+featuredImage: "/articles/api_mock_feat.jpg"
 tags:
   - api
   - testing
 ---
 
-Mocking an API can be useful when you want to test your application's integration with an API, but you don't have access to the real API or you don't want to make real API calls during testing. In this article, we'll show you how to quickly set up a mock API using modern tools in JavaScript, Go, Dart, and Python.
+Mocking an API can be useful when you want to test your application's integration with an API, but you don't have access to the real API or you don't want to make real API calls during testing. Here's how I set up a mock API with the tools I reach for in JavaScript, Go, Dart and Python.
 
 Here's an example of how to set up a mock API with JSON Server in just a few minutes:
 
@@ -168,4 +168,4 @@ response = requests.get("http://example.com/users")
 
 5. The mock Response object will be returned instead of a real HTTP response. You can then test your code's behavior using the mock response data.
 
-In conclusion, mocking an API can be a useful tool for testing and development. It allows you to simulate an API without relying on the real API, which can save you time and make your tests more reliable. There are various tools and libraries available for quickly setting up a mock API in different programming languages, such as JSON Server in JavaScript, httptest in Go, mockito in Dart, and unittest.mock in Python. By using these tools, you can easily create a mock API to use in your tests and development.
+Whichever language you're in, the idea is the same: your tests shouldn't depend on a server you don't control. A mock that returns fixed responses makes tests fast, and it lets you test the cases the real API rarely gives you, like a 500 or a timeout. Just keep the mock close to the real API's responses, or your tests will pass against something that doesn't exist.

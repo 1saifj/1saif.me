@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   plugins: [
     react()
   ],
@@ -21,33 +21,39 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
+        // Client only: the prerender (SSR) build keeps dependencies external.
+        manualChunks: isSsrBuild ? undefined : {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          icons: ['@phosphor-icons/react'],
         },
         // Optimize for Cloudflare Pages CDN
         assetFileNames: (assetInfo) => {
           if (!assetInfo.name) return `assets/[name]-[hash][extname]`;
           const info = assetInfo.name.split('.');
           const ext = info[info.length - 1];
+
           if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
             return `assets/images/[name]-[hash][extname]`;
           }
+
           if (/woff2?|ttf|otf|eot/i.test(ext)) {
             return `assets/fonts/[name]-[hash][extname]`;
           }
+
           return `assets/[name]-[hash][extname]`;
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js'
       }
     },
+    // No public source maps: they double the deploy and publish the source.
     sourcemap: false,
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: false,
+        // Keep console.warn/error for real problems; strip development logging.
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
         drop_debugger: true,
       },
       mangle: {
@@ -66,4 +72,4 @@ export default defineConfig({
     port: 4173,
     open: true
   }
-});
+}));

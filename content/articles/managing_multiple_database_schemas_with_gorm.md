@@ -1,9 +1,9 @@
 ---
 title: Managing Multiple Database Schemas with Gorm
-description: This tutorial will guide you through the process of handling multiple database schemas using Gorm in one connection
+description: "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes."
 createdAt: "2023-07-09"
 updatedAt: 2023-07-09
-featuredImage: "/articles/gorm_schema_feat.png"
+featuredImage: "/articles/gorm_schema_feat.jpg"
 tags:
   - golang
   - gorm

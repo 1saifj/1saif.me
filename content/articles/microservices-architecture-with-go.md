@@ -1,9 +1,9 @@
 ---
 title: "Microservices Architecture with Go and Docker"
-description: "Explore how to design and implement a microservices architecture using Go and containerization with Docker."
+description: "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer."
 createdAt: "2024-04-22"
 updatedAt: 2024-04-22
-featuredImage: "/articles/go_micro_feat.png"
+featuredImage: "/articles/go_micro_feat.jpg"
 tags:
   - backend
   - go
@@ -187,9 +187,9 @@ message UserResponse {
 }
 ```
 
-## Conclusion
+## What I'd keep in mind
 
-Building microservices with Go and Docker creates a scalable, maintainable architecture. The key takeaways:
+Go and Docker make each service small and easy to ship. Most of the hard parts are in how the services fit together:
 
 1. Design services around business capabilities
 2. Use Docker for consistent deployment
@@ -197,4 +197,4 @@ Building microservices with Go and Docker creates a scalable, maintainable archi
 4. Choose appropriate communication protocols
 5. Monitor and log extensively
 
-As you implement your own microservices architecture, remember that simplicity should be a guiding principle. Start with a small number of services and expand as your understanding and requirements grow. 
+And start with fewer services than you think you need. Splitting a service later is easier than merging two that should never have been split. 
