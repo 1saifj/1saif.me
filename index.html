@@ -20,7 +20,9 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="yandex-verification" content="2e69022045bd5d18" />
     
-    <link rel="preload" as="image" href="/sj_image-192.webp" media="(min-width: 761px)" fetchpriority="high" />
+    <!-- The home portrait, matching the <picture> sources; prerender drops these on other pages. -->
+    <link rel="preload" as="image" href="/sj_image-192.webp" media="(max-width: 620px)" />
+    <link rel="preload" as="image" imagesrcset="/sj_image-4x5.webp 480w, /sj_image.webp 800w" imagesizes="min(34vw, 360px)" media="(min-width: 621px)" />
     <link rel="preload" as="font" href="/fonts/geist-sans-400.woff2" type="font/woff2" crossorigin />
     <link rel="preload" as="font" href="/fonts/geist-sans-600.woff2" type="font/woff2" crossorigin />
     <link rel="alternate" type="application/rss+xml" title="Saif Aljanahi engineering notes" href="https://1saif.me/rss.xml" />
@@ -249,6 +251,8 @@ html.dark .theme-when-dark { display: inline-flex; }
     </script>
   </head>
   <body>
+    <!-- Cloudflare would rewrite the email links and add a blocking decoder script; the address is public anyway. -->
+    <!--email_off-->
     <div id="root"></div>
     
     
@@ -270,5 +274,6 @@ html.dark .theme-when-dark { display: inline-flex; }
       }
     </script>
     -->
+  <!--/email_off-->
   </body>
 </html>

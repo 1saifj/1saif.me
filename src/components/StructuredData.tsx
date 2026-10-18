@@ -13,8 +13,10 @@ const JsonLd: React.FC<{ data: object }> = ({ data }) => (
   <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
 )
 
-// Home page only: who the site is about.
+// Home page only: who the site is about, and the site itself.
 export const PersonStructuredData: React.FC = () => (
+  <>
+  <JsonLd data={{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Saif Aljanahi', url: SITE, inLanguage: ['en', 'ar'], author }} />
   <JsonLd data={{
     '@context': 'https://schema.org',
     ...author,
@@ -25,6 +27,17 @@ export const PersonStructuredData: React.FC = () => (
     address: { '@type': 'PostalAddress', addressLocality: 'Al-Najaf', addressCountry: 'IQ' },
     alumniOf: { '@type': 'CollegeOrUniversity', name: 'University of Kufa', url: 'https://uokufa.edu.iq' },
     knowsAbout: ['Go', 'TypeScript', 'PostgreSQL', 'Google Cloud', 'Flutter', 'Next.js', 'Backend development'],
+    knowsLanguage: ['ar', 'en'],
+  }} />
+  </>
+)
+
+// Search results show these as a trail, e.g. 1saif.me › Writing › post. Paths include /ar on Arabic pages.
+export const BreadcrumbStructuredData: React.FC<{ items: [string, string][] }> = ({ items }) => (
+  <JsonLd data={{
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map(([name, path], index) => ({ '@type': 'ListItem', position: index + 1, name, item: `${SITE}${path}` })),
   }} />
 )
 
