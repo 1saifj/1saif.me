@@ -10,6 +10,7 @@ import { convertMarkdownToHtml } from '../utils/markdownProcessor'
 import { enhanceCodeBlocks } from '../utils/codeBlocks'
 import { dateLocale, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
 import { ContentSkeleton } from '../components/ContentSkeleton'
+import { SiteFooter } from '../components/SiteFooter'
 
 // Filled by entry-server before prerendering. In the browser, the prerendered body is read back
 // from the page on first render, so the article shows at once instead of a skeleton.
@@ -86,27 +87,28 @@ export const BlogPost: React.FC = () => {
       <ArticleStructuredData title={blog.title} description={blog.description} publishedDate={createdDate.toISOString()} modifiedDate={blog.updatedAt ? new Date(blog.updatedAt).toISOString() : undefined} tags={blog.tags} slug={slug!} image={blog.featuredImage} wordCount={words} />
 
       <BreadcrumbStructuredData items={[[ar ? 'الرئيسية' : 'Home', ar ? '/ar' : '/'], [ar ? 'المقالات' : 'Writing', `${ar ? '/ar' : ''}/blog`], [text.title, `${ar ? '/ar' : ''}/blog/${slug}`]]} />
+      <div className="reading-progress" aria-hidden="true" />
       <SiteHeader current="blog" />
 
       <main id="main-content">
         <article lang="en" dir="ltr">
           {/* On Arabic pages the head is Arabic, laid out in the same column as the English body below it. */}
-          <header className="site-container plain-page plain-article-head">
+          <header className="plain-page plain-article-head">
             {ar
               ? <div lang="ar" dir="rtl"><p className="plain-back"><Link to="/blog">→ كل المقالات</Link></p><h1>{text.title}</h1><p className="plain-lede">{text.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString(dateLocale(language), { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {arabicMinutes(readTime)} قراءة · <button type="button" className="plain-button" onClick={() => void share()}>مشاركة</button></p><p className="site-translation-note">المقال مكتوب بالإنجليزية، وعنوانه الأصلي: <bdi lang="en">{blog.title}</bdi></p></div>
               : <><p className="plain-back"><Link to="/blog">← All posts</Link></p><h1>{blog.title}</h1><p className="plain-lede">{blog.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {readTime} min read · <button type="button" className="plain-button" onClick={() => void share()}>Share</button></p></>}
           </header>
-          <div className="site-container plain-article-body">{htmlContent ? <div ref={body} className="site-article-content article-content" data-article={slug} dangerouslySetInnerHTML={{ __html: htmlContent }} /> : <ContentSkeleton />}</div>
+          <div className="plain-article-body">{htmlContent ? <div ref={body} className="site-article-content article-content" data-article={slug} dangerouslySetInnerHTML={{ __html: htmlContent }} /> : <ContentSkeleton />}</div>
         </article>
 
-        {relatedPosts.length > 0 && <section className="site-article-related site-section"><div className="site-container"><h2 className="plain-section-title">{ar ? 'مقالات ذات صلة' : 'Related posts'}</h2><ul className="plain-list">{relatedPosts.map(post => {
+        {relatedPosts.length > 0 && <section className="related-posts" aria-labelledby="related-title"><div><h2 id="related-title">{ar ? 'مقالات ذات صلة' : 'Related posts'}</h2><ul>{relatedPosts.map(post => {
           const related = postText(post, language)
 
-          return <li key={post.title} lang={related.lang} dir={related.lang === 'ar' ? 'rtl' : 'ltr'}><Link to={`/blog/${createSlugFromTitle(post.title)}`}>{related.title}</Link></li>
+          return <li key={post.title}><Link to={`/blog/${createSlugFromTitle(post.title)}`}><span lang={related.lang} dir={related.lang === 'ar' ? 'rtl' : 'ltr'}>{related.title}</span><time dateTime={new Date(post.createdAt).toISOString()}>{new Intl.DateTimeFormat(dateLocale(language), { month: 'short', year: 'numeric', timeZone: SITE_TIME_ZONE }).format(post.createdAt)}</time></Link></li>
         })}</ul></div></section>}
       </main>
 
-      <footer className="site-footer"><div className="site-container site-footer-main"><Link to="/" className="site-wordmark" dir="ltr">saif<span>.</span>me</Link><p>{ar ? 'مدونة من النجف.' : 'Blog from Al-Najaf.'}</p><div className="site-footer-links"><a href="mailto:saifalialjanahi@gmail.com">{ar ? 'البريد الإلكتروني' : 'Email'}</a><a href="/rss.xml">RSS</a></div></div></footer>
+      <SiteFooter />
     </div>
   )
 }

@@ -106,6 +106,10 @@ export default function SearchDialog({ onClose }: { onClose: () => void }) {
     } else if (event.key === 'Enter' && flat[active]) {
       event.preventDefault()
       go(flat[active])
+    } else if (event.key === 'Escape') {
+      // A search field clears itself on Esc; here Esc closes the dialog, as the hint says.
+      event.preventDefault()
+      dialog.current?.close()
     }
   }
 

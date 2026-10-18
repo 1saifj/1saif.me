@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SiteHeader } from './SiteHeader'
 import { PostThumb } from './PostThumb'
+import { InterfaceIcon } from './InterfaceIcon'
+import { SiteFooter } from './SiteFooter'
 import { postText, publishedBlogs } from '../data/blogs'
 import { createSlugFromTitle } from '../utils/slugUtils'
 import { dateLocale, Language, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
@@ -18,8 +20,6 @@ const copy = {
     filter: 'Filter by topic',
     empty: 'No posts match that search.',
     clear: 'Clear search',
-    footer: 'Written in Al-Najaf, Iraq.',
-    email: 'Email',
   },
   ar: {
     title: 'المقالات',
@@ -30,8 +30,6 @@ const copy = {
     filter: 'التصفية حسب الموضوع',
     empty: 'لا توجد مقالات تطابق البحث.',
     clear: 'مسح البحث',
-    footer: 'كُتبت في النجف، العراق.',
-    email: 'البريد الإلكتروني',
   },
 }
 
@@ -62,13 +60,16 @@ export const BlogListing: React.FC = () => {
     <div className="site-shell site-writing-page">
       <SiteHeader current="blog" />
 
-      <main id="main-content" className="site-container plain-page">
+      <main id="main-content" className="plain-page">
         <h1>{t.title}</h1>
         <p className="plain-lede">{t.intro}</p>
 
         <div className="plain-filters">
-          <label className="sr-only" htmlFor="post-search">{t.search}</label>
-          <input id="post-search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t.placeholder} type="search" />
+          <div className="plain-search">
+            <label className="sr-only" htmlFor="post-search">{t.search}</label>
+            <InterfaceIcon name="search" />
+            <input id="post-search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t.placeholder} type="search" autoComplete="off" />
+          </div>
           <p className="plain-tags" aria-label={t.filter}>
             <button type="button" aria-pressed={selectedTag === 'all'} onClick={() => setSelectedTag('all')}>{t.all}</button>
             {topTags.map(tag => <button type="button" key={tag} aria-pressed={selectedTag === tag} onClick={() => setSelectedTag(tag)} lang="en">{tag}</button>)}
@@ -90,10 +91,7 @@ export const BlogListing: React.FC = () => {
           : <p>{t.empty} <button type="button" className="plain-button" onClick={() => { setQuery(''); setSelectedTag('all') }}>{t.clear}</button></p>}
       </main>
 
-      <footer className="site-container plain-footer">
-        <span>{t.footer}</span>
-        <span className="plain-links"><a href="https://github.com/1saifj" target="_blank" rel="noreferrer">GitHub</a><a href="mailto:saifalialjanahi@gmail.com">{t.email}</a><a href="/rss.xml">RSS</a></span>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

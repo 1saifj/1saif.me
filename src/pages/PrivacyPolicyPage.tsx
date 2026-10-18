@@ -1,11 +1,11 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { SiteHeader } from '../components/SiteHeader'
 import SEOHead from '../components/SEOHead'
+import { SiteFooter } from '../components/SiteFooter'
 import { dateLocale, useLanguage } from '../i18n/language'
 
 // Change this date whenever the policy text changes.
-const lastUpdated = new Date('2026-10-17T00:00:00')
+const lastUpdated = new Date('2026-10-19T00:00:00')
 
 const copy = {
   en: {
@@ -26,7 +26,7 @@ const copy = {
     services: [['Email service', 'Delivers replies to contact messages.'], ['Analytics service', 'Provides privacy-focused, aggregate usage information when enabled.'], ['Hosting provider', 'Serves the site and its static assets.'], ['Legal requirements', 'Information may be shared when required by law or to protect rights.']],
     rights: [['Access', 'Ask what personal data is held about you.'], ['Rectification', 'Ask for inaccurate information to be corrected.'], ['Erasure', 'Ask for your personal data to be deleted.'], ['Portability', 'Request a copy of your data in a machine-readable format.'], ['Object', 'Object to particular types of processing.'], ['Restriction', 'Ask for how your data is used to be limited.']],
     contactBody: 'If you want to ask about this policy or exercise one of these rights, email me. I aim to respond within 30 days.',
-    name: 'Saif Aljanahi', resume: 'Résumé',
+    name: 'Saif Aljanahi',
   },
   ar: {
     seoTitle: 'الخصوصية | سيف الجناحي',
@@ -46,7 +46,7 @@ const copy = {
     services: [['خدمة البريد الإلكتروني', 'تُرسل الردود على رسائل التواصل.'], ['خدمة التحليلات', 'تقدّم بيانات استخدام إجمالية تحترم الخصوصية عند تفعيلها.'], ['مزوّد الاستضافة', 'يقدّم الموقع وملفاته الثابتة.'], ['المتطلبات القانونية', 'قد تُشارك المعلومات عندما يفرض القانون ذلك أو لحماية الحقوق.']],
     rights: [['الاطّلاع', 'أن تسأل عن البيانات الشخصية المحفوظة عنك.'], ['التصحيح', 'أن تطلب تصحيح المعلومات غير الدقيقة.'], ['الحذف', 'أن تطلب حذف بياناتك الشخصية.'], ['قابلية النقل', 'أن تطلب نسخة من بياناتك بصيغة يقرؤها الحاسوب.'], ['الاعتراض', 'أن تعترض على أنواع معيّنة من المعالجة.'], ['التقييد', 'أن تطلب تقييد طريقة استخدام بياناتك.']],
     contactBody: 'إذا أردت الاستفسار عن هذه السياسة أو ممارسة أحد هذه الحقوق، راسلني عبر البريد الإلكتروني. أسعى للرد خلال 30 يوماً.',
-    name: 'سيف الجناحي', resume: 'السيرة الذاتية',
+    name: 'سيف الجناحي',
   },
 }
 
@@ -62,11 +62,11 @@ export const PrivacyPolicyPage: React.FC = () => {
         <SiteHeader />
 
         <main id="main-content">
-          <article className="site-container plain-page">
+          <article className="plain-page">
             <header>
               <h1>{t.title}</h1>
+              <p className="plain-lede">{t.intro}</p>
               <p className="plain-meta">{t.updated} {lastUpdated.toLocaleDateString(dateLocale(language), { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-              <p>{t.intro}</p>
             </header>
 
             <section className="plain-section" aria-labelledby={ids[0]}>
@@ -129,10 +129,7 @@ export const PrivacyPolicyPage: React.FC = () => {
           </article>
         </main>
 
-        <footer className="site-container plain-footer">
-          <span>© {new Date().getFullYear()} {t.name}</span>
-          <Link to="/resume">{t.resume}</Link>
-        </footer>
+        <SiteFooter />
       </div>
     </>
   )

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -42,36 +42,42 @@
 @font-face { font-family: 'Geist Mono'; font-style: normal; font-display: swap; font-weight: 400; src: url('/fonts/plex-arabic-400.woff2') format('woff2'); unicode-range: U+060C, U+061B, U+061F, U+0621-063A, U+0640-0652, U+0660-066D, U+0670, U+067E, U+0686, U+06A4, U+06A9, U+06AF, U+06CC, U+06D4, U+200C-200F; }
 @font-face { font-family: 'Geist Mono'; font-style: normal; font-display: swap; font-weight: 600; src: url('/fonts/plex-arabic-600.woff2') format('woff2'); unicode-range: U+060C, U+061B, U+061F, U+0621-063A, U+0640-0652, U+0660-066D, U+0670, U+067E, U+0686, U+06A4, U+06A9, U+06AF, U+06CC, U+06D4, U+200C-200F; }
 
-:root { font-synthesis: none; text-rendering: optimizeLegibility; scroll-behavior: smooth; }
+/* Tokens for every page: ink on paper, one blue, hairline borders. */
+:root { --nb-bg: #fff; --nb-subtle: #f6f8fa; --nb-line: #e3e8ee; --nb-ink: #10161d; --nb-ink-2: #46525e; --nb-ink-3: #5b6875; --nb-accent: #0a66c2; --nb-surface: #fff; color-scheme: light; font-synthesis: none; text-rendering: optimizeLegibility; scroll-behavior: smooth; }
+html.dark { --nb-bg: #0d1117; --nb-subtle: #161b22; --nb-line: #262f3a; --nb-ink: #e6ebf1; --nb-ink-2: #a9b4c0; --nb-ink-3: #8f9baa; --nb-accent: #5aa7ec; --nb-surface: #161b22; color-scheme: dark; }
 html, body, #root { min-height: 100%; margin: 0; }
-body { background: #fff; }
-html.dark body { background: #0d1117; }
+body { background: var(--nb-bg); }
+::selection { background: color-mix(in srgb, var(--nb-accent) 24%, transparent); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .sr-only:focus-visible { position: fixed; z-index: 50; width: auto; height: auto; margin: 0; padding: 10px 14px; inset-block-start: 16px; inset-inline-start: 16px; overflow: visible; clip: auto; color: #fff; background: #0a66c2; border-radius: 6px; }
 
-.notebook-shell {
-  --nb-bg: #fff; --nb-line: #e3e8ee; --nb-ink: #10161d; --nb-ink-2: #46525e; --nb-ink-3: #5b6875; --nb-accent: #0a66c2; --nb-surface: #fff;
-  min-height: 100svh; color: var(--nb-ink); background: var(--nb-bg); font: 16px/1.6 'Geist Sans', ui-sans-serif, system-ui, sans-serif;
-}
-html.dark .notebook-shell { --nb-bg: #0d1117; --nb-line: #262f3a; --nb-ink: #e6ebf1; --nb-ink-2: #a9b4c0; --nb-ink-3: #8f9baa; --nb-accent: #5aa7ec; --nb-surface: #161b22; }
+.notebook-shell { min-height: 100svh; color: var(--nb-ink); background: var(--nb-bg); font: 16px/1.6 'Geist Sans', ui-sans-serif, system-ui, sans-serif; }
 .notebook-shell *, .notebook-shell *::before, .notebook-shell *::after { box-sizing: border-box; }
-.notebook-shell a { color: inherit; }
-.notebook-shell button { font: inherit; cursor: pointer; }
-.notebook-shell :focus-visible { outline: 2px solid var(--nb-accent); outline-offset: 3px; }
-.notebook-shell svg { width: 15px; height: 15px; flex: 0 0 auto; }
+/* Zero-specificity defaults, so a component's own class always wins over them. */
+.notebook-shell :where(a) { color: inherit; }
+.notebook-shell :where(button) { font: inherit; cursor: pointer; }
+.notebook-shell :where(svg) { width: 15px; height: 15px; flex: 0 0 auto; }
+.notebook-shell :focus-visible { outline: 2px solid var(--nb-accent); outline-offset: 3px; border-radius: 2px; }
 
 /* Header (also used on every other page through SiteHeader) */
-.notebook-header { position: sticky; z-index: 20; top: 0; border-bottom: 1px solid var(--nb-line); background: color-mix(in srgb, var(--nb-bg) 92%, transparent); backdrop-filter: blur(12px); }
+.notebook-header { position: sticky; z-index: 20; top: 0; border-bottom: 1px solid var(--nb-line); background: color-mix(in srgb, var(--nb-bg) 94%, transparent); -webkit-backdrop-filter: saturate(1.5) blur(12px); backdrop-filter: saturate(1.5) blur(12px); }
+/* At the very top the header sits on the page; its hairline appears once the page scrolls under it. */
+@supports (animation-timeline: scroll()) {
+  .notebook-header { animation: nb-header-line linear both; animation-timeline: scroll(); animation-range: 0 40px; }
+  @keyframes nb-header-line { from { border-bottom-color: transparent; } }
+}
 .notebook-header-inner { display: flex; align-items: center; gap: 28px; width: min(calc(100% - 48px), 960px); min-height: 60px; margin-inline: auto; }
-.notebook-brand { color: var(--nb-ink); font-weight: 600; text-decoration: none; }
+.notebook-brand { color: var(--nb-ink); font-weight: 600; letter-spacing: -.01em; text-decoration: none; }
 /* The wordmark's dot is the favicon's dot: the one accent mark next to the ink. */
 .notebook-brand-dot { color: var(--nb-accent); }
 .notebook-desktop-nav { display: flex; gap: 22px; margin-inline-start: auto; }
-.notebook-desktop-nav a, .notebook-mobile-nav a { color: var(--nb-ink-2); font-size: 14px; text-decoration: none; }
+.notebook-desktop-nav a, .notebook-mobile-nav a { position: relative; padding: 6px 0; color: var(--nb-ink-2); font-size: 14px; text-decoration: none; white-space: nowrap; transition: color .15s ease; }
 .notebook-desktop-nav a:hover, .notebook-mobile-nav a:hover, .notebook-desktop-nav a.is-active, .notebook-mobile-nav a.is-active { color: var(--nb-ink); }
-.notebook-desktop-nav a.is-active, .notebook-mobile-nav a.is-active { text-decoration: underline; text-underline-offset: 6px; }
-.notebook-header-actions { display: flex; align-items: center; gap: 4px; }
-.notebook-search-trigger, .notebook-quiet-button { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 9px; border: 0; border-radius: 6px; color: var(--nb-ink-2); background: transparent; font-size: 14px; }
+/* The current section's mark grows from the centre. */
+.notebook-desktop-nav a::after, .notebook-mobile-nav a::after { position: absolute; inset-inline: 0; bottom: 0; height: 1.5px; border-radius: 1px; background: currentColor; transform: scaleX(0); transition: transform .22s cubic-bezier(.2, .7, .2, 1); content: ''; }
+.notebook-desktop-nav a.is-active::after, .notebook-mobile-nav a.is-active::after { transform: scaleX(1); }
+.notebook-header-actions { display: flex; align-items: center; gap: 2px; }
+.notebook-search-trigger, .notebook-quiet-button { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 10px; border: 0; border-radius: 6px; color: var(--nb-ink-2); background: transparent; font-size: 14px; transition: color .15s ease, background-color .15s ease; }
 .notebook-search-trigger:hover, .notebook-quiet-button:hover { color: var(--nb-ink); background: color-mix(in srgb, var(--nb-ink) 6%, transparent); }
 .notebook-mobile-nav { display: none; }
 .notebook-bar { display: contents; }
@@ -79,25 +85,25 @@ html.dark .notebook-shell { --nb-bg: #0d1117; --nb-line: #262f3a; --nb-ink: #e6e
 /* Layout */
 .notebook-layout { width: min(calc(100% - 48px), 960px); margin-inline: auto; }
 .notebook-intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 56px; padding: 88px 0 72px; border-bottom: 1px solid var(--nb-line); }
-.notebook-intro h1 { margin: 0; font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 600; line-height: 1.08; letter-spacing: -.03em; }
-.notebook-intro-lede { max-width: 620px; margin: 20px 0 0; font-size: 1.2rem; line-height: 1.55; }
-.notebook-intro-description { max-width: 620px; margin: 14px 0 0; color: var(--nb-ink-2); }
-.notebook-intro-description a, .notebook-prose a, .notebook-contact a, .notebook-feature a, .notebook-work-list a { text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; }
+.notebook-intro h1 { margin: 0; font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 600; line-height: 1.08; letter-spacing: -.03em; text-wrap: balance; }
+.notebook-intro-lede { max-width: 620px; margin: 20px 0 0; font-size: 1.2rem; line-height: 1.55; text-wrap: pretty; }
+.notebook-intro-description { max-width: 620px; margin: 14px 0 0; color: var(--nb-ink-2); text-wrap: pretty; }
+.notebook-intro-description a, .notebook-prose a, .notebook-contact a, .notebook-feature a, .notebook-work-list a { text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; transition: text-decoration-color .15s ease; }
 .notebook-intro-description a:hover, .notebook-prose a:hover, .notebook-contact a:hover, .notebook-feature a:hover, .notebook-work-list a:hover { text-decoration-color: currentColor; }
 .notebook-link-row { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 24px 0 0; }
-.notebook-link-row a { color: var(--nb-accent); text-decoration: none; }
-.notebook-link-row a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.notebook-portrait { display: block; width: min(28vw, 240px); }
-.notebook-portrait img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; border-radius: 8px; object-fit: cover; }
-.notebook-portrait { position: relative; }
+.notebook-link-row a { color: var(--nb-accent); text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; transition: text-decoration-color .15s ease; }
+.notebook-link-row a:hover { text-decoration-color: currentColor; }
+.notebook-portrait { position: relative; display: block; width: min(28vw, 240px); }
 .notebook-portrait picture { display: block; }
+/* A hairline inside the photo's edge keeps it from bleeding into the page in either theme. */
+.notebook-portrait img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; border-radius: 8px; object-fit: cover; outline: 1px solid color-mix(in srgb, var(--nb-ink) 10%, transparent); outline-offset: -1px; }
 
 .notebook-section { padding: 64px 0; border-bottom: 1px solid var(--nb-line); scroll-margin-top: 72px; }
 .notebook-section:last-child { border-bottom: 0; }
 .notebook-section-title { margin: 0 0 28px; font-size: 1.5rem; font-weight: 600; letter-spacing: -.015em; }
 .notebook-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; }
-.notebook-section-head > a { color: var(--nb-accent); font-size: 15px; text-decoration: none; }
-.notebook-section-head > a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.notebook-section-head > a { color: var(--nb-accent); font-size: 15px; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; transition: text-decoration-color .15s ease; }
+.notebook-section-head > a:hover { text-decoration-color: currentColor; }
 .notebook-section-note { margin: -18px 0 22px; color: var(--nb-ink-3); font-size: 15px; }
 .notebook-subtitle { margin: 44px 0 6px; color: var(--nb-ink-2); font-size: 1rem; font-weight: 600; }
 .notebook-muted { color: var(--nb-ink-3); }
@@ -107,18 +113,18 @@ html.dark .notebook-shell { --nb-bg: #0d1117; --nb-line: #262f3a; --nb-ink: #e6e
 .notebook-timeline > li { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--nb-line); }
 .notebook-timeline-period { margin: 3px 0 0; color: var(--nb-ink-3); font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 /* A small accent dot marks the roles that are still current. */
-.notebook-timeline > li.is-current .notebook-timeline-period::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-inline-end: 8px; border-radius: 50%; background: var(--nb-accent); vertical-align: 1px; }
+.notebook-timeline > li.is-current .notebook-timeline-period::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-inline-end: 8px; border-radius: 50%; background: var(--nb-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--nb-accent) 18%, transparent); vertical-align: 1px; }
 .notebook-timeline h4 { margin: 0; font-size: 1.05rem; font-weight: 600; }
 .notebook-timeline-role { margin: 4px 0 0; font-size: 15px; }
 .notebook-timeline-role span { color: var(--nb-ink-3); font-size: 14px; }
-.notebook-timeline-summary { margin: 6px 0 0; max-width: 62ch; color: var(--nb-ink-2); font-size: 15px; line-height: 1.55; }
+.notebook-timeline-summary { margin: 6px 0 0; max-width: 62ch; color: var(--nb-ink-2); font-size: 15px; line-height: 1.55; text-wrap: pretty; }
 
 /* Work */
 .notebook-work-featured { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; }
-.notebook-feature h3 { margin: 0; font-size: 1.15rem; font-weight: 600; line-height: 1.35; }
+.notebook-feature h3 { margin: 0; font-size: 1.15rem; font-weight: 600; line-height: 1.35; text-wrap: balance; }
 .notebook-feature h3 a { text-decoration: none; }
 .notebook-feature h3 a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.notebook-feature p { margin: 8px 0 0; color: var(--nb-ink-2); font-size: 15px; }
+.notebook-feature p { margin: 8px 0 0; color: var(--nb-ink-2); font-size: 15px; text-wrap: pretty; }
 .notebook-feature .notebook-muted { font-size: 14px; }
 .notebook-work-list { margin: 0; padding: 0; list-style: none; }
 .notebook-work-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 24px; padding: 12px 0; border-bottom: 1px solid var(--nb-line); }
@@ -126,38 +132,40 @@ html.dark .notebook-shell { --nb-bg: #0d1117; --nb-line: #262f3a; --nb-ink: #e6e
 .notebook-work-list li a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .notebook-work-list .notebook-muted { font-size: 14px; }
 
-/* Writing */
+/* Writing (also the rows on /blog) */
 .notebook-post-list { border-top: 1px solid var(--nb-line); }
 .notebook-post-row { display: grid; grid-template-columns: 84px minmax(0, 1fr) 144px; gap: 24px; align-items: start; padding: 22px 0; border-bottom: 1px solid var(--nb-line); color: inherit; text-decoration: none; }
-.notebook-post-row time { padding-top: 2px; color: var(--nb-ink-3); font-size: 14px; white-space: nowrap; }
+.notebook-post-row:focus-visible { outline-offset: 4px; }
+.notebook-post-row time { padding-top: 2px; color: var(--nb-ink-3); font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 /* Arabic month names are longer, so the date column is wider. */
 html[dir='rtl'] .notebook-post-row { grid-template-columns: 120px minmax(0, 1fr) 144px; }
-.notebook-post-row :is(h2, h3) { margin: 0; font-size: 1.08rem; font-weight: 600; line-height: 1.4; }
+.notebook-post-row :is(h2, h3) { margin: 0; font-size: 1.08rem; font-weight: 600; line-height: 1.4; text-wrap: balance; }
 .notebook-post-row:hover :is(h2, h3) { text-decoration: underline; text-underline-offset: 3px; }
-.notebook-post-row p { margin: 6px 0 0; color: var(--nb-ink-2); font-size: 15px; line-height: 1.55; }
-.notebook-post-thumb { display: block; width: 144px; height: 96px; border: 1px solid var(--nb-line); border-radius: 6px; background: #fff; object-fit: cover; }
-html.dark .notebook-post-thumb { border-color: var(--nb-line); filter: invert(.88) hue-rotate(180deg); }
+.notebook-post-row p { margin: 6px 0 0; color: var(--nb-ink-2); font-size: 15px; line-height: 1.55; text-wrap: pretty; }
+.notebook-post-thumb { display: block; width: 144px; height: 96px; border: 1px solid var(--nb-line); border-radius: 6px; background: #fff; object-fit: cover; transition: border-color .2s ease, transform .2s ease; }
+.notebook-post-row:hover .notebook-post-thumb { border-color: color-mix(in srgb, var(--nb-ink-3) 45%, var(--nb-line)); transform: translateY(-2px); }
+html.dark .notebook-post-thumb { filter: invert(.88) hue-rotate(180deg); }
 
-/* About, contact, footer */
+/* About, contact */
 .notebook-prose { max-width: 640px; }
-.notebook-prose p { margin: 0 0 14px; color: var(--nb-ink-2); font-size: 1.05rem; line-height: 1.7; }
+.notebook-prose p { margin: 0 0 14px; color: var(--nb-ink-2); font-size: 1.05rem; line-height: 1.7; text-wrap: pretty; }
 .notebook-contact p { margin: 0; color: var(--nb-ink-2); font-size: 1.05rem; }
-.notebook-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; width: min(calc(100% - 48px), 960px); margin-inline: auto; padding: 28px 0 40px; border-top: 1px solid var(--nb-line); color: var(--nb-ink-3); font-size: 14px; }
+
+/* Footer, the same on every page (components/SiteFooter.tsx) */
+.notebook-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; width: min(calc(100% - 48px), 960px); margin-inline: auto; padding: 28px 0 40px; border-top: 1px solid var(--nb-line); color: var(--nb-ink-3); font-size: 14px; }
 .notebook-footer p { margin: 0; }
-.notebook-footer-links { display: flex; flex-wrap: wrap; gap: 16px; }
-.notebook-footer-links a { text-decoration: none; }
-.notebook-footer-links a:hover { color: var(--nb-ink); text-decoration: underline; text-underline-offset: 3px; }
+.notebook-footer-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.notebook-footer-links a { color: inherit; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; transition: color .15s ease, text-decoration-color .15s ease; }
+.notebook-footer-links a:hover { color: var(--nb-ink); text-decoration-color: currentColor; }
 
 /* Skeletons stay static: they only hold space while a route or article loads. */
 @keyframes sk-in { from { opacity: 0; } to { opacity: 1; } }
 .site-skeleton, .route-skeleton { animation: sk-in 200ms ease 200ms both; }
 .site-skeleton { display: grid; gap: 14px; min-height: 60vh; padding: 8px 0 40px; }
-.site-skeleton span, .route-skeleton span { display: block; height: 14px; border-radius: 4px; background: #eef1f4; }
-html.dark .site-skeleton span, html.dark .route-skeleton span { background: #1c232c; }
+.site-skeleton span, .route-skeleton span { display: block; height: 14px; border-radius: 4px; background: var(--nb-subtle); }
 .route-skeleton { display: grid; align-content: start; gap: 16px; width: min(calc(100% - 48px), 960px); min-height: 100svh; margin-inline: auto; padding-top: 140px; }
 .route-skeleton .route-skeleton-title { height: 40px; width: 50%; margin-bottom: 18px; }
-.site-translation-note { margin: 14px 0 0; color: #4a5866; font-size: 14px; }
-html.dark .site-translation-note { color: #9aa8b6; }
+.site-translation-note { margin: 14px 0 0; color: var(--nb-ink-3); font-size: 14px; }
 
 /* Arabic */
 html[dir='rtl'] .notebook-shell { font-family: 'IBM Plex Sans Arabic', 'Geist Sans', Tahoma, sans-serif; }
@@ -170,14 +178,16 @@ html[dir='rtl'] .notebook-intro-lede, html[dir='rtl'] .notebook-intro-descriptio
 html.dark .theme-when-dark { display: inline-flex; }
 @media (max-width: 760px) {
   .notebook-header-inner, .notebook-layout, .notebook-footer { width: calc(100% - 32px); }
+  .notebook-header-inner { min-height: 56px; }
   .notebook-desktop-nav { display: none; }
   .notebook-header-actions { margin-inline-start: auto; }
-  .notebook-mobile-nav { display: flex; gap: 20px; overflow-x: auto; width: calc(100% - 32px); margin-inline: auto; padding: 0 0 10px; scrollbar-width: none; }
+  .notebook-mobile-nav { display: flex; gap: 22px; overflow-x: auto; width: calc(100% - 32px); margin-inline: auto; padding: 0 0 6px; scrollbar-width: none; }
   .notebook-mobile-nav::-webkit-scrollbar { display: none; }
+  .notebook-search-trigger, .notebook-quiet-button { min-width: 40px; min-height: 40px; justify-content: center; }
   .notebook-search-trigger span { display: none; }
   /* Visually hidden, still the button's accessible name. */
   .notebook-theme-button .theme-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .notebook-intro { grid-template-columns: 1fr; gap: 28px; padding: 48px 0 44px; }
+  .notebook-intro { grid-template-columns: 1fr; gap: 28px; padding: 44px 0 44px; }
   .notebook-portrait { order: -1; width: 112px; }
   .notebook-portrait img { border-radius: 50%; aspect-ratio: 1; }
   .notebook-section { padding: 48px 0; }
@@ -189,6 +199,17 @@ html.dark .theme-when-dark { display: inline-flex; }
   .route-skeleton { width: calc(100% - 32px); }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  /* Rows settle into place as they scroll in. Transform only: content is never hidden, and nothing on the first screen moves. */
+  @supports (animation-timeline: view()) {
+    .notebook-timeline > li, .notebook-feature, .notebook-work-list li, .notebook-post-row, .notebook-prose, .notebook-contact > p, .plain-role, .related-posts li { animation: nb-settle linear both; animation-timeline: view(); animation-range: entry 0% entry 140px; }
+    @keyframes nb-settle { from { transform: translateY(18px); } }
+  }
+  /* A page reached through an in-site link fades in. The first load never animates: html[data-nav] is set on navigation. */
+  html[data-nav] :is(.notebook-main, .site-shell > main) { animation: nb-page-in .28s cubic-bezier(.2, .7, .2, 1) both; }
+  @keyframes nb-page-in { from { opacity: 0; transform: translateY(8px); } }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; }
+}
 @media (prefers-reduced-motion: reduce) {
   :root { scroll-behavior: auto; }
   .site-skeleton, .route-skeleton { animation: none; }
