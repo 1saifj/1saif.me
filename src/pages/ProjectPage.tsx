@@ -10,6 +10,7 @@ import { enhanceCodeBlocks } from '../utils/codeBlocks'
 import SEOHead from '../components/SEOHead'
 import { BreadcrumbStructuredData } from '../components/StructuredData'
 import { ContentSkeleton } from '../components/ContentSkeleton'
+import { SiteFooter } from '../components/SiteFooter'
 import { comma, Language, pick, useLanguage } from '../i18n/language'
 
 const copy = {
@@ -32,10 +33,6 @@ export const ProjectPage: React.FC = () => {
   const { language } = useLanguage()
   const t = copy[language]
   const projectFile = slug ? findContentBySlug(projectFiles, slug) : undefined
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [slug])
 
   // Bodies are bundled with the page, so they render during prerendering too.
   const markdown = (language === 'ar' && projectFile && arabicBodies.get(projectFile.slug)) || projectFile?.content
@@ -81,7 +78,7 @@ export const ProjectPage: React.FC = () => {
       <BreadcrumbStructuredData items={[[language === 'ar' ? 'الرئيسية' : 'Home', language === 'ar' ? '/ar' : '/'], [name, `${language === 'ar' ? '/ar' : ''}/project/${slug}`]]} />
       <SiteHeader current="work" />
 
-      <main id="main-content" className="site-container plain-page">
+      <main id="main-content" className="plain-page">
         <p className="plain-back"><Link to="/#work">{t.back}</Link></p>
         <h1>{name}</h1>
         <p className="plain-lede">{description}</p>
@@ -95,8 +92,9 @@ export const ProjectPage: React.FC = () => {
           ? <article ref={body} className="site-project-content article-content plain-body" lang={arabicBody ? 'ar' : 'en'} dir={arabicBody ? 'rtl' : 'ltr'} dangerouslySetInnerHTML={{ __html: contentHtml }} />
           : <ContentSkeleton />}
 
-        <p className="plain-next">{t.next}: <Link to={`/project/${createSlugFromTitle(next.name)}`}>{pick(language, next.name, next.ar?.name)}</Link></p>
+        <p className="plain-next"><span>{t.next}</span><Link to={`/project/${createSlugFromTitle(next.name)}`}>{pick(language, next.name, next.ar?.name)} <span aria-hidden="true">{language === 'ar' ? '←' : '→'}</span></Link></p>
       </main>
+      <SiteFooter />
     </div>
   )
 }
@@ -106,6 +104,7 @@ const languageNames = new Map([['typescript', 'TypeScript'], ['javascript', 'Jav
 const ErrorView: React.FC<{ title: string; desc: string; language: Language }> = ({ title, desc, language }) => (
   <div className="site-shell site-error-page">
     <SiteHeader current="work" />
-    <main id="main-content" className="site-container plain-page"><h1>{title}</h1><p className="plain-lede">{desc}</p><p><Link to="/#work">{copy[language].viewWork}</Link></p></main>
+    <main id="main-content" className="plain-page"><h1>{title}</h1><p className="plain-lede">{desc}</p><p className="plain-ways"><Link to="/#work">{copy[language].viewWork}</Link></p></main>
+    <SiteFooter />
   </div>
 )
