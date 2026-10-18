@@ -8,7 +8,7 @@ wip: true
 isPrivate: true
 sourceType: private
 role: Tech lead and founding engineer
-impact: Took it from the idea and the plan to the product and its launch, inside the University of Kufa technology incubator
+impact: Took it from the idea and the plan to the product and its launch, inside the University of Kufa technology incubator, and trained its 15-student team
 ---
 
 # Wusool
@@ -19,6 +19,7 @@ I'm the tech lead and founding engineer. I took Wusool from the idea and the pla
 ## What I own
 
 - The product and the plan: the idea, the scope, the roadmap and the launch.
+- The team: I built and trained it. Fifteen University of Kufa students, from first year to final year, fourteen from Computer Science and one from Electronic and Communications Engineering. I taught them agile delivery, the tools we use, and software engineering fundamentals while we built the product.
 - The Flutter driver app: trip management and QR ticket scanning.
 - The Flutter passenger app: live tracking and booking, a Widgetbook design system, and a mock server so the apps could move before the API was ready.
 - The .NET API: identity hardening, such as keyed backup-code lookup and an allow-list for JWT algorithms, with tests that guard it.

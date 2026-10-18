@@ -47,12 +47,12 @@ export const projects: Project[] = [
     "isPrivate": true,
     "sourceType": "private",
     "role": "Tech lead and founding engineer",
-    "impact": "Took it from the idea and the plan to the product and its launch, inside the University of Kufa technology incubator",
+    "impact": "Took it from the idea and the plan to the product and its launch, inside the University of Kufa technology incubator, and trained its 15-student team",
     "ar": {
       "name": "وصول",
       "description": "نقل جامعي ذكي لطلبة جامعة الكوفة ومنتسبيها: تتبّع مباشر للحافلات، وتذاكر رقمية، ومسارات واضحة، عبر تطبيق Flutter للركّاب، وتطبيق Flutter للسائقين يمسح التذاكر برمز QR، وواجهة برمجية بـ .NET.",
       "role": "قائد تقني ومهندس مؤسس",
-      "impact": "أخذته من الفكرة والخطة إلى المنتج والإطلاق، ضمن الحاضنة التكنولوجية في جامعة الكوفة"
+      "impact": "أخذته من الفكرة والخطة إلى المنتج والإطلاق، ضمن الحاضنة التكنولوجية في جامعة الكوفة، ودرّبت فريقه المكوّن من 15 طالباً"
     }
   },
   {
