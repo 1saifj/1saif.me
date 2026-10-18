@@ -106,7 +106,7 @@ export const BlogPost: React.FC = () => {
         })}</ul></div></section>}
       </main>
 
-      <footer className="site-footer"><div className="site-container site-footer-main"><Link to="/" className="site-wordmark" dir="ltr">saif<span>.me</span></Link><p>{ar ? 'مدونة من النجف.' : 'Blog from Al-Najaf.'}</p><div className="site-footer-links"><a href="mailto:saifalialjanahi@gmail.com">{ar ? 'البريد الإلكتروني' : 'Email'}</a><a href="/rss.xml">RSS</a></div></div></footer>
+      <footer className="site-footer"><div className="site-container site-footer-main"><Link to="/" className="site-wordmark" dir="ltr">saif<span>.</span>me</Link><p>{ar ? 'مدونة من النجف.' : 'Blog from Al-Najaf.'}</p><div className="site-footer-links"><a href="mailto:saifalialjanahi@gmail.com">{ar ? 'البريد الإلكتروني' : 'Email'}</a><a href="/rss.xml">RSS</a></div></div></footer>
     </div>
   )
 }
