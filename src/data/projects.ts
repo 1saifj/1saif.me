@@ -21,6 +21,23 @@ export const projects: Project[] = [
     }
   },
   {
+    "order": 4,
+    "name": "Al Qaseh Financial Services",
+    "description": "Go and PostgreSQL services for financial operations, card issuing among them, and a year leading the backend team. A Redis lock per order with optimistic locking in PostgreSQL stopped duplicate approvals across instances.",
+    "language": "go",
+    "wip": false,
+    "isPrivate": true,
+    "sourceType": "company",
+    "role": "Software engineer, backend team lead",
+    "impact": "Go and PostgreSQL services, 2022 to 2025",
+    "ar": {
+      "name": "برمجيات مالية في القاصّة",
+      "description": "خدمات بـ Go وPostgreSQL للعمليات المالية، ومنها إصدار البطاقات، وعامٌ في قيادة فريق الأنظمة الخلفية. أوقف قفلٌ في Redis لكل طلب، مع قفل تفاؤلي في PostgreSQL، تكرارَ الموافقات بين النسخ.",
+      "role": "مهندس برمجيات، وقائد فريق الأنظمة الخلفية",
+      "impact": "خدمات بـ Go وPostgreSQL، من 2022 إلى 2025"
+    }
+  },
+  {
     "order": 1,
     "name": "Kufa Grad Tracking Platform",
     "description": "Graduate tracking and jobs platform for the University of Kufa: a Go API with notifications, chat and scheduled jobs, a bilingual Next.js web app, and a QA portal for testers.",
@@ -105,23 +122,6 @@ export const projects: Project[] = [
       "description": "دليل لزوّار مدينة النجف: واجهة برمجية بـ NestJS، وتطبيق Flutter، وتطبيق ويب بـ Next.js بالعربية والإنجليزية.",
       "role": "المطوّر الرئيسي",
       "impact": "واجهة NestJS بتصميم موجَّه بالنطاق (DDD) مع Drizzle وBetter Auth، وتطبيق ويب على Cloudflare"
-    }
-  },
-  {
-    "order": 4,
-    "name": "Al Qaseh Financial Services",
-    "description": "Backend engineering on financial software at Al Qaseh, including a year leading the backend team.",
-    "language": "go",
-    "wip": false,
-    "isPrivate": true,
-    "sourceType": "company",
-    "role": "Software engineer, backend team lead",
-    "impact": "Go and PostgreSQL services, 2022 to 2025",
-    "ar": {
-      "name": "برمجيات مالية في Al Qaseh",
-      "description": "هندسة الأنظمة الخلفية لبرمجيات مالية في Al Qaseh، وقد قدتُ فريق الأنظمة الخلفية فيها عاماً.",
-      "role": "مهندس برمجيات، وقائد فريق الأنظمة الخلفية",
-      "impact": "خدمات بـ Go وPostgreSQL، من 2022 إلى 2025"
     }
   },
   {
