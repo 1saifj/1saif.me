@@ -292,7 +292,7 @@ export const blogs: BlogPost[] = [
     "title": "Idempotency Keys, or How Not to Charge Someone Twice",
     "description": "A customer taps \"Pay\", the connection drops, and they tap again. How idempotency keys make that retry safe, and the race in the obvious implementation that lets the double charge through anyway.",
     "titleAr": "مفاتيح Idempotency، أو كيف لا تخصم المبلغ مرتين",
-    "descriptionAr": "يضغط العميل «ادفع»، فينقطع الاتصال، فيضغط مرة أخرى. كيف تجعل إعادة المحاولة آمنةً بمفاتيح idempotency، والسباق في التنفيذ البديهي الذي يسمح بالخصم المزدوج رغم ذلك.",
+    "descriptionAr": "يضغط العميل «ادفع»، فينقطع الاتصال، فيضغط مرة أخرى. كيف تجعل إعادة المحاولة آمنةً بمفاتيح idempotency، وحالة التسابق في التنفيذ البديهي الذي يسمح بالخصم المزدوج رغم ذلك.",
     "createdAt": 1742677200000,
     "updatedAt": 1742677200000,
     "draft": false,
