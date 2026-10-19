@@ -227,6 +227,12 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
   .post-pager-newer { grid-column: auto; text-align: start; }
 }
 
+@media (forced-colors: active) {
+  .plain-tags button[aria-pressed='true'] { forced-color-adjust: none; border-color: Highlight; color: HighlightText; background: Highlight; }
+  .post-toc a[aria-current] { forced-color-adjust: none; border-color: Highlight; color: Highlight; }
+  .reading-progress { forced-color-adjust: none; background: Highlight; }
+}
+
 @media print {
   @page { margin: 16mm 15mm; }
   .notebook-header, .notebook-footer, .reading-progress, .plain-print-hide { display: none !important; }

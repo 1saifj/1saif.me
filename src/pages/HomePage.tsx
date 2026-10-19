@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PersonStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
@@ -94,31 +94,51 @@ export const HomePage: React.FC = () => {
     if (id) document.getElementById(id)?.scrollIntoView({ block: 'start' })
   }, [])
 
+  // The current section is the last one whose top has passed 30% of the screen; at the bottom of the page it is
+  // the last section, which can never scroll that far up. A ratio-based observer missed both the tall Work section
+  // and Contact.
+  // Set while a nav click scrolls: the clicked section stays marked even when the page cannot scroll it to the top.
+  const pinned = useRef(false)
+
   useEffect(() => {
-    const sections = ['top', ...sectionIds].flatMap(id => {
-      const section = document.getElementById(id)
+    let frame = 0
 
-      return section ? [section] : []
-    })
+    const update = () => {
+      frame = 0
+      if (pinned.current) return
+      const line = window.innerHeight * 0.3
+      const atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4
+      const passed = (['top', ...sectionIds] as const).filter(id => (document.getElementById(id)?.getBoundingClientRect().top ?? Infinity) <= line)
 
-    if (!('IntersectionObserver' in window) || sections.length === 0) return undefined
+      setActiveSection(atEnd ? sectionIds[sectionIds.length - 1] : passed[passed.length - 1] ?? 'top')
+    }
 
-    const observer = new IntersectionObserver(entries => {
-      const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
 
-      if (visible) {
-        const visibleId = (['top', ...sectionIds] as const).find(id => id === visible.target.id)
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
 
-        if (visibleId) setActiveSection(visibleId)
-      }
-    }, { rootMargin: '-18% 0px -62% 0px', threshold: [0.1, 0.35, 0.7] })
-
-    sections.forEach(section => observer.observe(section))
-
-    return () => observer.disconnect()
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
   }, [])
 
-  const goTo = (id: string) => {
+  const goTo = (id: (typeof sectionIds)[number]) => {
+    setActiveSection(id)
+    pinned.current = true
+    const release = () => {
+      pinned.current = false
+      window.removeEventListener('scrollend', release)
+    }
+
+    // scrollend where supported; the timeout covers browsers without it and clicks that do not scroll.
+    window.addEventListener('scrollend', release)
+    window.setTimeout(release, 1200)
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}#${id}`)
   }
