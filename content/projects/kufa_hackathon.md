@@ -9,6 +9,13 @@ isPrivate: true
 sourceType: company
 role: Sole author
 impact: Next.js and Supabase, realtime updates and FCM push notifications, unit and end-to-end tests
+stack:
+  - Next.js
+  - Supabase
+  - Tailwind CSS
+  - TanStack Query
+  - Jest
+  - Playwright
 ---
 
 This platform runs the University of Kufa hackathon. I wrote all of it.

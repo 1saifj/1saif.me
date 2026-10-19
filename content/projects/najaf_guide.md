@@ -8,6 +8,13 @@ isPrivate: true
 sourceType: private
 role: Main engineer
 impact: Domain-driven NestJS API with Drizzle and Better Auth; web app on Cloudflare
+stack:
+  - NestJS
+  - PostgreSQL
+  - Drizzle
+  - Redis
+  - Flutter
+  - Next.js
 ---
 
 Najaf Guide is a city guide for visitors to Najaf. It is in progress and not yet public.

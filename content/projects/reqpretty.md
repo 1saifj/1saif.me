@@ -9,6 +9,9 @@ isPrivate: false
 sourceType: open-source
 role: Author
 impact: Open-source Go middleware for readable request and response logs
+stack:
+  - Go
+  - net/http
 ---
 
 reqpretty is a small open-source Go middleware. It logs HTTP requests and responses in a structured format that is easy to read while you develop.

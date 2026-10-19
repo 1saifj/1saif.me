@@ -8,6 +8,12 @@ isPrivate: true
 sourceType: company
 role: Software engineer, backend team lead
 impact: Go and PostgreSQL services, 2022 to 2025
+stack:
+  - Go
+  - PostgreSQL
+  - Flutter
+  - React
+  - Next.js
 ---
 
 I worked at Al Qaseh from August 2022 to July 2025 on backend services for financial software. From October 2023 to July 2024 I also led the backend team.
