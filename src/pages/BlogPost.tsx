@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { SiteHeader } from '../components/SiteHeader'
 import { postText, publishedBlogs } from '../data/blogs'
@@ -12,6 +12,7 @@ import { dateLocale, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
 import { ContentSkeleton } from '../components/ContentSkeleton'
 import { SiteFooter } from '../components/SiteFooter'
 import { NotFoundPage } from './NotFoundPage'
+import { PostToc, postHeadings, tocFrom } from '../components/PostToc'
 
 // Filled by entry-server before prerendering. In the browser, the prerendered body is read back
 // from the page on first render, so the article shows at once instead of a skeleton.
@@ -61,6 +62,7 @@ export const BlogPost: React.FC = () => {
   }, [blog?.file, slug])
 
   useEffect(() => (body.current && htmlContent ? enhanceCodeBlocks(body.current) : undefined), [htmlContent])
+  const headings = useMemo(() => postHeadings(htmlContent), [htmlContent])
 
   // A mistyped address gets the 404 page (it suggests the closest post), not a silent jump to the index.
   if (!blog?.file) return <NotFoundPage />
@@ -100,7 +102,7 @@ export const BlogPost: React.FC = () => {
               ? <div lang="ar" dir="rtl"><p className="plain-back"><Link to="/blog">→ كل المقالات</Link></p><h1>{text.title}</h1><p className="plain-lede">{text.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString(dateLocale(language), { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {arabicMinutes(readTime)} للقراءة<span className="plain-share"> · <button type="button" className="plain-button" onClick={() => void share()}>مشاركة</button></span></p><p className="site-translation-note">المقال مكتوب بالإنجليزية، وعنوانه الأصلي: <bdi lang="en">{blog.title}</bdi></p></div>
               : <><p className="plain-back"><Link to="/blog">← All posts</Link></p><h1>{blog.title}</h1><p className="plain-lede">{blog.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {readTime} min read<span className="plain-share"> · <button type="button" className="plain-button" onClick={() => void share()}>Share</button></span></p></>}
           </header>
-          <div className="plain-article-body">{htmlContent ? <div ref={body} className="site-article-content article-content" data-article={slug} dangerouslySetInnerHTML={{ __html: htmlContent }} /> : <ContentSkeleton />}</div>
+          <div className={headings.length >= tocFrom ? 'plain-article-body has-toc' : 'plain-article-body'}>{htmlContent ? <div ref={body} className="site-article-content article-content" data-article={slug} dangerouslySetInnerHTML={{ __html: htmlContent }} /> : <ContentSkeleton />}<PostToc headings={headings} label={ar ? 'في هذه الصفحة' : 'On this page'} language={language} /></div>
         </article>
 
         {relatedPosts.length > 0 && <section className="related-posts" aria-labelledby="related-title"><div><h2 id="related-title">{ar ? 'مقالات ذات صلة' : 'Related posts'}</h2><ul>{relatedPosts.map(post => {
