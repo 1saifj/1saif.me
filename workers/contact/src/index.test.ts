@@ -46,7 +46,7 @@ describe('contact worker', () => {
     const response = await worker.fetch(post(goodFields), makeEnv())
 
     expect(response.status).toBe(200)
-    expect(sent).toEqual([expect.objectContaining({ from: { email: 'contact@1saif.me', name: '1saif.me contact form' }, replyTo: { email: 'ali@example.com', name: 'Ali' } })])
+    expect(sent).toEqual([expect.objectContaining({ from: { email: 'hello@1saif.me', name: '1saif.me contact form' }, replyTo: { email: 'ali@example.com', name: 'Ali' } })])
   })
 
   it('sends a 5,000-character Arabic message', async () => {

@@ -117,7 +117,7 @@ export default {
 
     try {
       await env.EMAIL.send({
-        from: { email: 'contact@1saif.me', name: '1saif.me contact form' },
+        from: { email: 'hello@1saif.me', name: '1saif.me contact form' },
         replyTo: { email, name },
         subject: `Contact form: ${name}`,
         text: `${message}\n\n--\n${name} <${email}>`,

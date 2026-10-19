@@ -35,4 +35,4 @@ Cloudflare Pages builds on push: build command `npm run build`, output directory
 
 ## Contact
 
-Saif Aljanahi · [saifalialjanahi@gmail.com](mailto:saifalialjanahi@gmail.com) · [LinkedIn](https://linkedin.com/in/1saifj) · [GitHub](https://github.com/1saifj)
+Saif Aljanahi · [hello@1saif.me](mailto:hello@1saif.me) · [LinkedIn](https://linkedin.com/in/1saifj) · [GitHub](https://github.com/1saifj)

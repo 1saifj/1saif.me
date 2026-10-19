@@ -8,7 +8,7 @@ const SITE_NAME = 'Saif Aljanahi';
 
 const SITE_DESCRIPTION = 'Notes from a lead software engineer in Al-Najaf, Iraq, on backend platforms, Go, PostgreSQL, cloud infrastructure and Flutter.';
 
-const AUTHOR_EMAIL = 'saifalialjanahi@gmail.com';
+const AUTHOR_EMAIL = 'hello@1saif.me';
 
 const CONTENT_DIR = path.join(__dirname, '../content/articles');
 
