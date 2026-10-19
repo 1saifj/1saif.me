@@ -9,6 +9,13 @@ isPrivate: true
 sourceType: private
 role: Tech lead and founding engineer
 impact: Took it from the idea and the plan to the product and its launch, inside the University of Kufa technology incubator, and trained its 15-student team
+stack:
+  - Flutter
+  - BLoC
+  - Dio
+  - Widgetbook
+  - .NET 9
+  - Express
 ---
 
 Wusool (وصول, "arrival") is smart campus transport for University of Kufa students and staff: live bus tracking, digital tickets, schedules and clear routes, all from a phone. It is incubated at the University of Kufa technology incubator.

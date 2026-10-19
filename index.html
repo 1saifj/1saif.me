@@ -67,6 +67,8 @@ html[dir='rtl'] .sr-only:focus-visible { font-family: 'IBM Plex Sans Arabic', 'P
 
 /* Header (also used on every other page through SiteHeader) */
 .notebook-header { position: sticky; z-index: 20; top: 0; border-bottom: 1px solid var(--nb-line); background: color-mix(in srgb, var(--nb-bg) 94%, transparent); -webkit-backdrop-filter: saturate(1.5) blur(12px); backdrop-filter: saturate(1.5) blur(12px); }
+/* During a route change the header is its own snapshot, so it stays put while the pages cross-fade. */
+.notebook-header { view-transition-name: site-header; }
 /* At the very top the header sits on the page; its hairline appears once the page scrolls under it. */
 @supports (animation-timeline: scroll()) {
   .notebook-header { animation: nb-header-line linear both; animation-timeline: scroll(); animation-range: 0 40px; }
@@ -248,7 +250,8 @@ html.dark .theme-when-dark { display: inline-flex; }
   /* A page reached through an in-site link fades in. The first load never animates: html[data-nav] is set on navigation. */
   html[data-nav] :is(.notebook-main, .site-shell > main) { animation: nb-page-in .28s cubic-bezier(.2, .7, .2, 1) both; }
   @keyframes nb-page-in { from { opacity: 0; transform: translateY(8px); } }
-  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; }
+  /* A route change (View Transitions API, see RouteTransitions in App.tsx) cross-fades the pages over 220 ms. */
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation-duration: .22s; }
 }
 /* Paper is white: print with the light palette, whatever theme the screen uses. */
 @media print {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { convertMarkdownToHtml } from './markdownProcessor'
-import { enhanceCodeBlocks } from './codeBlocks'
+import { applyLineHighlight, enhanceCodeBlocks } from './codeBlocks'
 
 describe('enhanceCodeBlocks', () => {
   it('colors a code block in place and leaves the prose untouched', async () => {
@@ -62,5 +62,55 @@ describe('enhanceCodeBlocks', () => {
     expect(block?.hasAttribute('data-collapsed')).toBe(true)
     expect(button?.textContent).toBe('Show all 40 lines')
     cleanup()
+  })
+
+  it('keeps the title and the highlighted lines after Shiki replaces the code', async () => {
+    const root = document.createElement('div')
+
+    root.innerHTML = convertMarkdownToHtml('```go title="cmd/api/main.go" {2}\nfunc main() {}\nfunc helper() {}\n```')
+    document.body.append(root)
+    const cleanup = enhanceCodeBlocks(root)
+
+    await vi.waitFor(() => expect(root.querySelector('pre.shiki')).not.toBeNull(), { timeout: 5000 })
+    const marks = [...root.querySelectorAll('.code-content .line')].map(line => line.classList.contains('highlighted'))
+
+    expect(root.querySelector('.code-title')?.textContent).toBe('cmd/api/main.go')
+    expect(root.querySelector('pre')?.dataset.highlight).toBe('2')
+    expect(marks).toEqual([false, true])
+    cleanup()
+    root.remove()
+  })
+
+  it('copies the code only, with no title and no markers', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+
+    Object.assign(navigator, { clipboard: { writeText } })
+    const root = document.createElement('div')
+
+    root.innerHTML = convertMarkdownToHtml('```bash title="scripts/setup.sh" {1}\n$ npm install\n$ npm test\n```')
+    const cleanup = enhanceCodeBlocks(root)
+
+    root.querySelector<HTMLButtonElement>('.copy-button')?.click()
+    expect(writeText).toHaveBeenCalledWith('npm install\nnpm test')
+    cleanup()
+  })
+})
+
+describe('applyLineHighlight', () => {
+  it('marks the lines named in the pre data attribute', () => {
+    const pre = document.createElement('pre')
+
+    pre.dataset.highlight = '1,3'
+    pre.innerHTML = '<code><span class="line">a</span>\n<span class="line">b</span>\n<span class="line">c</span></code>'
+    applyLineHighlight(pre)
+    expect([...pre.querySelectorAll('.line')].map(line => line.classList.contains('highlighted'))).toEqual([true, false, true])
+  })
+
+  it('leaves a pre that names no lines alone', () => {
+    const pre = document.createElement('pre')
+
+    pre.innerHTML = '<code><span class="line">a</span></code>'
+    applyLineHighlight(pre)
+    expect(pre.querySelector('.highlighted')).toBeNull()
   })
 })

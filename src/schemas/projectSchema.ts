@@ -29,8 +29,15 @@ export const projectSchema = z.object({
   sourceType: sourceTypes.optional().default('open-source'),
   role: z.string().optional(),
   impact: z.string().optional(),
+  // Technologies the project body already names; plain chips, never links.
+  stack: z.array(z.string()).optional(),
+  // A path under public/. The figure renders only when the alt text and both dimensions are present.
+  image: z.string().optional(),
+  imageAlt: z.string().optional(),
+  imageWidth: z.number().optional(),
+  imageHeight: z.number().optional(),
   // Arabic display text; slugs and links always use the English name.
-  ar: z.object({ name: z.string(), description: z.string(), role: z.string(), impact: z.string() }).partial().optional(),
+  ar: z.object({ name: z.string(), description: z.string(), role: z.string(), impact: z.string(), imageAlt: z.string() }).partial().optional(),
 })
 
 export type Project = z.infer<typeof projectSchema>

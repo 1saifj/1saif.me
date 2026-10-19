@@ -9,6 +9,8 @@ isPrivate: false
 sourceType: open-source
 role: Author
 impact: Activity-based watchdogs, one permission vocabulary across five CLIs, end-to-end tested
+stack:
+  - Node.js
 ---
 
 RelayRook is an open-source Agent Skill and CLI. One coding agent uses it to hand implementation, code review or security review to the other coding CLIs on the same machine.

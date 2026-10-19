@@ -127,3 +127,60 @@ describe('markdown code blocks', () => {
     expect(html).toContain('AS $$ SELECT $1 $$;')
   })
 })
+
+describe('code fence meta', () => {
+  it('leaves a fence with no meta exactly as it was', async () => {
+    const html = await render('```go\nx := 1\ny := 2\n```')
+
+    // The exact bytes of the block, so any change to a fence without meta shows up here.
+    expect(html).toBe('<!--code-block--><div class="code-block-container"><div class="code-header"><span class="code-lang">Go</span><button type="button" class="copy-button" aria-live="polite">Copy</button></div><div class="code-content code-surface"><pre data-lang="go"><code><span class="line">x := 1</span>\n<span class="line">y := 2</span></code></pre></div></div><!--/code-block-->')
+  })
+
+  it('shows a title in the header, next to the language label', async () => {
+    const html = await render('```go title="cmd/api/main.go"\nfunc main() {}\n```')
+
+    expect(html).toContain('<span class="code-title">cmd/api/main.go</span><span class="code-lang">Go</span>')
+    expect(html).toContain('data-lang="go"')
+    expect(html).not.toContain('data-highlight')
+  })
+
+  it('marks the named lines, and keeps the line set on the pre for the browser', async () => {
+    const html = await render('```go {1,3-5}\na\nb\nc\nd\ne\n```')
+    const marks = (html.match(/<span class="line[^"]*">/g) ?? []).map(tag => tag.includes('highlighted'))
+
+    expect(html).toContain('data-highlight="1,3-5"')
+    expect(marks).toEqual([true, false, true, true, true])
+  })
+
+  it('carries a title and a line set on the same fence', async () => {
+    const html = await render('```go title="cmd/api/main.go" {2}\na\nb\n```')
+
+    expect(html).toContain('<span class="code-title">cmd/api/main.go</span>')
+    expect(html).toContain('data-highlight="2"')
+    expect(html).toContain('<span class="line highlighted">b</span>')
+  })
+
+  it('ignores a malformed meta: bad title, bad ranges and stray words', async () => {
+    const html = await render('Before\n\n```go title=main.go {a,b-} {2-} {0} run it\nfunc main() {}\n```\n\nAfter')
+
+    expect(html).toContain('<p>Before</p>')
+    expect(html).toContain('<p>After</p>')
+    expect(html).not.toContain('code-title')
+    expect(html).not.toContain('data-highlight')
+    expect(html).not.toContain('highlighted')
+    expect(html).toContain('<span class="code-lang">Go</span>')
+  })
+
+  it('escapes HTML in the title, so a title cannot open a tag', async () => {
+    const html = await render('```text title="a<b>&"\nplain\n```')
+
+    expect(html).toContain('<span class="code-title">a&lt;b&gt;&amp;</span>')
+  })
+
+  it('reads braces inside a title as text, not as lines to mark', async () => {
+    const html = await render('```text title="{1}"\na\nb\n```')
+
+    expect(html).toContain('<span class="code-title">{1}</span>')
+    expect(html).not.toContain('data-highlight')
+  })
+})

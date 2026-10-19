@@ -11,17 +11,22 @@ import SEOHead from '../components/SEOHead'
 import { BreadcrumbStructuredData } from '../components/StructuredData'
 import { ContentSkeleton } from '../components/ContentSkeleton'
 import { SiteFooter } from '../components/SiteFooter'
-import { comma, Language, pick, useLanguage } from '../i18n/language'
+import { Language, pick, useLanguage } from '../i18n/language'
+import { buildGlanceItems } from '../utils/projectGlance'
 
 const copy = {
   en: {
-    back: '← All work', inProgress: 'in progress', visit: 'Visit site', repo: 'Source code', next: 'Next project',
+    back: '← All work', inProgress: 'in progress', visit: 'Visit site', source: 'Source code', next: 'Next project',
+    role: 'Role', status: 'Status', type: 'Type', language: 'Main language', links: 'Links', stack: 'Stack',
+    shipped: 'Shipped', openSource: 'Open source', company: 'Company', private: 'Private',
     bodyNote: 'This case study is in English.',
     notFound: 'Project not found', notFoundBody: "The project you're looking for doesn't exist or has moved.", invalid: 'Invalid project URL', invalidBody: 'No project identifier was provided in the URL.',
     unavailable: 'Project data unavailable', unavailableBody: 'This project has invalid metadata and cannot be displayed yet.', viewWork: 'See all work',
   },
   ar: {
-    back: '→ كل الأعمال', inProgress: 'قيد التطوير', visit: 'زيارة الموقع', repo: 'الكود المصدري', next: 'المشروع التالي',
+    back: '→ كل الأعمال', inProgress: 'قيد التطوير', visit: 'زيارة الموقع', source: 'الكود المصدري', next: 'المشروع التالي',
+    role: 'الدور', status: 'الحالة', type: 'النوع', language: 'اللغة الأساسية', links: 'الروابط', stack: 'التقنيات',
+    shipped: 'مكتمل', openSource: 'مفتوح المصدر', company: 'شركة', private: 'خاص',
     bodyNote: 'تفاصيل دراسة الحالة متاحة باللغة الإنجليزية.',
     notFound: 'المشروع غير موجود', notFoundBody: 'المشروع الذي تبحث عنه غير موجود أو نُقل إلى مكان آخر.', invalid: 'رابط مشروع غير صالح', invalidBody: 'لم يتضمن الرابط معرّف مشروع.',
     unavailable: 'بيانات المشروع غير متاحة', unavailableBody: 'بيانات هذا المشروع غير صالحة ولا يمكن عرضها حالياً.', viewWork: 'عرض كل الأعمال',
@@ -57,6 +62,11 @@ export const ProjectPage: React.FC = () => {
     sourceType: projectFile.frontmatter.sourceType || 'open-source',
     role: projectFile.frontmatter.role,
     impact: projectFile.frontmatter.impact,
+    stack: projectFile.frontmatter.stack,
+    image: projectFile.frontmatter.image,
+    imageAlt: projectFile.frontmatter.imageAlt,
+    imageWidth: projectFile.frontmatter.imageWidth,
+    imageHeight: projectFile.frontmatter.imageHeight,
   })
 
   if (!parsed.success) {
@@ -71,6 +81,12 @@ export const ProjectPage: React.FC = () => {
   const name = pick(language, project.name, entry?.ar?.name)
   const arabicBody = language === 'ar' && arabicBodies.has(projectFile.slug)
   const description = pick(language, project.description, entry?.ar?.description)
+  const role = pick(language, project.role, entry?.ar?.role)
+  const glance = buildGlanceItems(project, role, t)
+
+  const image = project.image && project.imageAlt && project.imageWidth && project.imageHeight
+    ? { src: project.image, alt: pick(language, project.imageAlt, entry?.ar?.imageAlt), width: project.imageWidth, height: project.imageHeight }
+    : undefined
 
   return (
     <div className="site-shell site-project-page">
@@ -82,10 +98,21 @@ export const ProjectPage: React.FC = () => {
         <p className="plain-back"><Link to="/#work">{t.back}</Link></p>
         <h1>{name}</h1>
         <p className="plain-lede">{description}</p>
-        <p className="plain-meta">
-          {pick(language, project.role, entry?.ar?.role)}{project.wip && <>{comma(language)}{t.inProgress}</>} · {languageNames.get(project.language)}
-          {project.url && <> · <a href={project.url} target="_blank" rel="noreferrer">{project.isPrivate ? t.visit : t.repo}</a></>}
-        </p>
+        <dl className="plain-glance">
+          {glance.map(item => (
+            <div key={item.key}>
+              <dt>{item.label}</dt>
+              <dd>{item.href ? <a href={item.href} target="_blank" rel="noreferrer">{item.value}</a> : item.value}</dd>
+            </div>
+          ))}
+          {project.stack && project.stack.length > 0 && (
+            <div className="plain-glance-stack">
+              <dt>{t.stack}</dt>
+              <dd><ul className="plain-stack">{project.stack.map(tech => <li key={tech}>{tech}</li>)}</ul></dd>
+            </div>
+          )}
+        </dl>
+        {image && <figure className="plain-figure"><img src={image.src} alt={image.alt} width={image.width} height={image.height} loading="lazy" decoding="async" /></figure>}
 
         {language === 'ar' && !arabicBody && <p className="site-translation-note">{t.bodyNote}</p>}
         {contentHtml
@@ -98,8 +125,6 @@ export const ProjectPage: React.FC = () => {
     </div>
   )
 }
-
-const languageNames = new Map([['typescript', 'TypeScript'], ['javascript', 'JavaScript'], ['go', 'Go'], ['dart', 'Dart'], ['rust', 'Rust'], ['haskell', 'Haskell'], ['ocaml', 'OCaml']])
 
 const ErrorView: React.FC<{ title: string; desc: string; language: Language }> = ({ title, desc, language }) => (
   <div className="site-shell site-error-page">
