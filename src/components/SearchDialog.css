@@ -28,6 +28,10 @@ html[dir='rtl'] .search-group-title { letter-spacing: 0; }
 .search-empty { margin: 18px 10px; color: var(--nb-ink-2); font-size: 15px; line-height: 1.6; }
 .search-hints { flex: none; margin: 0; padding: 9px 16px; border-top: 1px solid var(--nb-line); color: var(--nb-ink-3); font-size: 12px; }
 
+@media (forced-colors: active) {
+  .search-item[aria-selected='true'] { outline: 2px solid Highlight; outline-offset: -2px; }
+}
+
 /* Touch screens have no Esc key: a Close button takes the hint's place. */
 .search-close { display: none; flex: none; min-height: 32px; padding: 0 4px; border: 0; color: var(--nb-accent); background: none; font: inherit; font-size: 15px; cursor: pointer; }
 @media (hover: none) and (pointer: coarse) {
