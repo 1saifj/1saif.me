@@ -8,6 +8,13 @@ isPrivate: true
 sourceType: company
 role: Lead engineer
 impact: TypeScript and Go services, Pulumi infrastructure on Google Cloud, load tests before launch
+stack:
+  - TypeScript
+  - Go
+  - Pulumi
+  - Google Cloud
+  - PostgreSQL
+  - Next.js
 ---
 
 I lead engineering for a product that partners and their customers use every day. This page describes the work in general terms, and the code, the partners and the numbers stay private.

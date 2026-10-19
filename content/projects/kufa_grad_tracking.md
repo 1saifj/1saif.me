@@ -9,6 +9,13 @@ isPrivate: true
 sourceType: company
 role: Main author
 impact: Built and maintained since 2023: Go API, Next.js app, FastAPI QA portal, Sentry, Playwright
+stack:
+  - Go
+  - PostgreSQL
+  - Next.js
+  - React
+  - FastAPI
+  - Playwright
 ---
 
 The University of Kufa uses this platform to follow its graduates and connect them with jobs. I have built and maintained it since 2023, and I wrote most of the code.
