@@ -123,7 +123,7 @@ export const PrivacyPolicyPage: React.FC = () => {
               <div>
                 <h2 id={ids[5]}>{t.sections[5]}</h2>
                 <p>{t.contactBody}</p>
-                <a className="site-button" href="mailto:saifalialjanahi@gmail.com" dir="ltr">saifalialjanahi@gmail.com <span aria-hidden>↗</span></a>
+                <a className="site-button" href="mailto:hello@1saif.me" dir="ltr">hello@1saif.me <span aria-hidden>↗</span></a>
               </div>
             </section>
           </article>

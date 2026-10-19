@@ -23,7 +23,7 @@ export const PersonStructuredData: React.FC = () => (
     jobTitle: 'Lead Software Engineer',
     description: 'Lead software engineer in Al-Najaf, Iraq. Builds backend platforms, cloud infrastructure and university systems with TypeScript, Go, PostgreSQL and Flutter.',
     image: `${SITE}/sj_image.jpeg`,
-    email: 'saifalialjanahi@gmail.com',
+    email: 'hello@1saif.me',
     address: { '@type': 'PostalAddress', addressLocality: 'Al-Najaf', addressCountry: 'IQ' },
     alumniOf: { '@type': 'CollegeOrUniversity', name: 'University of Kufa', url: 'https://uokufa.edu.iq' },
     knowsAbout: ['Go', 'TypeScript', 'PostgreSQL', 'Google Cloud', 'Flutter', 'Next.js', 'Backend development'],
