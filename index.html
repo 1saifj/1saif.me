@@ -217,6 +217,10 @@ html.dark .theme-when-dark { display: inline-flex; }
   html.dark { --nb-bg: #fff; --nb-subtle: #f6f8fa; --nb-line: #e3e8ee; --nb-ink: #10161d; --nb-ink-2: #46525e; --nb-ink-3: #5b6875; --nb-accent: #0a66c2; --nb-surface: #fff; color-scheme: light; }
   html.dark .notebook-post-thumb { filter: none; }
 }
+/* Windows High Contrast drops backgrounds; states drawn with one use system colours instead. */
+@media (forced-colors: active) {
+  .notebook-desktop-nav a::after, .notebook-mobile-nav a::after, .notebook-timeline > li.is-current .notebook-timeline-period::before { forced-color-adjust: none; background: Highlight; }
+}
 @media (prefers-reduced-motion: reduce) {
   :root { scroll-behavior: auto; }
   .site-skeleton, .route-skeleton { animation: none; }
