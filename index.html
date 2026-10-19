@@ -156,6 +156,30 @@ html.dark .notebook-post-thumb { filter: invert(.88) hue-rotate(180deg); }
 .notebook-prose { max-width: 640px; }
 .notebook-prose p { margin: 0 0 14px; color: var(--nb-ink-2); font-size: 1.05rem; line-height: 1.7; text-wrap: pretty; }
 .notebook-contact p { margin: 0; color: var(--nb-ink-2); font-size: 1.05rem; }
+.notebook-contact-body { display: grid; gap: 24px; }
+.notebook-contact-body > p { max-width: 34ch; line-height: 1.6; }
+.contact-form { display: grid; gap: 16px; padding: 20px; border: 1px solid var(--nb-line); border-radius: 12px; background: var(--nb-subtle); }
+.contact-form-row { display: grid; gap: 16px; }
+.contact-field { display: grid; gap: 6px; color: var(--nb-ink-2); font-size: 13px; font-weight: 500; }
+.contact-field :is(input, textarea) { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--nb-line); border-radius: 8px; color: var(--nb-ink); background: var(--nb-bg); font: inherit; font-size: 15px; transition: border-color .15s ease, box-shadow .15s ease; }
+.contact-field input { min-height: 42px; }
+.contact-field textarea { min-height: 128px; line-height: 1.55; resize: vertical; }
+.contact-field :is(input, textarea):hover { border-color: color-mix(in srgb, var(--nb-ink-3) 55%, var(--nb-line)); }
+.contact-field :is(input, textarea):focus { border-color: var(--nb-accent); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--nb-accent) 18%, transparent); }
+.contact-form-trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.contact-form-challenge:empty { display: none; }
+.contact-form-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.contact-form button { min-height: 42px; padding: 0 18px; border: 0; border-radius: 8px; color: #fff; background: var(--nb-accent); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color .15s ease; }
+.contact-form button:hover { background: color-mix(in srgb, var(--nb-accent) 86%, #000); }
+html.dark .contact-form button { color: #0d1117; }
+.contact-form button:disabled { opacity: .7; cursor: progress; }
+.notebook-contact .contact-form-status { flex: 1 1 200px; color: var(--nb-ink-3); font-size: 14px; }
+.notebook-contact .contact-form-status[data-tone="ok"] { color: #1a7f37; }
+.notebook-contact .contact-form-status[data-tone="error"] { color: #cf222e; }
+html.dark .notebook-contact .contact-form-status[data-tone="ok"] { color: #56d364; }
+html.dark .notebook-contact .contact-form-status[data-tone="error"] { color: #ff7b72; }
+@media (min-width: 560px) { .contact-form-row { grid-template-columns: 1fr 1fr; } .contact-form { padding: 24px; } }
+@media (min-width: 860px) { .notebook-contact-body { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 56px; align-items: start; } }
 
 /* Footer, the same on every page (components/SiteFooter.tsx) */
 .notebook-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; width: min(calc(100% - 48px), 960px); margin-inline: auto; padding: 28px 0 40px; border-top: 1px solid var(--nb-line); color: var(--nb-ink-3); font-size: 14px; }
@@ -208,7 +232,7 @@ html.dark .theme-when-dark { display: inline-flex; }
 @media (prefers-reduced-motion: no-preference) {
   /* Rows settle into place as they scroll in. Transform only: content is never hidden, and nothing on the first screen moves. */
   @supports (animation-timeline: view()) {
-    .notebook-timeline > li, .notebook-feature, .notebook-work-list li, .notebook-post-row, .notebook-prose, .notebook-contact > p, .plain-role, .related-posts li { animation: nb-settle linear both; animation-timeline: view(); animation-range: entry 0% entry 140px; }
+    .notebook-timeline > li, .notebook-feature, .notebook-work-list li, .notebook-post-row, .notebook-prose, .notebook-contact-body > *, .plain-role, .related-posts li { animation: nb-settle linear both; animation-timeline: view(); animation-range: entry 0% entry 140px; }
     @keyframes nb-settle { from { transform: translateY(18px); } }
   }
   /* A page reached through an in-site link fades in. The first load never animates: html[data-nav] is set on navigation. */

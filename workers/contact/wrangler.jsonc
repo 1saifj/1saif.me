@@ -1,0 +1,30 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "1saif-contact",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-06-15",
+  // Only this path runs the Worker. Pages serves every other path as free static assets,
+  // so a flood here cannot take the site down. Worker requests are counted, and past the
+  // plan's included amount billed, for the whole account, though: the zone's WAF rate
+  // limiting rule on this path stops a flood before it reaches the Worker.
+  "routes": [{ "pattern": "1saif.me/api/contact", "zone_name": "1saif.me" }],
+  // No *.workers.dev or preview URL: they would skip the zone's WAF rate limiting rule.
+  "workers_dev": false,
+  "preview_urls": false,
+  // Mail goes only to this verified Email Routing address, so it is free on every plan,
+  // and an abused endpoint can never mail anyone else.
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "destination_address": "saifalialjanahi@gmail.com",
+      "allowed_sender_addresses": ["contact@1saif.me"]
+    }
+  ],
+  // Limits are counted per Cloudflare location. Turnstile is the main gate; these stop a
+  // single client, and a crowd, from filling the inbox.
+  "ratelimits": [
+    { "name": "PER_CLIENT", "namespace_id": "71451", "simple": { "limit": 3, "period": 60 } },
+    { "name": "ALL_CLIENTS", "namespace_id": "71452", "simple": { "limit": 20, "period": 60 } }
+  ]
+  // Secret, set with `wrangler secret put TURNSTILE_SECRET -c workers/contact/wrangler.jsonc`.
+}
