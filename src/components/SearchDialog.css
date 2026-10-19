@@ -28,6 +28,13 @@ html[dir='rtl'] .search-group-title { letter-spacing: 0; }
 .search-empty { margin: 18px 10px; color: var(--nb-ink-2); font-size: 15px; line-height: 1.6; }
 .search-hints { flex: none; margin: 0; padding: 9px 16px; border-top: 1px solid var(--nb-line); color: var(--nb-ink-3); font-size: 12px; }
 
+/* Touch screens have no Esc key: a Close button takes the hint's place. */
+.search-close { display: none; flex: none; min-height: 32px; padding: 0 4px; border: 0; color: var(--nb-accent); background: none; font: inherit; font-size: 15px; cursor: pointer; }
+@media (hover: none) and (pointer: coarse) {
+  .search-field kbd { display: none; }
+  .search-close { display: inline-flex; align-items: center; }
+}
+
 @media (max-width: 620px) {
   .search-dialog { margin-top: 8px; max-height: calc(100dvh - 16px); }
   .search-hints { display: none; }

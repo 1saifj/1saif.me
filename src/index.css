@@ -57,6 +57,8 @@ html.dark .site-button { color: #0d1117; }
 .plain-article-head > [dir='rtl'] { max-width: 720px; }
 .plain-article-body { width: min(calc(100% - 48px), 960px); margin-inline: auto; padding-bottom: 24px; }
 .plain-article-body .article-content { max-width: 720px; }
+/* Arabic pages: the English article sits inside a left-to-right <article>, but its column starts on the right, like the rest of the page. */
+html[dir='rtl'] :is(.plain-article-head > [dir='rtl'], .plain-article-body .article-content) { margin-left: auto; }
 .plain-body { margin-top: 44px; }
 .site-translation-note + .plain-body { margin-top: 28px; }
 
@@ -179,6 +181,7 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
 /* ---- 404 ---- */
 .plain-page .plain-code { margin-bottom: 14px; color: var(--nb-accent); font: 600 14px/1 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; }
 .plain-page .plain-ways { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 28px; }
+.plain-page kbd { display: inline-block; padding: 0 6px; border: 1px solid var(--nb-line); border-bottom-width: 2px; border-radius: 5px; color: var(--nb-ink-2); background: var(--nb-subtle); font: 500 .8em/1.6 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
 
 @media (max-width: 760px) {
   .plain-page, .plain-article-body, .related-posts { width: calc(100% - 32px); }
@@ -195,10 +198,17 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
 }
 
 @media print {
+  @page { margin: 16mm 15mm; }
   .notebook-header, .notebook-footer, .reading-progress, .plain-print-hide { display: none !important; }
   .site-shell { color: #000; background: #fff; }
   .plain-page { width: auto; padding: 0; }
   .plain-page :where(p, li) { color: #222; }
-  .plain-role { break-inside: avoid; }
+  .plain-page :where(h2) { margin-top: 28px; break-after: avoid; }
+  /* A long role may continue on the next page, but never splits its heading from its first lines, or a bullet in two. */
+  .plain-role { padding: 14px 0; }
+  .plain-role :is(h3, .plain-meta), .plain-role-period { break-after: avoid; }
+  .plain-role li { break-inside: avoid; }
   .plain-page :where(a) { text-decoration: none; }
+  /* On paper a link is only useful with its address. */
+  .plain-links a[href^='http']::after { content: ' (' attr(href) ')'; color: #555; font-size: .85em; }
 }
