@@ -34,5 +34,3 @@ export const projectSchema = z.object({
 })
 
 export type Project = z.infer<typeof projectSchema>
-
-export type Language = z.infer<typeof languages>

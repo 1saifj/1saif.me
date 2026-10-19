@@ -1,6 +1,6 @@
 import { dateLocale, Language } from '../i18n/language'
 
-export type Localized = { role: string; location: string; mode: string; summary: string; highlights: string[] }
+type Localized = { role: string; location: string; mode: string; summary: string; highlights: string[] }
 
 export type Experience = Localized & {
   start: string // YYYY-MM
