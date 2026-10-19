@@ -12,11 +12,13 @@ interface TurnstileOptions {
   sitekey: string
   action: string
   language: string
-  theme: 'auto'
+  theme: 'light' | 'dark'
   size: 'flexible'
   appearance: 'interaction-only'
   callback: (token: string) => void
   'expired-callback': () => void
+  'error-callback': () => void
+  'timeout-callback': () => void
 }
 
 interface Turnstile {
@@ -80,43 +82,90 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
   const widgetId = useRef<string>()
   const token = useRef<string>()
   const tokenWaiters = useRef<((token: string | undefined) => void)[]>([])
+  // Set when the widget reports an error, so a submit does not wait 20 s for a token that will not come.
+  const challengeFailed = useRef(false)
   const [status, setStatus] = useState<Status>('idle')
 
+  // Every waiter gets the same answer: the token, or nothing when the challenge fails.
+  function settleToken(value: string | undefined) {
+    token.current = value
+    tokenWaiters.current.splice(0).forEach(resolve => resolve(value))
+  }
+
+  function failTurnstile() {
+    challengeFailed.current = true
+    settleToken(undefined)
+  }
+
   // The challenge takes seconds, so it starts as soon as the visitor heads for the form.
-  function startTurnstile() {
+  function startTurnstile(): Promise<boolean> {
     const container = widgetRef.current
 
-    if (!container || widgetId.current) return
+    if (!container) return Promise.resolve(false)
 
-    loadTurnstile()
+    if (widgetId.current) return Promise.resolve(true)
+
+    return loadTurnstile()
       .then(() => {
-        if (!window.turnstile || widgetId.current) return
+        if (!window.turnstile) return false
 
-        widgetId.current = window.turnstile.render(container, {
-          sitekey: TURNSTILE_SITE_KEY,
-          action: 'contact',
-          language,
-          theme: 'auto',
-          size: 'flexible',
-          appearance: 'interaction-only',
-          callback: value => {
-            token.current = value
-            tokenWaiters.current.splice(0).forEach(resolve => resolve(value))
-          },
-          'expired-callback': () => { token.current = undefined },
-        })
+        if (!widgetId.current) {
+          widgetId.current = window.turnstile.render(container, {
+            sitekey: TURNSTILE_SITE_KEY,
+            action: 'contact',
+            language,
+            theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+            size: 'flexible',
+            appearance: 'interaction-only',
+            callback: value => {
+              challengeFailed.current = false
+              settleToken(value)
+            },
+            'expired-callback': () => { token.current = undefined },
+            'error-callback': failTurnstile,
+            'timeout-callback': failTurnstile,
+          })
+        }
+
+        return true
       })
-      .catch(() => setStatus('challenge'))
+      .catch(() => false)
+  }
+
+  function resetTurnstile() {
+    token.current = undefined
+    challengeFailed.current = false
+
+    if (widgetId.current) window.turnstile?.reset(widgetId.current)
   }
 
   function waitForToken(): Promise<string | undefined> {
-    startTurnstile()
+    return new Promise<string | undefined>(resolve => {
+      if (token.current) {
+        resolve(token.current)
 
-    if (token.current) return Promise.resolve(token.current)
+        return
+      }
 
-    return new Promise(resolve => {
-      tokenWaiters.current.push(resolve)
-      setTimeout(() => resolve(undefined), TOKEN_WAIT_MS)
+      if (challengeFailed.current) {
+        resolve(undefined)
+
+        return
+      }
+
+      const finish = (value: string | undefined) => {
+        clearTimeout(timer)
+        tokenWaiters.current = tokenWaiters.current.filter(item => item !== finish)
+        resolve(value)
+      }
+
+      const timer = setTimeout(() => finish(undefined), TOKEN_WAIT_MS)
+      tokenWaiters.current.push(finish)
+
+      // A script that cannot load must fail the attempt now, not leave the button waiting for 20 s.
+      void startTurnstile().then(ready => {
+        if (!ready) finish(undefined)
+      })
     })
   }
 
@@ -129,13 +178,13 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
     const observer = new IntersectionObserver(entries => {
       if (!entries.some(entry => entry.isIntersecting)) return
       observer.disconnect()
-      startTurnstile()
+      void startTurnstile()
     }, { rootMargin: '200% 0px' })
 
     observer.observe(form)
 
     return () => observer.disconnect()
-  // startTurnstile reads only refs and the language.
+  // startTurnstile reads only refs, the language and the site theme.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language])
 
@@ -149,6 +198,8 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
     const value = await waitForToken()
 
     if (!value) {
+      // A failed or expired challenge needs a fresh widget before the next attempt.
+      resetTurnstile()
       setStatus('challenge')
 
       return
@@ -166,9 +217,7 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
       setStatus('failed')
     } finally {
       // Each token works once, so every attempt needs a new one.
-      token.current = undefined
-
-      if (widgetId.current) window.turnstile?.reset(widgetId.current)
+      resetTurnstile()
     }
   }
 
