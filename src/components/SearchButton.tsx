@@ -12,7 +12,11 @@ export const SearchButton: React.FC = () => {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      const typing = event.target instanceof HTMLElement && (event.target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName))
+      const slash = event.key === '/' && !typing && !event.metaKey && !event.ctrlKey && !event.altKey
+
+      // Ctrl K or ⌘ K anywhere; "/" too, unless the visitor is typing.
+      if (slash || ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k')) {
         event.preventDefault()
         setOpen(true)
       }
@@ -24,7 +28,7 @@ export const SearchButton: React.FC = () => {
   }, [])
 
   return <>
-    <button type="button" className="notebook-search-trigger" aria-label={label} aria-keyshortcuts="Meta+K Control+K" onClick={() => setOpen(true)}><InterfaceIcon name="search" /><span>{label}</span></button>
+    <button type="button" className="notebook-search-trigger" aria-label={label} aria-keyshortcuts="Meta+K Control+K /" onClick={() => setOpen(true)}><InterfaceIcon name="search" /><span>{label}</span></button>
     {open && <React.Suspense fallback={null}><SearchDialog onClose={() => setOpen(false)} /></React.Suspense>}
   </>
 }
