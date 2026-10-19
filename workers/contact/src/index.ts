@@ -54,7 +54,8 @@ const reply = (status: number, error?: string) => Response.json(error ? { error 
 async function passesTurnstile(token: string, ip: string, secret: string): Promise<boolean> {
   const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
     method: 'POST',
-    body: new URLSearchParams({ secret, response: token, remoteip: ip }),
+    // A pasted secret can carry a trailing space or line break.
+    body: new URLSearchParams({ secret: secret.trim(), response: token, remoteip: ip }),
     signal: AbortSignal.timeout(5_000),
   })
 
