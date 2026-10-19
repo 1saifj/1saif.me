@@ -155,15 +155,8 @@ function generateSitemap(posts) {
 `;
   });
 
-  xml += `    
-    <!-- RSS Feed -->
-    <url>
-        <loc>${SITE_URL}/rss.xml</loc>
-        <lastmod>${now}T00:00:00+00:00</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>0.7</priority>
-    </url>
-    
+  // Pages only: feeds are found through their <link rel="alternate"> tags, not the sitemap.
+  xml += `
 </urlset>`;
 
   return xml;
@@ -187,7 +180,7 @@ try {
   
   // Every page also exists in Arabic under /ar; list each one next to its English entry.
   const sitemap = generateSitemap(posts).replace(/(\s*<url>\s*<loc>)https:\/\/1saif\.me(\/[^<]*)(<\/loc>[\s\S]*?<\/url>)/g, (entry, open, page, rest) =>
-    page.endsWith('.xml') ? entry : `${entry}${open}${SITE_URL}/ar${page === '/' ? '' : page}${rest}`);
+    `${entry}${open}${SITE_URL}/ar${page === '/' ? '' : page}${rest}`);
 
   fs.writeFileSync(OUTPUT_FILE, sitemap);
   
