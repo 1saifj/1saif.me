@@ -50,9 +50,10 @@ interface ArticleStructuredDataProps {
   slug: string
   image?: string
   wordCount?: number
+  arabic?: boolean
 }
 
-export const ArticleStructuredData: React.FC<ArticleStructuredDataProps> = ({ title, description, publishedDate, modifiedDate, tags, slug, image, wordCount }) => (
+export const ArticleStructuredData: React.FC<ArticleStructuredDataProps> = ({ title, description, publishedDate, modifiedDate, tags, slug, image, wordCount, arabic }) => (
   <JsonLd data={{
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -62,7 +63,7 @@ export const ArticleStructuredData: React.FC<ArticleStructuredDataProps> = ({ ti
     datePublished: publishedDate,
     dateModified: modifiedDate || publishedDate,
     author,
-    mainEntityOfPage: `${SITE}/blog/${slug}`,
+    mainEntityOfPage: `${SITE}${arabic ? '/ar' : ''}/blog/${slug}`,
     keywords: tags.join(', '),
     inLanguage: 'en',
     ...(wordCount && { wordCount }),

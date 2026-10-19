@@ -129,7 +129,7 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="notebook-shell">
-      <SEOHead title={t.seoTitle} description={t.seoDescription} url="https://1saif.me/" image="/sj_image.jpeg" />
+      <SEOHead title={t.seoTitle} description={t.seoDescription} url="https://1saif.me/" />
       <PersonStructuredData />
 
       <header className="notebook-header">
