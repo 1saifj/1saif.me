@@ -2,8 +2,8 @@
    The colour tokens (--nb-*), the header, the footer and the post rows live in index.html, so every page shares them. */
 
 /* ---- Base ---- */
-.site-shell { display: flex; flex-direction: column; min-height: 100svh; overflow-x: clip; color: var(--nb-ink); background: var(--nb-bg); font: 16px/1.6 'Geist Sans', ui-sans-serif, system-ui, sans-serif; }
-html[dir='rtl'] .site-shell { font-family: 'IBM Plex Sans Arabic', 'Geist Sans', Tahoma, sans-serif; }
+.site-shell { display: flex; flex-direction: column; min-height: 100svh; overflow-x: clip; color: var(--nb-ink); background: var(--nb-bg); font: 16px/1.6 'Geist Sans', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif; }
+html[dir='rtl'] .site-shell { font-family: 'IBM Plex Sans Arabic', 'Plex Arabic Fallback', 'Geist Sans', 'Geist Fallback', ui-sans-serif, system-ui, Tahoma, sans-serif; }
 .site-shell > main { flex: 1 0 auto; }
 .site-shell *, .site-shell *::before, .site-shell *::after { box-sizing: border-box; }
 :where(.site-shell) :where(h1, h2, h3, h4, p, ul, ol, figure, blockquote, pre, table) { margin: 0; }
@@ -144,7 +144,7 @@ html.dark .article-content code { color: #f472b6; }
 /* Code blocks: one panel that follows the site theme. Token colours come from Shiki's dual-theme variables. */
 .code-block-container { margin: 1.75em 0; overflow: hidden; border: 1px solid var(--nb-line); border-radius: 8px; background: var(--nb-subtle); }
 .code-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 38px; padding-block: 0; padding-inline: 14px 6px; border-bottom: 1px solid var(--nb-line); }
-.code-lang { color: var(--nb-ink-3); font: 600 12px/1 'Geist Sans', ui-sans-serif, system-ui, sans-serif; letter-spacing: .02em; }
+.code-lang { color: var(--nb-ink-3); font: 600 12px/1 'Geist Sans', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif; letter-spacing: .02em; }
 .copy-button { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; color: var(--nb-ink-3); background: transparent; font-size: 12px; cursor: pointer; transition: color .15s ease, border-color .15s ease, background-color .15s ease; }
 .copy-button:hover, .copy-button:focus-visible { border-color: var(--nb-line); color: var(--nb-ink); background: var(--nb-bg); }
 .copy-button[data-copied] { color: #1a7f37; }
