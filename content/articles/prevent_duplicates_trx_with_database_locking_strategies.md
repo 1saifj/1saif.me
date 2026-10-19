@@ -243,4 +243,4 @@ In our case, optimistic locking was ideal because we had relatively low contenti
 - [GORM Transactions Documentation](https://gorm.io/docs/transactions.html)
 - [Redis SETNX Command](https://redis.io/commands/setnx/)
 - [Martin Fowler on Optimistic Offline Lock](https://martinfowler.com/eaaCatalog/optimisticOfflineLock.html)
-- [AWS Database Blog: Optimistic locking in Amazon DynamoDB](https://aws.amazon.com/blogs/database/optimistic-locking-in-amazon-dynamodb/)
+- [Amazon DynamoDB Developer Guide: Optimistic locking with version number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.OptimisticLocking.html)
