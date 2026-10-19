@@ -25,6 +25,21 @@
         "--strictPort"
       ],
       "port": 4173
+    },
+    {
+      "name": "portfolio-pages",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "wrangler@4",
+        "pages",
+        "dev",
+        "dist",
+        "--port",
+        "8790",
+        "--compatibility-date=2025-06-15"
+      ],
+      "port": 8790
     }
   ]
 }
