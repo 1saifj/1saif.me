@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { SiteHeader } from '../components/SiteHeader'
 import { postText, publishedBlogs } from '../data/blogs'
 import { loadArticle } from '../utils/contentLoader'
@@ -11,6 +11,7 @@ import { enhanceCodeBlocks } from '../utils/codeBlocks'
 import { dateLocale, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
 import { ContentSkeleton } from '../components/ContentSkeleton'
 import { SiteFooter } from '../components/SiteFooter'
+import { NotFoundPage } from './NotFoundPage'
 
 // Filled by entry-server before prerendering. In the browser, the prerendered body is read back
 // from the page on first render, so the article shows at once instead of a skeleton.
@@ -61,7 +62,8 @@ export const BlogPost: React.FC = () => {
 
   useEffect(() => (body.current && htmlContent ? enhanceCodeBlocks(body.current) : undefined), [htmlContent])
 
-  if (!blog?.file) return <Navigate to="/blog" replace />
+  // A mistyped address gets the 404 page (it suggests the closest post), not a silent jump to the index.
+  if (!blog?.file) return <NotFoundPage />
 
   const words = blog.words ?? 0
   const readTime = Math.max(1, Math.ceil(words / 200))
