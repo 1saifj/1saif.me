@@ -6,6 +6,7 @@ import { BrandLink, LanguageButton, ThemeButton } from '../components/SiteHeader
 import { PostThumb } from '../components/PostThumb'
 import { SearchButton } from '../components/SearchButton'
 import { SiteFooter } from '../components/SiteFooter'
+import { ContactForm } from '../components/ContactForm'
 import { projects } from '../data/projects'
 import { formatMonth, Job, jobs } from '../data/experience'
 import { postText, publishedBlogs } from '../data/blogs'
@@ -36,7 +37,7 @@ const copy = {
     source: 'Source code',
     about1: 'Most of my work is on the backend and the infrastructure under it. I care about how a system behaves after it ships, so I spend real time on load tests and on keeping infrastructure in code where the team can review it.',
     about2: 'I currently lead an engineering team and work on RelayRook in my spare time. The tools I reach for most are TypeScript, Go and PostgreSQL, with Flutter for mobile.',
-    contactBody: 'The best way to reach me is email:',
+    contactBody: 'Send me a message with this form, or email me at',
     portraitAlt: 'Saif Aljanahi',
     seoTitle: 'Saif Aljanahi | Lead Software Engineer in Al-Najaf, Iraq',
     seoDescription: 'Saif Aljanahi is a lead software engineer in Al-Najaf, Iraq. He builds backend platforms, cloud infrastructure and university systems with TypeScript, Go, PostgreSQL and Flutter.',
@@ -64,7 +65,7 @@ const copy = {
     source: 'الكود المصدري',
     about1: 'يتركّز معظم عملي على الأنظمة الخلفية والبنية التحتية التي تعمل عليها. ويهمّني سلوك النظام بعد إطلاقه، لذلك أخصّص وقتاً حقيقياً لاختبارات الحمل، ولكتابة البنية التحتية ككود يراجعه الفريق.',
     about2: 'أقود حالياً فريقاً هندسياً، وأعمل على RelayRook في وقت فراغي. وأكثر ما أستخدمه TypeScript وGo وPostgreSQL، مع Flutter لتطبيقات الأجهزة المحمولة.',
-    contactBody: 'أفضل طريقة للتواصل معي هي البريد الإلكتروني:',
+    contactBody: 'أرسل لي رسالة عبر هذا النموذج، أو راسلني على',
     portraitAlt: 'سيف الجناحي',
     seoTitle: 'سيف الجناحي | قائد هندسة برمجيات في النجف، العراق',
     seoDescription: 'سيف الجناحي قائد هندسة برمجيات في النجف، العراق. يبني الأنظمة الخلفية والبنية السحابية والأنظمة الجامعية باستخدام TypeScript وGo وPostgreSQL وFlutter.',
@@ -235,7 +236,10 @@ export const HomePage: React.FC = () => {
 
           <section id="contact" className="notebook-section notebook-contact" aria-labelledby="contact-title">
             <h2 id="contact-title" className="notebook-section-title">{t.contact}</h2>
-            <p>{t.contactBody} <a href="mailto:saifalialjanahi@gmail.com" dir="ltr">saifalialjanahi@gmail.com</a></p>
+            <div className="notebook-contact-body">
+              <p>{t.contactBody} <a href="mailto:saifalialjanahi@gmail.com" dir="ltr">saifalialjanahi@gmail.com</a></p>
+              <ContactForm language={language} />
+            </div>
           </section>
         </div>
       </main>
