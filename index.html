@@ -49,7 +49,9 @@ html, body, #root { min-height: 100%; margin: 0; }
 body { background: var(--nb-bg); }
 ::selection { background: color-mix(in srgb, var(--nb-accent) 24%, transparent); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-.sr-only:focus-visible { position: fixed; z-index: 50; width: auto; height: auto; margin: 0; padding: 10px 14px; inset-block-start: 16px; inset-inline-start: 16px; overflow: visible; clip: auto; color: #fff; background: #0a66c2; border-radius: 6px; }
+.sr-only:focus-visible { position: fixed; z-index: 50; width: auto; height: auto; margin: 0; padding: 10px 16px; inset-block-start: 12px; inset-inline-start: 12px; overflow: visible; clip: auto; color: #fff; background: #0a66c2; border-radius: 8px; outline: 2px solid #fff; outline-offset: -4px; box-shadow: 0 8px 24px rgba(9, 13, 18, .2); font: 600 14px/1.4 'Geist Sans', ui-sans-serif, system-ui, sans-serif; text-decoration: none; }
+/* The skip link sits outside the page shells, so it sets its own font. */
+html[dir='rtl'] .sr-only:focus-visible { font-family: 'IBM Plex Sans Arabic', 'Geist Sans', Tahoma, sans-serif; }
 
 .notebook-shell { min-height: 100svh; color: var(--nb-ink); background: var(--nb-bg); font: 16px/1.6 'Geist Sans', ui-sans-serif, system-ui, sans-serif; }
 .notebook-shell *, .notebook-shell *::before, .notebook-shell *::after { box-sizing: border-box; }
