@@ -38,6 +38,7 @@ export const BlogPost: React.FC = () => {
   // The prerendered body is already final, so the first visit skips loading the Markdown again.
   const prerendered = useRef(article.html ? slug : undefined)
   const body = useRef<HTMLDivElement>(null)
+  const [copied, setCopied] = useState(false)
   const { language } = useLanguage()
   const ar = language === 'ar'
 
@@ -93,8 +94,13 @@ export const BlogPost: React.FC = () => {
       return
     }
 
-    await navigator.clipboard?.writeText(url)
+    // No share sheet (desktop Firefox, for one): copy the link, and say so on the button.
+    await navigator.clipboard?.writeText(url).then(() => {
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2000)
+    }, () => undefined)
   }
+  const shareLabel = copied ? (ar ? 'تم نسخ الرابط' : 'Link copied') : (ar ? 'مشاركة' : 'Share')
 
   return (
     <div className="site-shell site-article-page">
@@ -110,8 +116,8 @@ export const BlogPost: React.FC = () => {
           {/* On Arabic pages the head is Arabic, laid out in the same column as the English body below it. */}
           <header className="plain-page plain-article-head">
             {ar
-              ? <div lang="ar" dir="rtl"><p className="plain-back"><Link to="/blog">→ كل المقالات</Link></p><h1>{text.title}</h1><p className="plain-lede">{text.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString(dateLocale(language), { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {arabicMinutes(readTime)} للقراءة<span className="plain-share"> · <button type="button" className="plain-button" onClick={() => void share()}>مشاركة</button></span></p><p className="site-translation-note">المقال مكتوب بالإنجليزية، وعنوانه الأصلي: <bdi lang="en">{blog.title}</bdi></p></div>
-              : <><p className="plain-back"><Link to="/blog">← All posts</Link></p><h1>{blog.title}</h1><p className="plain-lede">{blog.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {readTime} min read<span className="plain-share"> · <button type="button" className="plain-button" onClick={() => void share()}>Share</button></span></p></>}
+              ? <div lang="ar" dir="rtl"><p className="plain-back"><Link to="/blog">→ كل المقالات</Link></p><h1>{text.title}</h1><p className="plain-lede">{text.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString(dateLocale(language), { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {arabicMinutes(readTime)} للقراءة<span className="plain-share"> · <button type="button" className="plain-button" aria-live="polite" onClick={() => void share()}>{shareLabel}</button></span></p><p className="site-translation-note">المقال مكتوب بالإنجليزية، وعنوانه الأصلي: <bdi lang="en">{blog.title}</bdi></p></div>
+              : <><p className="plain-back"><Link to="/blog">← All posts</Link></p><h1>{blog.title}</h1><p className="plain-lede">{blog.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {readTime} min read<span className="plain-share"> · <button type="button" className="plain-button" aria-live="polite" onClick={() => void share()}>{shareLabel}</button></span></p></>}
           </header>
           <div className={headings.length >= tocFrom ? 'plain-article-body has-toc' : 'plain-article-body'}>{htmlContent ? <div ref={body} className="site-article-content article-content" data-article={slug} dangerouslySetInnerHTML={{ __html: htmlContent }} /> : <ContentSkeleton />}<PostToc headings={headings} label={ar ? 'في هذه الصفحة' : 'On this page'} language={language} /></div>
         </article>
