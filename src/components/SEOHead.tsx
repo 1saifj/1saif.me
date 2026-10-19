@@ -16,7 +16,7 @@ interface SEOHeadProps {
   noIndex?: boolean
 }
 
-const SEOHead: React.FC<SEOHeadProps> = ({ title, description, url, image = '/sj_image.jpeg', type = 'website', publishedTime, modifiedTime, tags = [], noIndex = false }) => {
+const SEOHead: React.FC<SEOHeadProps> = ({ title, description, url, image, type = 'website', publishedTime, modifiedTime, tags = [], noIndex = false }) => {
   const { language } = useLanguage()
   const fullTitle = title.includes('Saif Aljanahi') || title.includes('سيف الجناحي') ? title : `${title} | ${language === 'ar' ? 'سيف الجناحي' : 'Saif Aljanahi'}`
   // Pages pass their English URL; the Arabic page is the same path under /ar. Each version names itself canonical.
@@ -24,7 +24,9 @@ const SEOHead: React.FC<SEOHeadProps> = ({ title, description, url, image = '/sj
   const path = baseUrl.slice(SITE.length) || '/'
   const arabicUrl = `${SITE}/ar${path === '/' ? '' : path}`
   const currentUrl = language === 'ar' ? arabicUrl : baseUrl
-  const imageUrl = image.startsWith('http') ? image : `${SITE}${image}`
+  // Without a page image, the 1200x630 name card (scripts/og-card.mjs) in the page's language.
+  const cardImage = image ?? (language === 'ar' ? '/og-card-ar.jpg' : '/og-card.jpg')
+  const imageUrl = cardImage.startsWith('http') ? cardImage : `${SITE}${cardImage}`
 
   return (
     <Helmet>
