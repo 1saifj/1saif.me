@@ -42,6 +42,8 @@ html.dark .site-button { color: #0d1117; }
 .plain-search svg { position: absolute; top: 50%; inset-inline-start: 13px; width: 16px; height: 16px; color: var(--nb-ink-3); transform: translateY(-50%); pointer-events: none; }
 .plain-search input { width: 100%; height: 44px; padding-block: 0; padding-inline: 38px 14px; border: 1px solid var(--nb-line); border-radius: 8px; color: var(--nb-ink); background: var(--nb-bg); transition: border-color .15s ease, box-shadow .15s ease; }
 .plain-search input::placeholder { color: var(--nb-ink-3); }
+/* The browser's own clear button does not match the site; Esc still clears, and the empty state has Clear search. */
+.plain-search input::-webkit-search-cancel-button { display: none; }
 .plain-search input:hover { border-color: color-mix(in srgb, var(--nb-ink-3) 55%, var(--nb-line)); }
 .plain-search input:focus { border-color: var(--nb-accent); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--nb-accent) 18%, transparent); }
 .plain-tags { display: flex; flex-wrap: wrap; gap: 8px; }
