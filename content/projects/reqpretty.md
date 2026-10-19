@@ -20,4 +20,4 @@ reqpretty is a small open-source Go middleware. It logs HTTP requests and respon
 - Optional colour output.
 - Works as standard `net/http` middleware, with a configurable logger.
 
-It is still a work in progress. The source is on GitHub.
+It is still a work in progress. The source is on [GitHub](https://github.com/1saifj/reqpretty).

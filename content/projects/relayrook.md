@@ -24,4 +24,4 @@ RelayRook is an open-source Agent Skill and CLI. One coding agent uses it to han
 
 Written in Node.js, with end-to-end tests that run each worker against a simulated CLI. Workers also run on Windows.
 
-The source is on GitHub.
+The source is on [GitHub](https://github.com/1saifj/relayrook).
