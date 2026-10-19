@@ -248,6 +248,8 @@ html.dark .theme-when-dark { display: inline-flex; }
 /* Windows High Contrast drops backgrounds; states drawn with one use system colours instead. */
 @media (forced-colors: active) {
   .notebook-desktop-nav a::after, .notebook-mobile-nav a::after, .notebook-timeline > li.is-current .notebook-timeline-period::before { forced-color-adjust: none; background: Highlight; }
+  /* Form fields draw focus with a shadow, which forced colors drops, so restore the outline. */
+  .contact-field :is(input, textarea):focus { outline: 2px solid Highlight; outline-offset: 2px; }
 }
 @media (prefers-reduced-motion: reduce) {
   :root { scroll-behavior: auto; }

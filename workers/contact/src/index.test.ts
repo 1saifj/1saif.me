@@ -38,6 +38,7 @@ function post(fields: Record<string, string>, headers: Record<string, string> = 
 afterEach(() => {
   sent.length = 0
   vi.unstubAllGlobals()
+  vi.restoreAllMocks()
 })
 
 describe('contact worker', () => {
@@ -100,5 +101,27 @@ describe('contact worker', () => {
     stubTurnstile(result)
     expect((await worker.fetch(post(goodFields), makeEnv())).status).toBe(400)
     expect(sent).toHaveLength(0)
+  })
+
+  it('fails closed when siteverify cannot be reached', async () => {
+    vi.stubGlobal('fetch', async () => {
+      throw new Error('network down')
+    })
+
+    expect((await worker.fetch(post(goodFields), makeEnv())).status).toBe(400)
+    expect(sent).toHaveLength(0)
+  })
+
+  it('logs the error code but no visitor data when the send fails', async () => {
+    stubTurnstile({ success: true, hostname: '1saif.me', action: 'contact' })
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const env = makeEnv()
+
+    env.EMAIL.send = async () => {
+      throw Object.assign(new Error('Contact form: Ali ali@example.com Hello'), { code: 'E_SEND' })
+    }
+
+    expect((await worker.fetch(post(goodFields), env)).status).toBe(502)
+    expect(logged.mock.calls).toEqual([['send failed', 'E_SEND']])
   })
 })
