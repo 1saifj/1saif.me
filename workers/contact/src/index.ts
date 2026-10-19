@@ -2,6 +2,7 @@
 // junk traffic is dropped before it costs a Turnstile call or an email.
 
 interface ContactEmail {
+  to: string
   from: { email: string; name: string }
   replyTo: { email: string; name: string }
   subject: string
@@ -117,6 +118,8 @@ export default {
 
     try {
       await env.EMAIL.send({
+        // The runtime requires a recipient; the binding allows only this one.
+        to: 'saifalialjanahi@gmail.com',
         from: { email: 'hello@1saif.me', name: '1saif.me contact form' },
         replyTo: { email, name },
         subject: `Contact form: ${name}`,
@@ -124,7 +127,7 @@ export default {
       })
     } catch (error) {
       // Log the code only: the message is personal data.
-      console.error('send failed', error instanceof Error && 'code' in error ? error.code : 'unknown')
+      console.error('send failed', error instanceof Error && 'code' in error ? error.code : 'no code', String(error).slice(0, 300))
 
       return reply(502, 'send')
     }
