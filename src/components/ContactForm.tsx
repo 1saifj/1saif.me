@@ -6,8 +6,21 @@ const TURNSTILE_SITE_KEY = '0x4AAAAAAFbfd5bsGhJ9I7uT'
 
 const TURNSTILE_SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
 
+const TOKEN_WAIT_MS = 20_000
+
+interface TurnstileOptions {
+  sitekey: string
+  action: string
+  language: string
+  theme: 'auto'
+  size: 'flexible'
+  appearance: 'interaction-only'
+  callback: (token: string) => void
+  'expired-callback': () => void
+}
+
 interface Turnstile {
-  render(container: HTMLElement, options: { sitekey: string; action: string; language: string; theme: 'auto'; size: 'flexible'; appearance: 'interaction-only' }): string
+  render(container: HTMLElement, options: TurnstileOptions): string
   reset(widgetId: string): void
 }
 
@@ -65,37 +78,86 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
   const formRef = useRef<HTMLFormElement>(null)
   const widgetRef = useRef<HTMLDivElement>(null)
   const widgetId = useRef<string>()
+  const token = useRef<string>()
+  const tokenWaiters = useRef<((token: string | undefined) => void)[]>([])
   const [status, setStatus] = useState<Status>('idle')
 
-  // The third-party script loads only when the form comes near the screen.
-  useEffect(() => {
-    const form = formRef.current
+  // The challenge takes seconds, so it starts as soon as the visitor heads for the form.
+  function startTurnstile() {
     const container = widgetRef.current
 
-    if (!form || !container) return
+    if (!container || widgetId.current) return
+
+    loadTurnstile()
+      .then(() => {
+        if (!window.turnstile || widgetId.current) return
+
+        widgetId.current = window.turnstile.render(container, {
+          sitekey: TURNSTILE_SITE_KEY,
+          action: 'contact',
+          language,
+          theme: 'auto',
+          size: 'flexible',
+          appearance: 'interaction-only',
+          callback: value => {
+            token.current = value
+            tokenWaiters.current.splice(0).forEach(resolve => resolve(value))
+          },
+          'expired-callback': () => { token.current = undefined },
+        })
+      })
+      .catch(() => setStatus('challenge'))
+  }
+
+  function waitForToken(): Promise<string | undefined> {
+    startTurnstile()
+
+    if (token.current) return Promise.resolve(token.current)
+
+    return new Promise(resolve => {
+      tokenWaiters.current.push(resolve)
+      setTimeout(() => resolve(undefined), TOKEN_WAIT_MS)
+    })
+  }
+
+  // The third-party script loads only near the form: about two screens away, or on the first focus inside it.
+  useEffect(() => {
+    const form = formRef.current
+
+    if (!form) return
 
     const observer = new IntersectionObserver(entries => {
       if (!entries.some(entry => entry.isIntersecting)) return
       observer.disconnect()
-      loadTurnstile()
-        .then(() => {
-          if (window.turnstile && !widgetId.current) widgetId.current = window.turnstile.render(container, { sitekey: TURNSTILE_SITE_KEY, action: 'contact', language, theme: 'auto', size: 'flexible', appearance: 'interaction-only' })
-        })
-        .catch(() => setStatus('challenge'))
-    }, { rootMargin: '400px' })
+      startTurnstile()
+    }, { rootMargin: '200% 0px' })
 
     observer.observe(form)
 
     return () => observer.disconnect()
+  // startTurnstile reads only refs and the language.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = event.currentTarget
+    const body = new URLSearchParams([...new FormData(form)].map(([key, value]) => [key, String(value)]))
     setStatus('sending')
 
+    // A visitor can finish the form before the challenge does; wait for it instead of failing.
+    const value = await waitForToken()
+
+    if (!value) {
+      setStatus('challenge')
+
+      return
+    }
+
+    body.set('cf-turnstile-response', value)
+
     try {
-      const response = await fetch('/api/contact', { method: 'POST', body: new URLSearchParams([...new FormData(form)].map(([key, value]) => [key, String(value)])) })
+      const response = await fetch('/api/contact', { method: 'POST', body })
       const result: { error?: string } = await response.json()
 
       if (response.ok) form.reset()
@@ -104,6 +166,8 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
       setStatus('failed')
     } finally {
       // Each token works once, so every attempt needs a new one.
+      token.current = undefined
+
       if (widgetId.current) window.turnstile?.reset(widgetId.current)
     }
   }
@@ -112,7 +176,7 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
   const tone = status === 'sent' ? 'ok' : status === 'idle' || status === 'sending' ? undefined : 'error'
 
   return (
-    <form ref={formRef} className="contact-form" onSubmit={submit}>
+    <form ref={formRef} className="contact-form" onSubmit={submit} onFocus={startTurnstile}>
       <div className="contact-form-row">
         <label className="contact-field"><span>{t.name}</span><input name="name" autoComplete="name" required maxLength={100} /></label>
         <label className="contact-field"><span>{t.email}</span><input name="email" type="email" autoComplete="email" dir="ltr" required maxLength={254} /></label>
