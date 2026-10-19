@@ -62,6 +62,23 @@ html.dark .site-button { color: #0d1117; }
 /* Arabic pages: the English article sits inside a left-to-right <article>, but its column starts on the right, like the rest of the page. */
 html[dir='rtl'] :is(.plain-article-head > [dir='rtl'], .plain-article-body .article-content) { margin-left: auto; }
 .plain-body { margin-top: 44px; }
+
+/* Contents list beside long posts. Only wide screens have room; elsewhere the headings carry the structure. */
+.post-toc { display: none; }
+@media (min-width: 1100px) {
+  .plain-article-body.has-toc { display: grid; grid-template-columns: minmax(0, 720px) 196px; justify-content: space-between; align-items: start; }
+  /* Arabic pages: the article column is on the right, so the list goes left. */
+  html[dir='rtl'] .plain-article-body.has-toc { grid-template-columns: 196px minmax(0, 720px); }
+  html[dir='rtl'] .plain-article-body.has-toc > .article-content { grid-column: 2; grid-row: 1; }
+  html[dir='rtl'] .post-toc { grid-column: 1; grid-row: 1; }
+  .post-toc { position: sticky; top: 92px; display: block; max-height: calc(100vh - 120px); overflow-y: auto; font-size: 13.5px; overscroll-behavior: contain; }
+  .post-toc p { margin: 0 0 10px; color: var(--nb-ink-3); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+  .post-toc p:lang(ar) { font-size: 13px; letter-spacing: 0; }
+  .post-toc ol { margin: 0; padding: 0; list-style: none; border-inline-start: 1px solid var(--nb-line); }
+  .post-toc a { display: block; margin-inline-start: -1px; padding: 5px 0 5px 14px; border-inline-start: 1px solid transparent; color: var(--nb-ink-3); line-height: 1.4; text-decoration: none; transition: color .15s ease, border-color .15s ease; }
+  .post-toc a:hover { color: var(--nb-ink); }
+  .post-toc a[aria-current] { border-color: var(--nb-accent); color: var(--nb-ink); }
+}
 .site-translation-note + .plain-body { margin-top: 28px; }
 
 /* Reading progress: a hairline at the top that fills as the post scrolls. No script; hidden where unsupported. */
@@ -217,7 +234,8 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
   .plain-links a[href^='http']::after, .article-content a[href^='http']::after { content: ' (' attr(href) ')'; color: #555; font-size: .85em; overflow-wrap: anywhere; }
   /* Posts: full code, light token colours, no controls. */
   .plain-article-body, .related-posts { width: auto; }
-  .plain-back, .plain-share, .related-posts, .copy-button, .code-expand, .heading-anchor { display: none !important; }
+  .plain-back, .plain-share, .related-posts, .post-toc, .copy-button, .code-expand, .heading-anchor { display: none !important; }
+  .plain-article-body.has-toc { display: block; }
   .plain-article-head { padding-bottom: 24px; }
   .code-block-container[data-collapsed] pre { max-height: none; overflow: visible; }
   .code-block-container[data-collapsed] .code-content::after { content: none; }
