@@ -86,7 +86,7 @@ export const BlogPost: React.FC = () => {
       <SEOHead title={`${text.title} | ${ar ? 'سيف الجناحي' : 'Saif Aljanahi'}`} description={text.description} image={blog.featuredImage || '/sj_image.jpeg'} url={`https://1saif.me/blog/${slug}`} type="article" tags={blog.tags} publishedTime={createdDate.toISOString()} modifiedTime={blog.updatedAt ? new Date(blog.updatedAt).toISOString() : undefined} />
       <ArticleStructuredData title={blog.title} description={blog.description} publishedDate={createdDate.toISOString()} modifiedDate={blog.updatedAt ? new Date(blog.updatedAt).toISOString() : undefined} tags={blog.tags} slug={slug!} image={blog.featuredImage} wordCount={words} />
 
-      <BreadcrumbStructuredData items={[[ar ? 'الرئيسية' : 'Home', ar ? '/ar' : '/'], [ar ? 'المقالات' : 'Writing', `${ar ? '/ar' : ''}/blog`], [text.title, `${ar ? '/ar' : ''}/blog/${slug}`]]} />
+      <BreadcrumbStructuredData items={[[ar ? 'الصفحة الرئيسية' : 'Home', ar ? '/ar' : '/'], [ar ? 'المقالات' : 'Writing', `${ar ? '/ar' : ''}/blog`], [text.title, `${ar ? '/ar' : ''}/blog/${slug}`]]} />
       <div className="reading-progress" aria-hidden="true" />
       <SiteHeader current="blog" />
 
