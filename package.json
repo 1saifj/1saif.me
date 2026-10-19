@@ -11,7 +11,6 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
     "build:production": "npm run build",
     "build:ci": "npm install --legacy-peer-deps && npm run build",
     "deploy:preview": "npm run build:production && echo 'Build complete! Upload dist/ folder to Cloudflare Pages'",
