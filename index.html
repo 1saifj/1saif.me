@@ -24,8 +24,6 @@
     <!-- The home portrait, matching the <picture> sources; prerender drops these on other pages. -->
     <link rel="preload" as="image" href="/sj_image-192.webp" media="(max-width: 620px)" />
     <link rel="preload" as="image" imagesrcset="/sj_image-4x5.webp 480w, /sj_image.webp 800w" imagesizes="min(34vw, 360px)" media="(min-width: 621px)" />
-    <link rel="preload" as="font" href="/fonts/geist-sans-400.woff2" type="font/woff2" crossorigin />
-    <link rel="preload" as="font" href="/fonts/geist-sans-600.woff2" type="font/woff2" crossorigin />
     <link rel="alternate" type="application/rss+xml" title="Saif Aljanahi Blog" href="https://1saif.me/rss.xml" />
     <link rel="alternate" type="application/atom+xml" title="Saif Aljanahi Blog" href="https://1saif.me/atom.xml" />
 
@@ -33,11 +31,17 @@
     
     <!-- Homepage styles are inlined to keep first paint independent of a stylesheet request. -->
     <style id="homepage-styles">
-@font-face { font-family: 'Geist Sans'; font-style: normal; font-display: optional; font-weight: 400; src: url('/fonts/geist-sans-400.woff2') format('woff2'); }
-@font-face { font-family: 'Geist Sans'; font-style: normal; font-display: optional; font-weight: 600; src: url('/fonts/geist-sans-600.woff2') format('woff2'); }
+/* No font preloads: Chrome holds the first paint for preloaded fonts, at times for over a second. Text paints in the fallback and swaps. */
+@font-face { font-family: 'Geist Sans'; font-style: normal; font-display: swap; font-weight: 400; src: url('/fonts/geist-sans-400.woff2') format('woff2'); }
+@font-face { font-family: 'Geist Sans'; font-style: normal; font-display: swap; font-weight: 600; src: url('/fonts/geist-sans-600.woff2') format('woff2'); }
 @font-face { font-family: 'IBM Plex Sans Arabic'; font-style: normal; font-display: swap; font-weight: 400; src: url('/fonts/plex-arabic-400.woff2') format('woff2'); unicode-range: U+0020, U+00A0, U+060C, U+061B, U+061F, U+0621-063A, U+0640-0652, U+0660-066D, U+0670, U+067E, U+0686, U+06A4, U+06A9, U+06AF, U+06CC, U+06D4, U+200C-200F; }
 @font-face { font-family: 'IBM Plex Sans Arabic'; font-style: normal; font-display: swap; font-weight: 500; src: url('/fonts/plex-arabic-500.woff2') format('woff2'); unicode-range: U+0020, U+00A0, U+060C, U+061B, U+061F, U+0621-063A, U+0640-0652, U+0660-066D, U+0670, U+067E, U+0686, U+06A4, U+06A9, U+06AF, U+06CC, U+06D4, U+200C-200F; }
 @font-face { font-family: 'IBM Plex Sans Arabic'; font-style: normal; font-display: swap; font-weight: 600; src: url('/fonts/plex-arabic-600.woff2') format('woff2'); unicode-range: U+0020, U+00A0, U+060C, U+061B, U+061F, U+0621-063A, U+0640-0652, U+0660-066D, U+0670, U+067E, U+0686, U+06A4, U+06A9, U+06AF, U+06CC, U+06D4, U+200C-200F; }
+/* Local fallbacks scaled to the web fonts' width and line metrics, so the swap moves no text: Arial for Geist, Tahoma (desktop) for Plex. size-adjust also scales the overrides, so each is the target divided by it. */
+@font-face { font-family: 'Geist Fallback'; font-weight: 400; src: local('Arial'), local('ArialMT'); size-adjust: 104%; ascent-override: 88.5%; descent-override: 21.2%; line-gap-override: 0%; unicode-range: U+0000-024F, U+2000-206F, U+20A0-20CF; }
+@font-face { font-family: 'Geist Fallback'; font-weight: 600; src: local('Arial Bold'), local('Arial-BoldMT'); size-adjust: 101.5%; ascent-override: 90.6%; descent-override: 21.7%; line-gap-override: 0%; unicode-range: U+0000-024F, U+2000-206F, U+20A0-20CF; }
+@font-face { font-family: 'Plex Arabic Fallback'; font-weight: 400; src: local('Tahoma'); size-adjust: 89%; ascent-override: 122.5%; descent-override: 46.1%; line-gap-override: 0%; unicode-range: U+0020, U+00A0, U+060C, U+061B, U+061F, U+0621-063A, U+0640-0652, U+0660-066D, U+0670, U+067E, U+0686, U+06A4, U+06A9, U+06AF, U+06CC, U+06D4, U+200C-200F; }
+@font-face { font-family: 'Plex Arabic Fallback'; font-weight: 600; src: local('Tahoma Bold'), local('Tahoma-Bold'); size-adjust: 82%; ascent-override: 132.9%; descent-override: 50%; line-gap-override: 0%; unicode-range: U+0020, U+00A0, U+060C, U+061B, U+061F, U+0621-063A, U+0640-0652, U+0660-066D, U+0670, U+067E, U+0686, U+06A4, U+06A9, U+06AF, U+06CC, U+06D4, U+200C-200F; }
 /* Arabic glyphs inside monospace labels (status, section numbers) use Plex too; Latin keeps the mono face. */
 @font-face { font-family: 'Geist Mono'; font-style: normal; font-display: swap; font-weight: 400; src: url('/fonts/plex-arabic-400.woff2') format('woff2'); unicode-range: U+060C, U+061B, U+061F, U+0621-063A, U+0640-0652, U+0660-066D, U+0670, U+067E, U+0686, U+06A4, U+06A9, U+06AF, U+06CC, U+06D4, U+200C-200F; }
 @font-face { font-family: 'Geist Mono'; font-style: normal; font-display: swap; font-weight: 600; src: url('/fonts/plex-arabic-600.woff2') format('woff2'); unicode-range: U+060C, U+061B, U+061F, U+0621-063A, U+0640-0652, U+0660-066D, U+0670, U+067E, U+0686, U+06A4, U+06A9, U+06AF, U+06CC, U+06D4, U+200C-200F; }
@@ -49,11 +53,11 @@ html, body, #root { min-height: 100%; margin: 0; }
 body { background: var(--nb-bg); }
 ::selection { background: color-mix(in srgb, var(--nb-accent) 24%, transparent); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-.sr-only:focus-visible { position: fixed; z-index: 50; width: auto; height: auto; margin: 0; padding: 10px 16px; inset-block-start: 12px; inset-inline-start: 12px; overflow: visible; clip: auto; color: #fff; background: #0a66c2; border-radius: 8px; outline: 2px solid #fff; outline-offset: -4px; box-shadow: 0 8px 24px rgba(9, 13, 18, .2); font: 600 14px/1.4 'Geist Sans', ui-sans-serif, system-ui, sans-serif; text-decoration: none; }
+.sr-only:focus-visible { position: fixed; z-index: 50; width: auto; height: auto; margin: 0; padding: 10px 16px; inset-block-start: 12px; inset-inline-start: 12px; overflow: visible; clip: auto; color: #fff; background: #0a66c2; border-radius: 8px; outline: 2px solid #fff; outline-offset: -4px; box-shadow: 0 8px 24px rgba(9, 13, 18, .2); font: 600 14px/1.4 'Geist Sans', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif; text-decoration: none; }
 /* The skip link sits outside the page shells, so it sets its own font. */
-html[dir='rtl'] .sr-only:focus-visible { font-family: 'IBM Plex Sans Arabic', 'Geist Sans', Tahoma, sans-serif; }
+html[dir='rtl'] .sr-only:focus-visible { font-family: 'IBM Plex Sans Arabic', 'Plex Arabic Fallback', 'Geist Sans', 'Geist Fallback', ui-sans-serif, system-ui, Tahoma, sans-serif; }
 
-.notebook-shell { min-height: 100svh; color: var(--nb-ink); background: var(--nb-bg); font: 16px/1.6 'Geist Sans', ui-sans-serif, system-ui, sans-serif; }
+.notebook-shell { min-height: 100svh; color: var(--nb-ink); background: var(--nb-bg); font: 16px/1.6 'Geist Sans', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif; }
 .notebook-shell *, .notebook-shell *::before, .notebook-shell *::after { box-sizing: border-box; }
 /* Zero-specificity defaults, so a component's own class always wins over them. */
 .notebook-shell :where(a) { color: inherit; }
@@ -170,7 +174,7 @@ html.dark .notebook-post-thumb { filter: invert(.88) hue-rotate(180deg); }
 .site-translation-note { margin: 14px 0 0; color: var(--nb-ink-3); font-size: 14px; }
 
 /* Arabic */
-html[dir='rtl'] .notebook-shell { font-family: 'IBM Plex Sans Arabic', 'Geist Sans', Tahoma, sans-serif; }
+html[dir='rtl'] .notebook-shell { font-family: 'IBM Plex Sans Arabic', 'Plex Arabic Fallback', 'Geist Sans', 'Geist Fallback', ui-sans-serif, system-ui, Tahoma, sans-serif; }
 html[dir='rtl'] .notebook-shell * { letter-spacing: normal; }
 html[dir='rtl'] .notebook-intro h1 { line-height: 1.3; }
 html[dir='rtl'] .notebook-intro-lede, html[dir='rtl'] .notebook-intro-description, html[dir='rtl'] .notebook-prose p, html[dir='rtl'] .notebook-feature p { line-height: 1.85; }
@@ -272,15 +276,7 @@ html.dark .theme-when-dark { display: inline-flex; }
             const rest = '/' + (wanted === 'ar' ? path : path.slice(3)).replace(/^[\/\\]+/, '');
             const target = wanted === 'ar' ? '/ar' + (rest === '/' ? '' : rest) : rest;
             window.location.replace(target + (query.toString() ? '?' + query : '') + window.location.hash);
-            return;
           }
-          if (!arabic) return;
-          ['400', '600'].forEach(function(weight) {
-            const link = document.createElement('link');
-            link.rel = 'preload'; link.as = 'font'; link.type = 'font/woff2'; link.crossOrigin = 'anonymous';
-            link.href = '/fonts/plex-arabic-' + weight + '.woff2';
-            document.head.appendChild(link);
-          });
         } catch (e) {}
       })();
     </script>
