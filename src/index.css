@@ -212,5 +212,16 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
   .plain-role li { break-inside: avoid; }
   .plain-page :where(a) { text-decoration: none; }
   /* On paper a link is only useful with its address. */
-  .plain-links a[href^='http']::after { content: ' (' attr(href) ')'; color: #555; font-size: .85em; }
+  .plain-links a[href^='http']::after, .article-content a[href^='http']::after { content: ' (' attr(href) ')'; color: #555; font-size: .85em; overflow-wrap: anywhere; }
+  /* Posts: full code, light token colours, no controls. */
+  .plain-article-body, .related-posts { width: auto; }
+  .plain-back, .plain-share, .related-posts, .copy-button, .code-expand, .heading-anchor { display: none !important; }
+  .plain-article-head { padding-bottom: 24px; }
+  .code-block-container[data-collapsed] pre { max-height: none; overflow: visible; }
+  .code-block-container[data-collapsed] .code-content::after { content: none; }
+  .code-content pre { overflow: visible; white-space: pre-wrap; overflow-wrap: anywhere; background: none; }
+  html.dark .code-content .shiki span { color: var(--shiki-light); }
+  html.dark .article-content code { color: #be185d; }
+  .article-content :is(h2, h3, h4) { break-after: avoid; }
+  .article-content :is(figure, blockquote, tr) { break-inside: avoid; }
 }

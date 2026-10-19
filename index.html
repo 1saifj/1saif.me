@@ -212,6 +212,11 @@ html.dark .theme-when-dark { display: inline-flex; }
   @keyframes nb-page-in { from { opacity: 0; transform: translateY(8px); } }
   ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; }
 }
+/* Paper is white: print with the light palette, whatever theme the screen uses. */
+@media print {
+  html.dark { --nb-bg: #fff; --nb-subtle: #f6f8fa; --nb-line: #e3e8ee; --nb-ink: #10161d; --nb-ink-2: #46525e; --nb-ink-3: #5b6875; --nb-accent: #0a66c2; --nb-surface: #fff; color-scheme: light; }
+  html.dark .notebook-post-thumb { filter: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   :root { scroll-behavior: auto; }
   .site-skeleton, .route-skeleton { animation: none; }
