@@ -106,6 +106,7 @@ export const HomePage: React.FC = () => {
 
     const update = () => {
       frame = 0
+
       if (pinned.current) return
       const line = window.innerHeight * 0.3
       const atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4
@@ -132,6 +133,7 @@ export const HomePage: React.FC = () => {
   const goTo = (id: (typeof sectionIds)[number]) => {
     setActiveSection(id)
     pinned.current = true
+
     const release = () => {
       pinned.current = false
       window.removeEventListener('scrollend', release)
@@ -182,7 +184,7 @@ export const HomePage: React.FC = () => {
             </div>
             <div className="notebook-portrait">
               <picture>
-                <source media="(min-width: 621px)" srcSet="/sj_image-4x5.webp 480w, /sj_image.webp 800w" sizes="min(34vw, 360px)" />
+                <source media="(min-width: 621px)" srcSet="/sj_image-4x5-240.webp 240w, /sj_image-4x5.webp 480w, /sj_image.webp 800w" sizes="min(28vw, 240px)" />
                 <img src="/sj_image-192.webp" alt={t.portraitAlt} width="192" height="240" {...{ fetchpriority: 'high' }} />
               </picture>
             </div>
