@@ -4,7 +4,7 @@ import { useLanguage } from '../i18n/language'
 
 const copy = {
   en: { name: 'Saif Aljanahi', note: 'Built with React and hosted on Cloudflare Pages.', resume: 'Résumé', privacy: 'Privacy' },
-  ar: { name: 'سيف الجناحي', note: 'بُني باستخدام React ومستضاف على Cloudflare Pages.', resume: 'السيرة الذاتية', privacy: 'الخصوصية' },
+  ar: { name: 'سيف الجناحي', note: 'بُني باستخدام React، ويُستضاف على Cloudflare Pages.', resume: 'السيرة الذاتية', privacy: 'الخصوصية' },
 }
 
 // One footer for every page.
