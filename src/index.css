@@ -198,10 +198,17 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
 }
 
 @media print {
+  @page { margin: 16mm 15mm; }
   .notebook-header, .notebook-footer, .reading-progress, .plain-print-hide { display: none !important; }
   .site-shell { color: #000; background: #fff; }
   .plain-page { width: auto; padding: 0; }
   .plain-page :where(p, li) { color: #222; }
-  .plain-role { break-inside: avoid; }
+  .plain-page :where(h2) { margin-top: 28px; break-after: avoid; }
+  /* A long role may continue on the next page, but never splits its heading from its first lines, or a bullet in two. */
+  .plain-role { padding: 14px 0; }
+  .plain-role :is(h3, .plain-meta), .plain-role-period { break-after: avoid; }
+  .plain-role li { break-inside: avoid; }
   .plain-page :where(a) { text-decoration: none; }
+  /* On paper a link is only useful with its address. */
+  .plain-links a[href^='http']::after { content: ' (' attr(href) ')'; color: #555; font-size: .85em; }
 }
