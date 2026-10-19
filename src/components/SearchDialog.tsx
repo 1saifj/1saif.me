@@ -13,13 +13,13 @@ type Item = { id: string; group: Group; title: string; detail: string; to: strin
 
 const copy = {
   en: {
-    label: 'Search the site', placeholder: 'Search posts, projects and pages', posts: 'Posts', recent: 'Recent posts', projects: 'Projects', pages: 'Pages',
-    empty: 'Nothing matches that. Try a tool or a topic, like Go, PostgreSQL or Flutter.', move: 'move', open: 'open', close: 'close',
+    label: 'Search the site', placeholder: 'Search the site', posts: 'Posts', recent: 'Recent posts', projects: 'Projects', pages: 'Pages',
+    empty: 'Nothing matches that. Try a tool or a topic, like Go, PostgreSQL or Flutter.', move: 'move', open: 'open', close: 'close', dismiss: 'Close',
     pageList: [['/', 'Home'], ['/#work', 'Experience and projects'], ['/blog', 'Writing'], ['/resume', 'Résumé'], ['/#about', 'About'], ['/#contact', 'Contact'], ['/privacy', 'Privacy']],
   },
   ar: {
-    label: 'البحث في الموقع', placeholder: 'ابحث في المقالات والمشاريع والصفحات', posts: 'المقالات', recent: 'أحدث المقالات', projects: 'المشاريع', pages: 'الصفحات',
-    empty: 'لا توجد نتائج. جرّب اسم أداة أو موضوعاً، مثل Go أو PostgreSQL أو Flutter.', move: 'للتنقّل', open: 'للفتح', close: 'للإغلاق',
+    label: 'البحث في الموقع', placeholder: 'ابحث في الموقع', posts: 'المقالات', recent: 'أحدث المقالات', projects: 'المشاريع', pages: 'الصفحات',
+    empty: 'لا توجد نتائج. جرّب اسم أداة أو موضوعاً، مثل Go أو PostgreSQL أو Flutter.', move: 'للتنقّل', open: 'للفتح', close: 'للإغلاق', dismiss: 'إغلاق',
     pageList: [['/', 'الصفحة الرئيسية'], ['/#work', 'الخبرة والمشاريع'], ['/blog', 'المقالات'], ['/resume', 'السيرة الذاتية'], ['/#about', 'عنّي'], ['/#contact', 'التواصل'], ['/privacy', 'الخصوصية']],
   },
 }
@@ -122,6 +122,7 @@ export default function SearchDialog({ onClose }: { onClose: () => void }) {
         <input type="search" autoFocus value={query} onChange={event => setQuery(event.target.value)} onKeyDown={onKeyDown} placeholder={t.placeholder} aria-label={t.label}
           role="combobox" aria-expanded="true" aria-controls="search-results" aria-autocomplete="list" aria-activedescendant={flat[active]?.id} />
         <kbd>Esc</kbd>
+        <button type="button" className="search-close" onClick={() => dialog.current?.close()}>{t.dismiss}</button>
       </div>
       <div ref={list} id="search-results" className="search-results" role="listbox" aria-label={t.label}>
         {groups.map(({ group, items: entries }) => <div key={group} role="group" aria-labelledby={`search-${group}`}>
