@@ -1,5 +1,6 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react'
 import { Language } from '../i18n/language'
+import { ContactErrors, ContactField, firstInvalidField, validateContact, validateField } from '../utils/contactValidation'
 
 // Public site key of the 1saif-contact Turnstile widget (hostname 1saif.me).
 const TURNSTILE_SITE_KEY = '0x4AAAAAAFbfd5bsGhJ9I7uT'
@@ -39,9 +40,22 @@ const copy = {
     sending: 'Sending…',
     note: 'I usually reply within a few days.',
     sent: 'Thanks. Your message was sent, and I will reply by email.',
+    sentTitle: 'Message sent',
+    sendAnother: 'Send another message',
     rate: 'Too many messages were sent. Wait a minute, then try again.',
     challenge: 'The spam check did not pass. Try again.',
     failed: 'The message was not sent. Try again, or email me directly.',
+    errors: {
+      nameRequired: 'Enter your name.',
+      nameLong: 'Keep the name to 100 characters or fewer.',
+      nameLine: 'Use one line without control characters.',
+      emailRequired: 'Enter your email address.',
+      emailLong: 'Keep the email to 254 characters or fewer.',
+      emailInvalid: 'Use an address like name@example.com.',
+      messageRequired: 'Write a message.',
+      messageLong: 'Keep the message to 5,000 characters or fewer.',
+      messageControl: 'Remove control characters from the message.',
+    },
   },
   ar: {
     name: 'الاسم',
@@ -51,9 +65,22 @@ const copy = {
     sending: 'جارٍ الإرسال…',
     note: 'أرد عادةً خلال أيام قليلة.',
     sent: 'شكراً. أُرسلت رسالتك، وسأرد عليك عبر البريد الإلكتروني.',
+    sentTitle: 'أُرسلت الرسالة',
+    sendAnother: 'إرسال رسالة أخرى',
     rate: 'أُرسل عدد كبير من الرسائل. انتظر دقيقة ثم حاول مرة أخرى.',
     challenge: 'لم ينجح التحقق من البريد المزعج. حاول مرة أخرى.',
     failed: 'لم تُرسل الرسالة. حاول مرة أخرى، أو راسلني مباشرة عبر البريد الإلكتروني.',
+    errors: {
+      nameRequired: 'أدخل اسمك.',
+      nameLong: 'اجعل الاسم 100 حرف أو أقل.',
+      nameLine: 'استخدم سطراً واحداً دون محارف تحكّم.',
+      emailRequired: 'أدخل بريدك الإلكتروني.',
+      emailLong: 'اجعل البريد 254 حرفاً أو أقل.',
+      emailInvalid: 'استخدم عنواناً مثل name@example.com.',
+      messageRequired: 'اكتب رسالة.',
+      messageLong: 'اجعل الرسالة 5000 حرف أو أقل.',
+      messageControl: 'أزل محارف التحكّم من الرسالة.',
+    },
   },
 }
 
@@ -75,16 +102,27 @@ function loadTurnstile(): Promise<void> {
   return turnstileScript
 }
 
+function fieldControl(form: HTMLFormElement, field: ContactField): HTMLInputElement | HTMLTextAreaElement | null {
+  const control = form.elements.namedItem(field)
+
+  return control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement ? control : null
+}
+
 export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
   const t = copy[language]
   const formRef = useRef<HTMLFormElement>(null)
   const widgetRef = useRef<HTMLDivElement>(null)
+  const sentRef = useRef<HTMLDivElement>(null)
   const widgetId = useRef<string>()
   const token = useRef<string>()
   const tokenWaiters = useRef<((token: string | undefined) => void)[]>([])
   // Set when the widget reports an error, so a submit does not wait 20 s for a token that will not come.
   const challengeFailed = useRef(false)
+  // The name field is not mounted while the confirmation shows, so it gets focus after the form returns.
+  const focusName = useRef(false)
   const [status, setStatus] = useState<Status>('idle')
+  const [errors, setErrors] = useState<ContactErrors>({})
+  const [attempted, setAttempted] = useState(false)
 
   // Every waiter gets the same answer: the token, or nothing when the challenge fails.
   function settleToken(value: string | undefined) {
@@ -188,10 +226,44 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language])
 
+  // The confirmation takes focus so keyboard and screen-reader users land on it.
+  useEffect(() => {
+    if (status === 'sent') sentRef.current?.focus()
+
+    if (status !== 'idle' || !focusName.current) return
+
+    focusName.current = false
+    const form = formRef.current
+
+    if (form) fieldControl(form, 'name')?.focus()
+  }, [status])
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = event.currentTarget
-    const body = new URLSearchParams([...new FormData(form)].map(([key, value]) => [key, String(value)]))
+    const data = new FormData(form)
+
+    const values = {
+      name: String(data.get('name') ?? ''),
+      email: String(data.get('email') ?? ''),
+      message: String(data.get('message') ?? ''),
+    }
+
+    const found = validateContact(values)
+
+    setErrors(found)
+
+    // A failed field stops the request before the slow challenge starts.
+    const first = firstInvalidField(found)
+
+    if (first) {
+      setAttempted(true)
+      fieldControl(form, first)?.focus()
+
+      return
+    }
+
+    const body = new URLSearchParams([...data].map(([key, value]) => [key, String(value)]))
     setStatus('sending')
 
     // A visitor can finish the form before the challenge does; wait for it instead of failing.
@@ -221,25 +293,61 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
     }
   }
 
+  // After the first failed submit, a field is re-checked as it changes so its error clears when it is fixed.
+  function revalidate(field: ContactField, value: string) {
+    if (!attempted) return
+
+    setErrors(current => ({ ...current, [field]: validateField(field, value) }))
+  }
+
+  function sendAnother() {
+    formRef.current?.reset()
+    setErrors({})
+    setAttempted(false)
+    focusName.current = true
+    setStatus('idle')
+  }
+
   const message = status === 'idle' || status === 'sending' ? t.note : t[status]
   const tone = status === 'sent' ? 'ok' : status === 'idle' || status === 'sending' ? undefined : 'error'
 
   return (
-    <form ref={formRef} className="contact-form" onSubmit={submit} onFocus={startTurnstile}>
-      <div className="contact-form-row">
-        <label className="contact-field"><span>{t.name}</span><input name="name" autoComplete="name" required maxLength={100} /></label>
-        <label className="contact-field"><span>{t.email}</span><input name="email" type="email" autoComplete="email" dir="ltr" required maxLength={254} /></label>
-      </div>
-      <label className="contact-field"><span>{t.message}</span><textarea name="message" rows={5} required maxLength={5000} /></label>
+    <form ref={formRef} className="contact-form" onSubmit={submit} onFocus={startTurnstile} noValidate>
+      {status === 'sent' ? (
+        <div ref={sentRef} className="contact-form-sent" role="status" tabIndex={-1}>
+          <h3>{t.sentTitle}</h3>
+          <p>{t.sent}</p>
+          <button type="button" onClick={sendAnother}>{t.sendAnother}</button>
+        </div>
+      ) : <>
+        <div className="contact-form-row">
+          <div className="contact-field">
+            <label htmlFor="contact-name">{t.name}</label>
+            <input id="contact-name" name="name" autoComplete="name" maxLength={100} aria-required="true" aria-invalid={errors.name ? true : undefined} aria-describedby={errors.name ? 'contact-name-error' : undefined} onChange={event => revalidate('name', event.currentTarget.value)} />
+            {errors.name && <span className="contact-field-error" id="contact-name-error">{t.errors[errors.name]}</span>}
+          </div>
+          <div className="contact-field">
+            <label htmlFor="contact-email">{t.email}</label>
+            <input id="contact-email" name="email" type="email" autoComplete="email" dir="ltr" maxLength={254} aria-required="true" aria-invalid={errors.email ? true : undefined} aria-describedby={errors.email ? 'contact-email-error' : undefined} onChange={event => revalidate('email', event.currentTarget.value)} />
+            {errors.email && <span className="contact-field-error" id="contact-email-error">{t.errors[errors.email]}</span>}
+          </div>
+        </div>
+        <div className="contact-field">
+          <label htmlFor="contact-message">{t.message}</label>
+          <textarea id="contact-message" name="message" rows={5} maxLength={5000} aria-required="true" aria-invalid={errors.message ? true : undefined} aria-describedby={errors.message ? 'contact-message-error' : undefined} onChange={event => revalidate('message', event.currentTarget.value)} />
+          {errors.message && <span className="contact-field-error" id="contact-message-error">{t.errors[errors.message]}</span>}
+        </div>
+      </>}
       {/* Hidden from people; bots that fill it are dropped by the Worker. The name is one no autofill matches. */}
       <div className="contact-form-trap" aria-hidden="true">
         <input name="leave_empty" tabIndex={-1} autoComplete="off" />
       </div>
+      {/* Kept mounted across the confirmation so the same Turnstile widget serves the next message. */}
       <div ref={widgetRef} className="contact-form-challenge" />
-      <div className="contact-form-footer">
+      {status !== 'sent' && <div className="contact-form-footer">
         <button type="submit" disabled={status === 'sending'}>{status === 'sending' ? t.sending : t.send}</button>
         <p className="contact-form-status" role="status" data-tone={tone}>{message}</p>
-      </div>
+      </div>}
     </form>
   )
 }

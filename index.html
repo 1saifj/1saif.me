@@ -178,6 +178,16 @@ html.dark .contact-form button { color: #0d1117; }
 .notebook-contact .contact-form-status[data-tone="error"] { color: #cf222e; }
 html.dark .notebook-contact .contact-form-status[data-tone="ok"] { color: #56d364; }
 html.dark .notebook-contact .contact-form-status[data-tone="error"] { color: #ff7b72; }
+.contact-field-error { color: #cf222e; font-size: 13px; font-weight: 500; line-height: 1.45; }
+html.dark .contact-field-error { color: #ff7b72; }
+.contact-field :is(input, textarea)[aria-invalid="true"] { border-color: #cf222e; }
+html.dark .contact-field :is(input, textarea)[aria-invalid="true"] { border-color: #ff7b72; }
+.contact-form-sent { display: grid; gap: 8px; align-content: start; }
+.contact-form-sent h3 { margin: 0; color: var(--nb-ink); font-size: 1.05rem; font-weight: 600; }
+.contact-form-sent p { margin: 0; color: var(--nb-ink-2); font-size: 15px; line-height: 1.55; }
+.contact-form-sent button { justify-self: start; margin-top: 8px; }
+.notebook-contact .notebook-copy-email { padding: 0; border: 0; color: var(--nb-ink-3); background: none; font: inherit; font-size: 14px; text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 3px; }
+.notebook-contact .notebook-copy-email:hover { color: var(--nb-ink); text-decoration-color: currentColor; }
 @media (min-width: 560px) { .contact-form-row { grid-template-columns: 1fr 1fr; } .contact-form { padding: 24px; } }
 @media (min-width: 860px) { .notebook-contact-body { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 56px; align-items: start; } }
 
