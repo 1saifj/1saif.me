@@ -20,6 +20,7 @@ interface TurnstileResult {
   success: boolean
   hostname?: string
   action?: string
+  'error-codes'?: string[]
 }
 
 export interface Env {
@@ -57,13 +58,15 @@ async function passesTurnstile(token: string, ip: string, secret: string): Promi
     signal: AbortSignal.timeout(5_000),
   })
 
-  if (!response.ok) return false
-
-  // SAFETY: the shape is Cloudflare's documented siteverify response; every field read is checked below.
-  const result = await response.json() as TurnstileResult
+  // SAFETY: the shape is Cloudflare's documented siteverify response, also on its 400 replies; every field read is checked below.
+  const result = await response.json().catch(() => ({ success: false })) as TurnstileResult
 
   // A token minted for another site or another form must not pass here.
-  return result.success === true && result.hostname === '1saif.me' && result.action === 'contact'
+  const passed = result.success === true && result.hostname === '1saif.me' && result.action === 'contact'
+
+  if (!passed) console.warn('turnstile failed', response.status, result['error-codes'], result.hostname, result.action)
+
+  return passed
 }
 
 export default {
