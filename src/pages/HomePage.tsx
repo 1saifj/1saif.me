@@ -176,7 +176,7 @@ export const HomePage: React.FC = () => {
               <p className="notebook-link-row">
                 <a href="https://github.com/1saifj" target="_blank" rel="noreferrer">GitHub</a>
                 <a href="https://www.linkedin.com/in/1saifj" target="_blank" rel="noreferrer">LinkedIn</a>
-                <a href="mailto:saifalialjanahi@gmail.com">{t.email}</a>
+                <a href="mailto:hello@1saif.me">{t.email}</a>
                 <Link to="/resume">{t.resume}</Link>
               </p>
             </div>
@@ -237,7 +237,7 @@ export const HomePage: React.FC = () => {
           <section id="contact" className="notebook-section notebook-contact" aria-labelledby="contact-title">
             <h2 id="contact-title" className="notebook-section-title">{t.contact}</h2>
             <div className="notebook-contact-body">
-              <p>{t.contactBody} <a href="mailto:saifalialjanahi@gmail.com" dir="ltr">saifalialjanahi@gmail.com</a></p>
+              <p>{t.contactBody} <a href="mailto:hello@1saif.me" dir="ltr">hello@1saif.me</a></p>
               <ContactForm language={language} />
             </div>
           </section>

@@ -48,7 +48,7 @@ export const SiteHeader: React.FC<{ current?: Section }> = ({ current }) => {
 
   const renderNav = (className: string) => <nav className={className} aria-label={l.nav}>
     {links.map(link => <Link key={link.id} to={link.to} className={current === link.id ? 'is-active' : ''} aria-current={current === link.id ? 'page' : undefined}>{l[link.id]}</Link>)}
-    <a href="mailto:saifalialjanahi@gmail.com">{l.contact}</a>
+    <a href="mailto:hello@1saif.me">{l.contact}</a>
   </nav>
 
   return <div className="notebook-shell notebook-bar">

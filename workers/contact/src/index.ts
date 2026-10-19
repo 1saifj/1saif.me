@@ -2,6 +2,7 @@
 // junk traffic is dropped before it costs a Turnstile call or an email.
 
 interface ContactEmail {
+  to: string
   from: { email: string; name: string }
   replyTo: { email: string; name: string }
   subject: string
@@ -20,6 +21,7 @@ interface TurnstileResult {
   success: boolean
   hostname?: string
   action?: string
+  'error-codes'?: string[]
 }
 
 export interface Env {
@@ -53,17 +55,20 @@ const reply = (status: number, error?: string) => Response.json(error ? { error 
 async function passesTurnstile(token: string, ip: string, secret: string): Promise<boolean> {
   const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
     method: 'POST',
-    body: new URLSearchParams({ secret, response: token, remoteip: ip }),
+    // A pasted secret can carry a trailing space or line break.
+    body: new URLSearchParams({ secret: secret.trim(), response: token, remoteip: ip }),
     signal: AbortSignal.timeout(5_000),
   })
 
-  if (!response.ok) return false
-
-  // SAFETY: the shape is Cloudflare's documented siteverify response; every field read is checked below.
-  const result = await response.json() as TurnstileResult
+  // SAFETY: the shape is Cloudflare's documented siteverify response, also on its 400 replies; every field read is checked below.
+  const result = await response.json().catch(() => ({ success: false })) as TurnstileResult
 
   // A token minted for another site or another form must not pass here.
-  return result.success === true && result.hostname === '1saif.me' && result.action === 'contact'
+  const passed = result.success === true && result.hostname === '1saif.me' && result.action === 'contact'
+
+  if (!passed) console.warn('turnstile failed', response.status, result['error-codes'], result.hostname, result.action)
+
+  return passed
 }
 
 export default {
@@ -113,14 +118,16 @@ export default {
 
     try {
       await env.EMAIL.send({
-        from: { email: 'contact@1saif.me', name: '1saif.me contact form' },
+        // The runtime requires a recipient; the binding allows only this one.
+        to: 'saifalialjanahi@gmail.com',
+        from: { email: 'hello@1saif.me', name: '1saif.me contact form' },
         replyTo: { email, name },
         subject: `Contact form: ${name}`,
         text: `${message}\n\n--\n${name} <${email}>`,
       })
     } catch (error) {
       // Log the code only: the message is personal data.
-      console.error('send failed', error instanceof Error && 'code' in error ? error.code : 'unknown')
+      console.error('send failed', error instanceof Error && 'code' in error ? error.code : 'no code', String(error).slice(0, 300))
 
       return reply(502, 'send')
     }
