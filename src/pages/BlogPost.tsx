@@ -71,7 +71,18 @@ export const BlogPost: React.FC = () => {
   const readTime = Math.max(1, Math.ceil(words / 200))
   const createdDate = new Date(blog.createdAt)
   const text = postText(blog, language)
-  const relatedPosts = publishedBlogs.filter(post => post.title !== blog.title && post.tags.some(tag => blog.tags.includes(tag))).slice(0, 3)
+  // Posts are newest first, so the next entry is older and the previous one newer.
+  const index = publishedBlogs.indexOf(blog)
+  const older = publishedBlogs[index + 1]
+  const newer = index > 0 ? publishedBlogs[index - 1] : undefined
+  const relatedPosts = publishedBlogs.filter(post => post !== blog && post !== older && post !== newer && post.tags.some(tag => blog.tags.includes(tag))).slice(0, 3)
+  const pagerLink = (post: typeof blog, kind: 'older' | 'newer') => {
+    const linked = postText(post, language)
+    // The arrow points the way the link moves through time: back is left in English, right in Arabic.
+    const arrow = (kind === 'older') === ar ? '→' : '←'
+
+    return <Link to={`/blog/${createSlugFromTitle(post.title)}`} className={`post-pager-${kind}`}><span>{kind === 'older' ? (ar ? `${arrow} المقال الأقدم` : `${arrow} Older post`) : (ar ? `المقال الأحدث ${arrow}` : `Newer post ${arrow}`)}</span><strong lang={linked.lang} dir={linked.lang === 'ar' ? 'rtl' : 'ltr'}>{linked.title}</strong></Link>
+  }
 
   const share = async () => {
     const url = window.location.href
@@ -105,11 +116,14 @@ export const BlogPost: React.FC = () => {
           <div className={headings.length >= tocFrom ? 'plain-article-body has-toc' : 'plain-article-body'}>{htmlContent ? <div ref={body} className="site-article-content article-content" data-article={slug} dangerouslySetInnerHTML={{ __html: htmlContent }} /> : <ContentSkeleton />}<PostToc headings={headings} label={ar ? 'في هذه الصفحة' : 'On this page'} language={language} /></div>
         </article>
 
-        {relatedPosts.length > 0 && <section className="related-posts" aria-labelledby="related-title"><div><h2 id="related-title">{ar ? 'مقالات ذات صلة' : 'Related posts'}</h2><ul>{relatedPosts.map(post => {
+        <section className="related-posts"><div>
+          <nav className="post-pager" aria-label={ar ? 'مقالات أخرى' : 'More posts'}>{older && pagerLink(older, 'older')}{newer && pagerLink(newer, 'newer')}</nav>
+          {relatedPosts.length > 0 && <><h2 id="related-title">{ar ? 'مقالات ذات صلة' : 'Related posts'}</h2><ul>{relatedPosts.map(post => {
           const related = postText(post, language)
 
           return <li key={post.title}><Link to={`/blog/${createSlugFromTitle(post.title)}`}><span lang={related.lang} dir={related.lang === 'ar' ? 'rtl' : 'ltr'}>{related.title}</span><time dateTime={new Date(post.createdAt).toISOString()}>{new Intl.DateTimeFormat(dateLocale(language), { month: 'short', year: 'numeric', timeZone: SITE_TIME_ZONE }).format(post.createdAt)}</time></Link></li>
-        })}</ul></div></section>}
+        })}</ul></>}
+        </div></section>
       </main>
 
       <SiteFooter />

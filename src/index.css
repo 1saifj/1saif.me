@@ -91,11 +91,18 @@ html[dir='rtl'] :is(.plain-article-head > [dir='rtl'], .plain-article-body .arti
 
 .related-posts { width: min(calc(100% - 48px), 960px); margin: 0 auto; padding: 8px 0 72px; }
 .related-posts > div { max-width: 720px; padding-top: 28px; border-top: 1px solid var(--nb-line); }
+/* Older and newer posts: two quiet cards that walk the archive in order. */
+.post-pager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 40px; }
+.post-pager a { display: grid; align-content: start; gap: 4px; padding: 14px 16px; border: 1px solid var(--nb-line); border-radius: 8px; color: var(--nb-ink); text-decoration: none; transition: border-color .15s ease, background-color .15s ease; }
+.post-pager a:hover { border-color: color-mix(in srgb, var(--nb-ink-3) 55%, var(--nb-line)); background: var(--nb-subtle); }
+.post-pager span { color: var(--nb-ink-3); font-size: 13px; }
+.post-pager strong { font-weight: 600; line-height: 1.4; text-wrap: balance; }
+.post-pager-newer { grid-column: 2; text-align: end; }
 .related-posts h2 { margin: 0 0 8px; color: var(--nb-ink-3); font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 html[dir='rtl'] .related-posts h2 { font-size: 14px; letter-spacing: 0; }
 .related-posts ul { margin: 0; padding: 0; list-style: none; }
-.related-posts a { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--nb-line); color: var(--nb-ink); text-decoration: none; }
-.related-posts a:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.related-posts li a { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--nb-line); color: var(--nb-ink); text-decoration: none; }
+.related-posts li a:hover span { text-decoration: underline; text-underline-offset: 3px; }
 .related-posts time { flex: none; color: var(--nb-ink-3); font-size: 14px; font-variant-numeric: tabular-nums; }
 
 .plain-page .plain-next { display: grid; gap: 2px; max-width: none; margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--nb-line); }
@@ -215,7 +222,9 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
   .plain-role { grid-template-columns: 1fr; }
   .site-privacy-row, .plain-page .site-privacy-services p { grid-template-columns: 1fr; gap: 4px; }
   .site-privacy-rights { grid-template-columns: 1fr; }
-  .related-posts a { flex-direction: column; gap: 2px; }
+  .related-posts li a { flex-direction: column; gap: 2px; }
+  .post-pager { grid-template-columns: 1fr; }
+  .post-pager-newer { grid-column: auto; text-align: start; }
 }
 
 @media print {
