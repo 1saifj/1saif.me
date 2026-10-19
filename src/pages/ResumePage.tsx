@@ -20,6 +20,7 @@ const copy = {
     selected: 'Selected work',
     work: [
       ['/project/backend-platform-and-cloud-infrastructure', 'Backend Platform and Cloud Infrastructure'],
+      ['/project/wusool', 'Wusool'],
       ['/project/kufa-grad-tracking-platform', 'Kufa Grad Tracking Platform'],
       ['/project/relayrook', 'RelayRook'],
     ],
@@ -37,6 +38,7 @@ const copy = {
     selected: 'أعمال مختارة',
     work: [
       ['/project/backend-platform-and-cloud-infrastructure', 'منصة الأنظمة الخلفية والبنية السحابية'],
+      ['/project/wusool', 'وصول'],
       ['/project/kufa-grad-tracking-platform', 'منصة متابعة خريجي جامعة الكوفة'],
       ['/project/relayrook', 'RelayRook'],
     ],

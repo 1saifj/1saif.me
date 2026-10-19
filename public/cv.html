@@ -46,6 +46,8 @@
       line-height: 1.5;
     }
 
+    /* Links stay plain on paper and in a saved PDF, where they still work. */
+    .contact-line a, .project-item a { color: inherit; text-decoration: none; }
     .contact-line {
       margin: 2pt 0;
     }
@@ -99,6 +101,11 @@
 
     .content-block {
       margin-bottom: 16pt;
+    }
+
+    /* On paper a role, a bullet or a project never splits across pages. Each role is shorter than a page. */
+    .content-block, li, .project-item {
+      break-inside: avoid;
     }
 
     .position-header {
@@ -178,8 +185,8 @@
     <div class="headline">Lead Software Engineer</div>
     <div class="contact-info">
       <div class="contact-line">Al-Najaf, Iraq | +964 782 208 4101</div>
-      <div class="contact-line">saifalialjanahi@gmail.com</div>
-      <div class="contact-line">https://www.1saif.me | linkedin.com/in/1saifj | github.com/1saifj</div>
+      <div class="contact-line"><a href="mailto:saifalialjanahi@gmail.com">saifalialjanahi@gmail.com</a></div>
+      <div class="contact-line"><a href="https://1saif.me">1saif.me</a> | <a href="https://www.linkedin.com/in/1saifj">linkedin.com/in/1saifj</a> | <a href="https://github.com/1saifj">github.com/1saifj</a></div>
     </div>
   </div>
 
@@ -318,6 +325,12 @@
     <h2>Selected Work</h2>
 
     <div class="project-item">
+      <div class="project-title">Wusool</div>
+      <div class="project-context">Tech lead and founding engineer | University of Kufa technology incubator</div>
+      <p>Smart campus transport for University of Kufa students and staff: live bus tracking, digital tickets and clear routes, with Flutter passenger and driver apps and a .NET API. Took it from the idea and the plan to the launch, and trained its 15-student team. <a href="https://wusool.to/en">wusool.to</a></p>
+    </div>
+
+    <div class="project-item">
       <div class="project-title">Kufa Grad Tracking Platform</div>
       <div class="project-context">University of Kufa</div>
       <p>Graduate tracking and jobs platform: a Go API with notifications, chat and scheduled jobs, a bilingual Next.js web app, and a QA portal for testers.</p>
@@ -326,7 +339,7 @@
     <div class="project-item">
       <div class="project-title">RelayRook</div>
       <div class="project-context">Open source</div>
-      <p>An Agent Skill and CLI that lets one coding agent hand work to Claude Code, Codex, Kiro, OpenCode or Devin, hold their permission prompts, and get typed results back. github.com/1saifj/relayrook</p>
+      <p>An Agent Skill and CLI that lets one coding agent hand work to Claude Code, Codex, Kiro, OpenCode or Devin, hold their permission prompts, and get typed results back. <a href="https://github.com/1saifj/relayrook">github.com/1saifj/relayrook</a></p>
     </div>
   </section>
 </body>
