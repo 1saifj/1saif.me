@@ -53,22 +53,29 @@ const LINE_BREAK = /[\r\n]/
 const reply = (status: number, error?: string) => Response.json(error ? { error } : { ok: true }, { status, headers: { 'Cache-Control': 'no-store' } })
 
 async function passesTurnstile(token: string, ip: string, secret: string): Promise<boolean> {
-  const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-    method: 'POST',
-    // A pasted secret can carry a trailing space or line break.
-    body: new URLSearchParams({ secret: secret.trim(), response: token, remoteip: ip }),
-    signal: AbortSignal.timeout(5_000),
-  })
+  try {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      // A pasted secret can carry a trailing space or line break.
+      body: new URLSearchParams({ secret: secret.trim(), response: token, remoteip: ip }),
+      signal: AbortSignal.timeout(5_000),
+    })
 
-  // SAFETY: the shape is Cloudflare's documented siteverify response, also on its 400 replies; every field read is checked below.
-  const result = await response.json().catch(() => ({ success: false })) as TurnstileResult
+    // SAFETY: the shape is Cloudflare's documented siteverify response, also on its 400 replies; every field read is checked below.
+    const result = await response.json().catch(() => ({ success: false })) as TurnstileResult
 
-  // A token minted for another site or another form must not pass here.
-  const passed = result.success === true && result.hostname === '1saif.me' && result.action === 'contact'
+    // A token minted for another site or another form must not pass here.
+    const passed = result.success === true && result.hostname === '1saif.me' && result.action === 'contact'
 
-  if (!passed) console.warn('turnstile failed', response.status, result['error-codes'], result.hostname, result.action)
+    if (!passed) console.warn('turnstile failed', response.status, result['error-codes'], result.hostname, result.action)
 
-  return passed
+    return passed
+  } catch {
+    // A timeout or a network failure must fail closed, not become an unhandled 500.
+    console.warn('turnstile request failed')
+
+    return false
+  }
 }
 
 export default {
@@ -126,8 +133,8 @@ export default {
         text: `${message}\n\n--\n${name} <${email}>`,
       })
     } catch (error) {
-      // Log the code only: the message is personal data.
-      console.error('send failed', error instanceof Error && 'code' in error ? error.code : 'no code', String(error).slice(0, 300))
+      // Log the code only: the subject and text hold visitor data.
+      console.error('send failed', error instanceof Error && 'code' in error ? error.code : 'no code')
 
       return reply(502, 'send')
     }
