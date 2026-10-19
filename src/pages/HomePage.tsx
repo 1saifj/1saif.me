@@ -38,6 +38,8 @@ const copy = {
     about1: 'Most of my work is on the backend and the infrastructure under it. I care about how a system behaves after it ships, so I spend real time on load tests and on keeping infrastructure in code where the team can review it.',
     about2: 'I currently lead an engineering team and work on RelayRook in my spare time. The tools I reach for most are TypeScript, Go and PostgreSQL, with Flutter for mobile.',
     contactBody: 'Send me a message with this form, or email me at',
+    copyEmail: 'Copy',
+    copiedEmail: 'Copied',
     portraitAlt: 'Saif Aljanahi',
     seoTitle: 'Saif Aljanahi | Lead Software Engineer in Al-Najaf, Iraq',
     seoDescription: 'Saif Aljanahi is a lead software engineer in Al-Najaf, Iraq. He builds backend platforms, cloud infrastructure and university systems with TypeScript, Go, PostgreSQL and Flutter.',
@@ -66,6 +68,8 @@ const copy = {
     about1: 'يتركّز معظم عملي على الأنظمة الخلفية والبنية التحتية التي تعمل عليها. ويهمّني سلوك النظام بعد إطلاقه، لذلك أخصّص وقتاً حقيقياً لاختبارات الحمل، ولكتابة البنية التحتية ككود يراجعه الفريق.',
     about2: 'أقود حالياً فريقاً هندسياً، وأعمل على RelayRook في وقت فراغي. وأكثر ما أستخدمه TypeScript وGo وPostgreSQL، مع Flutter لتطبيقات الأجهزة المحمولة.',
     contactBody: 'أرسل لي رسالة عبر هذا النموذج، أو راسلني على',
+    copyEmail: 'نسخ',
+    copiedEmail: 'تم النسخ',
     portraitAlt: 'سيف الجناحي',
     seoTitle: 'سيف الجناحي | قائد هندسة برمجيات في النجف، العراق',
     seoDescription: 'سيف الجناحي قائد هندسة برمجيات في النجف، العراق. يبني الأنظمة الخلفية والبنية السحابية والأنظمة الجامعية باستخدام TypeScript وGo وPostgreSQL وFlutter.',
@@ -76,6 +80,8 @@ type Copy = (typeof copy)['en']
 
 const sectionIds = ['work', 'blog', 'about', 'contact'] as const
 
+const CONTACT_EMAIL = 'hello@1saif.me'
+
 function formatDate(timestamp: number, language: Language): string {
   return new Intl.DateTimeFormat(dateLocale(language), { month: 'short', year: 'numeric', timeZone: SITE_TIME_ZONE }).format(new Date(timestamp))
 }
@@ -84,6 +90,7 @@ export const HomePage: React.FC = () => {
   const { language } = useLanguage()
   // 'top' is the intro: no nav link is current there.
   const [activeSection, setActiveSection] = useState<(typeof sectionIds)[number] | 'top'>('top')
+  const emailLink = useRef<HTMLAnchorElement>(null)
   const t: Copy = copy[language]
   const visiblePosts = useMemo(() => publishedBlogs.slice(0, 6), [])
   const featuredProjects = projects.slice(0, 4)
@@ -239,7 +246,7 @@ export const HomePage: React.FC = () => {
           <section id="contact" className="notebook-section notebook-contact" aria-labelledby="contact-title">
             <h2 id="contact-title" className="notebook-section-title">{t.contact}</h2>
             <div className="notebook-contact-body">
-              <p>{t.contactBody} <a href="mailto:hello@1saif.me" dir="ltr">hello@1saif.me</a></p>
+              <p>{t.contactBody} <a ref={emailLink} href={`mailto:${CONTACT_EMAIL}`} dir="ltr">{CONTACT_EMAIL}</a> <CopyEmailButton address={CONTACT_EMAIL} linkRef={emailLink} label={t.copyEmail} copiedLabel={t.copiedEmail} /></p>
               <ContactForm language={language} />
             </div>
           </section>
@@ -249,6 +256,54 @@ export const HomePage: React.FC = () => {
       <SiteFooter />
     </div>
   )
+}
+
+const CopyEmailButton: React.FC<{ address: string; linkRef: React.RefObject<HTMLAnchorElement>; label: string; copiedLabel: string }> = ({ address, linkRef, label, copiedLabel }) => {
+  const [copied, setCopied] = useState(false)
+  const timer = useRef<number>()
+
+  useEffect(() => () => window.clearTimeout(timer.current), [])
+
+  const showCopied = () => {
+    setCopied(true)
+    window.clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => setCopied(false), 2000)
+  }
+
+  // The clipboard needs a secure context and permission; selecting the address is the fallback.
+  const selectAddress = () => {
+    const link = linkRef.current
+
+    if (!link) return
+
+    const range = document.createRange()
+    range.selectNodeContents(link)
+    const selection = window.getSelection()
+    selection?.removeAllRanges()
+    selection?.addRange(range)
+  }
+
+  const copy = async () => {
+    const clipboard = navigator.clipboard
+
+    if (!clipboard) {
+      selectAddress()
+
+      return
+    }
+
+    try {
+      await clipboard.writeText(address)
+      showCopied()
+    } catch {
+      selectAddress()
+    }
+  }
+
+  return <>
+    <button type="button" className="notebook-copy-email" onClick={() => void copy()}>{copied ? copiedLabel : label}</button>
+    <span className="sr-only" aria-live="polite">{copied ? copiedLabel : ''}</span>
+  </>
 }
 
 const JobRow: React.FC<{ job: Job; t: Copy; language: Language }> = ({ job, t, language }) => (
