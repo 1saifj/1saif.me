@@ -144,7 +144,9 @@ html.dark .article-content code { color: #f472b6; }
 /* Code blocks: one panel that follows the site theme. Token colours come from Shiki's dual-theme variables. */
 .code-block-container { margin: 1.75em 0; overflow: hidden; border: 1px solid var(--nb-line); border-radius: 8px; background: var(--nb-subtle); }
 .code-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 38px; padding-block: 0; padding-inline: 14px 6px; border-bottom: 1px solid var(--nb-line); }
-.code-lang { color: var(--nb-ink-3); font: 600 12px/1 'Geist Sans', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif; letter-spacing: .02em; }
+/* A fence may name its file: the title leads, and the language label stays as the quiet second one. */
+.code-title { min-width: 0; overflow: hidden; color: var(--nb-ink); font: 500 12.5px/1 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; text-overflow: ellipsis; white-space: nowrap; }
+.code-lang { flex: none; margin-inline-end: auto; color: var(--nb-ink-3); font: 600 12px/1 'Geist Sans', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif; letter-spacing: .02em; }
 .copy-button { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; color: var(--nb-ink-3); background: transparent; font-size: 12px; cursor: pointer; transition: color .15s ease, border-color .15s ease, background-color .15s ease; }
 .copy-button:hover, .copy-button:focus-visible { border-color: var(--nb-line); color: var(--nb-ink); background: var(--nb-bg); }
 .copy-button[data-copied] { color: #1a7f37; }
@@ -159,6 +161,9 @@ html.dark .copy-button[data-copied] { color: #3fb950; }
 .code-content .shiki span { color: var(--shiki-light); }
 html.dark .code-content .shiki span { color: var(--shiki-dark); }
 .code-content pre .line { display: inline-block; min-width: 100%; }
+/* Lines named in the fence meta, as in ```go {3,7-9}. Forced colors drop the tint, so there it becomes a border. */
+.code-content pre .line.highlighted { background: color-mix(in srgb, var(--nb-accent) 9%, transparent); }
+html.dark .code-content pre .line.highlighted { background: color-mix(in srgb, var(--nb-accent) 15%, transparent); }
 /* Line numbers for longer blocks (utils/codeBlocks.ts sets data-numbered). Counters are not part of the copied text. */
 .code-content pre[data-numbered] code { counter-reset: line; }
 .code-content pre[data-numbered] .line::before { display: inline-block; width: 2ch; margin-inline-end: 16px; color: var(--nb-ink-3); text-align: end; opacity: .65; content: counter(line); counter-increment: line; user-select: none; }
@@ -228,6 +233,7 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
   .plain-tags button[aria-pressed='true'] { forced-color-adjust: none; border-color: Highlight; color: HighlightText; background: Highlight; }
   .post-toc a[aria-current] { forced-color-adjust: none; border-color: Highlight; color: Highlight; }
   .reading-progress { forced-color-adjust: none; background: Highlight; }
+  .code-content pre .line.highlighted { background: none; border-inline-start: 3px solid Highlight; }
 }
 
 @media print {

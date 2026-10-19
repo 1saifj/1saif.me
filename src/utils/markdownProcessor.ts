@@ -1,3 +1,4 @@
+import { formatLineRanges, isHighlightedLine, parseFenceMeta } from './codeFenceMeta'
 import { getLanguageLabel } from './syntaxHighlighter'
 
 // Plain semantic HTML: every style lives in index.css under .article-content.
@@ -16,15 +17,20 @@ export const convertMarkdownToHtml = (markdown: string): string => {
 
   // Step 1a: Code blocks first. They render as escaped plain text, tagged with their language.
   // In the browser, utils/codeBlocks.ts adds syntax colors in place and wires the Copy button.
-  let html = source.replace(/```(\w+)?\n([\s\S]*?)```/g, (_match, lang: string | undefined, code: string) => {
+  // A fence may carry a title and a line set after the language, as in ```go title="cmd/api/main.go" {3,7-9}.
+  let html = source.replace(/```(\w*)([^\n]*)\n([\s\S]*?)```/g, (_match, lang: string, meta: string, code: string) => {
     const language = lang || 'text'
+    const { titleHtml, ranges } = parseFenceMeta(meta)
     const lines = code.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').split('\n')
     // Same line structure Shiki produces, so line numbers show from the first paint and nothing moves when colours arrive.
-    const escapedCode = lines.map(line => `<span class="line">${line}</span>`).join('\n')
+    const escapedCode = lines.map((line, index) => `<span class="line${isHighlightedLine(ranges, index + 1) ? ' highlighted' : ''}">${line}</span>`).join('\n')
     const numbered = lines.length >= numberFrom ? ' data-numbered' : ''
+    // The browser re-marks the lines after Shiki rewrites the code, so the set travels on the pre.
+    const highlight = ranges.length ? ` data-highlight="${formatLineRanges(ranges)}"` : ''
+    const title = titleHtml ? `<span class="code-title">${titleHtml}</span>` : ''
     // Long blocks start folded; the reader opens them. Folding in the HTML (not in script) keeps the layout still.
     const folded = lines.length > foldAbove
-    const block = `<div class="code-block-container"${folded ? ' data-collapsed' : ''}><div class="code-header"><span class="code-lang">${getLanguageLabel(language)}</span><button type="button" class="copy-button" aria-live="polite">Copy</button></div><div class="code-content code-surface"><pre data-lang="${language}"${numbered}><code>__ESCAPED_CODE__</code></pre></div>${folded ? `<button type="button" class="code-expand" aria-expanded="false" data-lines="${lines.length}">Show all ${lines.length} lines</button>` : ''}</div>`
+    const block = `<div class="code-block-container"${folded ? ' data-collapsed' : ''}><div class="code-header">${title}<span class="code-lang">${getLanguageLabel(language)}</span><button type="button" class="copy-button" aria-live="polite">Copy</button></div><div class="code-content code-surface"><pre data-lang="${language}"${highlight}${numbered}><code>__ESCAPED_CODE__</code></pre></div>${folded ? `<button type="button" class="code-expand" aria-expanded="false" data-lines="${lines.length}">Show all ${lines.length} lines</button>` : ''}</div>`
       .replace('__ESCAPED_CODE__', () => escapedCode)
 
     return `\n\n<!--code-block-->${block}<!--/code-block-->\n\n`

@@ -31,8 +31,7 @@ When I design microservices, I follow these principles:
 
 Each microservice should focus on a specific business capability:
 
-```go
-// user-service/main.go
+```go title="user-service/main.go"
 package main
 
 import (

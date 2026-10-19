@@ -1,6 +1,19 @@
+import { isHighlightedLine, parseLineRanges } from './codeFenceMeta'
 import { highlightCode } from './syntaxHighlighter'
 
 const shells = new Set(['bash', 'sh', 'shell', 'zsh'])
+
+// Shiki rewrites the code element, so the marks the server laid down are put back from the pre's data attribute.
+export const applyLineHighlight = (pre: HTMLElement): void => {
+  const ranges = parseLineRanges(pre.dataset.highlight ?? '')
+
+  if (!ranges.length) return
+  const lines = [...pre.querySelectorAll<HTMLElement>('.line')]
+
+  lines.forEach((line, index) => {
+    if (isHighlightedLine(ranges, index + 1)) line.classList.add('highlighted')
+  })
+}
 
 // Article and project bodies render as plain HTML (prerendered, so the text paints at once).
 // This adds the interactive parts in place, without re-rendering the prose: syntax colors for
@@ -20,6 +33,7 @@ export function enhanceCodeBlocks(root: HTMLElement): () => void {
     colored.classList.add(...pre.classList)
     Object.assign(colored.dataset, pre.dataset)
     pre.replaceWith(colored)
+    applyLineHighlight(colored)
   }
 
   const blocks = [...root.querySelectorAll<HTMLElement>('pre[data-lang]')]
