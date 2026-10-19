@@ -66,8 +66,7 @@ function getBlogPosts() {
           description: metadata.description || '',
           updatedAt: metadata.updatedAt || metadata.createdAt || stats.mtime.toISOString().split('T')[0],
           createdAt: metadata.createdAt || stats.birthtime.toISOString().split('T')[0],
-          featuredImage: metadata.featuredImage || '',
-          tags: Array.isArray(metadata.tags) ? metadata.tags : []
+          featuredImage: metadata.featuredImage || ''
         });
       }
     }

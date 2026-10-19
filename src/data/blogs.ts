@@ -1,7 +1,7 @@
 import { BlogPost } from '../schemas/blogSchema'
 
 // Homepage metadata stays small; full markdown remains lazy on article routes.
-export const blogs: BlogPost[] = [
+const blogs: BlogPost[] = [
   {
     "title": "OpenTelemetry in Go: Traces You Can Actually Read",
     "description": "What OpenTelemetry is, what traces, metrics, logs and baggage each give you, and a small Go setup that sends traces to a local Jaeger in a few minutes.",
