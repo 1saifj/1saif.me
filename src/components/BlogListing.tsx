@@ -6,6 +6,7 @@ import { InterfaceIcon } from './InterfaceIcon'
 import { SiteFooter } from './SiteFooter'
 import { postText, publishedBlogs } from '../data/blogs'
 import { createSlugFromTitle } from '../utils/slugUtils'
+import { searchText } from '../utils/searchText'
 import { dateLocale, Language, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
 
 const formatDate = (timestamp: number, language: Language) => new Intl.DateTimeFormat(dateLocale(language), { year: 'numeric', month: 'short', day: 'numeric', timeZone: SITE_TIME_ZONE }).format(timestamp)
@@ -48,11 +49,11 @@ export const BlogListing: React.FC = () => {
   }, [])
 
   const posts = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
+    const normalizedQuery = searchText(query.trim())
 
     return publishedBlogs
       .filter(blog => selectedTag === 'all' || blog.tags.includes(selectedTag))
-      .filter(blog => !normalizedQuery || `${blog.title} ${blog.description} ${blog.titleAr ?? ''} ${blog.descriptionAr ?? ''} ${blog.tags.join(' ')}`.toLowerCase().includes(normalizedQuery))
+      .filter(blog => !normalizedQuery || searchText(`${blog.title} ${blog.description} ${blog.titleAr ?? ''} ${blog.descriptionAr ?? ''} ${blog.tags.join(' ')}`).includes(normalizedQuery))
       .sort((a, b) => b.createdAt - a.createdAt)
   }, [query, selectedTag])
 
