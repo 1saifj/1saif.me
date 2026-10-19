@@ -23,13 +23,18 @@ const base = template
   .replace(/<title>[\s\S]*?<\/title>/, '')
   .replace(/\s*<meta (name|property)="(description|title|keywords|og:[^"]+|twitter:[^"]+)"[^>]*>/g, '')
 
-// Inner pages need the route stylesheet in the HTML itself, or they paint unstyled until JavaScript
-// loads it. The home page keeps its inline styles only. Vite's loader skips a stylesheet already linked.
+// Inner pages carry the route stylesheet inline: a linked one blocks the first paint, at times for over
+// a second. The home page keeps its inline styles only. Once the app starts after load, Vite's loader
+// also links the file; it holds the same rules, so nothing on screen changes.
 const css = (await fs.readdir(path.join(dist, 'assets'))).find(name => /^index-.*\.css$/.test(name))
 
 if (!css) throw new Error('route stylesheet assets/index-*.css not found')
 
-const stylesheet = `<link rel="stylesheet" href="/assets/${css}">`
+const cssText = await fs.readFile(path.join(dist, 'assets', css), 'utf8')
+
+if (cssText.includes('</style')) throw new Error(`${css} cannot be inlined: it contains </style`)
+
+const stylesheet = `<style>${cssText}</style>`
 
 // Every page is prerendered, so the app only adds interactivity and can start once the page has
 // loaded. Fetching it earlier competes with the HTML and fonts for bandwidth before first paint.
@@ -48,7 +53,7 @@ const page = (url) => {
     .replace(/<script type="module" crossorigin src="[^"]+"><\/script>/, startAfterLoad)
     .replace(/\s*<link rel="modulepreload"[^>]*>/g, '')
     .replace(/\s*<!-- The home portrait[^\n]*\n(\s*<link rel="preload" as="image"[^>]*>)+/, home ? '$&' : '')
-    .replace('</head>', `${head}\n${home ? '' : stylesheet}\n</head>`)
+    .replace('</head>', () => `${head}\n${home ? '' : stylesheet}\n</head>`)
     .replace('<div id="root"></div>', `<div id="root" data-route="${url}">${html}</div>`)
 }
 
