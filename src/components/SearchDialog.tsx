@@ -4,6 +4,7 @@ import { InterfaceIcon } from './InterfaceIcon'
 import { postText, publishedBlogs } from '../data/blogs'
 import { projects } from '../data/projects'
 import { createSlugFromTitle } from '../utils/slugUtils'
+import { searchText } from '../utils/searchText'
 import { dateLocale, Language, pick, SITE_TIME_ZONE, useLanguage } from '../i18n/language'
 import './SearchDialog.css'
 
@@ -33,16 +34,16 @@ const buildItems = (language: Language): Item[] => {
     const text = postText(post, language)
 
     return { id: `post-${post.file}`, group: 'posts', title: text.title, detail: month.format(post.createdAt), to: `/blog/${createSlugFromTitle(post.title)}`, lang: text.lang,
-      haystack: [post.title, post.description, post.titleAr, post.descriptionAr, ...post.tags].join(' ').toLowerCase() }
+      haystack: searchText([post.title, post.description, post.titleAr, post.descriptionAr, ...post.tags].join(' ')) }
   })
 
   const work = projects.map((project): Item => ({
     id: `project-${createSlugFromTitle(project.name)}`, group: 'projects', title: pick(language, project.name, project.ar?.name), detail: pick(language, project.role ?? '', project.ar?.role),
     to: `/project/${createSlugFromTitle(project.name)}`, lang: language,
-    haystack: [project.name, project.description, project.role, project.language, project.ar?.name, project.ar?.description].join(' ').toLowerCase(),
+    haystack: searchText([project.name, project.description, project.role, project.language, project.ar?.name, project.ar?.description].join(' ')),
   }))
 
-  const pages = copy[language].pageList.map(([to, title]): Item => ({ id: `page-${to}`, group: 'pages', title, detail: '', to, lang: language, haystack: `${title} ${to}`.toLowerCase() }))
+  const pages = copy[language].pageList.map(([to, title]): Item => ({ id: `page-${to}`, group: 'pages', title, detail: '', to, lang: language, haystack: searchText(`${title} ${to}`) }))
 
   return [...posts, ...work, ...pages]
 }
@@ -58,12 +59,12 @@ export default function SearchDialog({ onClose }: { onClose: () => void }) {
   const items = useMemo(() => buildItems(language), [language])
 
   const groups = useMemo(() => {
-    const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+    const terms = searchText(query.trim()).split(/\s+/).filter(Boolean)
 
     // Nothing typed yet: the newest posts and the pages, as a starting point.
     const matches = terms.length
       ? items.filter(item => terms.every(term => item.haystack.includes(term)))
-        .sort((a, b) => Number(b.title.toLowerCase().includes(terms[0])) - Number(a.title.toLowerCase().includes(terms[0])))
+        .sort((a, b) => Number(searchText(b.title).includes(terms[0])) - Number(searchText(a.title).includes(terms[0])))
       : items.filter(item => item.group !== 'projects')
 
     return (['posts', 'projects', 'pages'] as const).flatMap(group => {
