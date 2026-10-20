@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 const publicDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../public')
 // Inlined as data URLs: a page set with setContent cannot load file:// fonts or images.
+
 const file = name => `data:${name.endsWith('.woff2') ? 'font/woff2' : 'image/webp'};base64,${fs.readFileSync(path.join(publicDir, name)).toString('base64')}`
 
 const cards = [
@@ -35,11 +36,14 @@ img { width: 336px; height: 420px; border-radius: 14px; object-fit: cover; outli
 </body></html>`
 
 const browser = await chromium.launch({ channel: 'chrome' })
+
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } })
+
 for (const card of cards) {
   await page.setContent(html(card), { waitUntil: 'load' })
   await page.evaluate(() => document.fonts.ready)
   await page.screenshot({ path: path.join(publicDir, card.out), type: 'jpeg', quality: 86 })
   console.log('wrote', card.out)
 }
+
 await browser.close()

@@ -1,10 +1,11 @@
-import { Suspense } from 'react'
+import { Suspense, type ComponentType } from 'react'
 import { renderToString } from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom/server'
 import { Routes, Route } from 'react-router-dom'
 import { HelmetProvider, type HelmetServerState } from 'react-helmet-async'
 import { isArabicPath, LanguageProvider } from './i18n/language'
 import { SkipLink } from './components/SkipLink'
+import { routePaths, type RoutePath } from './routes'
 import { HomePage } from './pages/HomePage'
 import { BlogListingPage } from './pages/BlogListingPage'
 import { BlogPost, prerenderedArticles } from './pages/BlogPost'
@@ -18,9 +19,22 @@ import { createSlugFromTitle } from './utils/slugUtils'
 import { loadArticle } from './utils/contentLoader'
 import { convertMarkdownToHtml } from './utils/markdownProcessor'
 
+// The same route table as App.tsx, with every page eager: the server has no chunk to load.
+const routePages: Record<RoutePath, ComponentType> = {
+  '/': HomePage,
+  '/blog': BlogListingPage,
+  '/blog/:slug': BlogPost,
+  '/project/:slug': ProjectPage,
+  '/resume': ResumePage,
+  '/privacy': PrivacyPolicyPage,
+}
+
+// The fixed routes come from the shared list; the pages with data come from the content.
+const staticPaths = routePaths.filter(path => !path.includes(':'))
+
 // Build-time only (scripts/prerender.mjs): renders each route to static HTML so content paints before JavaScript runs.
 const englishRoutes = [
-  '/', '/blog', '/resume', '/privacy',
+  ...staticPaths,
   ...projects.map(project => `/project/${createSlugFromTitle(project.name)}`),
   ...publishedBlogs.map(post => `/blog/${createSlugFromTitle(post.title)}`),
 ]
@@ -53,12 +67,11 @@ export function render(url: string) {
             {/* Same boundary as App.tsx, so the server markup matches what the client hydrates. */}
             <Suspense fallback={null}>
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/blog" element={<BlogListingPage />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/project/:slug" element={<ProjectPage />} />
-                <Route path="/resume" element={<ResumePage />} />
-                <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                {routePaths.map(path => {
+                  const Page = routePages[path]
+
+                  return <Route key={path} path={path} element={<Page />} />
+                })}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>

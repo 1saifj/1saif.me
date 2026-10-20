@@ -3,11 +3,14 @@ import { BrowserRouter as Router, Routes, Route, useHref, useLocation, useNaviga
 import { HomePage } from './pages/HomePage'
 import { SkipLink } from './components/SkipLink'
 import { isArabicPath, LanguageProvider } from './i18n/language'
+import { matchRoute, routePaths, type RoutePath } from './routes'
+
+type PageComponent = ComponentType & { preload: () => Promise<void> }
 
 // Each page chunk also waits for the route stylesheet, so a page never paints unstyled.
 // Once loaded, a page renders directly instead of suspending: main.tsx loads the current route
 // before mounting, so the prerendered HTML is never swapped for the loading fallback.
-const page = <M,>(load: () => Promise<M>, pick: (module: M) => ComponentType) => {
+const page = <M,>(load: () => Promise<M>, pick: (module: M) => ComponentType): PageComponent => {
   let Loaded: ComponentType | undefined
   const loadComponent = () => Promise.all([import('./index.css'), load()]).then(([, module]) => (Loaded = pick(module)))
   const Lazy = lazy(() => loadComponent().then(Component => ({ default: Component })))
@@ -29,22 +32,27 @@ const PrivacyPolicyPage = page(() => import('./pages/PrivacyPolicyPage'), m => m
 
 const NotFoundPage = page(() => import('./pages/NotFoundPage'), m => m.NotFoundPage)
 
+// Home ships in the main bundle, so its preload is already done; the wrapper keeps the table one shape.
+const Home = Object.assign(() => <HomePage />, { preload: () => Promise.resolve() })
+
+// One entry per route path: <Routes> and the preload read the same table, and a missing page is a type error.
+const routePages: Record<RoutePath, PageComponent> = {
+  '/': Home,
+  '/blog': BlogListingPage,
+  '/blog/:slug': BlogPost,
+  '/project/:slug': ProjectPage,
+  '/resume': ResumePage,
+  '/privacy': PrivacyPolicyPage,
+}
+
 export const preloadRoute = (pathname: string): Promise<void> => {
   const path = pathname.replace(/\/+$/, '') || '/'
+  const route = matchRoute(path)
 
-  if (path === '/') return Promise.resolve()
+  // A path the router does not own is a 404 page, as it always was.
+  if (!route) return NotFoundPage.preload()
 
-  if (path === '/blog') return BlogListingPage.preload()
-
-  if (path.startsWith('/blog/')) return BlogPost.preload()
-
-  if (path.startsWith('/project/')) return ProjectPage.preload()
-
-  if (path === '/resume') return ResumePage.preload()
-
-  if (path === '/privacy') return PrivacyPolicyPage.preload()
-
-  return NotFoundPage.preload()
+  return routePages[route].preload()
 }
 
 // Chrome 111+ and Safari 18+ run view transitions; every other browser keeps the CSS page fade.
@@ -78,7 +86,7 @@ function RouteSkeleton() {
 }
 
 // The paths the router owns. Another same-origin file (/cv.html, /rss.xml) keeps the browser's own click.
-const isAppPath = (path: string) => path === '/' || path === '/blog' || path === '/resume' || path === '/privacy' || path.startsWith('/blog/') || path.startsWith('/project/')
+const isAppPath = (path: string) => matchRoute(path) !== undefined
 
 // In-site link clicks run in a view transition: the pages cross-fade while the header keeps its own
 // snapshot (view-transition-name in index.html) and stays put. Back/forward and the search dialog
@@ -180,12 +188,11 @@ function App() {
           <RouteTransitions />
           <Suspense fallback={<RouteSkeleton />}>
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/blog" element={<BlogListingPage />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/project/:slug" element={<ProjectPage />} />
-              <Route path="/resume" element={<ResumePage />} />
-              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              {routePaths.map(path => {
+                const Page = routePages[path]
+
+                return <Route key={path} path={path} element={<Page />} />
+              })}
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>

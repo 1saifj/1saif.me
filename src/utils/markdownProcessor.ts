@@ -6,6 +6,7 @@ const blockTags = 'h[1-6]|div|blockquote|ul|ol|table|figure'
 
 // Code blocks of this many lines get line numbers; longer than foldAbove, they start folded.
 const numberFrom = 8
+
 const foldAbove = 30
 
 // Heading ids for #links. Keeps Latin and Arabic letters and digits, so Arabic headings get readable ids too.
@@ -30,6 +31,7 @@ export const convertMarkdownToHtml = (markdown: string): string => {
     const title = titleHtml ? `<span class="code-title">${titleHtml}</span>` : ''
     // Long blocks start folded; the reader opens them. Folding in the HTML (not in script) keeps the layout still.
     const folded = lines.length > foldAbove
+
     const block = `<div class="code-block-container"${folded ? ' data-collapsed' : ''}><div class="code-header">${title}<span class="code-lang">${getLanguageLabel(language)}</span><button type="button" class="copy-button" aria-live="polite">Copy</button></div><div class="code-content code-surface"><pre data-lang="${language}"${highlight}${numbered}><code>__ESCAPED_CODE__</code></pre></div>${folded ? `<button type="button" class="code-expand" aria-expanded="false" data-lines="${lines.length}">Show all ${lines.length} lines</button>` : ''}</div>`
       .replace('__ESCAPED_CODE__', () => escapedCode)
 
@@ -49,6 +51,7 @@ export const convertMarkdownToHtml = (markdown: string): string => {
   // Step 2: Headings, now that code blocks are hidden (a `# comment` in code is not a heading).
   // Each heading is its own block, so the text right under it becomes a paragraph.
   const used = new Map<string, number>()
+
   const heading = (level: number) => (_match: string, text: string) => {
     const base = slugify(text)
     const count = used.get(base) ?? 0

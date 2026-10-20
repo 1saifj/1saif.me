@@ -11,7 +11,7 @@ The personal site of Saif Aljanahi: work, writing and résumé, in English and A
 
 ## Content
 
-- Articles are Markdown files in `content/articles/`, listed in `src/data/blogs.ts`
+- Articles are Markdown files in `content/articles/`, listed in `src/data/blogs.ts`; a new post also needs its thumbnails, made with `npm run thumbs -- <image>` (needs the `cwebp` CLI: `brew install webp`)
 - Case studies are Markdown files in `content/projects/`, with Arabic versions in `content/projects/ar/`
 - The sitemap and the RSS, Atom and JSON feeds are generated on every build
 
