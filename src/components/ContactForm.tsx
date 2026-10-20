@@ -16,6 +16,7 @@ interface TurnstileOptions {
   theme: 'light' | 'dark'
   size: 'flexible'
   appearance: 'interaction-only'
+  'refresh-expired': 'auto'
   callback: (token: string) => void
   'expired-callback': () => void
   'error-callback': () => void
@@ -37,6 +38,8 @@ const copy = {
     email: 'Email',
     message: 'Message',
     send: 'Send message',
+    checking: 'Checking…',
+    checkingNote: 'Waiting for the spam check to finish.',
     sending: 'Sending…',
     note: 'I usually reply within a few days.',
     sent: 'Thanks. Your message was sent, and I will reply by email.',
@@ -62,6 +65,8 @@ const copy = {
     email: 'البريد الإلكتروني',
     message: 'الرسالة',
     send: 'إرسال الرسالة',
+    checking: 'جارٍ التحقق…',
+    checkingNote: 'بانتظار انتهاء التحقق من البريد المزعج.',
     sending: 'جارٍ الإرسال…',
     note: 'أرد عادةً خلال أيام قليلة.',
     sent: 'شكراً. أُرسلت رسالتك، وسأرد عليك عبر البريد الإلكتروني.',
@@ -84,19 +89,24 @@ const copy = {
   },
 }
 
-type Status = 'idle' | 'sending' | 'sent' | 'rate' | 'challenge' | 'failed'
+type Status = 'idle' | 'checking' | 'sending' | 'sent' | 'rate' | 'challenge' | 'failed'
 
 let turnstileScript: Promise<void> | undefined
 
 function loadTurnstile(): Promise<void> {
   turnstileScript ??= new Promise((resolve, reject) => {
+    // The connection opens while the script downloads; no crossorigin, because the script is a no-cors classic script.
+    const preconnect = document.createElement('link')
+    preconnect.rel = 'preconnect'
+    preconnect.href = 'https://challenges.cloudflare.com'
+
     const script = document.createElement('script')
     script.src = TURNSTILE_SCRIPT
     script.async = true
     script.onload = () => resolve()
     script.onerror = () => { turnstileScript = undefined; reject(new Error('Turnstile did not load')) }
 
-    document.head.append(script)
+    document.head.append(preconnect, script)
   })
 
   return turnstileScript
@@ -114,6 +124,8 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
   const widgetRef = useRef<HTMLDivElement>(null)
   const sentRef = useRef<HTMLDivElement>(null)
   const widgetId = useRef<string>()
+  // The one in-flight or finished start, so the idle, observer and focus paths never render a second widget.
+  const startPromise = useRef<Promise<boolean>>()
   const token = useRef<string>()
   const tokenWaiters = useRef<((token: string | undefined) => void)[]>([])
   // Set when the widget reports an error, so a submit does not wait 20 s for a token that will not come.
@@ -135,35 +147,44 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
     settleToken(undefined)
   }
 
-  // The challenge takes seconds, so it starts as soon as the visitor heads for the form.
+  // The challenge takes seconds, so it starts before the visitor reaches the form.
   function startTurnstile(): Promise<boolean> {
+    startPromise.current ??= renderTurnstile().then(ready => {
+      // A failed load must not stick: the next focus or submit tries again.
+      if (!ready) startPromise.current = undefined
+
+      return ready
+    })
+
+    return startPromise.current
+  }
+
+  function renderTurnstile(): Promise<boolean> {
     const container = widgetRef.current
 
     if (!container) return Promise.resolve(false)
-
-    if (widgetId.current) return Promise.resolve(true)
 
     return loadTurnstile()
       .then(() => {
         if (!window.turnstile) return false
 
-        if (!widgetId.current) {
-          widgetId.current = window.turnstile.render(container, {
-            sitekey: TURNSTILE_SITE_KEY,
-            action: 'contact',
-            language,
-            theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-            size: 'flexible',
-            appearance: 'interaction-only',
-            callback: value => {
-              challengeFailed.current = false
-              settleToken(value)
-            },
-            'expired-callback': () => { token.current = undefined },
-            'error-callback': failTurnstile,
-            'timeout-callback': failTurnstile,
-          })
-        }
+        widgetId.current ??= window.turnstile.render(container, {
+          sitekey: TURNSTILE_SITE_KEY,
+          action: 'contact',
+          language,
+          theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+          size: 'flexible',
+          appearance: 'interaction-only',
+          'refresh-expired': 'auto',
+          callback: value => {
+            challengeFailed.current = false
+            settleToken(value)
+          },
+          // With refresh-expired auto, a new token replaces the expired one; until it arrives, none is sent.
+          'expired-callback': () => { token.current = undefined },
+          'error-callback': failTurnstile,
+          'timeout-callback': failTurnstile,
+        })
 
         return true
       })
@@ -174,6 +195,7 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
     token.current = undefined
     challengeFailed.current = false
 
+    // Reset starts the next challenge at once, so a second message does not wait for it.
     if (widgetId.current) window.turnstile?.reset(widgetId.current)
   }
 
@@ -207,7 +229,44 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
     })
   }
 
-  // The third-party script loads only near the form: about two screens away, or on the first focus inside it.
+  // Turnstile starts once the page is idle, so the token is usually ready before the visitor reaches the form.
+  useEffect(() => {
+    let idle = 0
+    let timer = 0
+
+    const setTimer = window.setTimeout.bind(window)
+    const start = () => { void startTurnstile() }
+
+    // A #contact link lands on the form, so that visitor cannot wait.
+    if (window.location.hash === '#contact') {
+      start()
+
+      return
+    }
+
+    const schedule = () => {
+      if ('requestIdleCallback' in window) {
+        idle = window.requestIdleCallback(start, { timeout: 2000 })
+      } else {
+        timer = setTimer(start, 200)
+      }
+    }
+
+    // The load event keeps the challenge from competing with the page's own images and styles.
+    if (document.readyState === 'complete') schedule()
+    else window.addEventListener('load', schedule, { once: true })
+
+    return () => {
+      window.removeEventListener('load', schedule)
+
+      if (idle) window.cancelIdleCallback(idle)
+      window.clearTimeout(timer)
+    }
+  // startTurnstile reads only refs; the widget starts once per page.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Fallbacks while the idle start waits: near the form, or on the first focus inside it.
   useEffect(() => {
     const form = formRef.current
 
@@ -264,9 +323,10 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
     }
 
     const body = new URLSearchParams([...data].map(([key, value]) => [key, String(value)]))
-    setStatus('sending')
 
     // A visitor can finish the form before the challenge does; wait for it instead of failing.
+    if (!token.current) setStatus('checking')
+
     const value = await waitForToken()
 
     if (!value) {
@@ -277,6 +337,7 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
       return
     }
 
+    setStatus('sending')
     body.set('cf-turnstile-response', value)
 
     try {
@@ -308,8 +369,10 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
     setStatus('idle')
   }
 
-  const message = status === 'idle' || status === 'sending' ? t.note : t[status]
-  const tone = status === 'sent' ? 'ok' : status === 'idle' || status === 'sending' ? undefined : 'error'
+  const busy = status === 'checking' || status === 'sending'
+  const waiting = status === 'idle' || busy
+  const message = status === 'checking' ? t.checkingNote : waiting ? t.note : t[status]
+  const tone = status === 'sent' ? 'ok' : waiting ? undefined : 'error'
 
   return (
     <form ref={formRef} className="contact-form" onSubmit={submit} onFocus={startTurnstile} noValidate>
@@ -345,7 +408,7 @@ export const ContactForm: React.FC<{ language: Language }> = ({ language }) => {
       {/* Kept mounted across the confirmation so the same Turnstile widget serves the next message. */}
       <div ref={widgetRef} className="contact-form-challenge" />
       {status !== 'sent' && <div className="contact-form-footer">
-        <button type="submit" disabled={status === 'sending'}>{status === 'sending' ? t.sending : t.send}</button>
+        <button type="submit" disabled={busy}>{status === 'checking' ? t.checking : status === 'sending' ? t.sending : t.send}</button>
         <p className="contact-form-status" role="status" data-tone={tone}>{message}</p>
       </div>}
     </form>

@@ -5,7 +5,7 @@ import { SiteFooter } from '../components/SiteFooter'
 import { dateLocale, useLanguage } from '../i18n/language'
 
 // Change this date whenever the policy text changes.
-const lastUpdated = new Date('2026-10-19T00:00:00')
+const lastUpdated = new Date('2026-10-20T00:00:00')
 
 const copy = {
   en: {
@@ -23,7 +23,7 @@ const copy = {
       ['Technical data', 'IP address, browser type, and referring website.', 'To keep the site secure and diagnose delivery issues.', 'Twelve months.'],
     ],
     uses: ['Reply to contact messages and provide requested information.', 'Understand site usage and improve performance and clarity.', 'Protect the site from abuse and keep the service reliable.', 'Meet legal obligations when they apply.'],
-    services: [['Email service', 'Delivers replies to contact messages.'], ['Spam protection', 'Cloudflare Turnstile checks that the contact form is sent by a person. It loads only near the form.'], ['Analytics service', 'Provides privacy-focused, aggregate usage information when enabled.'], ['Hosting provider', 'Serves the site and its static assets.'], ['Legal requirements', 'Information may be shared when required by law or to protect rights.']],
+    services: [['Email service', 'Delivers replies to contact messages.'], ['Spam protection', 'Cloudflare Turnstile checks that the contact form is sent by a person. It loads on the home page after the page has loaded.'], ['Analytics service', 'Provides privacy-focused, aggregate usage information when enabled.'], ['Hosting provider', 'Serves the site and its static assets.'], ['Legal requirements', 'Information may be shared when required by law or to protect rights.']],
     rights: [['Access', 'Ask what personal data is held about you.'], ['Rectification', 'Ask for inaccurate information to be corrected.'], ['Erasure', 'Ask for your personal data to be deleted.'], ['Portability', 'Request a copy of your data in a machine-readable format.'], ['Object', 'Object to particular types of processing.'], ['Restriction', 'Ask for how your data is used to be limited.']],
     contactBody: 'If you want to ask about this policy or exercise one of these rights, email me. I aim to respond within 30 days.',
     name: 'Saif Aljanahi',
@@ -43,7 +43,7 @@ const copy = {
       ['البيانات التقنية', 'عنوان IP، ونوع المتصفح، والموقع الذي أحالك.', 'لحماية الموقع وتشخيص مشكلات التحميل.', 'اثنا عشر شهراً.'],
     ],
     uses: ['الرد على رسائل التواصل وتقديم المعلومات المطلوبة.', 'فهم طريقة استخدام الموقع وتحسين أدائه ووضوحه.', 'حماية الموقع من إساءة الاستخدام والحفاظ على موثوقيته.', 'الوفاء بالالتزامات القانونية عند انطباقها.'],
-    services: [['خدمة البريد الإلكتروني', 'تُرسل الردود على رسائل التواصل.'], ['الحماية من البريد المزعج', 'تتحقّق Cloudflare Turnstile من أن نموذج التواصل يرسله شخص. وتُحمَّل فقط عند الاقتراب من النموذج.'], ['خدمة التحليلات', 'تقدّم بيانات استخدام إجمالية تحترم الخصوصية عند تفعيلها.'], ['مزوّد الاستضافة', 'يقدّم الموقع وملفاته الثابتة.'], ['المتطلبات القانونية', 'قد تُشارك المعلومات عندما يفرض القانون ذلك أو لحماية الحقوق.']],
+    services: [['خدمة البريد الإلكتروني', 'تُرسل الردود على رسائل التواصل.'], ['الحماية من البريد المزعج', 'تتحقّق Cloudflare Turnstile من أن نموذج التواصل يرسله شخص. وتُحمَّل في الصفحة الرئيسية بعد اكتمال تحميلها.'], ['خدمة التحليلات', 'تقدّم بيانات استخدام إجمالية تحترم الخصوصية عند تفعيلها.'], ['مزوّد الاستضافة', 'يقدّم الموقع وملفاته الثابتة.'], ['المتطلبات القانونية', 'قد تُشارك المعلومات عندما يفرض القانون ذلك أو لحماية الحقوق.']],
     rights: [['الاطّلاع', 'أن تسأل عن البيانات الشخصية المحفوظة عنك.'], ['التصحيح', 'أن تطلب تصحيح المعلومات غير الدقيقة.'], ['الحذف', 'أن تطلب حذف بياناتك الشخصية.'], ['قابلية النقل', 'أن تطلب نسخة من بياناتك بصيغة يقرؤها الحاسوب.'], ['الاعتراض', 'أن تعترض على أنواع معيّنة من المعالجة.'], ['التقييد', 'أن تطلب تقييد طريقة استخدام بياناتك.']],
     contactBody: 'إذا أردت الاستفسار عن هذه السياسة أو ممارسة أحد هذه الحقوق، راسلني عبر البريد الإلكتروني. أسعى للرد خلال 30 يوماً.',
     name: 'سيف الجناحي',
