@@ -1,4 +1,5 @@
 {
+  // Deployed by Cloudflare Workers Builds when workers/contact changes on main (README, Deploys).
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "1saif-contact",
   "main": "src/index.ts",

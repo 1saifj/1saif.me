@@ -29,9 +29,22 @@ npm run lint
 
 Node 18 or newer.
 
-## Deploying
+## Deploys
 
-Cloudflare Pages builds on push: build command `npm run build`, output directory `dist`. The site needs no environment variables.
+| What | Runs when | How |
+| --- | --- | --- |
+| The site | Every push to `main` | Cloudflare Pages project `1saif-me` builds with `npm run build` and serves `dist` |
+| The contact Worker | A push to `main` that changes `workers/contact/*` | Cloudflare Workers Builds on the `1saif-contact` Worker: build command `npx vitest run workers`, deploy command `npx wrangler deploy -c workers/contact/wrangler.jsonc` |
+
+Both use Cloudflare's GitHub app and Cloudflare-managed build tokens, so the repo holds no deploy secrets. Wrangler keeps the `TURNSTILE_SECRET` that is already on the Worker. Build logs: Workers & Pages → `1saif-contact` → Deployments.
+
+To deploy or roll back the Worker by hand:
+
+```bash
+npx wrangler@4 deploy -c workers/contact/wrangler.jsonc
+npx wrangler@4 rollback -c workers/contact/wrangler.jsonc
+npx wrangler@4 tail -c workers/contact/wrangler.jsonc
+```
 
 ## Contact
 
