@@ -18,6 +18,7 @@ export const PostToc: React.FC<{ headings: Heading[]; label: string; language: s
 
   useEffect(() => {
     if (headings.length < tocFrom || !('IntersectionObserver' in window)) return undefined
+
     // A heading counts as current while it is in the top third of the screen, under the sticky header.
     const observer = new IntersectionObserver(entries => {
       const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]
