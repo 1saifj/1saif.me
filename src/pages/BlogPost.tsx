@@ -77,6 +77,7 @@ export const BlogPost: React.FC = () => {
   const older = publishedBlogs[index + 1]
   const newer = index > 0 ? publishedBlogs[index - 1] : undefined
   const relatedPosts = publishedBlogs.filter(post => post !== blog && post !== older && post !== newer && post.tags.some(tag => blog.tags.includes(tag))).slice(0, 3)
+
   const pagerLink = (post: typeof blog, kind: 'older' | 'newer') => {
     const linked = postText(post, language)
     // The arrow points the way the link moves through time: back is left in English, right in Arabic.
@@ -100,6 +101,7 @@ export const BlogPost: React.FC = () => {
       window.setTimeout(() => setCopied(false), 2000)
     }, () => undefined)
   }
+
   const shareLabel = copied ? (ar ? 'تم نسخ الرابط' : 'Link copied') : (ar ? 'مشاركة' : 'Share')
 
   return (
