@@ -79,6 +79,7 @@ export function enhanceCodeBlocks(root: HTMLElement): () => void {
     block.toggleAttribute('data-collapsed', !open)
     button.setAttribute('aria-expanded', String(open))
     button.textContent = open ? 'Show less' : `Show all ${button.dataset.lines} lines`
+
     // Folding again from below would leave the reader past the block, so bring its top back into view.
     if (!open && block.getBoundingClientRect().top < 0) block.scrollIntoView({ block: 'start' })
   }
@@ -87,6 +88,7 @@ export function enhanceCodeBlocks(root: HTMLElement): () => void {
     const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('.copy-button, .code-expand') : null
 
     if (!button) return
+
     if (button.classList.contains('copy-button')) copy(button)
     else toggle(button)
   }
