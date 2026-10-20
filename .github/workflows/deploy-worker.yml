@@ -1,0 +1,70 @@
+name: Deploy contact Worker
+
+# The site itself deploys through Cloudflare Pages on every push to main. This workflow owns
+# only the Worker behind /api/contact, so a change to the site never redeploys the Worker.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'workers/contact/**'
+      - '.github/workflows/deploy-worker.yml'
+  workflow_dispatch:
+
+# Two deploys at once would race on the same Worker. Queue them instead of cancelling,
+# because a cancelled deploy could leave the Worker half updated.
+concurrency:
+  group: deploy-worker
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CLOUDFLARE_ACCOUNT_ID: 21559a7455b687a0cfa1022b7006168f
+
+jobs:
+  deploy:
+    name: Test and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # wrangler 4.111.0 needs Node 22 or newer, so do not read .node-version (20.10.0) or
+      # .nvmrc (18) here.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test the Worker
+        run: npx vitest run workers
+
+      - name: Deploy the Worker
+        # TURNSTILE_SECRET is a secret already on the Worker. `wrangler deploy` keeps it,
+        # so it must not be passed here, and the token is never printed.
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
+        run: npx --yes wrangler@4.111.0 deploy -c workers/contact/wrangler.jsonc
+
+      - name: Smoke test the route
+        # The Worker answers 405 to anything but POST. A fresh deploy can take a few seconds
+        # to reach every location, so retry before failing.
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 10); do
+            status=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 https://1saif.me/api/contact || echo 000)
+            if [ "$status" = "405" ]; then
+              echo "GET https://1saif.me/api/contact returned 405, as expected."
+              exit 0
+            fi
+            echo "Attempt $attempt: GET https://1saif.me/api/contact returned $status."
+            sleep 10
+          done
+          echo "::error::GET https://1saif.me/api/contact did not return 405 after the deploy."
+          exit 1

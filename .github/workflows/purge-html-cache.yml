@@ -1,0 +1,121 @@
+name: Purge HTML cache
+
+# Pages serves HTML from the edge cache. An HTML page cached before the newest deploy names
+# assets that no longer exist, so purge the host once the new deploy is live.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Only the newest push matters: its deploy replaces any earlier one still building.
+concurrency:
+  group: purge-html-cache
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CLOUDFLARE_ACCOUNT_ID: 21559a7455b687a0cfa1022b7006168f
+  CLOUDFLARE_ZONE_ID: 1a336e45128c1d2a66bcd20e61dc7256
+  PAGES_PROJECT: 1saif-me
+  SITE_HOST: 1saif.me
+
+jobs:
+  purge:
+    name: Wait for Pages, then purge
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Wait for the Pages deploy of this commit
+        # A manual run has no commit to match, so it only purges.
+        if: github.event_name == 'push'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_TOKEN }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PAGES_PROJECT}/deployments?env=production"
+          response="${RUNNER_TEMP}/deployments.json"
+          deadline=$(( SECONDS + 900 ))
+          attempt=0
+
+          while :; do
+            attempt=$(( attempt + 1 ))
+
+            code=$(curl -sS -o "$response" -w '%{http_code}' --max-time 30 \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$api") || code=000
+
+            if [ "$code" = "401" ] || [ "$code" = "403" ]; then
+              echo "::error::The Pages deployments call was refused with HTTP ${code}. Check the permissions of CLOUDFLARE_CACHE_TOKEN."
+              exit 1
+            fi
+
+            # Any other non-200 answer is treated as "not deployed yet": the next poll decides.
+            if [ "$code" = "200" ]; then
+              body=$(cat "$response")
+            else
+              echo "Attempt ${attempt}: the Pages deployments call returned HTTP ${code}."
+              body='{"result":[]}'
+            fi
+
+            # Pick every deployment of this commit. A retry shares the commit hash, so look at
+            # all of them: one success means the deploy is live.
+            state=$(jq -r --arg sha "$COMMIT_SHA" '
+              [ (.result // [])[] | select(.deployment_trigger.metadata.commit_hash? == $sha) ] as $mine
+              | if ($mine | length) == 0 then "waiting"
+                elif any($mine[]; .latest_stage.name == "deploy" and .latest_stage.status == "success") then "success"
+                elif any($mine[]; .latest_stage.name == "deploy"
+                               and (.latest_stage.status == "failure" or .latest_stage.status == "canceled")) then "failed"
+                else "pending"
+                end
+            ' <<<"$body")
+
+            detail=$(jq -r --arg sha "$COMMIT_SHA" '
+              [ (.result // [])[] | select(.deployment_trigger.metadata.commit_hash? == $sha) ] | .[0]
+              | if . == null then "no deployment for this commit yet"
+                else "\(.url // "unknown url") at \(.latest_stage.name // "?"): \(.latest_stage.status // "?")"
+                end
+            ' <<<"$body")
+
+            case "$state" in
+              success)
+                echo "Cloudflare Pages deploy of ${COMMIT_SHA} is live: $detail."
+                break
+                ;;
+              failed)
+                # Another push may fix it, but this run must not purge on a failed deploy.
+                echo "::error::Cloudflare Pages deploy of ${COMMIT_SHA} failed: $detail."
+                exit 1
+                ;;
+            esac
+
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              echo "::error::Gave up after 15 minutes: no successful Cloudflare Pages deploy of ${COMMIT_SHA} (last seen: $detail)."
+              exit 1
+            fi
+
+            echo "Attempt ${attempt}: $detail. Waiting 15s."
+            sleep 15
+          done
+
+      - name: Purge the cache for the host
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_CACHE_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          response="${RUNNER_TEMP}/purge.json"
+          code=$(curl -sS -o "$response" -w '%{http_code}' --max-time 30 \
+            -X POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data "{\"hosts\":[\"${SITE_HOST}\"]}")
+
+          if [ "$code" != "200" ] || [ "$(jq -r '.success' "$response")" != "true" ]; then
+            echo "::error::Cache purge failed with HTTP ${code}: $(jq -c '{errors}' "$response" 2>/dev/null || echo 'response was not JSON')"
+            exit 1
+          fi
+
+          echo "Purged the cache for ${SITE_HOST}."
