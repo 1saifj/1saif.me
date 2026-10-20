@@ -33,22 +33,10 @@ Node 18 or newer.
 
 | What | Runs when | How |
 | --- | --- | --- |
-| The site | Every push to `main` | Cloudflare Pages project `1saif-me` builds with `npm run build` and serves `dist`. It needs no environment variables |
-| The contact Worker | A push to `main` that changes `workers/contact/**` or `.github/workflows/deploy-worker.yml`, or a manual run | `.github/workflows/deploy-worker.yml` |
-| The edge cache | Every push to `main`, or a manual run | `.github/workflows/purge-html-cache.yml` |
+| The site | Every push to `main` | Cloudflare Pages project `1saif-me` builds with `npm run build` and serves `dist` |
+| The contact Worker | A push to `main` that changes `workers/contact/*` | Cloudflare Workers Builds on the `1saif-contact` Worker: build command `npx vitest run workers`, deploy command `npx wrangler deploy -c workers/contact/wrangler.jsonc` |
 
-**The contact Worker.** The workflow runs `npm ci`, then `npx vitest run workers`. It deploys with `npx --yes wrangler@4.111.0 deploy -c workers/contact/wrangler.jsonc`, then fails unless `GET https://1saif.me/api/contact` answers 405. Wrangler keeps the `TURNSTILE_SECRET` that is already on the Worker, so the workflow never passes it.
-
-**The edge cache.** Pages caches HTML at the edge, and a cached page can name the hashed assets of an older deploy. The workflow polls the Pages deployments API until the deployment of its own commit (`$GITHUB_SHA`) reaches stage `deploy` with status `success`, then purges the cache for host `1saif.me`. It fails if that deployment fails or if the wait passes 15 minutes. A manual run skips the wait and purges at once.
-
-**Secrets.** Add both in Settings → Secrets and variables → Actions.
-
-| Secret | Used by | Token permissions |
-| --- | --- | --- |
-| `CLOUDFLARE_WORKERS_TOKEN` | `deploy-worker.yml` | Account `1saif.me`: Workers Scripts → Edit, Account Settings → Read. Zone `1saif.me`: Workers Routes → Edit. Add Account → Email Routing Addresses → Read if the deploy refuses the `send_email` binding |
-| `CLOUDFLARE_CACHE_TOKEN` | `purge-html-cache.yml` | Account `1saif.me`: Cloudflare Pages → Read. Zone `1saif.me`: Cache Purge → Purge |
-
-`deploy-worker.yml` runs on Node 22, because wrangler 4.111.0 needs Node 22 or newer (`.node-version` says 20.10.0 and `.nvmrc` says 18, so neither is used for the deploy).
+Both use Cloudflare's GitHub app and Cloudflare-managed build tokens, so the repo holds no deploy secrets. Wrangler keeps the `TURNSTILE_SECRET` that is already on the Worker. Build logs: Workers & Pages → `1saif-contact` → Deployments.
 
 To deploy or roll back the Worker by hand:
 
