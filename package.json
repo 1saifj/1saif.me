@@ -15,6 +15,7 @@
     "build:ci": "npm install --legacy-peer-deps && npm run build",
     "deploy:preview": "npm run build:production && echo 'Build complete! Upload dist/ folder to Cloudflare Pages'",
     "verify:images": "node scripts/verify-blog-images.cjs",
+    "thumbs": "node scripts/thumbs.mjs",
     "seo:sitemap": "node scripts/generate-sitemap.cjs",
     "seo:rss": "node scripts/generate-rss.cjs",
     "seo:generate": "npm run seo:sitemap && npm run seo:rss",
