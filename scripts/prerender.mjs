@@ -17,7 +17,14 @@ await build({ root, logLevel: 'warn', ssr: { noExternal: ['react-helmet-async'] 
 
 const { prepare, render, routes } = await import(path.join(ssrOut, 'entry-server.mjs'))
 
-const template = await fs.readFile(path.join(dist, 'index.html'), 'utf8')
+const assetFiles = await fs.readdir(path.join(dist, 'assets'))
+
+// Vite rewrites the portrait preload's href but not its imagesrcset, so point those at the hashed files here.
+const template = (await fs.readFile(path.join(dist, 'index.html'), 'utf8')).replace(/\/src\/assets\/([\w-]+)\.webp/g, (match, name) => {
+  const built = assetFiles.find(file => file.startsWith(`${name}-`) && /^[\w-]{8}\.webp$/.test(file.slice(name.length + 1)))
+  if (!built) throw new Error(`no hashed build of ${match}`)
+  return `/assets/${built}`
+})
 
 // Each page brings its own title and meta through Helmet, so the template's defaults are removed.
 const base = template
