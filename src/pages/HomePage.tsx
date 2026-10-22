@@ -7,6 +7,11 @@ import { PostThumb } from '../components/PostThumb'
 import { SearchButton } from '../components/SearchButton'
 import { SiteFooter } from '../components/SiteFooter'
 import { ContactForm } from '../components/ContactForm'
+// Imported so the build hashes their names and they can be cached for a year.
+import portrait192 from '../assets/sj_image-192.webp'
+import portrait240 from '../assets/sj_image-4x5-240.webp'
+import portrait480 from '../assets/sj_image-4x5.webp'
+import portrait800 from '../assets/sj_image.webp'
 import { projects } from '../data/projects'
 import { formatMonth, Job, jobs } from '../data/experience'
 import { postText, publishedBlogs } from '../data/blogs'
@@ -191,8 +196,8 @@ export const HomePage: React.FC = () => {
             </div>
             <div className="notebook-portrait">
               <picture>
-                <source media="(min-width: 621px)" srcSet="/sj_image-4x5-240.webp 240w, /sj_image-4x5.webp 480w, /sj_image.webp 800w" sizes="min(28vw, 240px)" />
-                <img src="/sj_image-192.webp" alt={t.portraitAlt} width="192" height="240" {...{ fetchpriority: 'high' }} />
+                <source media="(min-width: 621px)" srcSet={`${portrait240} 240w, ${portrait480} 480w, ${portrait800} 800w`} sizes="min(28vw, 240px)" />
+                <img src={portrait192} alt={t.portraitAlt} width="192" height="240" {...{ fetchpriority: 'high' }} />
               </picture>
             </div>
           </section>

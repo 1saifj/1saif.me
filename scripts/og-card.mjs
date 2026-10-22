@@ -32,7 +32,7 @@ h1 { font-size: ${card.lang === 'ar' ? 78 : 76}px; font-weight: 600; letter-spac
 img { width: 336px; height: 420px; border-radius: 14px; object-fit: cover; outline: 1px solid rgba(16, 22, 29, .1); outline-offset: -1px; }
 </style></head><body>
 <div class="copy"><h1>${card.name}</h1><p class="title">${card.title}</p><p class="place">${card.place}</p><p class="line">${card.line}</p><p class="site">1saif<span>.</span>me</p></div>
-<img src="${file('sj_image.webp')}" alt="">
+<img src="${file('../src/assets/sj_image.webp')}" alt="">
 </body></html>`
 
 const browser = await chromium.launch({ channel: 'chrome' })
