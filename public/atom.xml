@@ -502,7 +502,7 @@
     <link href="https://1saif.me/blog/setting-up-a-local-development-environment-with-a-webhook-service-using-docker-compose" rel="alternate"/>
     <id>https://1saif.me/blog/setting-up-a-local-development-environment-with-a-webhook-service-using-docker-compose</id>
     <published>2024-09-02T00:00:00.000Z</published>
-    <updated>2023-09-02T00:00:00.000Z</updated>
+    <updated>2024-09-02T00:00:00.000Z</updated>
     <summary>One docker-compose file that runs a Node.js app, a webhook service, MongoDB and Nginx as a reverse proxy, so every developer starts the same stack with one command.</summary>
     <content type="html"><![CDATA[
       <p>One docker-compose file that runs a Node.js app, a webhook service, MongoDB and Nginx as a reverse proxy, so every developer starts the same stack with one command.</p>
@@ -548,9 +548,9 @@
     <id>https://1saif.me/blog/microservices-architecture-with-go-and-docker</id>
     <published>2024-04-22T00:00:00.000Z</published>
     <updated>2024-04-22T00:00:00.000Z</updated>
-    <summary>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.</summary>
+    <summary>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer.</summary>
     <content type="html"><![CDATA[
-      <p>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.</p>
+      <p>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer.</p>
       <img src="https://1saif.me/articles/go_micro_feat.jpg" alt="Microservices Architecture with Go and Docker" />
       <p><a href="https://1saif.me/blog/microservices-architecture-with-go-and-docker">Read more...</a></p>
     ]]></content>
@@ -592,9 +592,9 @@
     <id>https://1saif.me/blog/managing-multiple-database-schemas-with-gorm</id>
     <published>2023-07-09T00:00:00.000Z</published>
     <updated>2023-07-09T00:00:00.000Z</updated>
-    <summary>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.</summary>
+    <summary>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names.</summary>
     <content type="html"><![CDATA[
-      <p>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.</p>
+      <p>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names.</p>
       <img src="https://1saif.me/articles/gorm_schema_feat.jpg" alt="Managing Multiple Database Schemas with Gorm" />
       <p><a href="https://1saif.me/blog/managing-multiple-database-schemas-with-gorm">Read more...</a></p>
     ]]></content>
