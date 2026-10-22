@@ -2,6 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // Trusted Types: the CSP requires it, so every script URL and HTML string passes through this policy.
+      if (window.trustedTypes && trustedTypes.createPolicy) {
+        trustedTypes.createPolicy('default', {
+          createScriptURL: function (url) {
+            var u = new URL(url, location.href);
+            if (u.origin === location.origin || u.origin === 'https://challenges.cloudflare.com' || u.origin === 'https://static.cloudflareinsights.com') return url;
+            throw new TypeError('Blocked script URL: ' + url);
+          },
+          // shortcut: HTML passes unchanged because it comes from our own build (markdown, highlighter, JSON-LD); sanitize here if user content is ever rendered.
+          createHTML: function (html) { return html; }
+        });
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=2" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
@@ -71,8 +85,10 @@ html[dir='rtl'] .sr-only:focus-visible { font-family: 'IBM Plex Sans Arabic', 'P
 .notebook-header { view-transition-name: site-header; }
 /* At the very top the header sits on the page; its hairline appears once the page scrolls under it. */
 @supports (animation-timeline: scroll()) {
-  .notebook-header { animation: nb-header-line linear both; animation-timeline: scroll(); animation-range: 0 40px; }
-  @keyframes nb-header-line { from { border-bottom-color: transparent; } }
+  /* The hairline is a pseudo-element so the fade animates opacity, which the compositor handles. */
+  .notebook-header { border-bottom-color: transparent; }
+  .notebook-header::after { content: ''; position: absolute; inset: auto 0 -1px; height: 1px; background: var(--nb-line); animation: nb-header-line linear both; animation-timeline: scroll(); animation-range: 0 40px; }
+  @keyframes nb-header-line { from { opacity: 0; } }
 }
 .notebook-header-inner { display: flex; align-items: center; gap: 28px; width: min(calc(100% - 48px), 960px); min-height: 60px; margin-inline: auto; }
 .notebook-brand { color: var(--nb-ink); font-weight: 600; letter-spacing: -.01em; text-decoration: none; }
