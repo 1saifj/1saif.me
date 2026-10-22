@@ -95,18 +95,13 @@ let turnstileScript: Promise<void> | undefined
 
 function loadTurnstile(): Promise<void> {
   turnstileScript ??= new Promise((resolve, reject) => {
-    // The connection opens while the script downloads; no crossorigin, because the script is a no-cors classic script.
-    const preconnect = document.createElement('link')
-    preconnect.rel = 'preconnect'
-    preconnect.href = 'https://challenges.cloudflare.com'
-
     const script = document.createElement('script')
     script.src = TURNSTILE_SCRIPT
     script.async = true
     script.onload = () => resolve()
     script.onerror = () => { turnstileScript = undefined; reject(new Error('Turnstile did not load')) }
 
-    document.head.append(preconnect, script)
+    document.head.append(script)
   })
 
   return turnstileScript
