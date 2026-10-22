@@ -1,5 +1,6 @@
 // Renders every route to static HTML after `vite build`, so each page paints before JavaScript runs
 // and crawlers see real content. Uses React's server renderer; no browser is needed.
+import { createHash } from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -70,4 +71,20 @@ await fs.writeFile(path.join(dist, '404.html'), page('/__missing__'))
 
 await fs.writeFile(path.join(dist, 'ar', '404.html'), page('/ar/__missing__'))
 
-console.log(`prerendered ${routes.length} routes + 2 404 pages`)
+// The CSP allows inline scripts by hash only, so hash every executable inline script on every page we wrote.
+const hashes = new Set()
+for (const file of (await fs.readdir(dist, { recursive: true })).filter(name => name.endsWith('.html'))) {
+  const html = await fs.readFile(path.join(dist, file), 'utf8')
+  for (const [, attrs, body] of html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)) {
+    if (/\bsrc=|application\/ld\+json/.test(attrs)) continue
+    hashes.add(`'sha256-${createHash('sha256').update(body).digest('base64')}'`)
+  }
+}
+// Inline scripts are meant to be the same few on every page; a page-specific one would bloat the header.
+if (hashes.size === 0 || hashes.size > 8) throw new Error(`expected 1-8 distinct inline scripts, found ${hashes.size}`)
+const headersFile = path.join(dist, '_headers')
+const headers = await fs.readFile(headersFile, 'utf8')
+if (!headers.includes('__SCRIPT_HASHES__')) throw new Error('dist/_headers has no __SCRIPT_HASHES__ placeholder')
+await fs.writeFile(headersFile, headers.replace('__SCRIPT_HASHES__', [...hashes].join(' ')))
+
+console.log(`prerendered ${routes.length} routes + 2 404 pages, ${hashes.size} inline script hashes in the CSP`)
