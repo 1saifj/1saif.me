@@ -484,7 +484,7 @@
       "summary": "One docker-compose file that runs a Node.js app, a webhook service, MongoDB and Nginx as a reverse proxy, so every developer starts the same stack with one command.",
       "image": "https://1saif.me/articles/docker_feat.jpg",
       "date_published": "2024-09-02T00:00:00.000Z",
-      "date_modified": "2024-09-02T00:00:00.000Z",
+      "date_modified": "2023-09-02T00:00:00.000Z",
       "authors": [
         {
           "name": "Saif Aljanahi"
@@ -523,8 +523,8 @@
       "id": "https://1saif.me/blog/microservices-architecture-with-go-and-docker",
       "url": "https://1saif.me/blog/microservices-architecture-with-go-and-docker",
       "title": "Microservices Architecture with Go and Docker",
-      "content_html": "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer.",
-      "summary": "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer.",
+      "content_html": "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.",
+      "summary": "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.",
       "image": "https://1saif.me/articles/go_micro_feat.jpg",
       "date_published": "2024-04-22T00:00:00.000Z",
       "date_modified": "2024-04-22T00:00:00.000Z",
@@ -565,8 +565,8 @@
       "id": "https://1saif.me/blog/managing-multiple-database-schemas-with-gorm",
       "url": "https://1saif.me/blog/managing-multiple-database-schemas-with-gorm",
       "title": "Managing Multiple Database Schemas with Gorm",
-      "content_html": "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names.",
-      "summary": "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names.",
+      "content_html": "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.",
+      "summary": "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.",
       "image": "https://1saif.me/articles/gorm_schema_feat.jpg",
       "date_published": "2023-07-09T00:00:00.000Z",
       "date_modified": "2023-07-09T00:00:00.000Z",

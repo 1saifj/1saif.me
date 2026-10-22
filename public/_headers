@@ -1,6 +1,6 @@
 # Cloudflare Pages joins the values when two matching rules set the same header,
-# so every header is set by exactly one rule. HTML keeps "max-age=0, must-revalidate",
-# so a deploy shows up at once.
+# so every header is set by exactly one rule. HTML has no Cache-Control rule: Pages
+# then serves it with "max-age=0, must-revalidate", so a deploy shows up at once.
 
 /*
   X-Frame-Options: SAMEORIGIN
@@ -11,32 +11,6 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   # prerender.mjs fills script-src with the hash of every inline script it writes.
   Content-Security-Policy: default-src 'self'; script-src __SCRIPT_HASHES__ 'strict-dynamic' https: 'unsafe-inline'; worker-src 'self'; object-src 'none'; frame-src https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; require-trusted-types-for 'script'
-
-# HTML routes. no-transform stops Cloudflare from injecting its JavaScript Detections script,
-# which changes per request and so cannot be allowed by hash under the strict CSP.
-/
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
-
-/blog
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
-
-/blog/*
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
-
-/ar
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
-
-/ar/*
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
-
-/project/*
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
-
-/resume
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
-
-/privacy
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
 
 # Hashed build output never changes under the same name.
 /assets/*
