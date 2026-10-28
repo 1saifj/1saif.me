@@ -20,9 +20,10 @@ export function commentToHtml(markdown: string): string {
   const text = escapeHtml(markdown.replace(/\uE000/g, '').replace(/\r\n?/g, '\n')
     .replace(/```(\w{0,20})[^\n]*\n([\s\S]*?)```/g, (_match, lang: string, code: string) => `\n\n${hold(codeBlockHtml(lang, '', code))}\n\n`))
     .replace(/`([^`\n]+)`/g, (_match, code: string) => hold(`<code>${code}</code>`))
-    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, (_match, label: string, url: string) => hold(link(url, label)))
-    // A bare address becomes a link too; trailing punctuation stays outside it.
-    .replace(/(^|\s)(https?:\/\/[^\s<]*[^\s<.,;:!?)'"])/g, (_match, space: string, url: string) => space + hold(link(url, url)))
+    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)\uE000]+)\)/g, (_match, label: string, url: string) => hold(link(url, label)))
+    // A bare address becomes a link too; trailing punctuation stays outside it. No address may swallow a held part,
+    // or that part's HTML would land inside an href.
+    .replace(/(^|\s)(https?:\/\/[^\s<\uE000]*[^\s<.,;:!?)'"\uE000])/g, (_match, space: string, url: string) => space + hold(link(url, url)))
 
   const html = text.trim().split(/\n{2,}/).map(block => {
     const lines = block.split('\n')

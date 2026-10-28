@@ -33,10 +33,13 @@ describe('commentToHtml', () => {
     ['```js" onclick="alert(1)\ncode\n```'],
     ['![x](https://a.com/x.png" onerror="alert(1))'],
     ['\uE0000\uE000<b>forged</b>'],
+    ['https://a.com/[x](https://b.com)'],
+    ['[y](https://a.com/`code`)'],
   ])('never lets markup through: %s', input => {
     const html = commentToHtml(input)
 
     expect(html).not.toMatch(/<(script|img|b)[\s>]/)
     expect(html).not.toMatch(/\son\w+="/)
+    expect(html).not.toMatch(/href="[^"]*</)
   })
 })
