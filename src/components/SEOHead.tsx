@@ -39,6 +39,8 @@ const SEOHead: React.FC<SEOHeadProps> = ({ title, description, url, image, type 
       <meta name="robots" content={noIndex ? 'noindex' : 'index, follow, max-image-preview:large'} />
       <meta name="author" content="Saif Aljanahi" />
       {type === 'article' && tags.length > 0 && <meta name="keywords" content={tags.join(', ')} />}
+      {/* scripts/prerender.mjs writes this plain copy for AI assistants. */}
+      {type === 'article' && <link rel="alternate" type="text/markdown" href={`${baseUrl}.md`} />}
 
       <meta property="og:type" content={type} />
       <meta property="og:title" content={fullTitle} />
