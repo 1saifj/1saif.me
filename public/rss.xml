@@ -9,8 +9,8 @@
     <link>https://1saif.me/blog</link>
     <atom:link href="https://1saif.me/rss.xml" rel="self" type="application/rss+xml"/>
     <language>en-us</language>
-    <lastBuildDate>Sun, 18 Oct 2026 13:43:19 GMT</lastBuildDate>
-    <pubDate>Sat, 14 Mar 2026 00:00:00 GMT</pubDate>
+    <lastBuildDate>Wed, 28 Oct 2026 22:26:18 GMT</lastBuildDate>
+    <pubDate>Thu, 29 Oct 2026 00:00:00 GMT</pubDate>
     <ttl>60</ttl>
     <copyright>Copyright 2026 Saif Aljanahi</copyright>
     <managingEditor>hello@1saif.me (Saif Aljanahi)</managingEditor>
@@ -20,6 +20,26 @@
       <title>Saif Aljanahi Blog</title>
       <link>https://1saif.me/blog</link>
     </image>
+
+    <item>
+      <title>The VPN Gateway That Was Running on Luck</title>
+      <description>Twelve IPsec tunnels were up, traffic was flowing, and systemd said strongSwan wasn&apos;t running at all. How I found out, and the one-time script I used to fix it on production in about three seconds of downtime.</description>
+      <content:encoded><![CDATA[
+      <p>Twelve IPsec tunnels were up, traffic was flowing, and systemd said strongSwan wasn&apos;t running at all. How I found out, and the one-time script I used to fix it on production in about three seconds of downtime.</p>
+      
+      <p><a href="https://1saif.me/blog/the-vpn-gateway-that-was-running-on-luck">Read more...</a></p>
+    ]]></content:encoded>
+      <link>https://1saif.me/blog/the-vpn-gateway-that-was-running-on-luck</link>
+      <guid isPermaLink="true">https://1saif.me/blog/the-vpn-gateway-that-was-running-on-luck</guid>
+      <pubDate>Thu, 29 Oct 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Saif Aljanahi</dc:creator>
+      <category>linux</category>
+      <category>devops</category>
+      <category>networking</category>
+      <category>ipsec</category>
+      <category>systemd</category>
+      
+    </item>
 
     <item>
       <title>Locking Down a Small VM Without Spending Money</title>
@@ -479,9 +499,9 @@
 
     <item>
       <title>Microservices Architecture with Go and Docker</title>
-      <description>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.</description>
+      <description>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer.</description>
       <content:encoded><![CDATA[
-      <p>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.</p>
+      <p>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer.</p>
       <img src="https://1saif.me/articles/go_micro_feat.jpg" alt="Microservices Architecture with Go and Docker" />
       <p><a href="https://1saif.me/blog/microservices-architecture-with-go-and-docker">Read more...</a></p>
     ]]></content:encoded>
@@ -517,9 +537,9 @@
 
     <item>
       <title>Managing Multiple Database Schemas with Gorm</title>
-      <description>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.</description>
+      <description>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names.</description>
       <content:encoded><![CDATA[
-      <p>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.</p>
+      <p>How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names.</p>
       <img src="https://1saif.me/articles/gorm_schema_feat.jpg" alt="Managing Multiple Database Schemas with Gorm" />
       <p><a href="https://1saif.me/blog/managing-multiple-database-schemas-with-gorm">Read more...</a></p>
     ]]></content:encoded>
