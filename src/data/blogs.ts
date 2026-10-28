@@ -3,6 +3,24 @@ import { BlogPost } from '../schemas/blogSchema'
 // Homepage metadata stays small; full markdown remains lazy on article routes.
 const blogs: BlogPost[] = [
   {
+    "title": "The VPN Gateway That Was Running on Luck",
+    "description": "Twelve IPsec tunnels were up, traffic was flowing, and systemd said strongSwan wasn't running at all. How I found out, and the one-time script I used to fix it on production in about three seconds of downtime.",
+    "titleAr": "بوابة VPN كانت تعمل بالحظ",
+    "descriptionAr": "اثنا عشر نفق IPsec تعمل، والحركة تمرّ، وsystemd يقول إن strongSwan متوقف تماماً. كيف اكتشفت ذلك، والسكربت الذي لا يعمل إلا مرة واحدة وأصلحت به الإنتاج بانقطاع قرابة ثلاث ثوانٍ.",
+    "createdAt": 1793221200000,
+    "updatedAt": 1793221200000,
+    "draft": false,
+    "tags": [
+      "linux",
+      "devops",
+      "networking",
+      "ipsec",
+      "systemd"
+    ],
+    "file": "the_vpn_gateway_running_on_luck",
+    "words": 1197
+  },
+  {
     "title": "OpenTelemetry in Go: Traces You Can Actually Read",
     "description": "What OpenTelemetry is, what traces, metrics, logs and baggage each give you, and a small Go setup that sends traces to a local Jaeger in a few minutes.",
     "titleAr": "OpenTelemetry في Go: تتبّعات تستطيع قراءتها فعلاً",
