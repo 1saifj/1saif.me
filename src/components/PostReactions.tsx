@@ -1,6 +1,6 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react'
 import { dateLocale, Language, SITE_TIME_ZONE } from '../i18n/language'
-import { loadTurnstile } from './ContactForm'
+import { loadTurnstile } from '../utils/turnstile'
 
 // Public site key of the 1saif-comments Turnstile widget (hostname 1saif.me). Local dev uses Cloudflare's always-pass test key.
 const COMMENT_TURNSTILE_SITE_KEY = import.meta.env.DEV ? '1x00000000000000000000AA' : '0x4AAAAAAFqPCIgp66hZ-OXd'
@@ -49,8 +49,8 @@ const copy = {
   },
   ar: {
     like: 'أعجبني',
-    // Arabic counts: one, two, 3 to 10 take the plural, 11 and up take the singular.
-    likes: (count: number) => count === 1 ? 'إعجاب واحد' : count === 2 ? 'إعجابان' : count >= 3 && count <= 10 ? `${count} إعجابات` : `${count} إعجاب`,
+    // Arabic counts: one, two; a number ending in 3 to 10 takes the plural, any other the singular.
+    likes: (count: number) => count === 1 ? 'إعجاب واحد' : count === 2 ? 'إعجابان' : count % 100 >= 3 && count % 100 <= 10 ? `${count} إعجابات` : `${count} إعجاب`,
     likeFailed: 'لم يُحفظ الإعجاب. حاول مرة أخرى.',
     title: 'التعليقات',
     empty: 'لا تعليقات بعد.',

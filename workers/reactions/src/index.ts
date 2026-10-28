@@ -120,7 +120,7 @@ const MAX_NAME = 60
 
 const MAX_MESSAGE = 2_000
 
-// shortcut: the oldest 200 only; page the list when a post gets near that many.
+// shortcut: the newest 200 only; page the list when a post gets near that many.
 const MAX_COMMENTS = 200
 
 // Control characters, except tab and line breaks, which a message may hold.
@@ -193,11 +193,11 @@ async function readPost(slug: string, env: Env, ctx: Context): Promise<Response>
 
   const [stats, comments] = await db.batch<PostRow>([
     db.prepare('SELECT likes FROM post_stats WHERE slug = ?').bind(slug),
-    db.prepare('SELECT id, name, body, created_at AS createdAt FROM comments WHERE slug = ? AND hidden = 0 ORDER BY created_at LIMIT ?').bind(slug, MAX_COMMENTS),
+    db.prepare('SELECT id, name, body, created_at AS createdAt FROM comments WHERE slug = ? AND hidden = 0 ORDER BY created_at DESC LIMIT ?').bind(slug, MAX_COMMENTS),
   ])
 
   const response = Response.json(
-    { likes: stats.results[0]?.likes ?? 0, comments: comments.results },
+    { likes: stats.results[0]?.likes ?? 0, comments: comments.results.reverse() },
     { headers: { 'Cache-Control': 'public, max-age=30' } },
   )
 
@@ -208,6 +208,13 @@ async function readPost(slug: string, env: Env, ctx: Context): Promise<Response>
 
 // shortcut: the Cache API is per location, so other locations may serve the old reply for up to 30 s.
 const forget = (slug: string) => caches.default.delete(cacheKey(slug))
+
+// One hash per post and browser, so the stored likes of one browser cannot be joined across posts.
+async function visitorKey(slug: string, visitor: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${slug}:${visitor}`))
+
+  return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('')
+}
 
 async function like(request: Request, slug: string, env: Env, ip: string): Promise<Response> {
   if (!(await env.PER_CLIENT_LIKES.limit({ key: ip })).success) return fail(429, 'rate')
@@ -232,13 +239,14 @@ async function like(request: Request, slug: string, env: Env, ip: string): Promi
   if (!(await env.ALL_LIKES.limit({ key: 'all' })).success) return fail(429, 'rate')
 
   const liking = request.method === 'PUT'
+  const key = await visitorKey(slug, visitor)
 
-  // The count is recounted, never incremented, so a repeat or a lost reply can never make it drift.
+  // Triggers on likes keep post_stats exact (migrations/0002), so a repeat or a lost reply never makes it drift.
   const [changed, counted] = await env.DB.batch<{ likes: number }>([
     liking
-      ? env.DB.prepare('INSERT OR IGNORE INTO likes (slug, visitor, created_at) VALUES (?, ?, ?)').bind(slug, visitor, Date.now())
-      : env.DB.prepare('DELETE FROM likes WHERE slug = ? AND visitor = ?').bind(slug, visitor),
-    env.DB.prepare('INSERT INTO post_stats (slug, likes) VALUES (?1, (SELECT COUNT(*) FROM likes WHERE slug = ?1)) ON CONFLICT (slug) DO UPDATE SET likes = excluded.likes RETURNING likes').bind(slug),
+      ? env.DB.prepare('INSERT OR IGNORE INTO likes (slug, visitor, created_at) VALUES (?, ?, ?)').bind(slug, key, Date.now())
+      : env.DB.prepare('DELETE FROM likes WHERE slug = ? AND visitor = ?').bind(slug, key),
+    env.DB.prepare('SELECT likes FROM post_stats WHERE slug = ?').bind(slug),
   ])
 
   await forget(slug)
@@ -264,7 +272,8 @@ async function comment(request: Request, slug: string, env: Env, ctx: Context, i
     return fail(status, error)
   }
 
-  if (!(await env.PER_CLIENT_COMMENTS.limit({ key: ip })).success) return reject(429, 'rate', 'rate')
+  // Not tracked: a flood from one client must not spend the analytics budget.
+  if (!(await env.PER_CLIENT_COMMENTS.limit({ key: ip })).success) return fail(429, 'rate')
 
   const field = (key: string) => (form.get(key) ?? '').trim()
   const name = field('name')

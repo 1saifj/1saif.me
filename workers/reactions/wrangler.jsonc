@@ -26,7 +26,7 @@
       "migrations_dir": "migrations"
     }
   ],
-  // Page views, likes and comments for `npm run insights`. No IP and no visitor ID is written.
+  // Page views, likes and comments for `npm run insights`. No IP and no visitor ID is written here.
   "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "post_reactions" }],
   // A new comment mails Saif, only at this verified Email Routing address.
   "send_email": [

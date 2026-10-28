@@ -29,25 +29,28 @@ function makeDb() {
     if (sql.startsWith('SELECT likes')) return { results: stats.has(String(first)) ? [{ likes: stats.get(String(first)) }] : [], changes: 0 }
 
     if (sql.startsWith('SELECT id')) {
-      const visible = comments.filter(item => item.slug === first && item.hidden === 0).sort((a, b) => a.createdAt - b.createdAt).slice(0, Number(second))
+      const visible = comments.filter(item => item.slug === first && item.hidden === 0).sort((a, b) => b.createdAt - a.createdAt).slice(0, Number(second))
 
       return { results: visible.map(({ id, name, body, createdAt }) => ({ id, name, body, createdAt })), changes: 0 }
     }
 
+    // The likes_insert and likes_delete triggers (migrations/0002) move the count with each change.
     if (sql.startsWith('INSERT OR IGNORE INTO likes')) {
       const before = likes.size
       likes.add(`${first} ${second}`)
+      const changes = likes.size - before
 
-      return { results: [], changes: likes.size - before }
+      stats.set(String(first), (stats.get(String(first)) ?? 0) + changes)
+
+      return { results: [], changes }
     }
 
-    if (sql.startsWith('DELETE FROM likes')) return { results: [], changes: likes.delete(`${first} ${second}`) ? 1 : 0 }
+    if (sql.startsWith('DELETE FROM likes')) {
+      const changes = likes.delete(`${first} ${second}`) ? 1 : 0
 
-    if (sql.startsWith('INSERT INTO post_stats')) {
-      const count = [...likes].filter(key => key.startsWith(`${first} `)).length
-      stats.set(String(first), count)
+      if (changes) stats.set(String(first), Math.max(0, (stats.get(String(first)) ?? 0) - 1))
 
-      return { results: [{ likes: count }], changes: 1 }
+      return { results: [], changes }
     }
 
     if (sql.startsWith('INSERT INTO comments')) {
@@ -85,7 +88,7 @@ function makeDb() {
     },
   }
 
-  return { ...session, withSession: () => session, comments, queries: () => queries }
+  return { ...session, withSession: () => session, comments, likes, queries: () => queries }
 }
 
 function makeEnv(limits: Partial<Record<'PER_CLIENT_LIKES' | 'PER_CLIENT_COMMENTS' | 'ALL_CLIENTS_COMMENTS' | 'ALL_LIKES' | 'PER_CLIENT_COLLECT' | 'ALL_COLLECT', boolean>> = {}) {
@@ -222,7 +225,17 @@ describe('reactions worker: likes', () => {
     expect(points[0].indexes).toEqual([slug])
   })
 
-  it('removes a like and recounts', async () => {
+  it('stores a per-post hash, never the browser ID', async () => {
+    const { env, db } = makeEnv()
+
+    await worker.fetch(likeRequest('PUT'), env, ctx)
+    const [key] = [...db.likes]
+
+    expect(key).toMatch(new RegExp(`^${slug} [0-9a-f]{64}$`))
+    expect(key).not.toContain(visitor)
+  })
+
+  it('removes a like and lowers the count', async () => {
     const { env } = makeEnv()
 
     await worker.fetch(likeRequest('PUT'), env, ctx)
@@ -349,13 +362,21 @@ describe('reactions worker: comments', () => {
     expect((await worker.fetch(commentRequest(goodFields), env, ctx)).status).toBe(400)
   })
 
-  it.each(['PER_CLIENT_COMMENTS', 'ALL_CLIENTS_COMMENTS'] as const)('refuses a comment over %s', async binding => {
+  it('refuses a comment over ALL_CLIENTS_COMMENTS', async () => {
     stubTurnstile({ success: true, hostname: '1saif.me', action: 'comment' })
-    const { env, db } = makeEnv({ [binding]: false })
+    const { env, db } = makeEnv({ ALL_CLIENTS_COMMENTS: false })
 
     expect((await worker.fetch(commentRequest(goodFields), env, ctx)).status).toBe(429)
     expect(db.comments).toHaveLength(0)
     expect(points[0].blobs.at(-1)).toBe('rate')
+  })
+
+  it('refuses a comment over PER_CLIENT_COMMENTS without spending an analytics point', async () => {
+    const { env, db } = makeEnv({ PER_CLIENT_COMMENTS: false })
+
+    expect((await worker.fetch(commentRequest(goodFields), env, ctx)).status).toBe(429)
+    expect(db.comments).toHaveLength(0)
+    expect(points).toHaveLength(0)
   })
 
   it('refuses a JSON body', async () => {

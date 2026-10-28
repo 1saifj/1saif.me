@@ -1,36 +1,12 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react'
 import { Language } from '../i18n/language'
 import { ContactErrors, ContactField, firstInvalidField, validateContact, validateField } from '../utils/contactValidation'
+import { loadTurnstile } from '../utils/turnstile'
 
 // Public site key of the 1saif-contact Turnstile widget (hostname 1saif.me).
 const TURNSTILE_SITE_KEY = '0x4AAAAAAFbfd5bsGhJ9I7uT'
 
-const TURNSTILE_SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
-
 const TOKEN_WAIT_MS = 20_000
-
-interface TurnstileOptions {
-  sitekey: string
-  action: string
-  language: string
-  theme: 'light' | 'dark'
-  size: 'flexible'
-  appearance: 'interaction-only'
-  'refresh-expired': 'auto'
-  callback: (token: string) => void
-  'expired-callback': () => void
-  'error-callback': () => void
-  'timeout-callback': () => void
-}
-
-interface Turnstile {
-  render(container: HTMLElement, options: TurnstileOptions): string
-  reset(widgetId: string): void
-}
-
-declare global {
-  interface Window { turnstile?: Turnstile }
-}
 
 const copy = {
   en: {
@@ -90,22 +66,6 @@ const copy = {
 }
 
 type Status = 'idle' | 'checking' | 'sending' | 'sent' | 'rate' | 'challenge' | 'failed'
-
-let turnstileScript: Promise<void> | undefined
-
-export function loadTurnstile(): Promise<void> {
-  turnstileScript ??= new Promise((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = TURNSTILE_SCRIPT
-    script.async = true
-    script.onload = () => resolve()
-    script.onerror = () => { turnstileScript = undefined; reject(new Error('Turnstile did not load')) }
-
-    document.head.append(script)
-  })
-
-  return turnstileScript
-}
 
 function fieldControl(form: HTMLFormElement, field: ContactField): HTMLInputElement | HTMLTextAreaElement | null {
   const control = form.elements.namedItem(field)

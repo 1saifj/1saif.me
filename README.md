@@ -98,7 +98,7 @@ The account is on the Workers Free plan with no payment method, so nothing can b
 | Service | Free limit | What this site uses |
 | --- | --- | --- |
 | Workers | 100,000 requests a day, 10 ms CPU each | About 2 requests per post view (the page-view beacon, and the likes and comments read near the end), 1 per other page view, 1 per like or comment. Cache hits and refused requests count too |
-| D1 | 5 million rows read and 100,000 rows written a day | `ALL_LIKES` allows 15 likes a minute and `ALL_CLIENTS_COMMENTS` 10 verified comments a minute, per location: at most about 36,000 writes, or about 65,000 rows, a day. A like or unlike recounts the post's likes, so it reads one row per like the post already has. A read misses the 30 s edge cache at most twice a minute per post and location (and once after each write), and reads at most 201 rows |
+| D1 | 5 million rows read and 100,000 rows written a day | `ALL_LIKES` allows 15 likes a minute and `ALL_CLIENTS_COMMENTS` 10 verified comments a minute, per location: at most about 36,000 writes, or about 65,000 rows, a day. Triggers keep the like count, so a like or unlike costs a few rows, whatever the post's count. A read misses the 30 s edge cache at most twice a minute per post and location (and once after each write), and reads at most 201 rows |
 | Analytics Engine | 100,000 data points written and 10,000 read queries a day | `ALL_COLLECT` allows 50 page views a minute per location (72,000 a day), plus at most about 36,000 reaction events. One `npm run insights` run is 10 queries |
 
 Every query uses a primary key or the `comments_by_post` index, so no request scans a table. Rate limits are counted per Cloudflare location, so traffic spread over many locations can pass the caps.
