@@ -120,6 +120,8 @@ if (hashes.size === 0 || hashes.size > 8) throw new Error(`expected 1-8 distinct
 const headersFile = path.join(dist, '_headers')
 const headers = await fs.readFile(headersFile, 'utf8')
 if (!headers.includes('__SCRIPT_HASHES__')) throw new Error('dist/_headers has no __SCRIPT_HASHES__ placeholder')
-await fs.writeFile(headersFile, headers.replace('__SCRIPT_HASHES__', [...hashes].join(' ')))
+// The markdown copies name their HTML page as canonical, so search engines index the page, not the copy.
+const markdownCanonicals = posts.filter(post => post.file).map(post => `\n/blog/${post.slug}.md\n  Link: <${SITE}/blog/${post.slug}>; rel="canonical"\n`).join('')
+await fs.writeFile(headersFile, headers.replace('__SCRIPT_HASHES__', [...hashes].join(' ')) + markdownCanonicals)
 
 console.log(`prerendered ${routes.length} routes + 2 404 pages, ${hashes.size} inline script hashes in the CSP`)
