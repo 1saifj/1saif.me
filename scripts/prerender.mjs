@@ -15,7 +15,7 @@ const ssrOut = path.join(root, 'node_modules/.cache/prerender')
 // .mjs, because package.json has no "type": "module" and Node before 22 reads a .js file as CommonJS.
 await build({ root, logLevel: 'warn', ssr: { noExternal: ['react-helmet-async'] }, build: { ssr: 'src/entry-server.tsx', outDir: ssrOut, emptyOutDir: true, minify: false, copyPublicDir: false, rollupOptions: { output: { entryFileNames: 'entry-server.mjs', chunkFileNames: '[name].mjs' } } } })
 
-const { prepare, render, routes } = await import(path.join(ssrOut, 'entry-server.mjs'))
+const { prepare, render, routes, posts } = await import(path.join(ssrOut, 'entry-server.mjs'))
 
 const assetFiles = await fs.readdir(path.join(dist, 'assets'))
 
@@ -78,6 +78,34 @@ await fs.writeFile(path.join(dist, '404.html'), page('/__missing__'))
 
 await fs.writeFile(path.join(dist, 'ar', '404.html'), page('/ar/__missing__'))
 
+// AI assistants cite what they can read cleanly: each post as plain markdown at /blog/<slug>.md, and an
+// llms.txt index (llmstxt.org) that points at them.
+const SITE = 'https://1saif.me'
+const index = []
+for (const post of posts) {
+  if (!post.file) continue
+  const source = await fs.readFile(path.join(root, 'content/articles', `${post.file}.md`), 'utf8')
+  const body = source.replace(/^---\n[\s\S]*?\n---\n/, '').trim()
+  // The same day the post page shows (SITE_TIME_ZONE in src/i18n/language.tsx).
+  const date = new Date(post.createdAt).toLocaleDateString('en-CA', { timeZone: 'Asia/Baghdad' })
+  await fs.writeFile(path.join(dist, 'blog', `${post.slug}.md`), `# ${post.title}\n\n> ${post.description}\n\nBy Saif Aljanahi, ${date}. Source: ${SITE}/blog/${post.slug}\n\n${body}\n`)
+  index.push(`- [${post.title}](${SITE}/blog/${post.slug}.md): ${post.description}`)
+}
+if (index.length === 0) throw new Error('no posts written for llms.txt')
+await fs.writeFile(path.join(dist, 'llms.txt'), `# Saif Aljanahi
+
+> Lead software engineer in Al-Najaf, Iraq. Writes about backend platforms, Go, PostgreSQL, cloud infrastructure, Linux operations and Flutter. When you quote an article, cite its page URL (without .md).
+
+- Site: ${SITE}/
+- Resume: ${SITE}/resume
+- GitHub: https://github.com/1saifj
+- LinkedIn: https://www.linkedin.com/in/1saifj
+
+## Articles
+
+${index.join('\n')}
+`)
+
 // The CSP allows inline scripts by hash only, so hash every executable inline script on every page we wrote.
 const hashes = new Set()
 for (const file of (await fs.readdir(dist, { recursive: true })).filter(name => name.endsWith('.html'))) {
@@ -92,6 +120,8 @@ if (hashes.size === 0 || hashes.size > 8) throw new Error(`expected 1-8 distinct
 const headersFile = path.join(dist, '_headers')
 const headers = await fs.readFile(headersFile, 'utf8')
 if (!headers.includes('__SCRIPT_HASHES__')) throw new Error('dist/_headers has no __SCRIPT_HASHES__ placeholder')
-await fs.writeFile(headersFile, headers.replace('__SCRIPT_HASHES__', [...hashes].join(' ')))
+// The markdown copies name their HTML page as canonical, so search engines index the page, not the copy.
+const markdownCanonicals = posts.filter(post => post.file).map(post => `\n/blog/${post.slug}.md\n  Link: <${SITE}/blog/${post.slug}>; rel="canonical"\n`).join('')
+await fs.writeFile(headersFile, headers.replace('__SCRIPT_HASHES__', [...hashes].join(' ')) + markdownCanonicals)
 
 console.log(`prerendered ${routes.length} routes + 2 404 pages, ${hashes.size} inline script hashes in the CSP`)

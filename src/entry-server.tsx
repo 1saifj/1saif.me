@@ -39,6 +39,9 @@ const englishRoutes = [
   ...publishedBlogs.map(post => `/blog/${createSlugFromTitle(post.title)}`),
 ]
 
+// For llms.txt and the plain-markdown copies AI assistants read and cite.
+export const posts = publishedBlogs.map(post => ({ slug: createSlugFromTitle(post.title), title: post.title, description: post.description, file: post.file, createdAt: post.createdAt }))
+
 // Every page also exists in Arabic under /ar.
 export const routes = [...englishRoutes, ...englishRoutes.map(route => route === '/' ? '/ar' : `/ar${route}`)]
 

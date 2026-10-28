@@ -59,7 +59,8 @@ export const ArticleStructuredData: React.FC<ArticleStructuredDataProps> = ({ ti
     '@type': 'BlogPosting',
     headline: title,
     description,
-    ...(image && { image: `${SITE}${image}` }),
+    // Without a post image, the name card, so every post has the image Google asks for.
+    image: `${SITE}${image ?? (arabic ? '/og-card-ar.jpg' : '/og-card.jpg')}`,
     datePublished: publishedDate,
     dateModified: modifiedDate || publishedDate,
     author,
