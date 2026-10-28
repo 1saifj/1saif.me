@@ -88,7 +88,7 @@ function makeDb() {
   return { ...session, withSession: () => session, comments, queries: () => queries }
 }
 
-function makeEnv(limits: Partial<Record<'PER_CLIENT_LIKES' | 'PER_CLIENT_COMMENTS' | 'ALL_CLIENTS_COMMENTS' | 'ALL_WRITES' | 'PER_CLIENT_COLLECT' | 'ALL_COLLECT', boolean>> = {}) {
+function makeEnv(limits: Partial<Record<'PER_CLIENT_LIKES' | 'PER_CLIENT_COMMENTS' | 'ALL_CLIENTS_COMMENTS' | 'ALL_LIKES' | 'PER_CLIENT_COLLECT' | 'ALL_COLLECT', boolean>> = {}) {
   const limit = (allowed = true) => ({ limit: async () => ({ success: allowed }) })
   const db = makeDb()
 
@@ -106,7 +106,7 @@ function makeEnv(limits: Partial<Record<'PER_CLIENT_LIKES' | 'PER_CLIENT_COMMENT
     PER_CLIENT_LIKES: limit(limits.PER_CLIENT_LIKES),
     PER_CLIENT_COMMENTS: limit(limits.PER_CLIENT_COMMENTS),
     ALL_CLIENTS_COMMENTS: limit(limits.ALL_CLIENTS_COMMENTS),
-    ALL_WRITES: limit(limits.ALL_WRITES),
+    ALL_LIKES: limit(limits.ALL_LIKES),
     PER_CLIENT_COLLECT: limit(limits.PER_CLIENT_COLLECT),
     ALL_COLLECT: limit(limits.ALL_COLLECT),
     TURNSTILE_SECRET: 'secret',
@@ -246,7 +246,7 @@ describe('reactions worker: likes', () => {
     expect(db.queries()).toBe(0)
   })
 
-  it.each(['PER_CLIENT_LIKES', 'ALL_WRITES'] as const)('refuses a like over %s before D1', async binding => {
+  it.each(['PER_CLIENT_LIKES', 'ALL_LIKES'] as const)('refuses a like over %s before D1', async binding => {
     const { env, db } = makeEnv({ [binding]: false })
 
     expect((await worker.fetch(likeRequest('PUT'), env, ctx)).status).toBe(429)
@@ -349,7 +349,7 @@ describe('reactions worker: comments', () => {
     expect((await worker.fetch(commentRequest(goodFields), env, ctx)).status).toBe(400)
   })
 
-  it.each(['PER_CLIENT_COMMENTS', 'ALL_CLIENTS_COMMENTS', 'ALL_WRITES'] as const)('refuses a comment over %s', async binding => {
+  it.each(['PER_CLIENT_COMMENTS', 'ALL_CLIENTS_COMMENTS'] as const)('refuses a comment over %s', async binding => {
     stubTurnstile({ success: true, hostname: '1saif.me', action: 'comment' })
     const { env, db } = makeEnv({ [binding]: false })
 

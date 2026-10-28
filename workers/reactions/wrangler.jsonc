@@ -42,7 +42,7 @@
     { "name": "PER_CLIENT_LIKES", "namespace_id": "71453", "simple": { "limit": 10, "period": 60 } },
     { "name": "PER_CLIENT_COMMENTS", "namespace_id": "71454", "simple": { "limit": 3, "period": 60 } },
     { "name": "ALL_CLIENTS_COMMENTS", "namespace_id": "71455", "simple": { "limit": 10, "period": 60 } },
-    { "name": "ALL_WRITES", "namespace_id": "71456", "simple": { "limit": 15, "period": 60 } },
+    { "name": "ALL_LIKES", "namespace_id": "71456", "simple": { "limit": 15, "period": 60 } },
     { "name": "PER_CLIENT_COLLECT", "namespace_id": "71457", "simple": { "limit": 30, "period": 60 } },
     { "name": "ALL_COLLECT", "namespace_id": "71458", "simple": { "limit": 50, "period": 60 } }
   ]

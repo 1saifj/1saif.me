@@ -68,7 +68,7 @@ export interface Env {
   PER_CLIENT_LIKES: RateLimit
   PER_CLIENT_COMMENTS: RateLimit
   ALL_CLIENTS_COMMENTS: RateLimit
-  ALL_WRITES: RateLimit
+  ALL_LIKES: RateLimit
   PER_CLIENT_COLLECT: RateLimit
   ALL_COLLECT: RateLimit
   TURNSTILE_SECRET: string
@@ -228,7 +228,8 @@ async function like(request: Request, slug: string, env: Env, ip: string): Promi
 
   if (!UUID.test(visitor)) return fail(400, 'invalid')
 
-  if (!(await env.ALL_WRITES.limit({ key: 'all' })).success) return fail(429, 'rate')
+  // Likes have their own global bucket: unchallenged traffic must not use up the comments' budget.
+  if (!(await env.ALL_LIKES.limit({ key: 'all' })).success) return fail(429, 'rate')
 
   const liking = request.method === 'PUT'
 
@@ -288,8 +289,6 @@ async function comment(request: Request, slug: string, env: Env, ctx: Context, i
 
   // Counted only for verified visitors, so bots cannot use up the budget and block real people.
   if (!(await env.ALL_CLIENTS_COMMENTS.limit({ key: 'all' })).success) return reject(429, 'rate', 'rate')
-
-  if (!(await env.ALL_WRITES.limit({ key: 'all' })).success) return reject(429, 'rate', 'rate')
 
   const createdAt = Date.now()
 
