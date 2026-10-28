@@ -36,13 +36,19 @@ const SEOHead: React.FC<SEOHeadProps> = ({ title, description, url, image, type 
       <link rel="alternate" hrefLang="en" href={baseUrl} />
       <link rel="alternate" hrefLang="ar" href={arabicUrl} />
       <link rel="alternate" hrefLang="x-default" href={baseUrl} />
-      {noIndex && <meta name="robots" content="noindex" />}
+      <meta name="robots" content={noIndex ? 'noindex' : 'index, follow, max-image-preview:large'} />
+      <meta name="author" content="Saif Aljanahi" />
+      {type === 'article' && tags.length > 0 && <meta name="keywords" content={tags.join(', ')} />}
 
       <meta property="og:type" content={type} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={currentUrl} />
       <meta property="og:image" content={imageUrl} />
+      {/* Only the name card has a known size; post images vary. */}
+      {!image && <meta property="og:image:width" content="1200" />}
+      {!image && <meta property="og:image:height" content="630" />}
+      <meta property="og:image:alt" content={fullTitle} />
       <meta property="og:site_name" content="Saif Aljanahi" />
       <meta property="og:locale" content={language === 'ar' ? 'ar_IQ' : 'en_US'} />
       {type === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
@@ -53,6 +59,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({ title, description, url, image, type 
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={imageUrl} />
+      <meta name="twitter:image:alt" content={fullTitle} />
     </Helmet>
   )
 }

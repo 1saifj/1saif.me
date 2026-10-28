@@ -16,6 +16,28 @@
   ],
   "items": [
     {
+      "id": "https://1saif.me/blog/the-vpn-gateway-that-was-running-on-luck",
+      "url": "https://1saif.me/blog/the-vpn-gateway-that-was-running-on-luck",
+      "title": "The VPN Gateway That Was Running on Luck",
+      "content_html": "Twelve IPsec tunnels were up, traffic was flowing, and systemd said strongSwan wasn't running at all. How I found out, and the one-time script I used to fix it on production in about three seconds of downtime.",
+      "summary": "Twelve IPsec tunnels were up, traffic was flowing, and systemd said strongSwan wasn't running at all. How I found out, and the one-time script I used to fix it on production in about three seconds of downtime.",
+      "image": null,
+      "date_published": "2026-10-29T00:00:00.000Z",
+      "date_modified": "2026-10-29T00:00:00.000Z",
+      "authors": [
+        {
+          "name": "Saif Aljanahi"
+        }
+      ],
+      "tags": [
+        "linux",
+        "devops",
+        "networking",
+        "ipsec",
+        "systemd"
+      ]
+    },
+    {
       "id": "https://1saif.me/blog/locking-down-a-small-vm-without-spending-money",
       "url": "https://1saif.me/blog/locking-down-a-small-vm-without-spending-money",
       "title": "Locking Down a Small VM Without Spending Money",
@@ -484,7 +506,7 @@
       "summary": "One docker-compose file that runs a Node.js app, a webhook service, MongoDB and Nginx as a reverse proxy, so every developer starts the same stack with one command.",
       "image": "https://1saif.me/articles/docker_feat.jpg",
       "date_published": "2024-09-02T00:00:00.000Z",
-      "date_modified": "2023-09-02T00:00:00.000Z",
+      "date_modified": "2024-09-02T00:00:00.000Z",
       "authors": [
         {
           "name": "Saif Aljanahi"
@@ -523,8 +545,8 @@
       "id": "https://1saif.me/blog/microservices-architecture-with-go-and-docker",
       "url": "https://1saif.me/blog/microservices-architecture-with-go-and-docker",
       "title": "Microservices Architecture with Go and Docker",
-      "content_html": "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.",
-      "summary": "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery, logging, and why starting with fewer services is safer.",
+      "content_html": "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer.",
+      "summary": "How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer.",
       "image": "https://1saif.me/articles/go_micro_feat.jpg",
       "date_published": "2024-04-22T00:00:00.000Z",
       "date_modified": "2024-04-22T00:00:00.000Z",
@@ -565,8 +587,8 @@
       "id": "https://1saif.me/blog/managing-multiple-database-schemas-with-gorm",
       "url": "https://1saif.me/blog/managing-multiple-database-schemas-with-gorm",
       "title": "Managing Multiple Database Schemas with Gorm",
-      "content_html": "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.",
-      "summary": "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names and scopes.",
+      "content_html": "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names.",
+      "summary": "How to keep tables in two PostgreSQL schemas, app and auth, behind one GORM connection, using table names.",
       "image": "https://1saif.me/articles/gorm_schema_feat.jpg",
       "date_published": "2023-07-09T00:00:00.000Z",
       "date_modified": "2023-07-09T00:00:00.000Z",
