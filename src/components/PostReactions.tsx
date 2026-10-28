@@ -1,5 +1,7 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react'
 import { dateLocale, Language, SITE_TIME_ZONE } from '../i18n/language'
+import { enhanceCodeBlocks } from '../utils/codeBlocks'
+import { commentToHtml } from '../utils/commentMarkdown'
 import { loadTurnstile } from '../utils/turnstile'
 
 // Public site key of the 1saif-comments Turnstile widget (hostname 1saif.me). Local dev uses Cloudflare's always-pass test key.
@@ -37,6 +39,10 @@ const copy = {
     loadFailed: 'The comments did not load. Refresh the page to try again.',
     name: 'Name',
     message: 'Comment',
+    write: 'Write',
+    preview: 'Preview',
+    previewEmpty: 'Nothing to preview yet.',
+    markdown: 'Markdown works: **bold**, *italic*, `code`, ``` blocks with a language, [links](https://…).',
     post: 'Post comment',
     checking: 'Checking…',
     posting: 'Posting…',
@@ -57,6 +63,10 @@ const copy = {
     loadFailed: 'تعذّر تحميل التعليقات. حدّث الصفحة وحاول مرة أخرى.',
     name: 'الاسم',
     message: 'التعليق',
+    write: 'كتابة',
+    preview: 'معاينة',
+    previewEmpty: 'لا شيء للمعاينة بعد.',
+    markdown: 'يدعم Markdown: **غامق**، *مائل*، `كود`، ``` كتل كود بلغة، [روابط](https://…).',
     post: 'نشر التعليق',
     checking: 'جارٍ التحقق…',
     posting: 'جارٍ النشر…',
@@ -128,7 +138,10 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   // Announced only after a click, so loading the count while the visitor still reads the article stays silent.
   const [announcement, setAnnouncement] = useState('')
   const [status, setStatus] = useState<Status>('idle')
-  const [messageLength, setMessageLength] = useState(0)
+  const [draft, setDraft] = useState('')
+  const [previewing, setPreviewing] = useState(false)
+  const commentsRef = useRef<HTMLDivElement>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
 
   // Storage and the network run only in the browser, after hydration, so the prerendered page matches.
   useEffect(() => {
@@ -157,6 +170,9 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       observer.disconnect()
     }
   }, [slug])
+
+  useEffect(() => (commentsRef.current && reactions?.comments.length ? enhanceCodeBlocks(commentsRef.current) : undefined), [reactions?.comments])
+  useEffect(() => (previewRef.current && previewing && draft ? enhanceCodeBlocks(previewRef.current) : undefined), [previewing, draft])
 
   async function toggleLike() {
     if (!reactions || liking.current) return
@@ -307,7 +323,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
       if (response.ok) {
         form.reset()
-        setMessageLength(0)
+        setDraft('')
+        setPreviewing(false)
         setReactions(current => current && { ...current, comments: [...current.comments, result] })
         setStatus('posted')
       } else {
@@ -334,11 +351,12 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       </div>
 
       <h2 id="comments-title">{t.title}</h2>
-      <div className="post-comments">
+      <div ref={commentsRef} className="post-comments">
         {reactions && (reactions.comments.length
           ? <ol>{reactions.comments.map(item => <li key={item.id}>
             <p className="post-comment-meta"><strong dir="auto">{item.name}</strong><time dateTime={new Date(item.createdAt).toISOString()}>{dateFormat.format(item.createdAt)}</time></p>
-            <p className="post-comment-body" dir="auto">{item.body}</p>
+            {/* commentToHtml escapes the visitor's text before it adds any markup. */}
+            <div className="post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: commentToHtml(item.body) }} />
           </li>)}</ol>
           : <p className="post-comments-note">{t.empty}</p>)}
         {loadFailed && <p className="post-comments-note">{t.loadFailed}</p>}
@@ -350,9 +368,17 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           <input id="comment-name" name="name" autoComplete="name" dir="auto" maxLength={MAX_NAME} aria-required="true" />
         </div>
         <div className="contact-field">
-          <label htmlFor="comment-message">{t.message}</label>
-          <textarea id="comment-message" name="message" rows={4} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby="comment-count" onChange={event => setMessageLength(event.currentTarget.value.length)} />
-          <span className="post-comment-count" id="comment-count">{messageLength} / {MAX_MESSAGE}</span>
+          <div className="post-comment-label"><label htmlFor="comment-message">{t.message}</label>
+            <span className="post-comment-tabs">
+              <button type="button" aria-pressed={!previewing} onClick={() => setPreviewing(false)}>{t.write}</button>
+              <button type="button" aria-pressed={previewing} onClick={() => setPreviewing(true)}>{t.preview}</button>
+            </span>
+          </div>
+          {/* Hidden, not removed, while previewing, so the form still sends it. */}
+          <textarea id="comment-message" name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby="comment-hint comment-count" hidden={previewing} onChange={event => setDraft(event.currentTarget.value)} />
+          {previewing && <div ref={previewRef} className="post-comment-preview post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: draft.trim() ? commentToHtml(draft) : `<p>${t.previewEmpty}</p>` }} />}
+          <span className="post-comment-hint" id="comment-hint">{t.markdown}</span>
+          <span className="post-comment-count" id="comment-count">{draft.length} / {MAX_MESSAGE}</span>
         </div>
         {/* Hidden from people; bots that fill it get a fake success from the Worker. */}
         <div className="contact-form-trap" aria-hidden="true">

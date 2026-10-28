@@ -11,7 +11,7 @@
             if (u.origin === location.origin || u.origin === 'https://challenges.cloudflare.com') return url;
             throw new TypeError('Blocked script URL: ' + url);
           },
-          // shortcut: HTML passes unchanged because it comes from our own build (markdown, highlighter, JSON-LD); sanitize here if user content is ever rendered.
+          // shortcut: HTML passes unchanged: it comes from our own build (markdown, highlighter, JSON-LD), and visitor comments are escaped first by utils/commentMarkdown.ts; sanitize here if raw user HTML is ever rendered.
           createHTML: function (html) { return html; }
         });
       }
@@ -187,10 +187,10 @@ html.dark .notebook-post-thumb { filter: invert(.88) hue-rotate(180deg); }
 .contact-form-trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .contact-form-challenge:empty { display: none; }
 .contact-form-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
-.contact-form button { min-height: 42px; padding: 0 18px; border: 0; border-radius: 8px; color: #fff; background: var(--nb-accent); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color .15s ease; }
-.contact-form button:hover { background: color-mix(in srgb, var(--nb-accent) 86%, #000); }
-html.dark .contact-form button { color: #0d1117; }
-.contact-form button:disabled { opacity: .7; cursor: progress; }
+.contact-form button:not([aria-pressed], .copy-button) { min-height: 42px; padding: 0 18px; border: 0; border-radius: 8px; color: #fff; background: var(--nb-accent); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color .15s ease; }
+.contact-form button:not([aria-pressed], .copy-button):hover { background: color-mix(in srgb, var(--nb-accent) 86%, #000); }
+html.dark .contact-form button:not([aria-pressed], .copy-button) { color: #0d1117; }
+.contact-form button:not([aria-pressed], .copy-button):disabled { opacity: .7; cursor: progress; }
 .notebook-contact .contact-form-status { flex: 1 1 200px; color: var(--nb-ink-3); font-size: 14px; }
 .notebook-contact .contact-form-status[data-tone="ok"] { color: #1a7f37; }
 .notebook-contact .contact-form-status[data-tone="error"] { color: #cf222e; }

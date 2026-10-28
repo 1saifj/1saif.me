@@ -134,13 +134,26 @@ html.dark .post-like-button[aria-pressed='true'] { border-color: color-mix(in sr
 .post-like-count { color: var(--nb-ink-3); font-size: 14px; font-variant-numeric: tabular-nums; }
 /* Room for the first comments or the empty note, so the form below does not jump when they load. */
 .post-comments { min-height: 56px; }
-.post-comments ol { margin: 0; padding: 0; list-style: none; }
-.post-comments li { padding: 14px 0; border-bottom: 1px solid var(--nb-line); }
-.post-comments li:first-child { padding-top: 0; }
+.post-comments > ol { margin: 0; padding: 0; list-style: none; }
+.post-comments > ol > li { padding: 14px 0; border-bottom: 1px solid var(--nb-line); }
+.post-comments > ol > li:first-child { padding-top: 0; }
 .post-comment-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-size: 14px; }
 .post-comment-meta strong { color: var(--nb-ink); font-weight: 600; overflow-wrap: anywhere; }
 .post-comment-meta time { color: var(--nb-ink-3); font-variant-numeric: tabular-nums; }
-.post-comment-body { margin-top: 4px; color: var(--nb-ink-2); line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.post-comment-body { margin-top: 4px; font-size: 16px; line-height: 1.65; overflow-wrap: anywhere; }
+/* Comments use the article styles at a smaller scale; the last block leaves no gap under the comment. */
+.post-comment-body > :last-child { margin-bottom: 0; }
+.post-comment-body p { margin-bottom: .75em; }
+.post-comment-body :is(ul, ol) { margin: 0 0 .75em; padding-inline-start: 1.4em; }
+.post-comment-body blockquote { margin: 0 0 .75em; }
+.post-comment-body blockquote p { margin: 0; }
+.post-comment-body .code-block-container { margin: .5em 0 .9em; }
+.post-comment-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.post-comment-tabs { display: inline-flex; padding: 2px; border: 1px solid var(--nb-line); border-radius: 8px; }
+.post-comment-tabs button { padding: 3px 10px; border: 0; border-radius: 6px; color: var(--nb-ink-3); background: none; font: inherit; font-size: 12px; cursor: pointer; }
+.post-comment-tabs button[aria-pressed="true"] { color: var(--nb-ink); background: var(--nb-subtle); }
+.post-comment-preview { min-height: 128px; margin: 0; padding: 10px 12px; border: 1px dashed var(--nb-line); border-radius: 8px; font-weight: 400; }
+.post-comment-hint { color: var(--nb-ink-3); font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
 .post-comments-note { color: var(--nb-ink-3); font-size: 15px; }
 .post-comment-count { justify-self: end; color: var(--nb-ink-3); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
 .post-comment-status { flex: 1 1 200px; color: var(--nb-ink-3); font-size: 14px; }
