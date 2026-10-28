@@ -1,0 +1,50 @@
+{
+  // Deployed by Cloudflare Workers Builds when workers/reactions or the post list changes on main (README, Deploys).
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "1saif-reactions",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-06-15",
+  // Only these paths run the Worker; Pages serves every other path as free static assets.
+  // The account is on the Free plan, so the caps below keep this Worker inside the daily
+  // limits it shares with the contact Worker (README, Costs).
+  "routes": [
+    { "pattern": "1saif.me/api/posts/*", "zone_name": "1saif.me" },
+    { "pattern": "1saif.me/api/collect", "zone_name": "1saif.me" }
+  ],
+  // No *.workers.dev or preview URL: they would skip the zone's WAF rate limiting rule.
+  "workers_dev": false,
+  "preview_urls": false,
+  // 8787 is often taken; the Vite dev proxy sends /api/posts and /api/collect here.
+  "dev": { "port": 8797 },
+  // The Turnstile hostname a comment token must carry. .dev.vars sets localhost for wrangler dev.
+  "vars": { "ALLOWED_HOSTNAME": "1saif.me" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "1saif-reactions",
+      "database_id": "f7a3761b-e0dd-44be-81a6-29a00943df88",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Page views, likes and comments for `npm run insights`. No IP and no visitor ID is written.
+  "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "post_reactions" }],
+  // A new comment mails Saif, only at this verified Email Routing address.
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "destination_address": "saifalialjanahi@gmail.com",
+      "allowed_sender_addresses": ["hello@1saif.me"]
+    }
+  ],
+  // Limits are counted per Cloudflare location. Per-client limits run first; the ALL_* caps
+  // bound the daily D1 rows written and Analytics Engine data points (README, Costs).
+  "ratelimits": [
+    { "name": "PER_CLIENT_LIKES", "namespace_id": "71453", "simple": { "limit": 10, "period": 60 } },
+    { "name": "PER_CLIENT_COMMENTS", "namespace_id": "71454", "simple": { "limit": 3, "period": 60 } },
+    { "name": "ALL_CLIENTS_COMMENTS", "namespace_id": "71455", "simple": { "limit": 10, "period": 60 } },
+    { "name": "ALL_WRITES", "namespace_id": "71456", "simple": { "limit": 15, "period": 60 } },
+    { "name": "PER_CLIENT_COLLECT", "namespace_id": "71457", "simple": { "limit": 30, "period": 60 } },
+    { "name": "ALL_COLLECT", "namespace_id": "71458", "simple": { "limit": 50, "period": 60 } }
+  ]
+  // Secret, set with `wrangler secret put TURNSTILE_SECRET -c workers/reactions/wrangler.jsonc`.
+}

@@ -1,0 +1,4 @@
+# Copy to workers/reactions/.dev.vars for `npx wrangler dev -c workers/reactions/wrangler.jsonc`.
+# Cloudflare's always-pass test secret. Its siteverify reply carries hostname "example.com" and no action, so localhost checks success only.
+TURNSTILE_SECRET=1x0000000000000000000000000000000AA
+ALLOWED_HOSTNAME=localhost

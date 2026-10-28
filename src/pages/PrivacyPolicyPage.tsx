@@ -5,7 +5,7 @@ import { SiteFooter } from '../components/SiteFooter'
 import { dateLocale, useLanguage } from '../i18n/language'
 
 // Change this date whenever the policy text changes.
-const lastUpdated = new Date('2026-10-22T00:00:00')
+const lastUpdated = new Date('2026-10-29T00:00:00')
 
 const copy = {
   en: {
@@ -19,10 +19,13 @@ const copy = {
     what: 'What:', why: 'Why:', kept: 'Kept:',
     dataTypes: [
       ['Contact details', 'Name, email address, and anything you choose to include when you get in touch.', 'To reply to your message or provide a requested service.', 'Three years from the last contact.'],
-      ['Technical data', 'IP address, browser type, and referring website.', 'To keep the site secure and diagnose delivery issues.', 'Twelve months.'],
+      ['Technical data', 'IP address, browser type, and referring website. The IP address is also used for a short time to limit how many likes, comments and messages one visitor can send, and by Cloudflare Turnstile. It is not stored with likes, comments or page views.', 'To keep the site secure and diagnose delivery issues.', 'Twelve months.'],
+      ['Comments', 'The name and comment you post under an article. Both are shown publicly on that article.', 'To show the discussion under each article and to remove abuse.', 'Until you ask for removal, or the article is removed.'],
+      ['Likes', 'A random ID that your browser makes and keeps in its localStorage, sent with each like. It is not linked to your name, email address or IP address.', 'To count each like once and to let you remove it.', 'Until you remove the like or clear the site data in your browser.'],
+      ['Page views and speed', 'The page address, the site that sent you (its domain only), language, country, device type (from the screen width) and page speed measurements. No cookie, no ID and no IP address is stored. Nothing is sent when your browser sends Do Not Track or Global Privacy Control.', 'To learn which pages people read and to keep the site fast.', 'Three months.'],
     ],
-    uses: ['Reply to contact messages and provide requested information.', 'Understand site usage and improve performance and clarity.', 'Protect the site from abuse and keep the service reliable.', 'Meet legal obligations when they apply.'],
-    services: [['Email service', 'Delivers replies to contact messages.'], ['Spam protection', 'Cloudflare Turnstile checks that the contact form is sent by a person. It loads on the home page after the page has loaded.'], ['Hosting provider', 'Serves the site and its static assets.'], ['Legal requirements', 'Information may be shared when required by law or to protect rights.']],
+    uses: ['Reply to contact messages and provide requested information.', 'Show comments and like counts on articles.', 'Understand site usage and improve performance and clarity.', 'Protect the site from abuse and keep the service reliable.', 'Meet legal obligations when they apply.'],
+    services: [['Email service', 'Delivers replies to contact messages.'], ['Spam protection', 'Cloudflare Turnstile checks that the contact form and the comment form are sent by a person. It loads on the home page after the page has loaded, and on an article when you start to write a comment.'], ['Database and analytics', 'Cloudflare D1 stores likes and comments. Cloudflare Workers Analytics Engine stores the anonymous page views.'], ['Hosting provider', 'Serves the site and its static assets.'], ['Legal requirements', 'Information may be shared when required by law or to protect rights.']],
     rights: [['Access', 'Ask what personal data is held about you.'], ['Rectification', 'Ask for inaccurate information to be corrected.'], ['Erasure', 'Ask for your personal data to be deleted.'], ['Portability', 'Request a copy of your data in a machine-readable format.'], ['Object', 'Object to particular types of processing.'], ['Restriction', 'Ask for how your data is used to be limited.']],
     contactBody: 'If you want to ask about this policy or exercise one of these rights, email me. I aim to respond within 30 days.',
     name: 'Saif Aljanahi',
@@ -38,10 +41,13 @@ const copy = {
     what: 'الوصف:', why: 'لماذا:', kept: 'مدة الاحتفاظ:',
     dataTypes: [
       ['بيانات التواصل', 'الاسم، وعنوان البريد الإلكتروني، وأي معلومات تختار إرسالها عند التواصل.', 'للرد على رسالتك أو تقديم خدمة طلبتها.', 'ثلاث سنوات من آخر تواصل.'],
-      ['البيانات التقنية', 'عنوان IP، ونوع المتصفح، والموقع الذي أحالك.', 'لحماية الموقع وتشخيص مشكلات التحميل.', 'اثنا عشر شهراً.'],
+      ['البيانات التقنية', 'عنوان IP، ونوع المتصفح، والموقع الذي أحالك. ويُستخدم عنوان IP أيضاً لوقت قصير لتحديد عدد الإعجابات والتعليقات والرسائل التي يرسلها الزائر الواحد، وتستخدمه Cloudflare Turnstile. ولا يُحفظ مع الإعجابات أو التعليقات أو زيارات الصفحات.', 'لحماية الموقع وتشخيص مشكلات التحميل.', 'اثنا عشر شهراً.'],
+      ['التعليقات', 'الاسم والتعليق اللذان تنشرهما تحت مقال. ويظهر كلاهما للجميع على ذلك المقال.', 'لعرض النقاش تحت كل مقال وإزالة الإساءة.', 'حتى تطلب حذفهما، أو يُحذف المقال.'],
+      ['الإعجابات', 'معرّف عشوائي ينشئه متصفحك ويحفظه في localStorage، ويُرسَل مع كل إعجاب. لا يرتبط باسمك ولا ببريدك الإلكتروني ولا بعنوان IP.', 'لاحتساب كل إعجاب مرة واحدة، ولتتمكن من إلغائه.', 'حتى تلغي الإعجاب أو تمسح بيانات الموقع من متصفحك.'],
+      ['زيارات الصفحات والسرعة', 'عنوان الصفحة، والموقع الذي أحالك (اسم نطاقه فقط)، واللغة، والبلد، ونوع الجهاز (من عرض الشاشة)، وقياسات سرعة الصفحة. لا يُحفظ ملف تعريف ارتباط ولا معرّف ولا عنوان IP. ولا يُرسَل شيء إذا كان متصفحك يرسل إشارة Do Not Track أو Global Privacy Control.', 'لمعرفة الصفحات التي يقرؤها الناس وللحفاظ على سرعة الموقع.', 'ثلاثة أشهر.'],
     ],
-    uses: ['الرد على رسائل التواصل وتقديم المعلومات المطلوبة.', 'فهم طريقة استخدام الموقع وتحسين أدائه ووضوحه.', 'حماية الموقع من إساءة الاستخدام والحفاظ على موثوقيته.', 'الوفاء بالالتزامات القانونية عند انطباقها.'],
-    services: [['خدمة البريد الإلكتروني', 'تُرسل الردود على رسائل التواصل.'], ['الحماية من البريد المزعج', 'تتحقّق Cloudflare Turnstile من أن نموذج التواصل يرسله شخص. وتُحمَّل في الصفحة الرئيسية بعد اكتمال تحميلها.'], ['مزوّد الاستضافة', 'يقدّم الموقع وملفاته الثابتة.'], ['المتطلبات القانونية', 'قد تُشارك المعلومات عندما يفرض القانون ذلك أو لحماية الحقوق.']],
+    uses: ['الرد على رسائل التواصل وتقديم المعلومات المطلوبة.', 'عرض التعليقات وعدد الإعجابات على المقالات.', 'فهم طريقة استخدام الموقع وتحسين أدائه ووضوحه.', 'حماية الموقع من إساءة الاستخدام والحفاظ على موثوقيته.', 'الوفاء بالالتزامات القانونية عند انطباقها.'],
+    services: [['خدمة البريد الإلكتروني', 'تُرسل الردود على رسائل التواصل.'], ['الحماية من البريد المزعج', 'تتحقّق Cloudflare Turnstile من أن نموذج التواصل ونموذج التعليق يرسلهما شخص. وتُحمَّل في الصفحة الرئيسية بعد اكتمال تحميلها، وفي المقال عندما تبدأ كتابة تعليق.'], ['قاعدة البيانات والإحصاءات', 'تحفظ Cloudflare D1 الإعجابات والتعليقات، وتحفظ Cloudflare Workers Analytics Engine زيارات الصفحات المجهولة الهوية.'], ['مزوّد الاستضافة', 'يقدّم الموقع وملفاته الثابتة.'], ['المتطلبات القانونية', 'قد تُشارك المعلومات عندما يفرض القانون ذلك أو لحماية الحقوق.']],
     rights: [['الاطّلاع', 'أن تسأل عن البيانات الشخصية المحفوظة عنك.'], ['التصحيح', 'أن تطلب تصحيح المعلومات غير الدقيقة.'], ['الحذف', 'أن تطلب حذف بياناتك الشخصية.'], ['قابلية النقل', 'أن تطلب نسخة من بياناتك بصيغة يقرؤها الحاسوب.'], ['الاعتراض', 'أن تعترض على أنواع معيّنة من المعالجة.'], ['التقييد', 'أن تطلب تقييد طريقة استخدام بياناتك.']],
     contactBody: 'إذا أردت الاستفسار عن هذه السياسة أو ممارسة أحد هذه الحقوق، راسلني عبر البريد الإلكتروني. أسعى للرد خلال 30 يوماً.',
     name: 'سيف الجناحي',

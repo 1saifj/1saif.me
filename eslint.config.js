@@ -34,6 +34,7 @@ export default tseslint.config(
             'comma',
             'prerenderedArticles',
             'closestPost',
+            'loadTurnstile',
           ],
         },
       ],

@@ -13,6 +13,7 @@ import { ContentSkeleton } from '../components/ContentSkeleton'
 import { SiteFooter } from '../components/SiteFooter'
 import { NotFoundPage } from './NotFoundPage'
 import { PostToc, postHeadings, tocFrom } from '../components/PostToc'
+import { PostReactions } from '../components/PostReactions'
 
 // Filled by entry-server before prerendering. In the browser, the prerendered body is read back
 // from the page on first render, so the article shows at once instead of a skeleton.
@@ -123,6 +124,9 @@ export const BlogPost: React.FC = () => {
           </header>
           <div className={headings.length >= tocFrom ? 'plain-article-body has-toc' : 'plain-article-body'}>{htmlContent ? <div ref={body} className="site-article-content article-content" data-article={slug} dangerouslySetInnerHTML={{ __html: htmlContent }} /> : <ContentSkeleton />}<PostToc headings={headings} label={ar ? 'في هذه الصفحة' : 'On this page'} language={language} /></div>
         </article>
+
+        {/* Keyed by slug so moving to another post starts with that post's likes and comments. */}
+        <PostReactions key={slug} slug={slug!} language={language} />
 
         <section className="related-posts"><div>
           <nav className="post-pager" aria-label={ar ? 'مقالات أخرى' : 'More posts'}>{older && pagerLink(older, 'older')}{newer && pagerLink(newer, 'newer')}</nav>

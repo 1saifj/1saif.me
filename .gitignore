@@ -54,5 +54,6 @@ format-radii.js
 playwright-report/
 test-results/
 
-# Wrangler local state
+# Wrangler local state and local Worker secrets
 .wrangler/
+.dev.vars

@@ -93,7 +93,7 @@ type Status = 'idle' | 'checking' | 'sending' | 'sent' | 'rate' | 'challenge' | 
 
 let turnstileScript: Promise<void> | undefined
 
-function loadTurnstile(): Promise<void> {
+export function loadTurnstile(): Promise<void> {
   turnstileScript ??= new Promise((resolve, reject) => {
     const script = document.createElement('script')
     script.src = TURNSTILE_SCRIPT

@@ -19,7 +19,8 @@
     "seo:sitemap": "node scripts/generate-sitemap.cjs",
     "seo:rss": "node scripts/generate-rss.cjs",
     "seo:generate": "npm run seo:sitemap && npm run seo:rss",
-    "lint:oxlint": "oxlint -c .oxlintrc.json"
+    "lint:oxlint": "oxlint -c .oxlintrc.json",
+    "insights": "node scripts/insights.mjs"
   },
   "dependencies": {
     "@shikijs/langs": "^3.6.0",
