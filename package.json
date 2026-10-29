@@ -7,7 +7,7 @@
     "dev": "vite --host",
     "build": "npm run seo:generate && vite build && node scripts/prerender.mjs",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p workers/reactions/tsconfig.json",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -19,7 +19,8 @@
     "seo:sitemap": "node scripts/generate-sitemap.cjs",
     "seo:rss": "node scripts/generate-rss.cjs",
     "seo:generate": "npm run seo:sitemap && npm run seo:rss",
-    "lint:oxlint": "oxlint -c .oxlintrc.json"
+    "lint:oxlint": "oxlint -c .oxlintrc.json",
+    "insights": "node scripts/insights.mjs"
   },
   "dependencies": {
     "@shikijs/langs": "^3.6.0",

@@ -1,0 +1,8 @@
+# Copy to workers/reactions/.dev.vars for `npx wrangler dev -c workers/reactions/wrangler.jsonc`.
+# GitHub sends the visitor back to the Vite dev server, which proxies /api to wrangler dev.
+SITE_URL=http://localhost:5173
+# The GitHub App's client ID and secret (README, Likes and comments). Its callbacks include localhost:5173 and :5180.
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+# Any long random string, for example from `openssl rand -base64 32`.
+SESSION_SECRET=

@@ -25,6 +25,7 @@ npm run preview      # serve dist/ on port 4173
 npm test             # unit tests (Vitest)
 npm run typecheck
 npm run lint
+npm run insights     # page views, likes and comments (README, Insights)
 ```
 
 Node 18 or newer.
@@ -35,8 +36,21 @@ Node 18 or newer.
 | --- | --- | --- |
 | The site | Every push to `main` | Cloudflare Pages project `1saif-me` builds with `npm run build` and serves `dist` |
 | The contact Worker | A push to `main` that changes `workers/contact/*` | Cloudflare Workers Builds on the `1saif-contact` Worker: build command `npx vitest run workers`, deploy command `npx wrangler deploy -c workers/contact/wrangler.jsonc` |
+| The reactions Worker | A push to `main` that changes `workers/reactions/*`, `src/data/blogs.ts` or `src/utils/slugUtils.ts` | Cloudflare Workers Builds on the `1saif-reactions` Worker: build command `npx vitest run workers`, deploy command `npx wrangler deploy -c workers/reactions/wrangler.jsonc` |
 
-Both use Cloudflare's GitHub app and Cloudflare-managed build tokens, so the repo holds no deploy secrets. Wrangler keeps the `TURNSTILE_SECRET` that is already on the Worker. Build logs: Workers & Pages → `1saif-contact` → Deployments.
+All three use Cloudflare's GitHub app and Cloudflare-managed build tokens, so the repo holds no deploy secrets. Wrangler keeps the secrets that are already on each Worker. Build logs: Workers & Pages → the Worker → Deployments.
+
+The reactions Worker bundles the list of published posts, so it must deploy again when a post is added; until then, likes and comments on the new post answer 404. The watch paths above do that.
+
+The first deploy of the reactions Worker needs its database tables and two secrets: the client secret of the [1saif.me comments](https://github.com/apps/1saif-me-comments) GitHub App (its client ID is in `wrangler.jsonc`), and a random key that signs the sign-in cookies:
+
+```bash
+npx wrangler d1 migrations apply 1saif-reactions --remote -c workers/reactions/wrangler.jsonc
+npx wrangler secret put GITHUB_CLIENT_SECRET -c workers/reactions/wrangler.jsonc
+openssl rand -base64 32 | npx wrangler secret put SESSION_SECRET -c workers/reactions/wrangler.jsonc
+```
+
+Apply each new file in `workers/reactions/migrations/` with the same `migrations apply` command before the deploy that needs it. A new `SESSION_SECRET` signs everyone out.
 
 To deploy or roll back the Worker by hand:
 
@@ -45,6 +59,62 @@ npx wrangler@4 deploy -c workers/contact/wrangler.jsonc
 npx wrangler@4 rollback -c workers/contact/wrangler.jsonc
 npx wrangler@4 tail -c workers/contact/wrangler.jsonc
 ```
+
+## Likes and comments
+
+Post pages show a like button and comments, served by the reactions Worker (`workers/reactions`) from D1. Both need a sign-in with GitHub, and each GitHub account likes a post at most once. The sign-in reads the public profile only: the Worker keeps the account ID, username and name, and never keeps the GitHub token. Readers can edit their own comments, up to 10 times each, and the comment then shows "edited". Only the latest text is kept. Readers can delete their own comments: the text goes at once, and an empty hidden row stays, so the daily cap of 10 comments still counts it.
+
+A new or edited comment shows at once and mails Saif, with the commands to hide it and to block its author, so no comment can change after Saif has read it. One account can post at most 10 comments on one post in 24 hours (hidden ones count), so no account can fill a post. A blocked account cannot like or comment, and its comments drop off every post; the block command also removes its likes. To hide a comment, block an account, or list the latest comments:
+
+```bash
+npx wrangler d1 execute 1saif-reactions --remote --command "UPDATE comments SET hidden = 1 WHERE id = N"
+npx wrangler d1 execute 1saif-reactions --remote --command "UPDATE users SET blocked = 1 WHERE login = 'name'; DELETE FROM likes WHERE user_id = (SELECT github_id FROM users WHERE login = 'name')"
+npx wrangler d1 execute 1saif-reactions --remote --command "SELECT c.id, c.slug, u.login, c.body FROM comments c JOIN users u ON u.github_id = c.user_id ORDER BY c.id DESC LIMIT 20"
+```
+
+The page shows the change within 30 seconds (the edge cache time). For an erasure request, delete the account's rows: `DELETE FROM comments WHERE user_id = N`, then the same for `likes`, then `DELETE FROM users WHERE github_id = N`.
+
+To run it locally, start the Worker (port 8797, set in its `wrangler.jsonc`); the Vite dev server sends `/api/posts`, `/api/auth` and `/api/collect` to it:
+
+```bash
+cp workers/reactions/.dev.vars.example workers/reactions/.dev.vars   # then fill in the GitHub App client ID and secret
+npx wrangler d1 migrations apply 1saif-reactions --local -c workers/reactions/wrangler.jsonc
+npx wrangler dev -c workers/reactions/wrangler.jsonc
+VITE_INSIGHTS=1 npm run dev   # without VITE_INSIGHTS, dev sends no page views
+```
+
+The GitHub App sends the sign-in back only to its registered callback addresses: `https://1saif.me`, and `http://localhost:5173` and `http://localhost:5180` for dev. `SITE_URL` in `.dev.vars` must name the dev server you use.
+
+## Insights
+
+The same Worker records anonymous page views (path, referrer domain, language, country, device class, LCP, CLS, INP, TTFB) and like, unlike and comment events in Workers Analytics Engine. There is no cookie, no ID and no IP address. Browsers that send Do Not Track or Global Privacy Control, and automated browsers, send nothing. To read the numbers, make an API token with Account → Account Analytics → Read, then:
+
+```bash
+CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... npm run insights -- 30
+```
+
+It prints daily views, top pages with p75 LCP, INP, CLS and TTFB, per-post views (EN and AR), likes, comments and like rate, and the language, device, country and referrer splits. It ends with a 30-day forecast: a straight line through the full days, and the share of the Free limits that the busiest day (seen or forecast) would use. Data is kept for three months.
+
+## Costs
+
+The account is on the Workers Free plan with no payment method, so nothing can be billed. The Free limits are hard daily stops for the whole account (both Workers share them) and reset at 00:00 UTC:
+
+| Service | Free limit | What this site uses |
+| --- | --- | --- |
+| Workers | 100,000 requests a day, 10 ms CPU each | About 2 requests per post view (the page-view beacon, and the likes and comments read near the end), 1 more for a signed-in reader (their own like), 1 per other page view, 1 per like, comment or edit, 2 per sign-in. Cache hits and refused requests count too |
+| D1 | 5 million rows read and 100,000 rows written a day | `ALL_LIKES` allows 15 likes a minute and `ALL_CLIENTS_COMMENTS` 10 comments or edits a minute, per location: at most about 36,000 writes, or about 65,000 rows, a day. Triggers keep the like count, so a like or unlike costs a few rows, whatever the post's count. A read misses the 30 s edge cache at most twice a minute per post and location (and once after each new, edited or deleted comment; a like keeps the cache, and the liker gets the exact count), and reads about 401 rows for a post with 200 comments: the comments, their authors and the count (more when a blocked account's comments sit among them). So a post with 200 comments that one location reads every 30 s costs about 1.2 million rows a day, and about four such posts reach the limit |
+| Analytics Engine | 100,000 data points written and 10,000 read queries a day | `ALL_COLLECT` allows 40 page views a minute per location (57,600 a day), plus at most about 36,000 reaction events: about 93,600 in all from one location. The caps count per location, so traffic from many locations at once can go higher; the writes then stop for the day, and nothing is billed. One `npm run insights` run is 11 queries |
+
+Every query uses a primary key or an index (`comments_by_post`, and `comments_by_author` for the daily cap), so no request scans a table. Rate limits are counted per Cloudflare location, so traffic spread over many locations can pass the caps.
+
+Every like and comment needs a GitHub account, and each account is rate limited on its own, so faking them takes many accounts. Under a sustained attack, the Workers request limit is the first to go, because refused requests count too. When a limit is hit, only the `/api/` paths stop until the reset: a D1 limit stops likes and comments on every post, and the Workers request limit also stops page-view counts and the contact form. The site is static on Pages and keeps working. To switch the reactions Worker off at once, run `npx wrangler delete -c workers/reactions/wrangler.jsonc`, or remove its `routes` and deploy; post pages then show that the comments did not load.
+
+The zone's one Free WAF rate limiting rule (Security → Security rules → Rate limiting rules) stops a burst before it reaches any Worker, and blocked requests do not count: `URI Path starts with /api/`, 10 requests per 10 seconds per IP, then a 10-second block. A post view sends at most 3 `/api/` requests, so a reader stays far below it. It does not stop a steady stream: one IP just under it sends about 86,000 requests a day, most of the shared Workers limit.
+
+Known limits, accepted for a personal blog:
+- Each accepted comment or edit mails Saif, and nothing caps the mails a day: `ALL_CLIENTS_COMMENTS` allows 10 a minute per location.
+- The global comment cap counts before the blocked check, because checking first would cost a D1 read per request. So blocked accounts still posting can make others wait for the next minute.
+- A post reply read just before a comment is saved can reach the edge cache just after the purge, so that location shows the old reply for up to 30 s more.
 
 ## Contact
 
