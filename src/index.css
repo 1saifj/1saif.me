@@ -146,7 +146,7 @@ html.dark .post-like-button[aria-pressed='true'] { border-color: color-mix(in sr
 .post-comment-meta a:hover strong, .post-comment-meta a:focus-visible strong { text-decoration: underline; }
 .post-comment-meta strong { color: var(--nb-ink); font-weight: 600; overflow-wrap: anywhere; }
 .post-comment-login, .post-comment-meta time { color: var(--nb-ink-3); font-variant-numeric: tabular-nums; }
-.post-comment-meta time { cursor: default; }
+.post-comment-permalink:hover time, .post-comment-permalink:focus-visible time { text-decoration: underline; }
 .post-comment-edited { color: var(--nb-ink-3); }
 .post-comment-badge { padding: 0 7px; border: 1px solid var(--nb-line); border-radius: 999px; color: var(--nb-ink-2); font-size: 12px; font-weight: 500; line-height: 18px; }
 /* Each button keeps a 24 px target (WCAG 2.2); the negative margin keeps the row as tight as the text. */
@@ -161,8 +161,13 @@ html.dark .post-comment-actions[role='group'] .post-comment-delete { color: #ff7
 .post-comment-question[data-tone='error'] { color: #cf222e; }
 html.dark .post-comment-question[data-tone='error'] { color: #ff7b72; }
 /* A new or saved comment glows once, so the eye finds it. The glow is its own layer, so the comment's box stays the same. */
-.post-comments > ol > li.is-fresh { position: relative; isolation: isolate; }
-.post-comments > ol > li.is-fresh::before { content: ''; position: absolute; z-index: -1; inset: 0 -10px; border-radius: 10px; pointer-events: none; animation: post-comment-fresh 2.4s ease-out; }
+/* Below the sticky header, like the article headings. */
+#comments-title, .post-comments > ol > li { scroll-margin-top: 84px; }
+.post-comments > ol > li:is(.is-fresh, :target) { position: relative; isolation: isolate; }
+.post-comments > ol > li:is(.is-fresh, :target)::before { content: ''; position: absolute; z-index: -1; inset: 0 -10px; border-radius: 10px; pointer-events: none; }
+.post-comments > ol > li.is-fresh::before { animation: post-comment-fresh 2.4s ease-out; }
+/* The comment a link points at keeps a soft mark while the address names it. */
+.post-comments > ol > li:target::before { background: color-mix(in srgb, var(--nb-accent) 7%, transparent); }
 @keyframes post-comment-fresh { from { background: color-mix(in srgb, var(--nb-accent) 14%, transparent); } to { background: transparent; } }
 /* An edit puts the same editor in place of the comment body; the comment itself frames it. */
 .contact-form.post-comment-editing { gap: 10px; margin-top: 8px; padding: 0; border: 0; background: none; }
@@ -213,6 +218,8 @@ html.dark .github-signin:hover { background: #d1d9e0; }
 .post-comment-preview { min-height: 128px; padding: 10px 12px; font-weight: 400; }
 .post-comment-hint { color: var(--nb-ink-3); font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
 .post-comments-note { color: var(--nb-ink-3); font-size: 15px; }
+.post-comments-retry { padding: 0; border: 0; color: var(--nb-accent); background: none; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.post-comments-retry:disabled { opacity: .6; cursor: progress; }
 .post-comment-count[data-tone='error'] { color: #cf222e; }
 html.dark .post-comment-count[data-tone='error'] { color: #ff7b72; }
 .post-comment-count { justify-self: end; color: var(--nb-ink-3); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }

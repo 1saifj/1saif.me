@@ -27,7 +27,7 @@ const loaded = { likes: 2, comments: [{ id: 1, body: 'First line\nsecond line', 
 // The Worker sets this cookie at sign-in; jsdom refuses __Host- cookies on http, so the getter is stubbed.
 const signIn = () => vi.spyOn(document, 'cookie', 'get').mockReturnValue(`__Host-viewer=${btoa(JSON.stringify({ id: 42, login: 'octocat', name: 'The Octocat' }))}`)
 
-async function render(answers: (() => Promise<Response>)[]) {
+async function render(answers: (() => Promise<Response>)[], inView = true) {
   const fetch = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(async () => (answers.shift() ?? (async () => Response.json({}, { status: 500 })))())
 
   vi.stubGlobal('fetch', fetch)
@@ -35,7 +35,7 @@ async function render(answers: (() => Promise<Response>)[]) {
   document.body.append(container)
   root = createRoot(container)
   await act(async () => root.render(<PostReactions slug="a-post" language="en" />))
-  await act(async () => reveal())
+  if (inView) await act(async () => reveal())
 
   return fetch
 }
@@ -60,6 +60,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  history.replaceState(null, '', location.pathname)
   act(() => root.unmount())
   container.remove()
   vi.unstubAllGlobals()
@@ -386,6 +387,52 @@ describe('PostReactions', () => {
     await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded)])
     expect(document.activeElement).toBe(container.querySelector('.post-comment-form textarea'))
     expect(sessionStorage.getItem('comment-intent:a-post')).toBeNull()
+  })
+
+  it('loads at once for a link to one comment and goes to it, or to the heading when it is gone', async () => {
+    // jsdom does not lay out, so it has no scrollIntoView.
+    const scrolled = vi.fn()
+
+    Object.assign(Element.prototype, { scrollIntoView: scrolled })
+    history.replaceState(null, '', '#comment-2')
+    const fetch = await render([async () => Response.json(withOwn)], false)
+
+    expect(fetch).toHaveBeenCalledTimes(1)
+    // The browser scrolls to it itself, on a new fragment navigation.
+    expect(container.querySelector(':target')).toBe(container.querySelector('#comment-2'))
+    expect(scrolled).not.toHaveBeenCalled()
+    expect(container.querySelector('#comment-2 .post-comment-permalink')!.getAttribute('href')).toBe('#comment-2')
+
+    act(() => root.unmount())
+    container.remove()
+    history.replaceState(null, '', '#comment-99')
+    await render([async () => Response.json(withOwn)], false)
+    expect(scrolled.mock.contexts).toEqual([container.querySelector('#comments-title')])
+    Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
+  })
+
+  it('loads the list again on Try again, with the button off while it runs', async () => {
+    const fetch = await render([async () => Response.json({}, { status: 503 }), async () => Response.json(loaded)])
+    const retry = container.querySelector<HTMLButtonElement>('.post-comments-retry')!
+
+    expect(container.querySelector('.post-comments-note')!.textContent).toBe('The comments did not load. Try again')
+    act(() => retry.click())
+    expect(retry.disabled).toBe(true)
+    await act(async () => {})
+
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(container.querySelectorAll('.post-comments li')).toHaveLength(1)
+    expect(container.querySelector('.post-comments-retry')).toBeNull()
+    expect(document.activeElement).toBe(container.querySelector('#comments-title'))
+  })
+
+  it('names the shortcut key of the reader\'s platform', async () => {
+    signIn()
+    vi.spyOn(navigator, 'platform', 'get').mockReturnValue('MacIntel')
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded)])
+
+    expect(container.querySelector('.post-comment-hint')!.textContent).toContain('⌘ Enter sends.')
+    expect(container.querySelector('.comment-tool[aria-label="Bold"]')!.getAttribute('title')).toBe('Bold (⌘ B)')
   })
 
   it('drops a like or a comment kept for a sign-in that did not finish', async () => {

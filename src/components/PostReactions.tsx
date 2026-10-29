@@ -53,7 +53,8 @@ const copy = {
     signInToLike: 'Sign in with GitHub to like this post.',
     title: 'Comments',
     empty: 'No comments yet. Start the discussion.',
-    loadFailed: 'The comments did not load. Refresh the page to try again.',
+    loadFailed: 'The comments did not load.',
+    retry: 'Try again',
     previewHost: 'Likes and comments work on 1saif.me only, not on preview deploys.',
     message: 'Comment',
     signInPrompt: 'Sign in with GitHub to join the discussion.',
@@ -77,7 +78,7 @@ const copy = {
     write: 'Write',
     preview: 'Preview',
     previewEmpty: 'Nothing to preview yet.',
-    markdown: 'Markdown is supported. Write a language after ``` to color code. Ctrl/⌘ Enter sends.',
+    markdown: (mod: string) => `Markdown is supported. Write a language after \`\`\` to color code. ${mod} Enter sends.`,
     left: (count: number) => `${count} left`,
     formatting: 'Formatting',
     tools: { heading: 'Heading', bold: 'Bold', italic: 'Italic', code: 'Code', codeBlock: 'Code block', link: 'Link', list: 'Bulleted list', orderedList: 'Numbered list', quote: 'Quote' },
@@ -103,7 +104,8 @@ const copy = {
     signInToLike: 'سجّل الدخول عبر GitHub لتُعجب بهذا المقال.',
     title: 'التعليقات',
     empty: 'لا تعليقات بعد. ابدأ النقاش.',
-    loadFailed: 'تعذّر تحميل التعليقات. حدّث الصفحة وحاول مرة أخرى.',
+    loadFailed: 'تعذّر تحميل التعليقات.',
+    retry: 'أعد المحاولة',
     previewHost: 'الإعجابات والتعليقات تعمل على 1saif.me فقط، لا على نسخ المعاينة.',
     message: 'التعليق',
     signInPrompt: 'سجّل الدخول عبر GitHub لتشارك في النقاش.',
@@ -127,7 +129,7 @@ const copy = {
     write: 'كتابة',
     preview: 'معاينة',
     previewEmpty: 'لا شيء للمعاينة بعد.',
-    markdown: 'يدعم Markdown. اكتب اللغة بعد ``` لتلوين الكود. Ctrl/⌘ Enter للإرسال.',
+    markdown: (mod: string) => `يدعم Markdown. اكتب اللغة بعد \`\`\` لتلوين الكود. ${mod} Enter للإرسال.`,
     left: (count: number) => `تبقّى ${count}`,
     formatting: 'التنسيق',
     tools: { heading: 'عنوان', bold: 'غامق', italic: 'مائل', code: 'كود', codeBlock: 'كتلة كود', link: 'رابط', list: 'قائمة نقطية', orderedList: 'قائمة مرقّمة', quote: 'اقتباس' },
@@ -312,6 +314,8 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
   }
 
   const left = MAX_MESSAGE - value.length
+  // The editor renders only in the browser, after the cookie is read, so navigator is always there.
+  const mod = /Mac|iP(hone|ad|od)/.test(navigator.platform) ? '⌘' : 'Ctrl'
 
   return (
     <div className="contact-field">
@@ -323,7 +327,7 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
             <button type="button" aria-pressed={previewing} onClick={() => setPreviewing(true)}>{t.preview}</button>
           </span>
           {!previewing && <span className="comment-toolbar" role="group" aria-label={t.formatting}>
-            {TOOLS.map(tool => <button key={tool.format} type="button" className="comment-tool" aria-label={t.tools[tool.format]} title={tool.key ? `${t.tools[tool.format]} (Ctrl/⌘ ${tool.key.toUpperCase()})` : t.tools[tool.format]} aria-keyshortcuts={tool.key ? `Control+${tool.key.toUpperCase()} Meta+${tool.key.toUpperCase()}` : undefined} onClick={() => applyFormat(tool.format)}>
+            {TOOLS.map(tool => <button key={tool.format} type="button" className="comment-tool" aria-label={t.tools[tool.format]} title={tool.key ? `${t.tools[tool.format]} (${mod} ${tool.key.toUpperCase()})` : t.tools[tool.format]} aria-keyshortcuts={tool.key ? `Control+${tool.key.toUpperCase()} Meta+${tool.key.toUpperCase()}` : undefined} onClick={() => applyFormat(tool.format)}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>
             </button>)}
           </span>}
@@ -332,7 +336,7 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
         <textarea ref={messageRef} id={`${id}message`} defaultValue={value} name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby={`${id}hint ${id}count`} hidden={previewing} onChange={event => onChange(event.currentTarget.value)} onKeyDown={shortcut} onPaste={paste} />
         {previewing && <div ref={previewRef} className="post-comment-preview post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: value.trim() ? commentToHtml(value) : `<p>${t.previewEmpty}</p>` }} />}
         <div className="comment-editor-foot">
-          <span className="post-comment-hint" id={`${id}hint`}>{t.markdown}</span>
+          <span className="post-comment-hint" id={`${id}hint`}>{t.markdown(mod)}</span>
           {/* Kept empty, not removed, because the textarea names it in aria-describedby. */}
           <span className="post-comment-count" id={`${id}count`} data-tone={left < 50 ? 'error' : undefined}>{left <= COUNT_FROM ? t.left(left) : ''}</span>
         </div>
@@ -349,6 +353,9 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   const [viewer, setViewer] = useState<Author | null>()
   const [reactions, setReactions] = useState<Reactions>()
   const [loadFailed, setLoadFailed] = useState(false)
+  // Each Try again loads the list once more; the button stays, disabled, while it runs.
+  const [attempt, setAttempt] = useState(0)
+  const [retrying, setRetrying] = useState(false)
   const [liked, setLiked] = useState(false)
   const [likeNote, setLikeNote] = useState<LikeNote>()
   // Announced only after a click, so loading the count while the visitor still reads the article stays silent.
@@ -368,6 +375,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   const titleRef = useRef<HTMLHeadingElement>(null)
   // The comment whose Delete button takes focus back when its question is dismissed.
   const restoreDelete = useRef<number>()
+  const jumped = useRef(false)
 
   const draftKey = `${DRAFT_KEY}:${slug}`
   const likeIntentKey = `${LIKE_INTENT_KEY}:${slug}`
@@ -376,7 +384,6 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
   // Storage and the network run only in the browser, after hydration, so the prerendered page matches.
   useEffect(() => {
-    const section = sectionRef.current
     const signedIn = readViewer()
     // A draft saved when the session ended comes back after the new sign-in.
     const saved = signedIn && takeItem(draftKey)
@@ -399,16 +406,17 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       address.searchParams.delete('signin')
       window.history.replaceState(window.history.state, '', address.pathname + address.search + address.hash)
     }
+  }, [draftKey, likeIntentKey, commentIntentKey])
+
+  useEffect(() => {
+    const section = sectionRef.current
 
     if (!section) return
 
     let cancelled = false
+    const signedIn = readViewer()
 
-    // Fetched once, when the visitor scrolls near the section; a reader who stops early costs nothing.
-    const observer = new IntersectionObserver(entries => {
-      if (!entries.some(entry => entry.isIntersecting)) return
-      observer.disconnect()
-
+    function load() {
       // A like clicked while signed out is sent now. It is taken only here, so an effect that runs twice cannot drop it.
       const wantsLike = signedIn && takeItem(likeIntentKey) !== null
       const wantsComment = signedIn && takeItem(commentIntentKey) !== null
@@ -432,18 +440,47 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           // The signed-in count is exact; the cached one can be up to 30 s old.
           setReactions({ ...value, likes: ownLike.likes ?? value.likes })
           setLiked(ownLike.liked ?? false)
+          setLoadFailed(false)
+          // Try again leaves with the note, so focus goes to the heading of the list it brought.
+          if (attempt) titleRef.current?.focus()
         }, () => { if (!cancelled) setLoadFailed(true) })
-        // Only once the list is in, so the list does not push the box away after the page scrolled to it.
-        .finally(() => { if (!cancelled && wantsComment) setEditorKey(key => key + 1) })
+        .finally(() => {
+          if (cancelled) return
+
+          setRetrying(false)
+          // Only once the list is in, so the list does not push the box away after the page scrolled to it.
+          if (wantsComment) setEditorKey(key => key + 1)
+        })
+    }
+
+    // Fetched once, when the visitor scrolls near the section; a reader who stops early costs nothing.
+    const observer = new IntersectionObserver(entries => {
+      if (!entries.some(entry => entry.isIntersecting)) return
+      observer.disconnect()
+      load()
     }, { rootMargin: '600px 0px' })
 
-    observer.observe(section)
+    // A link to one comment needs the list now, because the section is far down the page.
+    if (attempt || /^#comment-\d+$/.test(location.hash)) load()
+    else observer.observe(section)
 
     return () => {
       cancelled = true
       observer.disconnect()
     }
-  }, [slug, draftKey, likeIntentKey, commentIntentKey, language])
+  }, [slug, likeIntentKey, commentIntentKey, language, attempt])
+
+  // The browser looked for a #comment- target before the list was in, so the page scrolls to it once here.
+  // A comment that is gone (deleted, hidden, or not in the newest 200) leaves the reader at the heading.
+  useEffect(() => {
+    if (!reactions || jumped.current || !/^#comment-\d+$/.test(location.hash)) return
+
+    jumped.current = true
+
+    // A new fragment navigation scrolls below the sticky header and sets :target, which the browser could not set before.
+    if (document.getElementById(location.hash.slice(1))) location.replace(location.hash)
+    else titleRef.current?.scrollIntoView()
+  }, [reactions])
 
   // The draft survives a reload. It is saved only once the viewer is known: the effect above takes a saved draft
   // first, and a signed-out page must not drop the one kept for the way back from GitHub.
@@ -683,7 +720,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       <h2 id="comments-title" ref={titleRef} tabIndex={-1}>{t.title}{reactions?.comments.length ? <span className="post-comments-count">{reactions.comments.length}</span> : null}</h2>
       <div ref={commentsRef} className="post-comments">
         {reactions && (reactions.comments.length
-          ? <ol>{reactions.comments.map(item => <li key={item.id} className={fresh === item.id ? 'is-fresh' : undefined}>
+          ? <ol>{reactions.comments.map(item => <li key={item.id} id={`comment-${item.id}`} className={fresh === item.id ? 'is-fresh' : undefined}>
             {/* GitHub serves the picture; no-referrer keeps the post address from it. */}
             <img className="post-comment-avatar" src={avatarUrl(item.author.id, 36)} alt="" width={36} height={36} loading="lazy" decoding="async" referrerPolicy="no-referrer" />
             <div className="post-comment-main">
@@ -692,7 +729,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
                 {/* A login is Latin script; without dir, an Arabic page puts its @ at the end. */}
                 {item.author.name && <span className="post-comment-login" dir="ltr">@{item.author.login}</span>}
                 {item.author.id === OWNER_ID && <span className="post-comment-badge">{t.author}</span>}
-                <time dateTime={new Date(item.createdAt).toISOString()} title={fullDate.format(item.createdAt)}>{commentTime(item.createdAt, now, dateLocale(language), dateFormat)}</time>
+                {/* The time links to the comment itself, as on GitHub. */}
+                <a className="post-comment-permalink" href={`#comment-${item.id}`}><time dateTime={new Date(item.createdAt).toISOString()} title={fullDate.format(item.createdAt)}>{commentTime(item.createdAt, now, dateLocale(language), dateFormat)}</time></a>
                 {item.editedAt ? <span className="post-comment-edited" title={fullDate.format(item.editedAt)}>{t.edited}<span className="sr-only"> {fullDate.format(item.editedAt)}</span></span> : null}
                 {viewer && (confirming?.id === item.id
                   // The keys make each state mount its own buttons, so autoFocus runs when the state changes.
@@ -729,7 +767,12 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           </li>)}</ol>
           : <p className="post-comments-note">{t.empty}</p>)}
         {/* The Worker routes exist only on 1saif.me, so Pages previews always get a 404 here. */}
-        {loadFailed && <p className="post-comments-note">{location.hostname.endsWith('.pages.dev') ? t.previewHost : t.loadFailed}</p>}
+        {loadFailed && (location.hostname.endsWith('.pages.dev')
+          ? <p className="post-comments-note">{t.previewHost}</p>
+          : <p className="post-comments-note">{t.loadFailed} <button type="button" className="post-comments-retry" disabled={retrying} onClick={() => {
+            setRetrying(true)
+            setAttempt(count => count + 1)
+          }}>{t.retry}</button></p>)}
       </div>
 
       {viewer === null && <div className="contact-form post-comment-signin">
