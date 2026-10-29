@@ -141,8 +141,23 @@ interface Beacon {
 
 const SITE_ORIGIN = 'https://1saif.me'
 
-// The post list is bundled at deploy time, so a new post needs a Worker deploy (README, Deploys).
 const SLUGS = new Set(publishedBlogs.map(post => createSlugFromTitle(post.title)))
+
+// The list above is bundled at deploy time. A post published after that is known by its live page, so it needs
+// no Worker deploy. Pages answers a missing page with 404 and a renamed one with a redirect, so only 200 counts.
+async function isPost(slug: string): Promise<boolean> {
+  if (!slug) return false
+
+  if (SLUGS.has(slug)) return true
+
+  const page = await fetch(`${SITE_ORIGIN}/blog/${slug}`, { method: 'HEAD', redirect: 'manual' }).catch(() => undefined)
+
+  if (page?.status !== 200) return false
+
+  SLUGS.add(slug)
+
+  return true
+}
 
 const ROUTE = /^\/api\/posts\/([a-z0-9-]{1,120})(?:\/(like|comments)(?:\/([1-9]\d{0,11}))?)?$/
 
@@ -478,10 +493,10 @@ async function sessionOf(request: Request, env: Env): Promise<Session | undefine
 
 const callbackUrl = (env: Env) => `${env.SITE_URL}/api/auth/github/callback`
 
-function returnPath(value: string | null): string {
+async function returnPath(value: string | null): Promise<string> {
   const match = RETURN_PATH.exec(value ?? '')
 
-  return match && SLUGS.has(match[1]) ? match[0] : '/blog'
+  return match && await isPost(match[1]) ? match[0] : '/blog'
 }
 
 function displayName(value: unknown): string | null {
@@ -497,7 +512,7 @@ async function startSignIn(env: Env, url: URL, ip: string): Promise<Response> {
   const state = base64url(crypto.getRandomValues(new Uint8Array(16)))
   const verifier = base64url(crypto.getRandomValues(new Uint8Array(32)))
   const challenge = base64url(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))))
-  const flow = await sign({ use: 'flow', state, verifier, back: returnPath(url.searchParams.get('return')), exp: Date.now() + FLOW_SECONDS * 1000 }, env)
+  const flow = await sign({ use: 'flow', state, verifier, back: await returnPath(url.searchParams.get('return')), exp: Date.now() + FLOW_SECONDS * 1000 }, env)
 
   const authorize = new URL('https://github.com/login/oauth/authorize')
 
@@ -683,7 +698,7 @@ export default {
     const isCollect = pathname === '/api/collect'
     const [, slug = '', action = '', commentId = ''] = ROUTE.exec(pathname) ?? []
 
-    if (!isCollect && (!SLUGS.has(slug) || (commentId && action !== 'comments'))) return fail(404, 'post')
+    if (!isCollect && ((commentId && action !== 'comments') || !(await isPost(slug)))) return fail(404, 'post')
 
     const methods = isCollect ? ['POST'] : action === 'comments' ? commentId ? ['PATCH', 'DELETE'] : ['POST'] : action === 'like' ? ['GET', 'PUT', 'DELETE'] : ['GET']
 

@@ -228,6 +228,19 @@ function stubGitHub(user: object = octocat, token: object = { access_token: 'ghu
   return calls
 }
 
+// The live site: each listed post page answers with its status, and every other page with 404. Each call is recorded.
+function stubSite(pages: Record<string, number> = {}) {
+  const calls: { url: string; method: string; redirect: string }[] = []
+
+  vi.stubGlobal('fetch', async (url: string, init: RequestInit = {}) => {
+    calls.push({ url: String(url), method: init.method ?? 'GET', redirect: init.redirect ?? 'follow' })
+
+    return new Response(null, { status: pages[String(url).replace('https://1saif.me/blog/', '')] ?? 404 })
+  })
+
+  return calls
+}
+
 const cookiesOf = (response: Response) => new Map(response.headers.getSetCookie().map(line => {
   const [pair] = line.split(';')
   const at = pair.indexOf('=')
@@ -303,10 +316,31 @@ afterEach(() => {
 describe('reactions worker: reads', () => {
   it('answers an unknown post with 404', async () => {
     const { env } = makeEnv()
+    stubSite()
 
     expect((await worker.fetch(new Request('https://1saif.me/api/posts/not-a-post'), env, ctx)).status).toBe(404)
     expect((await worker.fetch(send('PUT', '/api/posts/not-a-post/like', '{}'), env, ctx)).status).toBe(404)
     expect((await worker.fetch(send('DELETE', `/api/posts/${slug}/like/3`, ''), env, ctx)).status).toBe(404)
+  })
+
+  it('knows a post published after the deploy by its live page, and asks for that page once', async () => {
+    const { env } = makeEnv()
+    const calls = stubSite({ 'a-post-after-the-deploy': 200 })
+
+    expect((await worker.fetch(new Request('https://1saif.me/api/posts/a-post-after-the-deploy'), env, ctx)).status).toBe(200)
+    expect((await worker.fetch(new Request('https://1saif.me/api/posts/a-post-after-the-deploy'), env, ctx)).status).toBe(200)
+    expect(calls).toEqual([{ url: 'https://1saif.me/blog/a-post-after-the-deploy', method: 'HEAD', redirect: 'manual' }])
+  })
+
+  it('answers a renamed post, a failed page check or an unreachable site with 404', async () => {
+    const { env } = makeEnv()
+    stubSite({ 'an-old-post-name': 301, 'a-post-the-site-failed-on': 500 })
+
+    expect((await worker.fetch(new Request('https://1saif.me/api/posts/an-old-post-name'), env, ctx)).status).toBe(404)
+    expect((await worker.fetch(new Request('https://1saif.me/api/posts/a-post-the-site-failed-on'), env, ctx)).status).toBe(404)
+
+    vi.stubGlobal('fetch', async () => { throw new TypeError('network') })
+    expect((await worker.fetch(new Request('https://1saif.me/api/posts/a-post-while-the-site-is-down'), env, ctx)).status).toBe(404)
   })
 
   it('serves a repeat read from the edge cache without touching D1', async () => {
@@ -596,12 +630,24 @@ describe('reactions worker: GitHub sign-in', () => {
 
   it.each(['https://evil.example/', '//evil.example', '/blog/not-a-post', `/blog/${slug}?x=1`])('returns only to a post page, not to %s', async back => {
     const { env } = makeEnv()
+    stubSite()
     const { location, flow } = await startSignIn(env, back)
 
     stubGitHub()
     const response = await worker.fetch(callback(`code=abc&state=${location.searchParams.get('state')}`, flow), env, ctx)
 
     expect(response.headers.get('Location')).toBe('/blog#comments-title')
+  })
+
+  it('returns to a post published after the deploy', async () => {
+    const { env } = makeEnv()
+    stubSite({ 'a-post-to-return-to': 200 })
+    const { location, flow } = await startSignIn(env, '/blog/a-post-to-return-to')
+
+    stubGitHub()
+    const response = await worker.fetch(callback(`code=abc&state=${location.searchParams.get('state')}`, flow), env, ctx)
+
+    expect(response.headers.get('Location')).toBe('/blog/a-post-to-return-to#comments-title')
   })
 
   it('returns to the Arabic post page', async () => {
