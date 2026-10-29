@@ -1,5 +1,5 @@
 {
-  // Deployed by Cloudflare Workers Builds when workers/reactions or the post list changes on main (README, Deploys).
+  // Deployed by hand from main when workers/reactions or the post list changes, until Workers Builds is connected (README, Deploys).
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "1saif-reactions",
   "main": "src/index.ts",
