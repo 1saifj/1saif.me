@@ -20,6 +20,8 @@ interface StoredComment {
   userId: number
   body: string
   createdAt: number
+  editedAt: number | null
+  edits: number
   hidden: number
 }
 
@@ -51,7 +53,7 @@ function makeDb() {
         .slice(0, Number(second))
 
       return {
-        results: visible.map(({ id, body, createdAt, userId }) => ({ id, body, createdAt, userId, login: users.get(userId)?.login, name: users.get(userId)?.name })),
+        results: visible.map(({ id, body, createdAt, editedAt, userId }) => ({ id, body, createdAt, editedAt, userId, login: users.get(userId)?.login, name: users.get(userId)?.name })),
         changes: 0,
       }
     }
@@ -80,7 +82,13 @@ function makeDb() {
       return { results: [], changes }
     }
 
-    if (sql.startsWith('SELECT blocked')) return { results: users.has(Number(first)) ? [{ blocked: users.get(Number(first))?.blocked }] : [], changes: 0 }
+    // SELECT blocked, (the edits of comment ? on post ? by this user, if visible) FROM users WHERE github_id = ?
+    if (sql.startsWith('SELECT blocked')) {
+      const user = users.get(Number(third))
+      const item = comments.find(row => row.id === first && row.slug === second && row.userId === third && row.hidden === 0)
+
+      return { results: user ? [{ blocked: user.blocked, edits: item?.edits ?? null }] : [], changes: 0 }
+    }
 
     if (sql.startsWith('INSERT INTO users')) {
       users.set(Number(first), { login: String(second), name: third === null ? null : String(third), blocked: users.get(Number(first))?.blocked ?? 0 })
@@ -96,9 +104,21 @@ function makeDb() {
       if (comments.filter(item => item.slug === first && item.userId === Number(fourth) && item.createdAt > Number(values[5])).length >= Number(values[7])) return { results: [], changes: 0 }
 
       const id = comments.length + 1
-      comments.push({ id, slug: String(first), userId: Number(fourth), body: String(second), createdAt: Number(third), hidden: 0 })
+      comments.push({ id, slug: String(first), userId: Number(fourth), body: String(second), createdAt: Number(third), editedAt: null, edits: 0, hidden: 0 })
 
-      return { results: [{ id }], changes: 1 }
+      return { results: [{ id, createdAt: Number(third) }], changes: 1 }
+    }
+
+    // UPDATE comments SET body = ?, edited_at = ?, edits = edits + 1 WHERE id = ? AND slug = ? AND user_id = ? AND hidden = 0
+    // AND edits < ? AND the user is not blocked
+    if (sql.startsWith('UPDATE comments SET body = ?,')) {
+      const item = comments.find(row => row.id === third && row.slug === fourth && row.userId === values[4] && row.hidden === 0 && row.edits < Number(values[5]))
+
+      if (!item || users.get(Number(values[6]))?.blocked !== 0) return { results: [], changes: 0 }
+
+      Object.assign(item, { body: String(first), editedAt: Number(second), edits: item.edits + 1 })
+
+      return { results: [{ id: item.id, createdAt: item.createdAt }], changes: 1 }
     }
 
     // UPDATE comments SET body = '', hidden = 1 WHERE id = ? AND slug = ? AND user_id = ? AND body != ''
@@ -256,6 +276,9 @@ const goodFields = { message: 'Nice post.\r\nThanks', language: 'ar' }
 const commentRequest = (cookie: string, fields: Record<string, string> = goodFields, headers: Record<string, string> = {}) =>
   send('POST', `/api/posts/${slug}/comments`, new URLSearchParams(fields).toString(), { 'Content-Type': 'application/x-www-form-urlencoded', Cookie: cookie, ...headers })
 
+const editRequest = (cookie: string, id = 1, fields: Record<string, string> = { message: 'Edited.\r\nNow', language: 'en' }, headers: Record<string, string> = {}) =>
+  send('PATCH', `/api/posts/${slug}/comments/${id}`, new URLSearchParams(fields).toString(), { 'Content-Type': 'application/x-www-form-urlencoded', Cookie: cookie, ...headers })
+
 const read = async (env: Env) => {
   const response = await worker.fetch(new Request(`https://1saif.me/api/posts/${slug}`), env, ctx)
 
@@ -348,7 +371,7 @@ describe('reactions worker: reads', () => {
 
     const { comments } = await (await read(env)).json()
 
-    expect(comments).toEqual([{ id: 1, body: 'Nice post.\nThanks', createdAt: expect.any(Number), author: octocat }])
+    expect(comments).toEqual([{ id: 1, body: 'Nice post.\nThanks', createdAt: expect.any(Number), editedAt: null, author: octocat }])
   })
 })
 
@@ -636,7 +659,7 @@ describe('reactions worker: comments', () => {
 
     await Promise.all(pending)
     expect(response.status).toBe(201)
-    expect(await response.json()).toEqual({ id: 1, body: 'Nice post.\nThanks', createdAt: expect.any(Number), author: octocat })
+    expect(await response.json()).toEqual({ id: 1, body: 'Nice post.\nThanks', createdAt: expect.any(Number), editedAt: null, author: octocat })
     expect(sent).toHaveLength(1)
     expect(sent[0].text).toContain('The Octocat (https://github.com/octocat) wrote on')
     expect(sent[0].text).toContain('--command "UPDATE comments SET hidden = 1 WHERE id = 1"')
@@ -793,6 +816,94 @@ describe('reactions worker: comments', () => {
     expect(db.comments[0]).toMatchObject({ body: '', hidden: 1 })
     expect((await (await read(env)).json()).comments).toEqual([])
     expect((await worker.fetch(remove(octo.header), env, ctx)).status).toBe(404)
+  })
+
+  it('lets the author edit their own comment, keeps its date, marks it edited and mails the new text', async () => {
+    const { env, db } = makeEnv()
+    const octo = await signIn(env)
+    const other = await signIn(env, { id: 7, login: 'someone', name: null })
+
+    await worker.fetch(commentRequest(octo.header), env, ctx)
+    const before = await (await read(env)).json()
+
+    sent.length = 0
+    points.length = 0
+    expect((await worker.fetch(editRequest(other.header), env, ctx)).status).toBe(404)
+    expect((await worker.fetch(editRequest(''), env, ctx)).status).toBe(401)
+    expect((await worker.fetch(editRequest(octo.header, 1, undefined, { Origin: 'https://evil.example' }), env, ctx)).status).toBe(403)
+    expect((await worker.fetch(editRequest(octo.header, 1, undefined, { 'Content-Type': 'application/json' }), env, ctx)).status).toBe(415)
+    expect((await worker.fetch(editRequest(octo.header, 1, { message: ' ' }), env, ctx)).status).toBe(400)
+    expect((await worker.fetch(editRequest(octo.header, 1, { message: 'x'.repeat(2_001) }), env, ctx)).status).toBe(400)
+    expect(db.comments[0]).toMatchObject({ body: 'Nice post.\nThanks', editedAt: null })
+
+    const response = await worker.fetch(editRequest(octo.header), env, ctx)
+
+    await Promise.all(pending)
+    expect(response.status).toBe(200)
+    const edited = await response.json()
+
+    expect(edited).toEqual({ id: 1, body: 'Edited.\nNow', createdAt: before.comments[0].createdAt, editedAt: expect.any(Number), author: octocat })
+    // The edit cleared the cached reply, so the next read shows it.
+    expect((await (await read(env)).json()).comments).toEqual([edited])
+    expect(sent).toHaveLength(1)
+    expect(sent[0].subject).toBe(`Edited comment on ${slug}`)
+    expect(sent[0].text).toContain('--command "UPDATE comments SET hidden = 1 WHERE id = 1"')
+    expect(sent[0].text.endsWith('edited their comment on https://1saif.me/blog/' + slug + ':\n\nEdited.\nNow')).toBe(true)
+    expect(points.map(point => point.blobs[0])).toEqual(['comment_rejected', 'comment_rejected', 'comment_edited'])
+  })
+
+  it('refuses an edit of a deleted or hidden comment, and from a blocked account', async () => {
+    const { env, db } = makeEnv()
+    const { header } = await signIn(env)
+
+    await worker.fetch(commentRequest(header), env, ctx)
+    await worker.fetch(commentRequest(header), env, ctx)
+    await worker.fetch(send('DELETE', `/api/posts/${slug}/comments/1`, '', { Cookie: header }), env, ctx)
+    db.comments[1].hidden = 1
+
+    expect((await worker.fetch(editRequest(header, 1), env, ctx)).status).toBe(404)
+    expect((await worker.fetch(editRequest(header, 2), env, ctx)).status).toBe(404)
+    expect(db.comments.map(item => item.body)).toEqual(['', 'Nice post.\nThanks'])
+
+    db.comments[1].hidden = 0
+    db.users.set(42, { login: 'octocat', name: null, blocked: 1 })
+    expect((await worker.fetch(editRequest(header, 2), env, ctx)).status).toBe(403)
+    expect(db.comments[1].editedAt).toBeNull()
+  })
+
+  it('refuses an 11th edit of one comment', async () => {
+    const { env, db } = makeEnv()
+    const { header } = await signIn(env)
+
+    await worker.fetch(commentRequest(header), env, ctx)
+
+    for (let i = 0; i < 10; i += 1) expect((await worker.fetch(editRequest(header, 1, { message: `Edit ${i}` }), env, ctx)).status).toBe(200)
+
+    const refused = await worker.fetch(editRequest(header), env, ctx)
+
+    expect(refused.status).toBe(429)
+    expect((await refused.json()).error).toBe('edits')
+    expect(db.comments[0].body).toBe('Edit 9')
+  })
+
+  it('limits edits with the comment rate limits', async () => {
+    for (const limit of ['PER_CLIENT_COMMENTS', 'ALL_CLIENTS_COMMENTS'] as const) {
+      const { env, db } = makeEnv()
+      const { header } = await signIn(env)
+
+      await worker.fetch(commentRequest(header), env, ctx)
+      env[limit] = { limit: async () => ({ success: false }) }
+      expect((await worker.fetch(editRequest(header), env, ctx)).status).toBe(429)
+      expect(db.comments[0].editedAt).toBeNull()
+    }
+  })
+
+  it('takes PATCH only on one comment and POST only on the list', async () => {
+    const { env } = makeEnv()
+    const { header } = await signIn(env)
+
+    expect((await worker.fetch(send('PATCH', `/api/posts/${slug}/comments`, 'message=x', { Cookie: header }), env, ctx)).status).toBe(405)
+    expect((await worker.fetch(send('POST', `/api/posts/${slug}/comments/1`, 'message=x', { Cookie: header }), env, ctx)).status).toBe(405)
   })
 })
 

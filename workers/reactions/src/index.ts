@@ -86,6 +86,7 @@ interface PostComment {
   id: number
   body: string
   createdAt: number
+  editedAt: number | null
   author: Author
 }
 
@@ -93,6 +94,7 @@ interface CommentRow {
   id: number
   body: string
   createdAt: number
+  editedAt: number | null
   userId: number
   login: string
   name: string | null
@@ -167,6 +169,9 @@ const DAILY_COMMENTS = 10
 
 const DAY_MS = 86_400_000
 
+// Each edit mails Saif, so one comment takes at most this many edits.
+const MAX_EDITS = 10
+
 // Control characters, except tab and line breaks, which a message may hold.
 // eslint-disable-next-line no-control-regex -- matching control characters is the point.
 const CONTROL_CHARACTERS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/
@@ -240,7 +245,7 @@ async function readPost(slug: string, env: Env, ctx: Context): Promise<Response>
   // A blocked user's comments drop out here, so one flag hides all of them.
   const [stats, comments] = await db.batch<PostRow>([
     db.prepare('SELECT likes FROM post_stats WHERE slug = ?').bind(slug),
-    db.prepare(`SELECT c.id, c.body, c.created_at AS createdAt, u.github_id AS userId, u.login, u.name
+    db.prepare(`SELECT c.id, c.body, c.created_at AS createdAt, c.edited_at AS editedAt, u.github_id AS userId, u.login, u.name
       FROM comments c JOIN users u ON u.github_id = c.user_id
       WHERE c.slug = ? AND c.hidden = 0 AND u.blocked = 0 ORDER BY c.created_at DESC LIMIT ?`).bind(slug, MAX_COMMENTS),
   ])
@@ -249,6 +254,7 @@ async function readPost(slug: string, env: Env, ctx: Context): Promise<Response>
     id: row.id,
     body: row.body,
     createdAt: row.createdAt,
+    editedAt: row.editedAt,
     author: { id: row.userId, login: row.login, name: row.name },
   }))
 
@@ -317,7 +323,8 @@ async function like(request: Request, slug: string, env: Env): Promise<Response>
   return reply(200, { likes: counted.results[0]?.likes ?? 0, liked: (own.results[0]?.liked ?? 0) > 0 })
 }
 
-async function comment(request: Request, slug: string, env: Env, ctx: Context): Promise<Response> {
+// A new comment, or with an id the author's edit of their own comment. Both pass the same checks and limits.
+async function comment(request: Request, slug: string, env: Env, ctx: Context, id?: number): Promise<Response> {
   if (!request.headers.get('Content-Type')?.startsWith('application/x-www-form-urlencoded')) return fail(415, 'type')
 
   const session = await sessionOf(request, env)
@@ -347,23 +354,35 @@ async function comment(request: Request, slug: string, env: Env, ctx: Context): 
 
   if (!(await env.ALL_CLIENTS_COMMENTS.limit({ key: 'all' })).success) return reject(429, 'rate', 'rate')
 
-  const createdAt = Date.now()
+  const now = Date.now()
 
-  // The insert reads the user row, so a blocked user gets no row back and nothing is saved. 'hidden IN (0, 1)' lets
-  // comments_by_post (slug, hidden, created_at) find the day's rows, so D1 reads only those.
-  const row = await env.DB.prepare(`INSERT INTO comments (slug, user_id, body, created_at) SELECT ?, github_id, ?, ? FROM users WHERE github_id = ? AND blocked = 0
-      AND (SELECT COUNT(*) FROM comments WHERE slug = ? AND hidden IN (0, 1) AND created_at > ? AND user_id = ?) < ? RETURNING id`)
-    .bind(slug, message, createdAt, session.id, slug, createdAt - DAY_MS, session.id, DAILY_COMMENTS)
-    .first<{ id: number }>()
+  // Both statements read the user row, so a blocked user gets no row back and nothing is saved. An edit matches only
+  // the author's own visible comment, and keeps its place and date. 'hidden IN (0, 1)' lets comments_by_post
+  // (slug, hidden, created_at) find the day's rows, so D1 reads only those. An edit adds no row, so it skips that cap.
+  const row = await (id
+    ? env.DB.prepare(`UPDATE comments SET body = ?, edited_at = ?, edits = edits + 1 WHERE id = ? AND slug = ? AND user_id = ? AND hidden = 0 AND edits < ?
+        AND EXISTS (SELECT 1 FROM users WHERE github_id = ? AND blocked = 0) RETURNING id, created_at AS createdAt`)
+      .bind(message, now, id, slug, session.id, MAX_EDITS, session.id)
+    : env.DB.prepare(`INSERT INTO comments (slug, user_id, body, created_at) SELECT ?, github_id, ?, ? FROM users WHERE github_id = ? AND blocked = 0
+        AND (SELECT COUNT(*) FROM comments WHERE slug = ? AND hidden IN (0, 1) AND created_at > ? AND user_id = ?) < ? RETURNING id, created_at AS createdAt`)
+      .bind(slug, message, now, session.id, slug, now - DAY_MS, session.id, DAILY_COMMENTS)
+  ).first<{ id: number; createdAt: number }>()
 
   if (!row) {
-    const user = await env.DB.prepare('SELECT blocked FROM users WHERE github_id = ?').bind(session.id).first<{ blocked: number }>()
+    // Why nothing was saved: a blocked account, the daily cap, the edit cap, or no visible comment of this author.
+    const user = await env.DB.prepare('SELECT blocked, (SELECT edits FROM comments WHERE id = ? AND slug = ? AND user_id = github_id AND hidden = 0) AS edits FROM users WHERE github_id = ?')
+      .bind(id ?? null, slug, session.id)
+      .first<{ blocked: number; edits: number | null }>()
 
-    return user?.blocked === 0 ? reject(429, 'daily', 'daily') : reject(403, 'blocked', 'blocked')
+    if (user?.blocked !== 0) return reject(403, 'blocked', 'blocked')
+
+    if (!id) return reject(429, 'daily', 'daily')
+
+    return user.edits === null ? fail(404, 'comment') : reject(429, 'edits', 'edits')
   }
 
   await forget(slug)
-  track(env, slug, ['comment', countryOf(request), language])
+  track(env, slug, [id ? 'comment_edited' : 'comment', countryOf(request), language])
 
   const author: Author = { id: session.id, login: session.login, name: session.name }
 
@@ -372,15 +391,16 @@ async function comment(request: Request, slug: string, env: Env, ctx: Context): 
     // The runtime requires a recipient; the binding allows only this one.
     to: 'saifalialjanahi@gmail.com',
     from: { email: 'hello@1saif.me', name: '1saif.me comments' },
-    subject: `New comment on ${slug}`,
+    // An edit is mailed too, so a comment cannot change after Saif has read it.
+    subject: `${id ? 'Edited' : 'New'} comment on ${slug}`,
     // The commands come first, so text in the comment cannot pass for one of them.
-    text: `To hide this comment:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE comments SET hidden = 1 WHERE id = ${row.id}"\n\nTo hide every comment of @${author.login} and refuse new ones:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE users SET blocked = 1 WHERE github_id = ${author.id}"\n\n--\n${author.name ?? author.login} (https://github.com/${author.login}) wrote on ${SITE_ORIGIN}/blog/${slug}:\n\n${message}`,
+    text: `To hide this comment:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE comments SET hidden = 1 WHERE id = ${row.id}"\n\nTo hide every comment of @${author.login} and refuse new ones:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE users SET blocked = 1 WHERE github_id = ${author.id}"\n\n--\n${author.name ?? author.login} (https://github.com/${author.login}) ${id ? 'edited their comment' : 'wrote'} on ${SITE_ORIGIN}/blog/${slug}:\n\n${message}`,
   }).catch(error => {
     // Log the code only: the subject and text hold visitor data.
     console.error('send failed', error instanceof Error && 'code' in error ? error.code : 'no code')
   }))
 
-  return reply(201, { id: row.id, body: message, createdAt, author } satisfies PostComment)
+  return reply(id ? 200 : 201, { id: row.id, body: message, createdAt: row.createdAt, editedAt: id ? now : null, author } satisfies PostComment)
 }
 
 // The author deletes the comment's text for good; nobody else can, so the row's user_id must match the session.
@@ -663,7 +683,7 @@ export default {
 
     if (!isCollect && (!SLUGS.has(slug) || (commentId && action !== 'comments'))) return fail(404, 'post')
 
-    const methods = isCollect ? ['POST'] : action === 'comments' ? [commentId ? 'DELETE' : 'POST'] : action === 'like' ? ['GET', 'PUT', 'DELETE'] : ['GET']
+    const methods = isCollect ? ['POST'] : action === 'comments' ? commentId ? ['PATCH', 'DELETE'] : ['POST'] : action === 'like' ? ['GET', 'PUT', 'DELETE'] : ['GET']
 
     if (!methods.includes(request.method)) return fail(405, 'method')
 
@@ -672,7 +692,7 @@ export default {
     if (request.headers.get('Origin') !== env.SITE_URL) return fail(403, 'origin')
 
     // Deleting a comment carries no body.
-    if (commentId) return removeComment(request, slug, Number(commentId), env)
+    if (commentId && request.method === 'DELETE') return removeComment(request, slug, Number(commentId), env)
 
     // A missing length means a chunked body of any size, so it is refused before it is read.
     const length = Number(request.headers.get('Content-Length'))
@@ -681,6 +701,6 @@ export default {
 
     if (isCollect) return collect(request, env, ip)
 
-    return action === 'like' ? like(request, slug, env) : comment(request, slug, env, ctx)
+    return action === 'like' ? like(request, slug, env) : comment(request, slug, env, ctx, commentId ? Number(commentId) : undefined)
   },
 }

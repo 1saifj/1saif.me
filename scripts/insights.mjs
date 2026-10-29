@@ -108,7 +108,7 @@ for (const slug of slugs.sort((a, b) => reaction(b, 'like') - reaction(a, 'like'
   console.log(`${pad(slug.slice(0, 42), 42)} ${padNumber(seen, 6)}  ${padNumber(reaction(slug, 'like'), 6)}  ${padNumber(reaction(slug, 'unlike'), 7)}  ${padNumber(reaction(slug, 'comment'), 8)}  ${padNumber(reaction(slug, 'comment_rejected'), 8)}  ${padNumber(percent(reaction(slug, 'like'), seen), 9)}`)
 }
 
-console.log(`\nTotals: ${totalViews} views, ${count(events, row => row.event === 'like')} likes, ${count(events, row => row.event === 'unlike')} unlikes, ${count(events, row => row.event === 'comment')} comments, ${count(events, row => row.event === 'comment_rejected')} rejected comments`)
+console.log(`\nTotals: ${totalViews} views, ${count(events, row => row.event === 'like')} likes, ${count(events, row => row.event === 'unlike')} unlikes, ${count(events, row => row.event === 'comment')} comments, ${count(events, row => row.event === 'comment_edited')} edits, ${count(events, row => row.event === 'comment_rejected')} rejected comments and edits`)
 
 const split = rows => {
   const total = count(rows, () => true)

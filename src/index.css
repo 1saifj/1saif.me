@@ -144,9 +144,16 @@ html.dark .post-like-button[aria-pressed='true'] { border-color: color-mix(in sr
 .post-comment-meta a:hover strong, .post-comment-meta a:focus-visible strong { text-decoration: underline; }
 .post-comment-meta strong { color: var(--nb-ink); font-weight: 600; overflow-wrap: anywhere; }
 .post-comment-login, .post-comment-meta time { color: var(--nb-ink-3); font-variant-numeric: tabular-nums; }
-.post-comment-delete { margin-inline-start: auto; padding: 0; border: 0; color: var(--nb-ink-3); background: none; font: inherit; font-size: 13px; cursor: pointer; }
-.post-comment-delete:hover, .post-comment-delete:focus-visible { color: #cf222e; }
-html.dark .post-comment-delete:hover, html.dark .post-comment-delete:focus-visible { color: #ff7b72; }
+.post-comment-edited { color: var(--nb-ink-3); }
+.post-comment-actions { display: inline-flex; gap: 12px; margin-inline-start: auto; }
+.post-comment-actions button { padding: 0; border: 0; color: var(--nb-ink-3); background: none; font: inherit; font-size: 13px; cursor: pointer; }
+.post-comment-actions button:hover, .post-comment-actions button:focus-visible { color: var(--nb-ink); }
+.post-comment-actions .post-comment-delete:hover, .post-comment-actions .post-comment-delete:focus-visible { color: #cf222e; }
+html.dark .post-comment-actions .post-comment-delete:hover, html.dark .post-comment-actions .post-comment-delete:focus-visible { color: #ff7b72; }
+/* An edit puts the same editor in place of the comment body; the comment itself frames it. */
+.contact-form.post-comment-editing { gap: 10px; margin-top: 6px; padding: 0; border: 0; background: none; }
+.post-comment-cancel { min-height: 42px; padding: 0 16px; border: 1px solid var(--nb-line); border-radius: 8px; color: var(--nb-ink-2); background: none; font: inherit; font-size: 14px; cursor: pointer; }
+.post-comment-cancel:hover, .post-comment-cancel:focus-visible { color: var(--nb-ink); border-color: var(--nb-ink-3); }
 /* Signed out: one prompt and GitHub's button. Signed in: who is posting, and a way out. */
 .post-comment-signin { justify-items: start; }
 .post-comment-signin p { margin: 0; }

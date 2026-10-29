@@ -1,4 +1,4 @@
-import React, { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
+import React, { FormEvent, KeyboardEvent, useEffect, useId, useRef, useState } from 'react'
 import { dateLocale, Language, SITE_TIME_ZONE } from '../i18n/language'
 import { enhanceCodeBlocks } from '../utils/codeBlocks'
 import { Format, formatSelection } from '../utils/commentEditor'
@@ -24,6 +24,8 @@ interface PostComment {
   id: number
   body: string
   createdAt: number
+  // Missing in a reply cached before edits existed.
+  editedAt?: number | null
   author: Author
 }
 
@@ -51,6 +53,14 @@ const copy = {
     signOut: 'Sign out',
     delete: 'Delete',
     confirmDelete: 'Delete this comment? You cannot undo this.',
+    edit: 'Edit',
+    edited: 'edited',
+    editLabel: 'Edit comment',
+    save: 'Save',
+    saving: 'Saving…',
+    cancel: 'Cancel',
+    edits: 'This comment has reached its limit of 10 edits.',
+    editFailed: 'The edit was not saved. Try again.',
     write: 'Write',
     preview: 'Preview',
     previewEmpty: 'Nothing to preview yet.',
@@ -89,6 +99,14 @@ const copy = {
     signOut: 'تسجيل الخروج',
     delete: 'حذف',
     confirmDelete: 'أتحذف هذا التعليق؟ لا يمكن التراجع عن ذلك.',
+    edit: 'تعديل',
+    edited: 'معدَّل',
+    editLabel: 'تعديل التعليق',
+    save: 'حفظ',
+    saving: 'جارٍ الحفظ…',
+    cancel: 'إلغاء',
+    edits: 'بلغ هذا التعليق حدّ 10 تعديلات.',
+    editFailed: 'لم يُحفظ التعديل. حاول مرة أخرى.',
     write: 'كتابة',
     preview: 'معاينة',
     previewEmpty: 'لا شيء للمعاينة بعد.',
@@ -110,7 +128,11 @@ const copy = {
   },
 }
 
+type Copy = (typeof copy)[Language]
+
 type LikeNote = 'likeFailed' | 'likeBlocked' | 'signInToLike'
+
+type EditStatus = 'saving' | 'invalid' | 'rate' | 'blocked' | 'edits' | 'editFailed'
 
 type Status = 'idle' | 'posting' | 'posted' | 'invalid' | 'rate' | 'daily' | 'blocked' | 'expired' | 'signinFailed' | 'deleteFailed' | 'failed'
 
@@ -179,6 +201,74 @@ const likeInit = (liked: boolean, language: Language): RequestInit => ({
 
 const HeartIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.5 8.2 3.4 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.6 0 5.5 3.7 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z" /></svg>
 
+// The Markdown editor of a new comment and of an edit: Write and Preview, the toolbar, and the length.
+const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange: (value: string) => void; focus?: boolean }> = ({ t, label, value, onChange, focus }) => {
+  // A new comment and an edit can be open at once, so each editor has its own IDs.
+  const id = useId()
+  const [previewing, setPreviewing] = useState(false)
+  const messageRef = useRef<HTMLTextAreaElement>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => (previewRef.current && previewing && value ? enhanceCodeBlocks(previewRef.current) : undefined), [previewing, value])
+  useEffect(() => {
+    if (focus) messageRef.current?.focus()
+  }, [focus])
+
+  function applyFormat(format: Format) {
+    const area = messageRef.current
+
+    if (!area) return
+
+    const edit = formatSelection(area.value, area.selectionStart, area.selectionEnd, format)
+
+    area.focus()
+    area.setSelectionRange(edit.from, edit.to)
+
+    // insertText keeps the browser's undo history and fires the input event; setRangeText is the fallback without it.
+    if (!document.execCommand('insertText', false, edit.text)) {
+      area.setRangeText(edit.text)
+      onChange(area.value)
+    }
+
+    area.setSelectionRange(edit.selectionStart, edit.selectionEnd)
+  }
+
+  function formatShortcut(event: KeyboardEvent<HTMLTextAreaElement>) {
+    const tool = (event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && TOOLS.find(item => item.key === event.key.toLowerCase())
+
+    if (!tool) return
+
+    event.preventDefault()
+    applyFormat(tool.format)
+  }
+
+  return (
+    <div className="contact-field">
+      <label htmlFor={`${id}message`}>{label}</label>
+      <div className="comment-editor">
+        <div className="comment-editor-bar">
+          <span className="post-comment-tabs">
+            <button type="button" aria-pressed={!previewing} onClick={() => setPreviewing(false)}>{t.write}</button>
+            <button type="button" aria-pressed={previewing} onClick={() => setPreviewing(true)}>{t.preview}</button>
+          </span>
+          {!previewing && <span className="comment-toolbar" role="group" aria-label={t.formatting}>
+            {TOOLS.map(tool => <button key={tool.format} type="button" className="comment-tool" aria-label={t.tools[tool.format]} title={tool.key ? `${t.tools[tool.format]} (Ctrl/⌘ ${tool.key.toUpperCase()})` : t.tools[tool.format]} aria-keyshortcuts={tool.key ? `Control+${tool.key.toUpperCase()} Meta+${tool.key.toUpperCase()}` : undefined} onClick={() => applyFormat(tool.format)}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>
+            </button>)}
+          </span>}
+        </div>
+        {/* Hidden, not removed, while previewing, so it keeps its text and undo history. */}
+        <textarea ref={messageRef} id={`${id}message`} defaultValue={value} name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby={`${id}hint ${id}count`} hidden={previewing} onChange={event => onChange(event.currentTarget.value)} onKeyDown={formatShortcut} />
+        {previewing && <div ref={previewRef} className="post-comment-preview post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: value.trim() ? commentToHtml(value) : `<p>${t.previewEmpty}</p>` }} />}
+        <div className="comment-editor-foot">
+          <span className="post-comment-hint" id={`${id}hint`}>{t.markdown}</span>
+          <span className="post-comment-count" id={`${id}count`}>{value.length} / {MAX_MESSAGE}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ slug, language }) => {
   const t = copy[language]
   const sectionRef = useRef<HTMLElement>(null)
@@ -193,10 +283,11 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   const [announcement, setAnnouncement] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [draft, setDraft] = useState('')
-  const [previewing, setPreviewing] = useState(false)
+  // A new key after each post gives the next comment a fresh editor, back on Write.
+  const [posted, setPosted] = useState(0)
+  // One comment is edited at a time.
+  const [editing, setEditing] = useState<{ id: number; draft: string; status?: EditStatus }>()
   const commentsRef = useRef<HTMLDivElement>(null)
-  const previewRef = useRef<HTMLDivElement>(null)
-  const messageRef = useRef<HTMLTextAreaElement>(null)
 
   const draftKey = `${DRAFT_KEY}:${slug}`
   const likeIntentKey = `${LIKE_INTENT_KEY}:${slug}`
@@ -267,8 +358,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     }
   }, [slug, draftKey, likeIntentKey, language])
 
-  useEffect(() => (commentsRef.current && reactions?.comments.length ? enhanceCodeBlocks(commentsRef.current) : undefined), [reactions?.comments])
-  useEffect(() => (previewRef.current && previewing && draft ? enhanceCodeBlocks(previewRef.current) : undefined), [previewing, draft])
+  // A closed edit puts the comment's HTML back, so its code blocks are enhanced again.
+  useEffect(() => (commentsRef.current && reactions?.comments.length ? enhanceCodeBlocks(commentsRef.current) : undefined), [reactions?.comments, editing?.id])
 
   async function toggleLike() {
     if (!reactions || liking.current) return
@@ -311,34 +402,6 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     }
   }
 
-  function applyFormat(format: Format) {
-    const area = messageRef.current
-
-    if (!area) return
-
-    const edit = formatSelection(area.value, area.selectionStart, area.selectionEnd, format)
-
-    area.focus()
-    area.setSelectionRange(edit.from, edit.to)
-
-    // insertText keeps the browser's undo history and fires the input event; setRangeText is the fallback without it.
-    if (!document.execCommand('insertText', false, edit.text)) {
-      area.setRangeText(edit.text)
-      setDraft(area.value)
-    }
-
-    area.setSelectionRange(edit.selectionStart, edit.selectionEnd)
-  }
-
-  function formatShortcut(event: KeyboardEvent<HTMLTextAreaElement>) {
-    const tool = (event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && TOOLS.find(item => item.key === event.key.toLowerCase())
-
-    if (!tool) return
-
-    event.preventDefault()
-    applyFormat(tool.format)
-  }
-
   function endSession() {
     forgetViewer()
     setViewer(null)
@@ -348,7 +411,6 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const form = event.currentTarget
     const message = draft.trim()
 
     if (!message || message.length > MAX_MESSAGE) {
@@ -364,9 +426,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       const result: PostComment & { error?: string } = await response.json()
 
       if (response.ok) {
-        form.reset()
         setDraft('')
-        setPreviewing(false)
+        setPosted(count => count + 1)
         setReactions(current => current && { ...current, comments: [...current.comments, result] })
         setStatus('posted')
       } else if (response.status === 401) {
@@ -397,6 +458,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
       if (response.ok) {
         setReactions(current => current && { ...current, comments: current.comments.filter(item => item.id !== id) })
+        setEditing(current => current?.id === id ? undefined : current)
         setStatus('idle')
       } else if (response.status === 401) {
         endSession()
@@ -406,6 +468,57 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       }
     } catch {
       setStatus('deleteFailed')
+    }
+  }
+
+  // Focus goes back to the comment's Edit button, so a keyboard user stays at the comment.
+  function closeEdit(from: HTMLElement) {
+    from.closest('li')?.querySelector<HTMLButtonElement>('.post-comment-edit')?.focus()
+    setEditing(undefined)
+  }
+
+  async function saveEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = event.currentTarget
+
+    if (!editing || editing.status === 'saving') return
+
+    const { id } = editing
+    const message = editing.draft.trim()
+
+    // An unchanged text is not sent, so it neither marks the comment edited nor spends one of its edits.
+    if (message === reactions?.comments.find(item => item.id === id)?.body) {
+      closeEdit(form)
+
+      return
+    }
+
+    if (!message || message.length > MAX_MESSAGE) {
+      setEditing({ ...editing, status: 'invalid' })
+
+      return
+    }
+
+    setEditing({ ...editing, status: 'saving' })
+
+    try {
+      const response = await fetch(`/api/posts/${slug}/comments/${id}`, { method: 'PATCH', body: new URLSearchParams({ message, language }) })
+      const result: PostComment & { error?: string } = await response.json()
+
+      if (response.ok) {
+        setReactions(current => current && { ...current, comments: current.comments.map(item => item.id === id ? result : item) })
+        closeEdit(form)
+      } else if (response.status === 401) {
+        endSession()
+        setEditing(undefined)
+        setStatus('expired')
+      } else {
+        const failure = result.error === 'rate' || result.error === 'blocked' || result.error === 'invalid' || result.error === 'edits' ? result.error : 'editFailed'
+
+        setEditing(current => current && { ...current, status: failure })
+      }
+    } catch {
+      setEditing(current => current && { ...current, status: 'editFailed' })
     }
   }
 
@@ -436,10 +549,23 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
                 {/* A login is Latin script; without dir, an Arabic page puts its @ at the end. */}
                 {item.author.name && <span className="post-comment-login" dir="ltr">@{item.author.login}</span>}
                 <time dateTime={new Date(item.createdAt).toISOString()}>{dateFormat.format(item.createdAt)}</time>
-                {viewer?.id === item.author.id && <button type="button" className="post-comment-delete" onClick={() => void removeComment(item.id)}>{t.delete}</button>}
+                {item.editedAt ? <span className="post-comment-edited" title={dateFormat.format(item.editedAt)}>{t.edited}<span className="sr-only"> {dateFormat.format(item.editedAt)}</span></span> : null}
+                {viewer?.id === item.author.id && <span className="post-comment-actions">
+                  <button type="button" className="post-comment-edit" aria-expanded={editing?.id === item.id} onClick={() => setEditing(current => current?.id === item.id ? current : { id: item.id, draft: item.body })}>{t.edit}</button>
+                  <button type="button" className="post-comment-delete" onClick={() => void removeComment(item.id)}>{t.delete}</button>
+                </span>}
               </p>
-              {/* commentToHtml escapes the visitor's text before it adds any markup. */}
-              <div className="post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: commentToHtml(item.body) }} />
+              {editing?.id === item.id
+                ? <form className="contact-form post-comment-form post-comment-editing" onSubmit={saveEdit} noValidate>
+                  <CommentEditor t={t} label={t.editLabel} value={editing.draft} onChange={value => setEditing(current => current && { ...current, draft: value })} focus />
+                  <div className="contact-form-footer">
+                    <button type="submit" disabled={editing.status === 'saving'}>{editing.status === 'saving' ? t.saving : t.save}</button>
+                    <button type="button" className="post-comment-cancel" onClick={event => closeEdit(event.currentTarget)}>{t.cancel}</button>
+                    <p className="post-comment-status" role="status" data-tone={editing.status && editing.status !== 'saving' ? 'error' : undefined}>{editing.status && editing.status !== 'saving' ? t[editing.status] : ''}</p>
+                  </div>
+                </form>
+                // commentToHtml escapes the visitor's text before it adds any markup.
+                : <div className="post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: commentToHtml(item.body) }} />}
             </div>
           </li>)}</ol>
           : <p className="post-comments-note">{t.empty}</p>)}
@@ -460,29 +586,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           <span>{t.signedInAs} <strong dir="auto">{viewer.name ?? viewer.login}</strong></span>
           <button type="button" onClick={() => void signOut()}>{t.signOut}</button>
         </div>
-        <div className="contact-field">
-          <label htmlFor="comment-message">{t.message}</label>
-          <div className="comment-editor">
-            <div className="comment-editor-bar">
-              <span className="post-comment-tabs">
-                <button type="button" aria-pressed={!previewing} onClick={() => setPreviewing(false)}>{t.write}</button>
-                <button type="button" aria-pressed={previewing} onClick={() => setPreviewing(true)}>{t.preview}</button>
-              </span>
-              {!previewing && <span className="comment-toolbar" role="group" aria-label={t.formatting}>
-                {TOOLS.map(tool => <button key={tool.format} type="button" className="comment-tool" aria-label={t.tools[tool.format]} title={tool.key ? `${t.tools[tool.format]} (Ctrl/⌘ ${tool.key.toUpperCase()})` : t.tools[tool.format]} aria-keyshortcuts={tool.key ? `Control+${tool.key.toUpperCase()} Meta+${tool.key.toUpperCase()}` : undefined} onClick={() => applyFormat(tool.format)}>
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>
-                </button>)}
-              </span>}
-            </div>
-            {/* Hidden, not removed, while previewing, so the form still sends it. */}
-            <textarea ref={messageRef} id="comment-message" defaultValue={draft} name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby="comment-hint comment-count" hidden={previewing} onChange={event => setDraft(event.currentTarget.value)} onKeyDown={formatShortcut} />
-            {previewing && <div ref={previewRef} className="post-comment-preview post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: draft.trim() ? commentToHtml(draft) : `<p>${t.previewEmpty}</p>` }} />}
-            <div className="comment-editor-foot">
-              <span className="post-comment-hint" id="comment-hint">{t.markdown}</span>
-              <span className="post-comment-count" id="comment-count">{draft.length} / {MAX_MESSAGE}</span>
-            </div>
-          </div>
-        </div>
+        <CommentEditor key={posted} t={t} label={t.message} value={draft} onChange={setDraft} />
         <div className="contact-form-footer">
           <button type="submit" disabled={busy}>{busy ? t.posting : t.post}</button>
           <p className="post-comment-status" role="status" data-tone={tone}>{statusText}</p>

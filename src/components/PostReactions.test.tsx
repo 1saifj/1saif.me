@@ -42,6 +42,16 @@ async function render(answers: (() => Promise<Response>)[]) {
 
 const like = () => container.querySelector<HTMLElement>('.post-like-button')!
 
+// React tracks the value through the native setter, so a plain assignment would not reach onChange.
+async function type(area: HTMLTextAreaElement, value: string) {
+  Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!.call(area, value)
+  await act(async () => area.dispatchEvent(new Event('input', { bubbles: true })))
+}
+
+const own = { id: 2, body: 'Mine', createdAt: 1793221300000, editedAt: null, author: { id: 42, login: 'octocat', name: 'The Octocat' } }
+
+const withOwn = { ...loaded, comments: [...loaded.comments, own] }
+
 const count = () => container.querySelector('.post-like-count')!.textContent
 
 beforeEach(() => {
@@ -149,14 +159,63 @@ describe('PostReactions', () => {
   it('says when the account has reached the daily comment limit on this post', async () => {
     signIn()
     await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), async () => Response.json({ error: 'daily' }, { status: 429 })])
-    const message = container.querySelector('textarea')!
-
-    // React tracks the value through the native setter, so a plain assignment would not reach onChange.
-    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!.call(message, 'One more')
-    await act(async () => message.dispatchEvent(new Event('input', { bubbles: true })))
+    await type(container.querySelector('textarea')!, 'One more')
     await act(async () => container.querySelector('form')!.requestSubmit())
 
     expect(container.querySelector('.post-comment-form [role="status"]')!.textContent).toBe('You posted 10 comments on this post today. Try again tomorrow.')
+  })
+
+  it('edits the reader\'s own comment in the same editor, then marks it edited', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn), async () => Response.json({ ...own, body: 'Mine, **fixed**', editedAt: 1793221400000 })])
+    const edits = container.querySelectorAll<HTMLButtonElement>('.post-comment-edit')
+
+    expect(edits).toHaveLength(1)
+    await act(async () => edits[0].click())
+    const area = container.querySelector<HTMLTextAreaElement>('.post-comment-editing textarea')!
+
+    expect(area.value).toBe('Mine')
+    expect(document.activeElement).toBe(area)
+    expect(edits[0].getAttribute('aria-expanded')).toBe('true')
+    expect(container.querySelector('.post-comment-editing .comment-toolbar')).not.toBeNull()
+    // Two editors are open, so their IDs differ.
+    expect(new Set([...container.querySelectorAll('textarea')].map(item => item.id)).size).toBe(2)
+
+    await type(area, 'Mine, **fixed**')
+    await act(async () => container.querySelector<HTMLFormElement>('.post-comment-editing')!.requestSubmit())
+
+    const [url, init] = fetch.mock.calls[2]
+
+    expect(url).toBe('/api/posts/a-post/comments/2')
+    expect(init?.method).toBe('PATCH')
+    expect(Object.fromEntries(new URLSearchParams(String(init?.body)))).toEqual({ message: 'Mine, **fixed**', language: 'en' })
+    expect(container.querySelector('.post-comment-editing')).toBeNull()
+    expect(container.querySelectorAll('.post-comment-body')[1].innerHTML).toContain('<strong>fixed</strong>')
+    expect(container.querySelector('.post-comment-edited')!.textContent).toContain('edited')
+    expect(document.activeElement).toBe(edits[0])
+  })
+
+  it('sends no request for an unchanged edit, and keeps the editor open with the reason on a refusal', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn), async () => Response.json({ error: 'edits' }, { status: 429 })])
+    const edit = container.querySelector<HTMLButtonElement>('.post-comment-edit')!
+    const form = () => container.querySelector<HTMLFormElement>('.post-comment-editing')
+
+    await act(async () => edit.click())
+    await act(async () => form()!.requestSubmit())
+    expect(form()).toBeNull()
+    expect(fetch).toHaveBeenCalledTimes(2)
+
+    await act(async () => edit.click())
+    await type(form()!.querySelector('textarea')!, 'Changed')
+    await act(async () => form()!.requestSubmit())
+    expect(form()!.querySelector('[role="status"]')!.textContent).toBe('This comment has reached its limit of 10 edits.')
+
+    await act(async () => form()!.querySelector<HTMLButtonElement>('.post-comment-cancel')!.click())
+    expect(form()).toBeNull()
+    expect(container.querySelectorAll('.post-comment-body')[1].textContent).toBe('Mine')
+    expect(container.querySelector('.post-comment-edited')).toBeNull()
+    expect(fetch).toHaveBeenCalledTimes(3)
   })
 
   it('drops a like kept for a sign-in that did not finish', async () => {
