@@ -278,6 +278,13 @@ describe('PostReactions', () => {
     expect(document.activeElement).toBe(container.querySelector('.post-comment-form textarea'))
   })
 
+  it('keeps the draft saved for the way back from GitHub while the page is signed out', async () => {
+    sessionStorage.setItem('comment-draft:a-post', 'Written before the session ended')
+    await render([async () => Response.json(loaded)])
+
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBe('Written before the session ended')
+  })
+
   it('drops a like kept for a sign-in that did not finish', async () => {
     sessionStorage.setItem('like-intent:a-post', '1')
     await render([async () => Response.json(loaded)])

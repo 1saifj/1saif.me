@@ -498,6 +498,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   async function signOut() {
     // The cookies go even when the request fails, so the page never shows a sign-in that no longer works.
     await fetch('/api/auth/logout', { method: 'POST' }).catch(() => undefined)
+    // The next account in this tab must not get this reader's text. An ended session keeps it (endSession).
+    takeItem(draftKey)
     forgetViewer()
     setViewer(null)
     setLiked(false)

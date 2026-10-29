@@ -160,8 +160,9 @@ html.dark .post-comment-actions .post-comment-delete:hover, html.dark .post-comm
 html.dark .post-comment-actions[role='group'] .post-comment-delete { color: #ff7b72; }
 .post-comment-question[data-tone='error'] { color: #cf222e; }
 html.dark .post-comment-question[data-tone='error'] { color: #ff7b72; }
-/* A new or saved comment glows once, so the eye finds it. */
-.post-comments > ol > li.is-fresh { margin-inline: -10px; padding-inline: 10px; border-radius: 10px; animation: post-comment-fresh 2.4s ease-out; }
+/* A new or saved comment glows once, so the eye finds it. The glow is its own layer, so the comment's box stays the same. */
+.post-comments > ol > li.is-fresh { position: relative; isolation: isolate; }
+.post-comments > ol > li.is-fresh::before { content: ''; position: absolute; z-index: -1; inset: 0 -10px; border-radius: 10px; pointer-events: none; animation: post-comment-fresh 2.4s ease-out; }
 @keyframes post-comment-fresh { from { background: color-mix(in srgb, var(--nb-accent) 14%, transparent); } to { background: transparent; } }
 /* An edit puts the same editor in place of the comment body; the comment itself frames it. */
 .contact-form.post-comment-editing { gap: 10px; margin-top: 8px; padding: 0; border: 0; background: none; }
@@ -220,7 +221,7 @@ html.dark .post-comment-count[data-tone='error'] { color: #ff7b72; }
 .post-comment-status[data-tone='error'] { color: #cf222e; }
 html.dark .post-comment-status[data-tone='ok'] { color: #56d364; }
 html.dark .post-comment-status[data-tone='error'] { color: #ff7b72; }
-@media (prefers-reduced-motion: reduce) { .post-like-button[aria-pressed='true'] svg, .post-comments > ol > li.is-fresh { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .post-like-button[aria-pressed='true'] svg, .post-comments > ol > li.is-fresh::before { animation: none; } }
 
 .plain-page .plain-next { display: grid; gap: 2px; max-width: none; margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--nb-line); }
 .plain-next > span { color: var(--nb-ink-3); font-size: 13px; }
