@@ -292,6 +292,21 @@ describe('reactions worker: reads', () => {
     expect(db.queries()).toBe(queries)
   })
 
+  it('keeps the browser copy off on a cache hit, though the zone raises max-age there', async () => {
+    const { env } = makeEnv()
+    const key = new Request(`https://1saif.me/api/posts/${slug}`)
+
+    await read(env)
+    // What Cloudflare's default Browser Cache TTL (4 hours) does to the stored reply.
+    const hit = (await caches.default.match(key))!
+    const raised = new Response(hit.body, hit)
+
+    raised.headers.set('Cache-Control', 'public, max-age=14400, s-maxage=30')
+    await caches.default.put(key, raised)
+
+    expect((await read(env)).headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=30')
+  })
+
   it('shows a new comment on the next read, because a comment clears the cached reply', async () => {
     const { env } = makeEnv()
     const { header } = await signIn(env)

@@ -207,11 +207,22 @@ function track(env: Env, index: string, blobs: string[], doubles: number[] = [1]
 // The one cache key per post, so every visitor and every language shares one cached reply.
 const cacheKey = (slug: string) => new Request(`${SITE_ORIGIN}/api/posts/${slug}`)
 
+// Every visitor gets the same reply, so it holds nothing about the viewer and can be cached. Only the edge keeps
+// it (s-maxage), and a write clears that copy; a browser copy would hide a new comment after a reload.
+const POST_CACHE_CONTROL = 'public, max-age=0, s-maxage=30'
+
 async function readPost(slug: string, env: Env, ctx: Context): Promise<Response> {
   const cache = caches.default
   const cached = await cache.match(cacheKey(slug))
 
-  if (cached) return cached
+  if (cached) {
+    // The zone's Browser Cache TTL (4 hours by default) raises max-age on a cache hit, so the header is set again.
+    const reply = new Response(cached.body, cached)
+
+    reply.headers.set('Cache-Control', POST_CACHE_CONTROL)
+
+    return reply
+  }
 
   // Reads may come from the nearest D1 replica; a few seconds of lag is fine for counts and comments.
   const db = env.DB.withSession('first-unconstrained')
@@ -231,12 +242,7 @@ async function readPost(slug: string, env: Env, ctx: Context): Promise<Response>
     author: { id: row.userId, login: row.login, name: row.name },
   }))
 
-  // Every visitor gets the same reply, so it holds nothing about the viewer and can be cached. Only the edge keeps
-  // it (s-maxage), and a write clears that copy; a browser copy would hide a new like or comment after a reload.
-  const response = Response.json(
-    { likes: stats.results[0]?.likes ?? 0, comments: list },
-    { headers: { 'Cache-Control': 'public, max-age=0, s-maxage=30' } },
-  )
+  const response = Response.json({ likes: stats.results[0]?.likes ?? 0, comments: list }, { headers: { 'Cache-Control': POST_CACHE_CONTROL } })
 
   ctx.waitUntil(cache.put(cacheKey(slug), response.clone()))
 
