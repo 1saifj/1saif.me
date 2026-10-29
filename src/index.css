@@ -211,6 +211,8 @@ html.dark .github-signin:hover { background: #d1d9e0; }
 .comment-tool { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 6px; color: var(--nb-ink-3); background: none; cursor: pointer; }
 .comment-tool:hover, .comment-tool:focus-visible { color: var(--nb-ink); background: color-mix(in srgb, var(--nb-ink-3) 14%, transparent); }
 .comment-tool svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* Under 380 px the nine tools share one row evenly, instead of two wrapping onto a row of their own. */
+@media (max-width: 379px) { .comment-toolbar { display: grid; flex: 1 1 100%; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 0; } .comment-tool { width: auto; } }
 .post-comment-form .comment-editor textarea, .post-comment-form .comment-editor textarea:is(:hover, :focus) { vertical-align: top; border: 0; border-radius: 0; box-shadow: none; background: none; }
 /* The box grows with the text where the browser supports it, up to a height that keeps the buttons in view. */
 .comment-editor textarea { field-sizing: content; max-height: min(60vh, 480px); }
@@ -222,7 +224,7 @@ html.dark .github-signin:hover { background: #d1d9e0; }
 .post-comment-hint { color: var(--nb-ink-3); font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
 .post-comments-note { color: var(--nb-ink-3); font-size: 15px; }
 .post-comments-retry { padding: 0; border: 0; color: var(--nb-accent); background: none; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-.post-comments-retry:disabled { opacity: .6; cursor: progress; }
+.post-comments-retry[aria-disabled='true'] { opacity: .6; cursor: progress; }
 .post-comment-count[data-tone='error'] { color: #cf222e; }
 html.dark .post-comment-count[data-tone='error'] { color: #ff7b72; }
 .post-comment-count { justify-self: end; color: var(--nb-ink-3); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }

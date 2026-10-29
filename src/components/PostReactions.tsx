@@ -75,6 +75,7 @@ const copy = {
     cancel: 'Cancel',
     edits: 'This comment has reached its limit of 10 edits.',
     editFailed: 'The edit was not saved. Try again.',
+    gone: 'This comment was deleted, so the edit cannot be saved.',
     write: 'Write',
     preview: 'Preview',
     previewEmpty: 'Nothing to preview yet.',
@@ -126,6 +127,7 @@ const copy = {
     cancel: 'إلغاء',
     edits: 'بلغ هذا التعليق حدّ 10 تعديلات.',
     editFailed: 'لم يُحفظ التعديل. حاول مرة أخرى.',
+    gone: 'حُذف هذا التعليق، فلا يمكن حفظ التعديل.',
     write: 'كتابة',
     preview: 'معاينة',
     previewEmpty: 'لا شيء للمعاينة بعد.',
@@ -152,7 +154,7 @@ type Copy = (typeof copy)[Language]
 
 type LikeNote = 'likeFailed' | 'likeBlocked' | 'signInToLike'
 
-type EditStatus = 'saving' | 'invalid' | 'rate' | 'blocked' | 'edits' | 'editFailed' | 'unsaved'
+type EditStatus = 'saving' | 'invalid' | 'rate' | 'blocked' | 'edits' | 'editFailed' | 'unsaved' | 'gone'
 
 type Status = 'idle' | 'posting' | 'posted' | 'invalid' | 'rate' | 'daily' | 'blocked' | 'expired' | 'signinFailed' | 'failed'
 
@@ -233,7 +235,8 @@ const likeInit = (liked: boolean, language: Language): RequestInit => ({
 const HeartIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.5 8.2 3.4 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.6 0 5.5 3.7 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z" /></svg>
 
 // The Markdown editor of a new comment and of an edit: Write and Preview, the toolbar, and the length.
-const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange: (value: string) => void; focus?: boolean; labelHidden?: boolean }> = ({ t, label, value, onChange, focus, labelHidden }) => {
+// busy: while a post or a save is out, the text is locked, so nothing typed then is lost when the editor clears or closes.
+const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange: (value: string) => void; focus?: boolean; labelHidden?: boolean; busy?: boolean }> = ({ t, label, value, onChange, focus, labelHidden, busy }) => {
   // A new comment and an edit can be open at once, so each editor has its own IDs.
   const id = useId()
   const [previewing, setPreviewing] = useState(false)
@@ -252,6 +255,9 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
   }, [focus])
 
   function insert(area: HTMLTextAreaElement, edit: Edit) {
+    // setRangeText ignores readOnly, so the lock is checked here for every tool, key and paste.
+    if (area.readOnly) return
+
     area.focus()
     area.setSelectionRange(edit.from, edit.to)
 
@@ -327,13 +333,13 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
             <button type="button" aria-pressed={previewing} onClick={() => setPreviewing(true)}>{t.preview}</button>
           </span>
           {!previewing && <span className="comment-toolbar" role="group" aria-label={t.formatting}>
-            {TOOLS.map(tool => <button key={tool.format} type="button" className="comment-tool" aria-label={t.tools[tool.format]} title={tool.key ? `${t.tools[tool.format]} (${mod} ${tool.key.toUpperCase()})` : t.tools[tool.format]} aria-keyshortcuts={tool.key ? `Control+${tool.key.toUpperCase()} Meta+${tool.key.toUpperCase()}` : undefined} onClick={() => applyFormat(tool.format)}>
+            {TOOLS.map(tool => <button key={tool.format} type="button" className="comment-tool" disabled={busy} aria-label={t.tools[tool.format]} title={tool.key ? `${t.tools[tool.format]} (${mod} ${tool.key.toUpperCase()})` : t.tools[tool.format]} aria-keyshortcuts={tool.key ? `Control+${tool.key.toUpperCase()} Meta+${tool.key.toUpperCase()}` : undefined} onClick={() => applyFormat(tool.format)}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>
             </button>)}
           </span>}
         </div>
         {/* Hidden, not removed, while previewing, so it keeps its text and undo history. */}
-        <textarea ref={messageRef} id={`${id}message`} defaultValue={value} name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby={`${id}hint ${id}count`} hidden={previewing} onChange={event => onChange(event.currentTarget.value)} onKeyDown={shortcut} onPaste={paste} />
+        <textarea ref={messageRef} id={`${id}message`} defaultValue={value} name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby={`${id}hint ${id}count`} hidden={previewing} readOnly={busy} onChange={event => onChange(event.currentTarget.value)} onKeyDown={shortcut} onPaste={paste} />
         {previewing && <div ref={previewRef} className="post-comment-preview post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: value.trim() ? commentToHtml(value) : `<p>${t.previewEmpty}</p>` }} />}
         <div className="comment-editor-foot">
           <span className="post-comment-hint" id={`${id}hint`}>{t.markdown(mod)}</span>
@@ -417,20 +423,34 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     const signedIn = readViewer()
 
     function load() {
-      // A like clicked while signed out is sent now. It is taken only here, so an effect that runs twice cannot drop it.
+      // A like clicked while signed out is sent now. It is taken only here; a load that runs at once (a #comment- link,
+      // Try again) and is cancelled by StrictMode's second run in development drops it.
       const wantsLike = signedIn && takeItem(likeIntentKey) !== null
       const wantsComment = signedIn && takeItem(commentIntentKey) !== null
 
       // The post reply is cached and the same for everyone, so the viewer's own like comes from its own request.
       const ownLikeRequest: Promise<{ likes?: number; liked?: boolean }> = signedIn
-        ? fetch(`/api/posts/${slug}/like`, wantsLike ? likeInit(true, language) : undefined).then(response => {
-          if (response.status === 401 && !cancelled) {
-            forgetViewer()
-            setViewer(null)
+        ? fetch(`/api/posts/${slug}/like`, wantsLike ? likeInit(true, language) : undefined).then(async response => {
+          if (response.status === 401) {
+            if (!cancelled) {
+              forgetViewer()
+              setViewer(null)
+            }
+
+            return {}
           }
 
-          return response.ok ? response.json() : {}
-        }, () => ({}))
+          const own: { likes?: number; liked?: boolean } = response.ok ? await response.json() : {}
+
+          // A like kept over the sign-in that failed or was not stored says so, as the click itself would.
+          if (wantsLike && !own.liked && !cancelled) setLikeNote(own.likes === undefined ? 'likeFailed' : 'likeBlocked')
+
+          return own
+        }).catch(() => {
+          if (wantsLike && !cancelled) setLikeNote('likeFailed')
+
+          return {}
+        })
         : Promise.resolve({})
 
       Promise.all([fetch(`/api/posts/${slug}`).then(response => response.ok ? response.json() : Promise.reject(new Error(String(response.status)))), ownLikeRequest])
@@ -512,6 +532,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     if (!reactions || liking.current) return
 
     liking.current = true
+    // Cleared first, so the same message twice in a row is announced twice.
+    setAnnouncement('')
     const next = !liked
     const before = reactions.likes
     let note: LikeNote | undefined = 'likeFailed'
@@ -608,7 +630,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     try {
       const response = await fetch(`/api/posts/${slug}/comments/${id}`, { method: 'DELETE' })
 
-      if (response.ok) {
+      // 404: the comment is already gone (deleted in another tab), which is what the reader asked for.
+      if (response.ok || response.status === 404) {
         // The focused button goes with the comment, so focus moves to the heading of the list.
         titleRef.current?.focus()
         setConfirming(undefined)
@@ -702,7 +725,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
         setEditing(undefined)
         setStatus('expired')
       } else {
-        const failure = result.error === 'rate' || result.error === 'blocked' || result.error === 'invalid' || result.error === 'edits' ? result.error : 'editFailed'
+        const failure = result.error === 'rate' || result.error === 'blocked' || result.error === 'invalid' || result.error === 'edits' ? result.error : response.status === 404 ? 'gone' : 'editFailed'
 
         setEditing(current => current && { ...current, status: failure })
       }
@@ -768,7 +791,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
                   // Escape closes an unchanged edit; a changed one stays, so no text is lost by accident.
                   if (event.key === 'Escape' && !event.nativeEvent.isComposing && editing.draft.trim() === item.body) closeEdit(event.currentTarget)
                 }}>
-                  <CommentEditor t={t} label={t.editLabel} labelHidden value={editing.draft} onChange={value => setEditing(current => current && { ...current, draft: value })} focus />
+                  <CommentEditor t={t} label={t.editLabel} labelHidden value={editing.draft} onChange={value => setEditing(current => current && { ...current, draft: value })} focus busy={editing.status === 'saving'} />
                   <div className="contact-form-footer">
                     <p className="post-comment-status" role="status" data-tone={editing.status && editing.status !== 'saving' ? 'error' : undefined}>{editing.status && editing.status !== 'saving' ? t[editing.status] : ''}</p>
                     {/* One group, so a narrow screen never puts Cancel and Save on separate lines. */}
@@ -786,7 +809,9 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
         {/* The Worker routes exist only on 1saif.me, so Pages previews always get a 404 here. */}
         {loadFailed && (location.hostname.endsWith('.pages.dev')
           ? <p className="post-comments-note">{t.previewHost}</p>
-          : <p className="post-comments-note">{t.loadFailed} <button type="button" className="post-comments-retry" disabled={retrying} onClick={() => {
+          // aria-disabled, not disabled, so focus stays on the button while it runs and after it fails again.
+          : <p className="post-comments-note">{t.loadFailed} <button type="button" className="post-comments-retry" aria-disabled={retrying} onClick={() => {
+            if (retrying) return
             setRetrying(true)
             setAttempt(count => count + 1)
           }}>{t.retry}</button></p>)}
@@ -805,7 +830,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           <span>{t.signedInAs} <strong dir="auto">{viewer.name ?? viewer.login}</strong></span>
           <button type="button" onClick={() => void signOut()}>{t.signOut}</button>
         </div>
-        <CommentEditor key={editorKey} t={t} label={t.message} value={draft} onChange={setDraft} focus={editorKey > 0} />
+        <CommentEditor key={editorKey} t={t} label={t.message} value={draft} onChange={setDraft} focus={editorKey > 0} busy={busy} />
         <div className="contact-form-footer">
           <button type="submit" disabled={busy || !draft.trim()}>{busy ? t.posting : t.post}</button>
           <p className="post-comment-status" role="status" data-tone={tone}>{statusText}</p>

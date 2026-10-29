@@ -464,13 +464,90 @@ describe('PostReactions', () => {
 
     expect(container.querySelector('.post-comments-note')!.textContent).toBe('The comments did not load. Try again')
     act(() => retry.click())
-    expect(retry.disabled).toBe(true)
+    expect(retry.getAttribute('aria-disabled')).toBe('true')
+    // A second click while it runs sends nothing more.
+    act(() => retry.click())
     await act(async () => {})
 
     expect(fetch).toHaveBeenCalledTimes(2)
     expect(container.querySelectorAll('.post-comments li')).toHaveLength(1)
     expect(container.querySelector('.post-comments-retry')).toBeNull()
     expect(document.activeElement).toBe(container.querySelector('#comments-title'))
+  })
+
+  it('keeps focus on Try again when the list fails to load again', async () => {
+    await render([async () => Response.json({}, { status: 503 }), async () => Response.json({}, { status: 503 })])
+    const retry = container.querySelector<HTMLButtonElement>('.post-comments-retry')!
+
+    retry.focus()
+    await act(async () => retry.click())
+
+    expect(retry.getAttribute('aria-disabled')).toBe('false')
+    expect(document.activeElement).toBe(retry)
+  })
+
+  it('locks the text while a post is out, so nothing typed then is lost', async () => {
+    signIn()
+    Object.assign(document, { execCommand: () => false })
+    let answer: (response: Response) => void = () => {}
+
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), () => new Promise<Response>(resolve => { answer = resolve })])
+    const area = container.querySelector<HTMLTextAreaElement>('.post-comment-form textarea')!
+
+    await type(area, '- one')
+    area.setSelectionRange(5, 5)
+    await act(async () => container.querySelector('form')!.requestSubmit())
+    expect(area.readOnly).toBe(true)
+    expect(container.querySelector<HTMLButtonElement>('.post-comment-form .comment-tool')!.disabled).toBe(true)
+    await act(async () => area.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })))
+    expect(area.value).toBe('- one')
+
+    await act(async () => answer(Response.json({ ...own, id: 3, body: '- one' })))
+    expect(container.querySelector<HTMLTextAreaElement>('.post-comment-form textarea')!.readOnly).toBe(false)
+    Reflect.deleteProperty(document, 'execCommand')
+  })
+
+  it('says so when the like kept over the sign-in is refused or not stored', async () => {
+    signIn()
+    sessionStorage.setItem('like-intent:a-post', '1')
+    await render([async () => Response.json({ error: 'rate' }, { status: 429 }), async () => Response.json(loaded)])
+    expect(count()).toBe('The like was not saved. Try again.')
+
+    act(() => root.unmount())
+    container.remove()
+    sessionStorage.setItem('like-intent:a-post', '1')
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded)])
+    expect(count()).toBe('This account cannot like posts here.')
+  })
+
+  it('announces a failed like again when the next one fails too', async () => {
+    signIn()
+    let answer: (response: Response) => void = () => {}
+
+    await render([async () => Response.json({ liked: false }), async () => Response.json(loaded), async () => Response.json({ error: 'rate' }, { status: 429 }), () => new Promise<Response>(resolve => { answer = resolve })])
+    const region = container.querySelector('.post-like [aria-live]')!
+
+    await act(async () => like().click())
+    expect(region.textContent).toBe('The like was not saved. Try again.')
+    act(() => like().click())
+    expect(region.textContent).toBe('')
+    await act(async () => answer(Response.json({ error: 'rate' }, { status: 429 })))
+    expect(region.textContent).toBe('The like was not saved. Try again.')
+  })
+
+  it('treats a comment deleted in another tab as gone, and says why its edit cannot be saved', async () => {
+    signIn()
+    const second = { ...own, id: 3, body: 'Also mine' }
+
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json({ ...withOwn, comments: [...withOwn.comments, second] }), async () => Response.json({ error: 'comment' }, { status: 404 }), async () => Response.json({ error: 'comment' }, { status: 404 })])
+    await act(async () => container.querySelector<HTMLButtonElement>('#comment-2 .post-comment-delete')!.click())
+    await act(async () => container.querySelector<HTMLButtonElement>('#comment-2 .post-comment-delete')!.click())
+    expect(container.querySelector('#comment-2')).toBeNull()
+
+    await act(async () => container.querySelector<HTMLButtonElement>('#comment-3 .post-comment-edit')!.click())
+    await type(container.querySelector<HTMLTextAreaElement>('.post-comment-editing textarea')!, 'Changed')
+    await act(async () => container.querySelector<HTMLFormElement>('.post-comment-editing')!.requestSubmit())
+    expect(container.querySelector('.post-comment-editing [role="status"]')!.textContent).toBe('This comment was deleted, so the edit cannot be saved.')
   })
 
   it('names the shortcut key of the reader\'s platform', async () => {

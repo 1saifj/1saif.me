@@ -29,9 +29,13 @@ export function commentToHtml(markdown: string): string {
     .replace(/```(\w{0,20})[^\n]*\n([\s\S]*?)```/g, (_match, lang: string, code: string) => `\n\n${hold(codeBlockHtml(lang, '', code))}\n\n`))
     .replace(/`([^`\n]+)`/g, (_match, code: string) => hold(`<code>${code}</code>`))
     .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)\uE000]+)\)/g, (_match, label: string, url: string) => hold(link(url, label)))
-    // A bare address becomes a link too; trailing punctuation stays outside it. No address may swallow a held part,
-    // or that part's HTML would land inside an href.
-    .replace(/(^|\s)(https?:\/\/[^\s<\uE000]*[^\s<.,;:!?)'"\uE000])/g, (_match, space: string, url: string) => space + hold(link(url, url)))
+    // A bare address becomes a link too; trailing punctuation, and a quote or & escaped above, stay outside it. No
+    // address may swallow a held part, or that part's HTML would land inside an href.
+    .replace(/(^|\s)(https?:\/\/[^\s<\uE000]+)/g, (match, space: string, address: string) => {
+      const [, url, tail] = /^(.*?)((?:[.,;:!?)]|&(?:#39|quot|amp|lt|gt);)*)$/.exec(address) ?? []
+
+      return /^https?:\/\/./.test(url) ? space + hold(link(url, url)) + tail : match
+    })
 
   // Each heading is its own block, so the text right under it becomes a paragraph, as in the posts.
   const html = text.replace(/^#{1,3} .+$/gm, line => `\n\n${line}\n\n`).trim().split(/\n{2,}/).map(block => {

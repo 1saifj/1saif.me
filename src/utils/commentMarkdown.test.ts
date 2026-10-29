@@ -52,6 +52,16 @@ describe('commentToHtml', () => {
     expect(commentToHtml('[x](javascript:alert(1))')).toBe('<p>[x](javascript:alert(1))</p>')
   })
 
+  it('keeps a quote, a closing bracket or a trailing & outside a bare link, and an & inside one', () => {
+    const a = (url: string) => `<a href="${url}" target="_blank" rel="nofollow ugc noopener noreferrer">${url}</a>`
+
+    expect(commentToHtml("'https://a.dev/x'")).toBe("<p>&#39;https://a.dev/x&#39;</p>")
+    expect(commentToHtml("see https://a.dev/x'")).toBe(`<p>see ${a('https://a.dev/x')}&#39;</p>`)
+    expect(commentToHtml('see https://a.dev/x).')).toBe(`<p>see ${a('https://a.dev/x')}).</p>`)
+    expect(commentToHtml('see https://a.dev/?a=1&b=2&')).toBe(`<p>see ${a('https://a.dev/?a=1&amp;b=2')}&amp;</p>`)
+    expect(commentToHtml('see https://.')).toBe('<p>see https://.</p>')
+  })
+
   it.each([
     ['<script>alert(1)</script>'],
     ['<img src=x onerror=alert(1)>'],

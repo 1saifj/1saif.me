@@ -16,6 +16,13 @@ describe('formatSelection', () => {
     expect(apply('run ls now', 4, 6, 'code').html).toBe('<p>run <code>ls</code> now</p>')
   })
 
+  it('wraps each line of a selection over lines, so every line renders bold', () => {
+    const result = apply('one\n\ntwo', 0, 8, 'bold')
+
+    expect(result).toMatchObject({ text: '**one**\n\n**two**', selected: '**one**\n\n**two**' })
+    expect(result.html).toBe('<p><strong>one</strong></p><p><strong>two</strong></p>')
+  })
+
   it('puts the cursor between the markers when nothing is selected', () => {
     const edit = formatSelection('ab', 1, 1, 'bold')
 
@@ -38,6 +45,10 @@ describe('formatSelection', () => {
 
   it('turns a line into a heading that renders as one', () => {
     expect(apply('Intro\nSetup\nRun it', 7, 7, 'heading').html).toBe('<p>Intro</p><h5>Setup</h5><p>Run it</p>')
+  })
+
+  it('leaves the next line alone when the selection ends with its line break', () => {
+    expect(apply('a\nb', 0, 2, 'heading')).toMatchObject({ text: '### a\n\nb', html: '<h5>a</h5><p>b</p>' })
   })
 
   it('formats the first line when the cursor sits before a blank first line', () => {
@@ -65,6 +76,8 @@ describe('pasteLink', () => {
     ['the selection spans lines', 'a\nb', 0, 3, 'https://x.dev'],
     ['the paste is not one address', 'docs', 0, 4, 'see https://x.dev'],
     ['the address is not http', 'docs', 0, 4, 'javascript:alert(1)'],
+    ['the text is in a code block', '```\nx = "foo"', 9, 12, 'https://x.dev'],
+    ['the text is in a code span', 'run `foo` now', 5, 8, 'https://x.dev'],
   ])('pastes as usual when %s', (_, value, start, end, pasted) => {
     expect(pasteLink(value, start, end, pasted)).toBeUndefined()
   })
@@ -106,6 +119,7 @@ describe('continueList', () => {
     expect(enter('+ not a list here|')).toBeUndefined()
     expect(enter('```\n- inside code|')).toBeUndefined()
     expect(enter('```\ncode\n```\n- after code|')).toBe('```\ncode\n```\n- after code\n- |')
+    expect(enter('- run `npm i`|')).toBe('- run `npm i`\n- |')
   })
 })
 
