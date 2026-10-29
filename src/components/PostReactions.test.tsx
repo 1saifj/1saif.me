@@ -357,6 +357,53 @@ describe('PostReactions', () => {
     expect(form().querySelector<HTMLButtonElement>('[type="submit"]')!.disabled).toBe(true)
   })
 
+  it('closes an unchanged edit on a second Edit, and asks before a reload drops a changed one', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn)])
+    const edit = container.querySelector<HTMLButtonElement>('.post-comment-edit')!
+    const form = () => container.querySelector<HTMLFormElement>('.post-comment-editing')
+    const unload = () => {
+      const event = new Event('beforeunload', { cancelable: true })
+
+      window.dispatchEvent(event)
+
+      return event.defaultPrevented
+    }
+
+    await act(async () => edit.click())
+    expect(unload()).toBe(false)
+    await act(async () => edit.click())
+    expect(form()).toBeNull()
+    expect(edit.getAttribute('aria-expanded')).toBe('false')
+
+    await act(async () => edit.click())
+    await type(form()!.querySelector('textarea')!, 'Mine, changed')
+    expect(unload()).toBe(true)
+    await act(async () => edit.click())
+    expect(form()!.querySelector('[role="status"]')!.textContent).toBe('Save or cancel this edit first.')
+
+    await act(async () => form()!.querySelector<HTMLButtonElement>('.post-comment-cancel')!.click())
+    expect(unload()).toBe(false)
+  })
+
+  it('glows again on a second save of the same comment', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn), async () => Response.json({ ...own, body: 'One', editedAt: 1 }), async () => Response.json({ ...own, body: 'Two', editedAt: 2 })])
+    const item = () => container.querySelector<HTMLElement>('#comment-2')!
+
+    for (const body of ['One', 'Two']) {
+      await act(async () => container.querySelector<HTMLButtonElement>('.post-comment-edit')!.click())
+      await type(container.querySelector<HTMLTextAreaElement>('.post-comment-editing textarea')!, body)
+      await act(async () => container.querySelector<HTMLFormElement>('.post-comment-editing')!.requestSubmit())
+      expect(item().className).toBe('is-fresh')
+      // The ::before glow ends on the li itself; a code block's own animation inside it must not clear the mark.
+      await act(async () => item().querySelector('.post-comment-body')!.dispatchEvent(Object.assign(new Event('animationend', { bubbles: true }), { animationName: 'other' })))
+      expect(item().className).toBe('is-fresh')
+      await act(async () => item().dispatchEvent(Object.assign(new Event('animationend', { bubbles: true }), { animationName: 'post-comment-fresh' })))
+      expect(item().className).toBe('')
+    }
+  })
+
   it('continues a list on Enter, and ends it on Enter in an empty item', async () => {
     signIn()
     // jsdom has no execCommand, so the editor takes its setRangeText fallback.

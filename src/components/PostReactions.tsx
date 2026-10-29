@@ -491,6 +491,20 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     else takeItem(draftKey)
   }, [viewer, draft, draftKey])
 
+  // Unlike the new comment, an edit is not kept in the tab, so a changed one must not go with a reload or a closed tab.
+  // shortcut: an in-site link changes the page without an unload, so it still drops the edit; guard it in App.tsx if readers lose edits that way.
+  const editChanged = editing !== undefined && (editing.status === 'saving' || editing.draft.trim() !== reactions?.comments.find(item => item.id === editing.id)?.body)
+
+  useEffect(() => {
+    if (!editChanged) return
+
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault()
+
+    window.addEventListener('beforeunload', warn)
+
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [editChanged])
+
   // A closed edit puts the comment's HTML back, so its code blocks are enhanced again.
   useEffect(() => (commentsRef.current && reactions?.comments.length ? enhanceCodeBlocks(commentsRef.current) : undefined), [reactions?.comments, editing?.id])
 
@@ -618,21 +632,20 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     setConfirming(undefined)
   }
 
-  // An open edit with changes stays open, so its text is not lost; an unchanged one gives way.
+  // An open edit with changes stays open, so its text is not lost; an unchanged one gives way. Edit on the open
+  // comment closes it, as its aria-expanded says.
   function startEdit(item: PostComment) {
     // A status over 'saving' would turn Save back on and send a second edit.
     if (editing?.status === 'saving') return
 
-    const open = editing && editing.id !== item.id && reactions?.comments.find(comment => comment.id === editing.id)
-
-    if (editing && open && editing.draft.trim() !== open.body) {
+    if (editing && editChanged) {
       setEditing({ ...editing, status: 'unsaved' })
       commentsRef.current?.querySelector<HTMLTextAreaElement>('.post-comment-editing textarea')?.focus()
 
       return
     }
 
-    setEditing(current => current?.id === item.id ? current : { id: item.id, draft: item.body })
+    setEditing(editing?.id === item.id ? undefined : { id: item.id, draft: item.body })
   }
 
   // The reader's selection inside the comment, or else the whole comment, goes into the new comment as a quote.
@@ -720,7 +733,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       <h2 id="comments-title" ref={titleRef} tabIndex={-1}>{t.title}{reactions?.comments.length ? <span className="post-comments-count">{reactions.comments.length}</span> : null}</h2>
       <div ref={commentsRef} className="post-comments">
         {reactions && (reactions.comments.length
-          ? <ol>{reactions.comments.map(item => <li key={item.id} id={`comment-${item.id}`} className={fresh === item.id ? 'is-fresh' : undefined}>
+          // The mark goes when its glow ends, so the next post or save of the same comment glows again.
+          ? <ol>{reactions.comments.map(item => <li key={item.id} id={`comment-${item.id}`} className={fresh === item.id ? 'is-fresh' : undefined} onAnimationEnd={event => { if (event.animationName === 'post-comment-fresh') setFresh(undefined) }}>
             {/* GitHub serves the picture; no-referrer keeps the post address from it. */}
             <img className="post-comment-avatar" src={avatarUrl(item.author.id, 36)} alt="" width={36} height={36} loading="lazy" decoding="async" referrerPolicy="no-referrer" />
             <div className="post-comment-main">
@@ -757,8 +771,11 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
                   <CommentEditor t={t} label={t.editLabel} labelHidden value={editing.draft} onChange={value => setEditing(current => current && { ...current, draft: value })} focus />
                   <div className="contact-form-footer">
                     <p className="post-comment-status" role="status" data-tone={editing.status && editing.status !== 'saving' ? 'error' : undefined}>{editing.status && editing.status !== 'saving' ? t[editing.status] : ''}</p>
-                    <button type="button" className="post-comment-cancel" onClick={event => closeEdit(event.currentTarget)}>{t.cancel}</button>
-                    <button type="submit" disabled={editing.status === 'saving' || !editing.draft.trim() || editing.draft.trim() === item.body}>{editing.status === 'saving' ? t.saving : t.save}</button>
+                    {/* One group, so a narrow screen never puts Cancel and Save on separate lines. */}
+                    <span className="post-comment-edit-buttons">
+                      <button type="button" className="post-comment-cancel" onClick={event => closeEdit(event.currentTarget)}>{t.cancel}</button>
+                      <button type="submit" disabled={editing.status === 'saving' || !editing.draft.trim() || editing.draft.trim() === item.body}>{editing.status === 'saving' ? t.saving : t.save}</button>
+                    </span>
                   </div>
                 </form>
                 // commentToHtml escapes the visitor's text before it adds any markup.
