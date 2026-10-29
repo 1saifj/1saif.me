@@ -226,6 +226,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
       // A like clicked while signed out is sent now. It is taken only here, so an effect that runs twice cannot drop it.
       const wantsLike = signedIn && takeItem(likeIntentKey) !== null
+
       // The post reply is cached and the same for everyone, so the viewer's own like comes from its own request.
       const own: Promise<{ likes?: number; liked?: boolean }> = signedIn
         ? fetch(`/api/posts/${slug}/like`, wantsLike ? likeInit(true, language) : undefined).then(response => {

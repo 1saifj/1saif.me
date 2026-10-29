@@ -401,6 +401,7 @@ describe('reactions worker: likes', () => {
     const { env } = makeEnv()
     const { header } = await signIn(env)
     const keys: string[] = []
+
     const counting = {
       ...env,
       PER_CLIENT_LIKES: {
