@@ -433,7 +433,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
             <div className="post-comment-main">
               <p className="post-comment-meta">
                 <a href={`https://github.com/${item.author.login}`} target="_blank" rel="nofollow ugc noopener noreferrer"><strong dir="auto">{item.author.name ?? item.author.login}</strong></a>
-                {item.author.name && <span className="post-comment-login">@{item.author.login}</span>}
+                {/* A login is Latin script; without dir, an Arabic page puts its @ at the end. */}
+                {item.author.name && <span className="post-comment-login" dir="ltr">@{item.author.login}</span>}
                 <time dateTime={new Date(item.createdAt).toISOString()}>{dateFormat.format(item.createdAt)}</time>
                 {viewer?.id === item.author.id && <button type="button" className="post-comment-delete" onClick={() => void removeComment(item.id)}>{t.delete}</button>}
               </p>

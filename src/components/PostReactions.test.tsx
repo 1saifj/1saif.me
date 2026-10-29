@@ -64,6 +64,7 @@ describe('PostReactions', () => {
     expect(count()).toBe('2 likes')
     expect(container.querySelector('.post-comment-meta strong')!.textContent).toBe('<b>Ali</b>')
     expect(container.querySelector('.post-comments b')).toBeNull()
+    expect(container.querySelector('.post-comment-login')!.getAttribute('dir')).toBe('ltr')
   })
 
   it('sends a signed-out reader to GitHub and keeps the like for the way back', async () => {
