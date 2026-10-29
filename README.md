@@ -36,11 +36,11 @@ Node 18 or newer.
 | --- | --- | --- |
 | The site | Every push to `main` | Cloudflare Pages project `1saif-me` builds with `npm run build` and serves `dist` |
 | The contact Worker | A push to `main` that changes `workers/contact/*` | Cloudflare Workers Builds on the `1saif-contact` Worker: build command `npx vitest run workers`, deploy command `npx wrangler deploy -c workers/contact/wrangler.jsonc` |
-| The reactions Worker | By hand, after a change to `workers/reactions/*`, `src/data/blogs.ts` or `src/utils/slugUtils.ts` reaches `main` | `npx wrangler deploy -c workers/reactions/wrangler.jsonc` from `main`. Workers Builds is not connected for this Worker yet (below) |
+| The reactions Worker | By hand, after a change to `workers/reactions/*` or `src/utils/slugUtils.ts` reaches `main` | `npx wrangler deploy -c workers/reactions/wrangler.jsonc` from `main`. Workers Builds is not connected for this Worker yet (below) |
 
 The site and the contact Worker use Cloudflare's GitHub app and Cloudflare-managed build tokens, so the repo holds no deploy secrets. Wrangler keeps the secrets that are already on each Worker. Build logs: Workers & Pages → the Worker → Deployments.
 
-The reactions Worker bundles the list of published posts, so it must deploy again when a post is added; until then, likes and comments on the new post answer 404, and the post says the comments did not load. So deploy it right after a new post reaches `main`, or connect Workers Builds once: Workers & Pages → `1saif-reactions` → Settings → Build → Connect, with repo `1saifj/1saif.me`, branch `main`, build command `npx vitest run workers`, deploy command `npx wrangler deploy -c workers/reactions/wrangler.jsonc`, watch paths `workers/reactions/*`, `src/data/blogs.ts` and `src/utils/slugUtils.ts`, and builds for other branches off. Then change its row above.
+A new post needs no Worker deploy: the Worker bundles the posts published when it was deployed, and it knows a later post by its live page (`isPost` in `workers/reactions/src/index.ts`). To deploy Worker changes on merge, connect Workers Builds once: Workers & Pages → `1saif-reactions` → Settings → Build → Connect, with repo `1saifj/1saif.me`, branch `main`, build command `npx vitest run workers`, deploy command `npx wrangler deploy -c workers/reactions/wrangler.jsonc`, watch paths `workers/reactions/*` and `src/utils/slugUtils.ts`, and builds for other branches off. Then change its row above.
 
 The first deploy of the reactions Worker needs its database tables and two secrets: the client secret of the [1saif.me comments](https://github.com/apps/1saif-me-comments) GitHub App (its client ID is in `wrangler.jsonc`), and a random key that signs the sign-in cookies:
 
