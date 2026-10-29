@@ -38,6 +38,7 @@ const copy = {
     title: 'Comments',
     empty: 'No comments yet.',
     loadFailed: 'The comments did not load. Refresh the page to try again.',
+    previewHost: 'Likes and comments work on 1saif.me only, not on preview deploys.',
     name: 'Name',
     message: 'Comment',
     write: 'Write',
@@ -64,6 +65,7 @@ const copy = {
     title: 'التعليقات',
     empty: 'لا تعليقات بعد.',
     loadFailed: 'تعذّر تحميل التعليقات. حدّث الصفحة وحاول مرة أخرى.',
+    previewHost: 'الإعجابات والتعليقات تعمل على 1saif.me فقط، لا على نسخ المعاينة.',
     name: 'الاسم',
     message: 'التعليق',
     write: 'كتابة',
@@ -405,7 +407,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
             <div className="post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: commentToHtml(item.body) }} />
           </li>)}</ol>
           : <p className="post-comments-note">{t.empty}</p>)}
-        {loadFailed && <p className="post-comments-note">{t.loadFailed}</p>}
+        {/* The Worker routes exist only on 1saif.me, so Pages previews always get a 404 here. */}
+        {loadFailed && <p className="post-comments-note">{location.hostname.endsWith('.pages.dev') ? t.previewHost : t.loadFailed}</p>}
       </div>
 
       <form className="contact-form post-comment-form" onSubmit={submit} onFocus={() => void startTurnstile()} noValidate>
