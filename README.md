@@ -109,7 +109,7 @@ Every query uses a primary key or the `comments_by_post` index, so no request sc
 
 Every like and comment needs a GitHub account, and each account is rate limited on its own, so faking them takes many accounts. Under a sustained attack, the Workers request limit is the first to go, because refused requests count too. When a limit is hit, only the `/api/` paths stop until the reset: a D1 limit stops likes and comments on every post, and the Workers request limit also stops page-view counts and the contact form. The site is static on Pages and keeps working. To switch the reactions Worker off at once, run `npx wrangler delete -c workers/reactions/wrangler.jsonc`, or remove its `routes` and deploy; post pages then show that the comments did not load.
 
-To stop a flood before it reaches any Worker (blocked requests do not count), change the zone's WAF rate limiting rule (Security → WAF → Rate limiting rules) from `URI Path equals /api/contact` to `URI Path starts with /api/`, 10 requests per 10 seconds per IP.
+The zone's one Free WAF rate limiting rule (Security → Security rules → Rate limiting rules) stops a flood before it reaches any Worker, and blocked requests do not count: `URI Path starts with /api/`, 10 requests per 10 seconds per IP, then a 10-second block. A post view sends at most 3 `/api/` requests, so a reader stays far below it.
 
 ## Contact
 
