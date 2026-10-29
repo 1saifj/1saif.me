@@ -85,6 +85,13 @@ describe('PostReactions', () => {
     expect(like().getAttribute('aria-pressed')).toBe('true')
   })
 
+  it('shows the count from the reader\'s own request, because the cached post reply may be older', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 3, liked: true }), async () => Response.json(loaded)])
+
+    expect(count()).toBe('3 likes')
+  })
+
   it('sends the like clicked before the sign-in, and its count wins over the cached one', async () => {
     signIn()
     sessionStorage.setItem('like-intent:a-post', '1')

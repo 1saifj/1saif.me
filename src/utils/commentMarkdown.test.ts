@@ -34,6 +34,14 @@ describe('commentToHtml', () => {
     expect(commentToHtml('a | b\n---')).toBe('<p>a | b<br>---</p>')
   })
 
+  it('keeps a "# " line inside a code block as code', () => {
+    const html = commentToHtml('```bash\n# install deps\nnpm i\n```')
+
+    expect(html.match(/code-block-container/g)).toHaveLength(1)
+    expect(html).toContain('install deps')
+    expect(html).not.toMatch(/<h\d/)
+  })
+
   it('links only http(s) addresses, marked nofollow ugc', () => {
     expect(commentToHtml('[docs](https://example.com/a?b=1)')).toBe('<p><a href="https://example.com/a?b=1" target="_blank" rel="nofollow ugc noopener noreferrer">docs</a></p>')
     expect(commentToHtml('See https://example.com.')).toBe('<p>See <a href="https://example.com" target="_blank" rel="nofollow ugc noopener noreferrer">https://example.com</a>.</p>')
