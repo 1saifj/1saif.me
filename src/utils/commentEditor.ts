@@ -66,3 +66,34 @@ export function pasteLink(value: string, start: number, end: number, pasted: str
 
   return { from: start, to: end, text, selectionStart: start + text.length, selectionEnd: start + text.length }
 }
+
+// The markers commentToHtml renders as a list or a quote. A list item cannot nest, so a marker starts the line.
+const LIST_ITEM = /^([-*] |\d+\. |> ?)(.*)$/
+
+// As on GitHub: Enter at the end of a list or quote line starts the next item, and Enter on an empty item ends the list.
+export function continueList(value: string, caret: number): Edit | undefined {
+  const lineStart = value.lastIndexOf('\n', caret - 1) + 1
+  const atLineEnd = caret === value.length || value[caret] === '\n'
+  const match = LIST_ITEM.exec(value.slice(lineStart, caret))
+
+  // Inside a code block (an odd number of fences before the caret), Enter is a plain line break.
+  if (!atLineEnd || !match || (value.slice(0, lineStart).match(/^```/gm) ?? []).length % 2 === 1) return undefined
+
+  const [, marker, rest] = match
+
+  if (!rest.trim()) return { from: lineStart, to: caret, text: '', selectionStart: lineStart, selectionEnd: lineStart }
+
+  const number = /^\d+/.exec(marker)
+  const next = number ? `${Number(number[0]) + 1}. ` : marker.startsWith('>') ? '> ' : marker
+  const text = `\n${next}`
+
+  return { from: caret, to: caret, text, selectionStart: caret + text.length, selectionEnd: caret + text.length }
+}
+
+// A quote reply: each line gets "> ", and an empty line ">", so the quote stays one block. A code block is left
+// out, because a fence inside a quote does not render.
+export function quoteReply(text: string): string {
+  const prose = text.replace(/```[^\n]*\n[\s\S]*?(?:```|$)/g, '').replace(/\n{3,}/g, '\n\n').trim()
+
+  return prose && prose.split('\n').map(line => line.trim() ? `> ${line}` : '>').join('\n')
+}

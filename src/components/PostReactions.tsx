@@ -1,7 +1,7 @@
 import React, { ClipboardEvent, FormEvent, KeyboardEvent, useEffect, useId, useRef, useState } from 'react'
 import { dateLocale, Language, SITE_TIME_ZONE } from '../i18n/language'
 import { enhanceCodeBlocks } from '../utils/codeBlocks'
-import { Edit, Format, formatSelection, pasteLink } from '../utils/commentEditor'
+import { continueList, Edit, Format, formatSelection, pasteLink, quoteReply } from '../utils/commentEditor'
 import { commentToHtml } from '../utils/commentMarkdown'
 import { commentTime } from '../utils/commentTime'
 
@@ -20,6 +20,9 @@ const DRAFT_KEY = 'comment-draft'
 
 // A like clicked while signed out is kept across the GitHub sign-in and sent on the way back.
 const LIKE_INTENT_KEY = 'like-intent'
+
+// A sign-in started from the comment box returns to it, with the cursor in the box.
+const COMMENT_INTENT_KEY = 'comment-intent'
 
 interface Author {
   id: number
@@ -62,6 +65,8 @@ const copy = {
     confirmDelete: 'Delete this comment for good?',
     author: 'Author',
     edit: 'Edit',
+    quote: 'Quote reply',
+    unsaved: 'Save or cancel this edit first.',
     edited: 'edited',
     editLabel: 'Edit comment',
     save: 'Save',
@@ -110,6 +115,8 @@ const copy = {
     confirmDelete: 'أتحذف هذا التعليق نهائياً؟',
     author: 'الكاتب',
     edit: 'تعديل',
+    quote: 'رد مع اقتباس',
+    unsaved: 'احفظ هذا التعديل أو ألغِه أولاً.',
     edited: 'معدَّل',
     editLabel: 'تعديل التعليق',
     save: 'حفظ',
@@ -143,7 +150,7 @@ type Copy = (typeof copy)[Language]
 
 type LikeNote = 'likeFailed' | 'likeBlocked' | 'signInToLike'
 
-type EditStatus = 'saving' | 'invalid' | 'rate' | 'blocked' | 'edits' | 'editFailed'
+type EditStatus = 'saving' | 'invalid' | 'rate' | 'blocked' | 'edits' | 'editFailed' | 'unsaved'
 
 type Status = 'idle' | 'posting' | 'posted' | 'invalid' | 'rate' | 'daily' | 'blocked' | 'expired' | 'signinFailed' | 'failed'
 
@@ -164,7 +171,7 @@ function takeItem(key: string): string | null {
 function forgetKeptItems() {
   try {
     for (const key of Object.keys(sessionStorage)) {
-      if (key.startsWith(`${DRAFT_KEY}:`) || key.startsWith(`${LIKE_INTENT_KEY}:`)) sessionStorage.removeItem(key)
+      if ([DRAFT_KEY, LIKE_INTENT_KEY, COMMENT_INTENT_KEY].some(prefix => key.startsWith(`${prefix}:`))) sessionStorage.removeItem(key)
     }
   } catch {
     // Without storage nothing was kept.
@@ -233,7 +240,13 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
 
   useEffect(() => (previewRef.current && previewing && value ? enhanceCodeBlocks(previewRef.current) : undefined), [previewing, value])
   useEffect(() => {
-    if (focus) messageRef.current?.focus()
+    const area = messageRef.current
+
+    if (!focus || !area) return
+
+    area.focus()
+    // The cursor goes after the text, so a quote or a kept draft goes on where it stopped.
+    area.setSelectionRange(area.value.length, area.value.length)
   }, [focus])
 
   function insert(area: HTMLTextAreaElement, edit: Edit) {
@@ -241,7 +254,8 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
     area.setSelectionRange(edit.from, edit.to)
 
     // insertText keeps the browser's undo history and fires the input event; setRangeText is the fallback without it.
-    if (!document.execCommand('insertText', false, edit.text)) {
+    // insertText with no text does not delete in every browser, so an empty edit deletes the range.
+    if (!document.execCommand(edit.text ? 'insertText' : 'delete', false, edit.text)) {
       area.setRangeText(edit.text)
       onChange(area.value)
     }
@@ -256,8 +270,21 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
   }
 
   function shortcut(event: KeyboardEvent<HTMLTextAreaElement>) {
-    // An IME (Arabic, Chinese, Japanese) still composing owns the keys.
-    if (event.nativeEvent.isComposing || event.altKey || event.shiftKey || !(event.metaKey || event.ctrlKey)) return
+    // An IME (Arabic, Chinese, Japanese) still composing owns the keys; Safari marks its last Enter only with keyCode 229.
+    if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229 || event.altKey || event.shiftKey) return
+
+    const area = event.currentTarget
+
+    if (!event.metaKey && !event.ctrlKey) {
+      const edit = event.key === 'Enter' && area.selectionStart === area.selectionEnd ? continueList(area.value, area.selectionStart) : undefined
+
+      if (edit) {
+        event.preventDefault()
+        insert(area, edit)
+      }
+
+      return
+    }
 
     if (event.key === 'Enter') {
       event.preventDefault()
@@ -328,8 +355,9 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   const [announcement, setAnnouncement] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [draft, setDraft] = useState('')
-  // A new key after each post gives the next comment a fresh editor, back on Write.
-  const [posted, setPosted] = useState(0)
+  // A new key gives the new-comment editor a fresh start on Write, with the cursor in it: after a post, a quote
+  // reply, or a sign-in started from the comment box. The draft comes back through value.
+  const [editorKey, setEditorKey] = useState(0)
   // One comment is edited at a time.
   const [editing, setEditing] = useState<{ id: number; draft: string; status?: EditStatus }>()
   // Delete asks in place, inside the comment, instead of a browser dialog.
@@ -343,6 +371,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
   const draftKey = `${DRAFT_KEY}:${slug}`
   const likeIntentKey = `${LIKE_INTENT_KEY}:${slug}`
+  const commentIntentKey = `${COMMENT_INTENT_KEY}:${slug}`
   const signInHref = `/api/auth/github?return=${encodeURIComponent(`${language === 'ar' ? '/ar' : ''}/blog/${slug}`)}`
 
   // Storage and the network run only in the browser, after hydration, so the prerendered page matches.
@@ -357,7 +386,10 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     if (saved) setDraft(saved)
 
     // A like clicked before a sign-in that did not finish is dropped, so a later sign-in cannot send it.
-    if (!signedIn) takeItem(likeIntentKey)
+    if (!signedIn) {
+      takeItem(likeIntentKey)
+      takeItem(commentIntentKey)
+    }
 
     // The Worker sends a failed sign-in back with ?signin=failed; the address keeps only the post.
     const address = new URL(window.location.href)
@@ -379,6 +411,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
       // A like clicked while signed out is sent now. It is taken only here, so an effect that runs twice cannot drop it.
       const wantsLike = signedIn && takeItem(likeIntentKey) !== null
+      const wantsComment = signedIn && takeItem(commentIntentKey) !== null
 
       // The post reply is cached and the same for everyone, so the viewer's own like comes from its own request.
       const ownLikeRequest: Promise<{ likes?: number; liked?: boolean }> = signedIn
@@ -400,6 +433,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           setReactions({ ...value, likes: ownLike.likes ?? value.likes })
           setLiked(ownLike.liked ?? false)
         }, () => { if (!cancelled) setLoadFailed(true) })
+        // Only once the list is in, so the list does not push the box away after the page scrolled to it.
+        .finally(() => { if (!cancelled && wantsComment) setEditorKey(key => key + 1) })
     }, { rootMargin: '600px 0px' })
 
     observer.observe(section)
@@ -408,7 +443,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       cancelled = true
       observer.disconnect()
     }
-  }, [slug, draftKey, likeIntentKey, language])
+  }, [slug, draftKey, likeIntentKey, commentIntentKey, language])
 
   // The draft survives a reload. It is saved only once the viewer is known: the effect above takes a saved draft
   // first, and a signed-out page must not drop the one kept for the way back from GitHub.
@@ -491,7 +526,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
       if (response.ok) {
         setDraft('')
-        setPosted(count => count + 1)
+        setEditorKey(key => key + 1)
         setFresh(result.id)
         setReactions(current => current && { ...current, comments: [...current.comments, result] })
         setStatus('posted')
@@ -544,6 +579,31 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   function cancelDelete(id: number) {
     restoreDelete.current = id
     setConfirming(undefined)
+  }
+
+  // An open edit with changes stays open, so its text is not lost; an unchanged one gives way.
+  function startEdit(item: PostComment) {
+    const open = editing && editing.id !== item.id && reactions?.comments.find(comment => comment.id === editing.id)
+
+    if (editing && open && editing.draft.trim() !== open.body) {
+      setEditing({ ...editing, status: 'unsaved' })
+      commentsRef.current?.querySelector<HTMLTextAreaElement>('.post-comment-editing textarea')?.focus()
+
+      return
+    }
+
+    setEditing(current => current?.id === item.id ? current : { id: item.id, draft: item.body })
+  }
+
+  // The reader's selection inside the comment, or else the whole comment, goes into the new comment as a quote.
+  function quote(item: PostComment, button: HTMLElement) {
+    const body = button.closest('li')?.querySelector('.post-comment-body')
+    const selection = window.getSelection()
+    const selected = body && selection && !selection.isCollapsed && body.contains(selection.anchorNode) && body.contains(selection.focusNode) ? selection.toString() : ''
+    const quoted = quoteReply(selected || item.body)
+
+    setDraft(current => `${current.trim() ? `${current.trimEnd()}\n\n` : ''}${quoted}\n\n`)
+    setEditorKey(key => key + 1)
   }
 
   // Focus goes back to the comment's Edit button, so a keyboard user stays at the comment.
@@ -631,7 +691,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
                 {item.author.id === OWNER_ID && <span className="post-comment-badge">{t.author}</span>}
                 <time dateTime={new Date(item.createdAt).toISOString()} title={fullDate.format(item.createdAt)}>{commentTime(item.createdAt, now, dateLocale(language), dateFormat)}</time>
                 {item.editedAt ? <span className="post-comment-edited" title={fullDate.format(item.editedAt)}>{t.edited}<span className="sr-only"> {fullDate.format(item.editedAt)}</span></span> : null}
-                {viewer?.id === item.author.id && (confirming?.id === item.id
+                {viewer && (confirming?.id === item.id
                   // The keys make each state mount its own buttons, so autoFocus runs when the state changes.
                   ? <span key="confirm" className="post-comment-actions" role="group" aria-labelledby={`delete-${item.id}`} onKeyDown={event => { if (event.key === 'Escape') cancelDelete(item.id) }}>
                     <span id={`delete-${item.id}`} className="post-comment-question" data-tone={confirming.failed ? 'error' : undefined} aria-live="polite">{confirming.failed ? t.deleteFailed : t.confirmDelete}</span>
@@ -640,8 +700,12 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
                     <button type="button" className="post-comment-dismiss" onClick={() => cancelDelete(item.id)}>{t.cancel}</button>
                   </span>
                   : <span key="actions" className="post-comment-actions">
-                    <button type="button" className="post-comment-edit" aria-expanded={editing?.id === item.id} onClick={() => setEditing(current => current?.id === item.id ? current : { id: item.id, draft: item.body })}>{t.edit}</button>
-                    <button type="button" className="post-comment-delete" autoFocus={restoreDelete.current === item.id} onFocus={() => { restoreDelete.current = undefined }} onClick={() => setConfirming({ id: item.id })}>{t.delete}</button>
+                    {/* A comment of code only has no text a quote can carry. */}
+                    {quoteReply(item.body) && <button type="button" className="post-comment-quote" onClick={event => quote(item, event.currentTarget)}>{t.quote}</button>}
+                    {viewer.id === item.author.id && <>
+                      <button type="button" className="post-comment-edit" aria-expanded={editing?.id === item.id} onClick={() => startEdit(item)}>{t.edit}</button>
+                      <button type="button" className="post-comment-delete" autoFocus={restoreDelete.current === item.id} onFocus={() => { restoreDelete.current = undefined }} onClick={() => setConfirming({ id: item.id })}>{t.delete}</button>
+                    </>}
                   </span>)}
               </p>
               {editing?.id === item.id
@@ -667,7 +731,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
       {viewer === null && <div className="contact-form post-comment-signin">
         <p>{t.signInPrompt}</p>
-        <a className="github-signin" href={signInHref}><GitHubIcon />{t.signIn}</a>
+        <a className="github-signin" href={signInHref} onClick={() => keepItem(commentIntentKey, '1')}><GitHubIcon />{t.signIn}</a>
         <p className="post-comment-hint">{t.signInNote}</p>
         {(status === 'signinFailed' || status === 'expired') && <p className="post-comment-status" role="status" data-tone="error">{t[status]}</p>}
       </div>}
@@ -678,8 +742,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           <span>{t.signedInAs} <strong dir="auto">{viewer.name ?? viewer.login}</strong></span>
           <button type="button" onClick={() => void signOut()}>{t.signOut}</button>
         </div>
-        {/* After a post, focus stays in the fresh editor for the next comment. */}
-        <CommentEditor key={posted} t={t} label={t.message} value={draft} onChange={setDraft} focus={posted > 0} />
+        <CommentEditor key={editorKey} t={t} label={t.message} value={draft} onChange={setDraft} focus={editorKey > 0} />
         <div className="contact-form-footer">
           <button type="submit" disabled={busy || !draft.trim()}>{busy ? t.posting : t.post}</button>
           <p className="post-comment-status" role="status" data-tone={tone}>{statusText}</p>

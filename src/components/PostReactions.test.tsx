@@ -292,6 +292,7 @@ describe('PostReactions', () => {
     await type(container.querySelector('textarea')!, 'Half written')
     sessionStorage.setItem('comment-draft:other-post', 'Private thoughts')
     sessionStorage.setItem('like-intent:other-post', '1')
+    sessionStorage.setItem('comment-intent:other-post', '1')
     sessionStorage.setItem('theme', 'dark')
     await act(async () => container.querySelector<HTMLButtonElement>('.post-comment-viewer button')!.click())
 
@@ -299,10 +300,95 @@ describe('PostReactions', () => {
     expect(Object.keys(sessionStorage)).toEqual(['theme'])
   })
 
-  it('drops a like kept for a sign-in that did not finish', async () => {
+  it('quotes the selected words, or else the whole comment, into the new comment with the cursor after it', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn)])
+    const area = () => container.querySelector<HTMLTextAreaElement>('.post-comment-form textarea')!
+    const quote = () => container.querySelector<HTMLButtonElement>('.post-comment-quote')!
+
+    await type(area(), 'My point')
+    await act(async () => quote().click())
+    expect(area().value).toBe('My point\n\n> First line\n> second line\n\n')
+    expect(document.activeElement).toBe(area())
+    expect(area().selectionStart).toBe(area().value.length)
+
+    const words = document.createRange()
+
+    words.selectNodeContents(container.querySelector('.post-comment-body p')!.firstChild!)
+    window.getSelection()!.removeAllRanges()
+    window.getSelection()!.addRange(words)
+    await type(area(), '')
+    await act(async () => quote().click())
+    expect(area().value).toMatch(/^> First line\n/)
+    expect(area().value).not.toContain('second line')
+    // Every comment can be quoted, the reader's own too, and only the reader's own can be edited.
+    expect(container.querySelectorAll('.post-comment-quote')).toHaveLength(2)
+    expect(container.querySelectorAll('.post-comment-edit')).toHaveLength(1)
+  })
+
+  it('shows no Quote reply to a signed-out reader', async () => {
+    await render([async () => Response.json(loaded)])
+
+    expect(container.querySelector('.post-comment-quote')).toBeNull()
+  })
+
+  it('keeps an edit with changes open when another Edit is clicked, and lets an unchanged one go', async () => {
+    signIn()
+    const second = { ...own, id: 3, body: 'Also mine' }
+
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json({ ...withOwn, comments: [...withOwn.comments, second] })])
+    const edits = container.querySelectorAll<HTMLButtonElement>('.post-comment-edit')
+    const form = () => container.querySelector<HTMLFormElement>('.post-comment-editing')!
+
+    await act(async () => edits[0].click())
+    await act(async () => edits[1].click())
+    expect(form().querySelector('textarea')!.value).toBe('Also mine')
+
+    await type(form().querySelector('textarea')!, 'Also mine, changed')
+    await act(async () => edits[0].click())
+    expect(form().querySelector('textarea')!.value).toBe('Also mine, changed')
+    expect(form().querySelector('[role="status"]')!.textContent).toBe('Save or cancel this edit first.')
+    expect(document.activeElement).toBe(form().querySelector('textarea'))
+  })
+
+  it('continues a list on Enter, and ends it on Enter in an empty item', async () => {
+    signIn()
+    // jsdom has no execCommand, so the editor takes its setRangeText fallback.
+    Object.assign(document, { execCommand: () => false })
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded)])
+    const area = container.querySelector<HTMLTextAreaElement>('.post-comment-form textarea')!
+    const enter = () => act(async () => area.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })))
+
+    await type(area, '1. one')
+    area.setSelectionRange(6, 6)
+    await enter()
+    expect(area.value).toBe('1. one\n2. ')
+    await enter()
+    expect(area.value).toBe('1. one\n')
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBe('1. one\n')
+    Reflect.deleteProperty(document, 'execCommand')
+  })
+
+  it('brings a reader back to the comment box after a sign-in started there', async () => {
+    await render([async () => Response.json(loaded)])
+    container.addEventListener('click', event => event.preventDefault())
+    await act(async () => container.querySelector<HTMLElement>('.github-signin')!.click())
+    expect(sessionStorage.getItem('comment-intent:a-post')).toBe('1')
+    act(() => root.unmount())
+    container.remove()
+
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded)])
+    expect(document.activeElement).toBe(container.querySelector('.post-comment-form textarea'))
+    expect(sessionStorage.getItem('comment-intent:a-post')).toBeNull()
+  })
+
+  it('drops a like or a comment kept for a sign-in that did not finish', async () => {
     sessionStorage.setItem('like-intent:a-post', '1')
+    sessionStorage.setItem('comment-intent:a-post', '1')
     await render([async () => Response.json(loaded)])
 
     expect(sessionStorage.getItem('like-intent:a-post')).toBeNull()
+    expect(sessionStorage.getItem('comment-intent:a-post')).toBeNull()
   })
 })

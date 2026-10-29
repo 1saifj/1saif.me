@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { commentToHtml } from './commentMarkdown'
-import { Format, formatSelection, pasteLink } from './commentEditor'
+import { continueList, Format, formatSelection, pasteLink, quoteReply } from './commentEditor'
 
 const apply = (value: string, start: number, end: number, format: Format) => {
   const edit = formatSelection(value, start, end, format)
@@ -67,5 +67,58 @@ describe('pasteLink', () => {
     ['the address is not http', 'docs', 0, 4, 'javascript:alert(1)'],
   ])('pastes as usual when %s', (_, value, start, end, pasted) => {
     expect(pasteLink(value, start, end, pasted)).toBeUndefined()
+  })
+})
+
+// Presses Enter at the caret, marked |, and returns the text with the new caret marked |.
+const enter = (marked: string) => {
+  const caret = marked.indexOf('|')
+  const value = marked.replace('|', '')
+  const edit = continueList(value, caret)
+
+  if (!edit) return undefined
+  const text = value.slice(0, edit.from) + edit.text + value.slice(edit.to)
+
+  return text.slice(0, edit.selectionStart) + '|' + text.slice(edit.selectionStart)
+}
+
+describe('continueList', () => {
+  it('starts the next item of a list or a quote', () => {
+    expect(enter('- one|')).toBe('- one\n- |')
+    expect(enter('* one|\nafter')).toBe('* one\n* |\nafter')
+    expect(enter('> said|')).toBe('> said\n> |')
+    expect(enter('9. nine|')).toBe('9. nine\n10. |')
+  })
+
+  it('renders what it continues as one list', () => {
+    expect(commentToHtml('9. nine\n10. ten')).toBe('<ol><li>nine</li><li>ten</li></ol>')
+  })
+
+  it('ends the list on an empty item and removes its marker', () => {
+    expect(enter('- one\n- |')).toBe('- one\n|')
+    expect(enter('- one\n2. |')).toBe('- one\n|')
+    expect(enter('> a\n>|')).toBe('> a\n|')
+  })
+
+  it('leaves Enter alone in the middle of a line, outside a list, and inside a code block', () => {
+    expect(enter('- on|e')).toBeUndefined()
+    expect(enter('plain|')).toBeUndefined()
+    expect(enter('+ not a list here|')).toBeUndefined()
+    expect(enter('```\n- inside code|')).toBeUndefined()
+    expect(enter('```\ncode\n```\n- after code|')).toBe('```\ncode\n```\n- after code\n- |')
+  })
+})
+
+describe('quoteReply', () => {
+  it('quotes every line, keeps an empty line inside the quote, and renders as one quote', () => {
+    const quoted = quoteReply('First line\nsecond\n\nThird')
+
+    expect(quoted).toBe('> First line\n> second\n>\n> Third')
+    expect(commentToHtml(quoted)).toBe('<blockquote><p>First line<br>second<br><br>Third</p></blockquote>')
+  })
+
+  it('leaves code blocks out, because a fence inside a quote does not render', () => {
+    expect(quoteReply('Try this:\n\n```bash\nls\n```\n\nIt worked.')).toBe('> Try this:\n>\n> It worked.')
+    expect(quoteReply('```js\nonly()\n```')).toBe('')
   })
 })
