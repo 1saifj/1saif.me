@@ -336,7 +336,7 @@ describe('PostReactions', () => {
     signIn()
     const second = { ...own, id: 3, body: 'Also mine' }
 
-    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json({ ...withOwn, comments: [...withOwn.comments, second] })])
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json({ ...withOwn, comments: [...withOwn.comments, second] }), () => new Promise<Response>(() => {})])
     const edits = container.querySelectorAll<HTMLButtonElement>('.post-comment-edit')
     const form = () => container.querySelector<HTMLFormElement>('.post-comment-editing')!
 
@@ -349,6 +349,11 @@ describe('PostReactions', () => {
     expect(form().querySelector('textarea')!.value).toBe('Also mine, changed')
     expect(form().querySelector('[role="status"]')!.textContent).toBe('Save or cancel this edit first.')
     expect(document.activeElement).toBe(form().querySelector('textarea'))
+
+    // While the save is out, another Edit changes nothing, so Save cannot send it twice.
+    await act(async () => form().requestSubmit())
+    await act(async () => edits[0].click())
+    expect(form().querySelector<HTMLButtonElement>('[type="submit"]')!.disabled).toBe(true)
   })
 
   it('continues a list on Enter, and ends it on Enter in an empty item', async () => {

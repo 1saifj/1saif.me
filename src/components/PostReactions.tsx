@@ -583,6 +583,9 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
   // An open edit with changes stays open, so its text is not lost; an unchanged one gives way.
   function startEdit(item: PostComment) {
+    // A status over 'saving' would turn Save back on and send a second edit.
+    if (editing?.status === 'saving') return
+
     const open = editing && editing.id !== item.id && reactions?.comments.find(comment => comment.id === editing.id)
 
     if (editing && open && editing.draft.trim() !== open.body) {
