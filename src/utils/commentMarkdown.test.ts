@@ -42,6 +42,10 @@ describe('commentToHtml', () => {
     expect(html).not.toMatch(/<h\d/)
   })
 
+  it('labels an unknown fence language as plain text, even one named like an object property', () => {
+    expect(commentToHtml('```constructor\nx\n```')).toContain('<span class="code-lang">Plain text</span>')
+  })
+
   it('links only http(s) addresses, marked nofollow ugc', () => {
     expect(commentToHtml('[docs](https://example.com/a?b=1)')).toBe('<p><a href="https://example.com/a?b=1" target="_blank" rel="nofollow ugc noopener noreferrer">docs</a></p>')
     expect(commentToHtml('See https://example.com.')).toBe('<p>See <a href="https://example.com" target="_blank" rel="nofollow ugc noopener noreferrer">https://example.com</a>.</p>')

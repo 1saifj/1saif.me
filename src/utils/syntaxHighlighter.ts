@@ -34,8 +34,8 @@ const labels = {
 const resolve = (lang: string): Language | undefined => {
   const key = lang.toLowerCase().trim()
 
-  // SAFETY: the `in` check proves key names one of the loaders in `languages`.
-  return key in languages ? key as Language : aliases.get(key)
+  // SAFETY: an own-property check proves key names one of the loaders in `languages`; `in` would also pass 'constructor'.
+  return Object.prototype.hasOwnProperty.call(languages, key) ? key as Language : aliases.get(key)
 }
 
 export const getLanguageLabel = (lang: string): string => {

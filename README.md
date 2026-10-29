@@ -62,7 +62,7 @@ npx wrangler@4 tail -c workers/contact/wrangler.jsonc
 
 ## Likes and comments
 
-Post pages show a like button and comments, served by the reactions Worker (`workers/reactions`) from D1. Both need a sign-in with GitHub, and each GitHub account likes a post at most once. The sign-in reads the public profile only: the Worker keeps the account ID, username and name, and never keeps the GitHub token. Readers can delete their own comments.
+Post pages show a like button and comments, served by the reactions Worker (`workers/reactions`) from D1. Both need a sign-in with GitHub, and each GitHub account likes a post at most once. The sign-in reads the public profile only: the Worker keeps the account ID, username and name, and never keeps the GitHub token. Readers can delete their own comments: the text goes at once, and an empty hidden row stays, so the daily cap of 10 comments still counts it.
 
 A new comment shows at once and mails Saif, with the commands to hide it and to block its author. One account can post at most 10 comments on one post in 24 hours (hidden ones count), so no account can fill a post. A blocked account cannot like or comment, and its comments drop off every post. To hide a comment, block an account, or list the latest comments:
 

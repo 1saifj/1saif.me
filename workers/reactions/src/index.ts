@@ -174,6 +174,10 @@ const CONTROL_CHARACTERS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/
 // eslint-disable-next-line no-control-regex -- a display name keeps no control character or line break.
 const ANY_CONTROL_CHARACTER = /[\u0000-\u001f\u007f]/g
 
+// Direction marks and overrides, zero-width space, word joiner and BOM: they could make a name read as another one.
+// Zero-width (non-)joiners stay, because Persian names and emoji need them.
+const INVISIBLE_FORMAT = /[\u061c\u200b\u200e\u200f\u202a-\u202e\u2060\u2066-\u2069\ufeff]/g
+
 const SESSION_COOKIE = '__Host-session'
 
 // Readable by the page: it holds only the public profile, so the page knows who is signed in without a request.
@@ -369,7 +373,8 @@ async function comment(request: Request, slug: string, env: Env, ctx: Context): 
     to: 'saifalialjanahi@gmail.com',
     from: { email: 'hello@1saif.me', name: '1saif.me comments' },
     subject: `New comment on ${slug}`,
-    text: `${author.name ?? author.login} (https://github.com/${author.login}) wrote on ${SITE_ORIGIN}/blog/${slug}:\n\n${message}\n\n--\nTo hide this comment:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE comments SET hidden = 1 WHERE id = ${row.id}"\n\nTo hide every comment of @${author.login} and refuse new ones:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE users SET blocked = 1 WHERE github_id = ${author.id}"`,
+    // The commands come first, so text in the comment cannot pass for one of them.
+    text: `To hide this comment:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE comments SET hidden = 1 WHERE id = ${row.id}"\n\nTo hide every comment of @${author.login} and refuse new ones:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE users SET blocked = 1 WHERE github_id = ${author.id}"\n\n--\n${author.name ?? author.login} (https://github.com/${author.login}) wrote on ${SITE_ORIGIN}/blog/${slug}:\n\n${message}`,
   }).catch(error => {
     // Log the code only: the subject and text hold visitor data.
     console.error('send failed', error instanceof Error && 'code' in error ? error.code : 'no code')
@@ -378,7 +383,8 @@ async function comment(request: Request, slug: string, env: Env, ctx: Context): 
   return reply(201, { id: row.id, body: message, createdAt, author } satisfies PostComment)
 }
 
-// The author deletes the comment for good; nobody else can, so the row's user_id must match the session.
+// The author deletes the comment's text for good; nobody else can, so the row's user_id must match the session.
+// The empty row stays hidden, so it still counts toward DAILY_COMMENTS and posting and deleting cannot go on all day.
 async function removeComment(request: Request, slug: string, id: number, env: Env): Promise<Response> {
   const session = await sessionOf(request, env)
 
@@ -386,7 +392,7 @@ async function removeComment(request: Request, slug: string, id: number, env: En
 
   if (!(await env.PER_CLIENT_COMMENTS.limit({ key: `user:${session.id}` })).success) return fail(429, 'rate')
 
-  const { meta } = await env.DB.prepare('DELETE FROM comments WHERE id = ? AND slug = ? AND user_id = ?').bind(id, slug, session.id).all()
+  const { meta } = await env.DB.prepare("UPDATE comments SET body = '', hidden = 1 WHERE id = ? AND slug = ? AND user_id = ? AND body != ''").bind(id, slug, session.id).all()
 
   if (meta.changes === 0) return fail(404, 'comment')
 
@@ -457,7 +463,7 @@ function returnPath(value: string | null): string {
 }
 
 function displayName(value: unknown): string | null {
-  const name = typeof value === 'string' ? value.replace(ANY_CONTROL_CHARACTER, ' ').trim().slice(0, MAX_NAME) : ''
+  const name = typeof value === 'string' ? value.replace(ANY_CONTROL_CHARACTER, ' ').replace(INVISIBLE_FORMAT, '').trim().slice(0, MAX_NAME) : ''
 
   return name || null
 }
@@ -556,7 +562,7 @@ async function finishSignIn(request: Request, env: Env, url: URL, ip: string): P
 
   const now = Date.now()
 
-  await env.DB.prepare('INSERT INTO users (github_id, login, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT (github_id) DO UPDATE SET login = excluded.login, name = excluded.name, updated_at = excluded.updated_at')
+  await env.DB.prepare('INSERT INTO users (github_id, login, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT (github_id) DO UPDATE SET login = excluded.login, name = excluded.name, updated_at = excluded.updated_at WHERE login IS NOT excluded.login OR name IS NOT excluded.name')
     .bind(user.id, user.login, user.name, now, now)
     .all()
 

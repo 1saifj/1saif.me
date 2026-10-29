@@ -101,12 +101,13 @@ function makeDb() {
       return { results: [{ id }], changes: 1 }
     }
 
-    if (sql.startsWith('DELETE FROM comments')) {
-      const index = comments.findIndex(item => item.id === first && item.slug === second && item.userId === third)
+    // UPDATE comments SET body = '', hidden = 1 WHERE id = ? AND slug = ? AND user_id = ? AND body != ''
+    if (sql.startsWith('UPDATE comments')) {
+      const item = comments.find(row => row.id === first && row.slug === second && row.userId === third && row.body !== '')
 
-      if (index === -1) return { results: [], changes: 0 }
+      if (!item) return { results: [], changes: 0 }
 
-      comments.splice(index, 1)
+      Object.assign(item, { body: '', hidden: 1 })
 
       return { results: [], changes: 1 }
     }
@@ -503,13 +504,16 @@ describe('reactions worker: GitHub sign-in', () => {
     expect(cookies.get('__Host-github-flow')?.line).toContain('Max-Age=0')
   })
 
-  it('keeps a missing GitHub name empty and strips control characters from a name', async () => {
+  it('keeps a missing GitHub name empty and strips control and direction characters from a name', async () => {
     const { env, db } = makeEnv()
 
     await signIn(env, { id: 1, login: 'a-b', name: null })
     await signIn(env, { id: 2, login: 'c', name: 'Eve\r\nBcc: x' })
+    // Direction overrides and zero-width characters could make a name read as another one.
+    await signIn(env, { id: 3, login: 'd', name: 'Sai\u200Bf \u202Ehsilgne\u202C Aljanahi\uFEFF' })
     expect(db.users.get(1)?.name).toBeNull()
     expect(db.users.get(2)?.name).toBe('Eve  Bcc: x')
+    expect(db.users.get(3)?.name).toBe('Saif hsilgne Aljanahi')
   })
 
   it.each([
@@ -637,6 +641,8 @@ describe('reactions worker: comments', () => {
     expect(sent[0].text).toContain('The Octocat (https://github.com/octocat) wrote on')
     expect(sent[0].text).toContain('--command "UPDATE comments SET hidden = 1 WHERE id = 1"')
     expect(sent[0].text).toContain('--command "UPDATE users SET blocked = 1 WHERE github_id = 42"')
+    // The comment goes last, so text in it cannot pass for one of the commands.
+    expect(sent[0].text.endsWith('Nice post.\nThanks')).toBe(true)
     expect(points.map(point => point.blobs)).toEqual([['comment', '', 'ar']])
   })
 
@@ -689,13 +695,15 @@ describe('reactions worker: comments', () => {
     expect(points.at(-1)?.blobs.at(-1)).toBe('blocked')
   })
 
-  it('refuses an 11th comment from one account on one post in a day, hidden ones included', async () => {
+  it('refuses an 11th comment from one account on one post in a day, hidden and deleted ones included', async () => {
     const { env, db } = makeEnv()
     const { header } = await signIn(env)
 
     for (let i = 0; i < 10; i += 1) expect((await worker.fetch(commentRequest(header, { message: `Comment ${i}` }), env, ctx)).status).toBe(201)
 
-    db.comments[0].hidden = 1
+    // Deleting a comment must not free a place, or one account could post and delete all day.
+    expect((await worker.fetch(send('DELETE', `/api/posts/${slug}/comments/1`, '', { Cookie: header, Origin: 'https://1saif.me' }), env, ctx)).status).toBe(200)
+    db.comments[1].hidden = 1
     const refused = await worker.fetch(commentRequest(header), env, ctx)
 
     expect(refused.status).toBe(429)
@@ -782,8 +790,9 @@ describe('reactions worker: comments', () => {
     expect(db.comments).toHaveLength(1)
 
     expect((await worker.fetch(remove(octo.header), env, ctx)).status).toBe(200)
-    expect(db.comments).toHaveLength(0)
+    expect(db.comments[0]).toMatchObject({ body: '', hidden: 1 })
     expect((await (await read(env)).json()).comments).toEqual([])
+    expect((await worker.fetch(remove(octo.header), env, ctx)).status).toBe(404)
   })
 })
 
