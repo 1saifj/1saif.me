@@ -80,6 +80,8 @@ function makeDb() {
       return { results: [], changes }
     }
 
+    if (sql.startsWith('SELECT blocked')) return { results: users.has(Number(first)) ? [{ blocked: users.get(Number(first))?.blocked }] : [], changes: 0 }
+
     if (sql.startsWith('INSERT INTO users')) {
       users.set(Number(first), { login: String(second), name: third === null ? null : String(third), blocked: users.get(Number(first))?.blocked ?? 0 })
 
@@ -87,8 +89,11 @@ function makeDb() {
     }
 
     // INSERT ... SELECT FROM users WHERE github_id = ? AND blocked = 0: no row for a missing or blocked user.
+    // ... AND fewer than DAILY_COMMENTS of this account's comments on this post since the given time.
     if (sql.startsWith('INSERT INTO comments')) {
       if (users.get(Number(fourth))?.blocked !== 0) return { results: [], changes: 0 }
+
+      if (comments.filter(item => item.slug === first && item.userId === Number(fourth) && item.createdAt > Number(values[5])).length >= Number(values[7])) return { results: [], changes: 0 }
 
       const id = comments.length + 1
       comments.push({ id, slug: String(first), userId: Number(fourth), body: String(second), createdAt: Number(third), hidden: 0 })
@@ -682,6 +687,24 @@ describe('reactions worker: comments', () => {
     expect((await worker.fetch(commentRequest(header), env, ctx)).status).toBe(403)
     expect(db.comments).toHaveLength(0)
     expect(points.at(-1)?.blobs.at(-1)).toBe('blocked')
+  })
+
+  it('refuses an 11th comment from one account on one post in a day, hidden ones included', async () => {
+    const { env, db } = makeEnv()
+    const { header } = await signIn(env)
+
+    for (let i = 0; i < 10; i += 1) expect((await worker.fetch(commentRequest(header, { message: `Comment ${i}` }), env, ctx)).status).toBe(201)
+
+    db.comments[0].hidden = 1
+    const refused = await worker.fetch(commentRequest(header), env, ctx)
+
+    expect(refused.status).toBe(429)
+    expect((await refused.json()).error).toBe('daily')
+    expect(db.comments).toHaveLength(10)
+    expect(points.at(-1)?.blobs.at(-1)).toBe('daily')
+
+    for (const item of db.comments) item.createdAt -= 86_400_000
+    expect((await worker.fetch(commentRequest(header), env, ctx)).status).toBe(201)
   })
 
   it('keeps the comment when the email fails', async () => {

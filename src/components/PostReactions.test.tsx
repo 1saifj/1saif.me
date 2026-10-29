@@ -145,6 +145,19 @@ describe('PostReactions', () => {
     expect(count()).toBe('This account cannot like posts here.')
   })
 
+  it('says when the account has reached the daily comment limit on this post', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), async () => Response.json({ error: 'daily' }, { status: 429 })])
+    const message = container.querySelector('textarea')!
+
+    // React tracks the value through the native setter, so a plain assignment would not reach onChange.
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!.call(message, 'One more')
+    await act(async () => message.dispatchEvent(new Event('input', { bubbles: true })))
+    await act(async () => container.querySelector('form')!.requestSubmit())
+
+    expect(container.querySelector('.post-comment-form [role="status"]')!.textContent).toBe('You posted 10 comments on this post today. Try again tomorrow.')
+  })
+
   it('drops a like kept for a sign-in that did not finish', async () => {
     sessionStorage.setItem('like-intent:a-post', '1')
     await render([async () => Response.json(loaded)])

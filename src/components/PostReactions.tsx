@@ -63,6 +63,7 @@ const copy = {
     posted: 'Thanks. Your comment is posted.',
     invalid: 'Write a comment of up to 2,000 characters.',
     rate: 'Too many comments were sent. Wait a minute, then try again.',
+    daily: 'You posted 10 comments on this post today. Try again tomorrow.',
     blocked: 'This account cannot comment here.',
     expired: 'Your sign-in has ended. Sign in again to post your comment.',
     signinFailed: 'The GitHub sign-in did not finish. Try again.',
@@ -100,6 +101,7 @@ const copy = {
     posted: 'شكراً. نُشر تعليقك.',
     invalid: 'اكتب تعليقاً حتى 2000 حرف.',
     rate: 'أُرسل عدد كبير من التعليقات. انتظر دقيقة ثم حاول مرة أخرى.',
+    daily: 'نشرت 10 تعليقات على هذا المقال اليوم. حاول مرة أخرى غداً.',
     blocked: 'لا يمكن لهذا الحساب التعليق هنا.',
     expired: 'انتهت جلسة الدخول. سجّل الدخول مرة أخرى لنشر تعليقك.',
     signinFailed: 'لم يكتمل تسجيل الدخول عبر GitHub. حاول مرة أخرى.',
@@ -110,7 +112,7 @@ const copy = {
 
 type LikeNote = 'likeFailed' | 'likeBlocked' | 'signInToLike'
 
-type Status = 'idle' | 'posting' | 'posted' | 'invalid' | 'rate' | 'blocked' | 'expired' | 'signinFailed' | 'deleteFailed' | 'failed'
+type Status = 'idle' | 'posting' | 'posted' | 'invalid' | 'rate' | 'daily' | 'blocked' | 'expired' | 'signinFailed' | 'deleteFailed' | 'failed'
 
 // Storage can be blocked (private mode, strict settings); the page then works without it.
 function takeItem(key: string): string | null {
@@ -371,7 +373,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
         endSession()
         setStatus('expired')
       } else {
-        setStatus(result.error === 'rate' || result.error === 'blocked' || result.error === 'invalid' ? result.error : 'failed')
+        setStatus(result.error === 'rate' || result.error === 'daily' || result.error === 'blocked' || result.error === 'invalid' ? result.error : 'failed')
       }
     } catch {
       setStatus('failed')

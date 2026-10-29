@@ -161,6 +161,12 @@ const MAX_MESSAGE = 2_000
 // shortcut: the newest 200 only; page the list when a post gets near that many.
 const MAX_COMMENTS = 200
 
+// One account's comments on one post in 24 hours. The rate limits are per minute, so without this one account
+// could fill a post with 20 KB comments, and every reader would download them.
+const DAILY_COMMENTS = 10
+
+const DAY_MS = 86_400_000
+
 // Control characters, except tab and line breaks, which a message may hold.
 // eslint-disable-next-line no-control-regex -- matching control characters is the point.
 const CONTROL_CHARACTERS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/
@@ -339,12 +345,18 @@ async function comment(request: Request, slug: string, env: Env, ctx: Context): 
 
   const createdAt = Date.now()
 
-  // The insert reads the user row, so a blocked user gets no row back and nothing is saved.
-  const row = await env.DB.prepare('INSERT INTO comments (slug, user_id, body, created_at) SELECT ?, github_id, ?, ? FROM users WHERE github_id = ? AND blocked = 0 RETURNING id')
-    .bind(slug, message, createdAt, session.id)
+  // The insert reads the user row, so a blocked user gets no row back and nothing is saved. 'hidden IN (0, 1)' lets
+  // comments_by_post (slug, hidden, created_at) find the day's rows, so D1 reads only those.
+  const row = await env.DB.prepare(`INSERT INTO comments (slug, user_id, body, created_at) SELECT ?, github_id, ?, ? FROM users WHERE github_id = ? AND blocked = 0
+      AND (SELECT COUNT(*) FROM comments WHERE slug = ? AND hidden IN (0, 1) AND created_at > ? AND user_id = ?) < ? RETURNING id`)
+    .bind(slug, message, createdAt, session.id, slug, createdAt - DAY_MS, session.id, DAILY_COMMENTS)
     .first<{ id: number }>()
 
-  if (!row) return reject(403, 'blocked', 'blocked')
+  if (!row) {
+    const user = await env.DB.prepare('SELECT blocked FROM users WHERE github_id = ?').bind(session.id).first<{ blocked: number }>()
+
+    return user?.blocked === 0 ? reject(429, 'daily', 'daily') : reject(403, 'blocked', 'blocked')
+  }
 
   await forget(slug)
   track(env, slug, ['comment', countryOf(request), language])
