@@ -123,7 +123,7 @@ html[dir='rtl'] .related-posts h2 { font-size: 14px; letter-spacing: 0; }
 .post-reactions h2 { margin: 12px 0 0; color: var(--nb-ink-3); font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 html[dir='rtl'] .post-reactions h2 { font-size: 14px; letter-spacing: 0; }
 .post-like { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
-.post-like-button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 1px solid var(--nb-line); border-radius: 999px; color: var(--nb-ink-2); background: var(--nb-bg); font-size: 14px; font-weight: 600; cursor: pointer; transition: border-color .15s ease, color .15s ease, background-color .15s ease; }
+.post-like-button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 1px solid var(--nb-line); border-radius: 999px; color: var(--nb-ink-2); background: var(--nb-bg); font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; transition: border-color .15s ease, color .15s ease, background-color .15s ease; }
 .post-like-button:hover:not(:disabled) { border-color: color-mix(in srgb, var(--nb-ink-3) 55%, var(--nb-line)); color: var(--nb-ink); }
 .post-like-button:disabled { cursor: default; opacity: .65; }
 .post-like-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
@@ -135,11 +135,32 @@ html.dark .post-like-button[aria-pressed='true'] { border-color: color-mix(in sr
 /* Room for the first comments or the empty note, so the form below does not jump when they load. */
 .post-comments { min-height: 56px; }
 .post-comments > ol { margin: 0; padding: 0; list-style: none; }
-.post-comments > ol > li { padding: 14px 0; border-bottom: 1px solid var(--nb-line); }
+.post-comments > ol > li { display: flex; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--nb-line); }
 .post-comments > ol > li:first-child { padding-top: 0; }
-.post-comment-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-size: 14px; }
+.post-comment-avatar { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--nb-subtle); }
+.post-comment-main { flex: 1; min-width: 0; }
+.post-comment-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: 14px; }
+.post-comment-meta a { color: inherit; text-decoration: none; }
+.post-comment-meta a:hover strong, .post-comment-meta a:focus-visible strong { text-decoration: underline; }
 .post-comment-meta strong { color: var(--nb-ink); font-weight: 600; overflow-wrap: anywhere; }
-.post-comment-meta time { color: var(--nb-ink-3); font-variant-numeric: tabular-nums; }
+.post-comment-login, .post-comment-meta time { color: var(--nb-ink-3); font-variant-numeric: tabular-nums; }
+.post-comment-delete { margin-inline-start: auto; padding: 0; border: 0; color: var(--nb-ink-3); background: none; font: inherit; font-size: 13px; cursor: pointer; }
+.post-comment-delete:hover, .post-comment-delete:focus-visible { color: #cf222e; }
+html.dark .post-comment-delete:hover, html.dark .post-comment-delete:focus-visible { color: #ff7b72; }
+/* Signed out: one prompt and GitHub's button. Signed in: who is posting, and a way out. */
+.post-comment-signin { justify-items: start; }
+.post-comment-signin p { margin: 0; }
+.post-comment-signin > p:first-child { color: var(--nb-ink); font-size: 16px; font-weight: 500; }
+.github-signin { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 18px; border-radius: 8px; color: #fff; background: #1f2328; font-size: 14px; font-weight: 600; text-decoration: none; transition: background-color .15s ease; }
+.github-signin:hover { background: #32383f; }
+.github-signin svg { width: 18px; height: 18px; fill: currentColor; }
+html.dark .github-signin { color: #1f2328; background: #f0f6fc; }
+html.dark .github-signin:hover { background: #d1d9e0; }
+.post-comment-viewer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--nb-ink-2); font-size: 14px; }
+.post-comment-viewer img { border-radius: 50%; }
+.post-comment-viewer strong { color: var(--nb-ink); font-weight: 600; }
+.post-comment-viewer button { margin-inline-start: auto; padding: 4px 10px; border: 1px solid var(--nb-line); border-radius: 6px; color: var(--nb-ink-2); background: none; font: inherit; font-size: 13px; cursor: pointer; }
+.post-comment-viewer button:hover, .post-comment-viewer button:focus-visible { color: var(--nb-ink); border-color: var(--nb-ink-3); }
 .post-comment-body { margin-top: 4px; font-size: 16px; line-height: 1.65; overflow-wrap: anywhere; }
 /* Comments use the article styles at a smaller scale; the last block leaves no gap under the comment. */
 .post-comment-body > :last-child { margin-bottom: 0; }

@@ -61,10 +61,11 @@ export default defineConfig(({ isSsrBuild }) => ({
     port: 5173,
     open: true,
     // The reactions Worker under `npx wrangler dev -c workers/reactions/wrangler.jsonc` (README, Local dev).
-    // It takes writes only from the live site's origin, so the proxy sends that origin.
+    // .dev.vars sets its SITE_URL to this server, so the browser's own Origin passes its check.
     proxy: {
-      '/api/posts': { target: 'http://localhost:8797', headers: { Origin: 'https://1saif.me' } },
-      '/api/collect': { target: 'http://localhost:8797', headers: { Origin: 'https://1saif.me' } },
+      '/api/posts': 'http://localhost:8797',
+      '/api/auth': 'http://localhost:8797',
+      '/api/collect': 'http://localhost:8797',
     },
   },
   preview: {
