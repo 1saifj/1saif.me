@@ -59,7 +59,14 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   server: {
     port: 5173,
-    open: true
+    open: true,
+    // The reactions Worker under `npx wrangler dev -c workers/reactions/wrangler.jsonc` (README, Local dev).
+    // .dev.vars sets its SITE_URL to this server, so the browser's own Origin passes its check.
+    proxy: {
+      '/api/posts': 'http://localhost:8797',
+      '/api/auth': 'http://localhost:8797',
+      '/api/collect': 'http://localhost:8797',
+    },
   },
   preview: {
     port: 4173,

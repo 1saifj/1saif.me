@@ -4,6 +4,7 @@ import { HomePage } from './pages/HomePage'
 import { SkipLink } from './components/SkipLink'
 import { isArabicPath, LanguageProvider } from './i18n/language'
 import { matchRoute, routePaths, type RoutePath } from './routes'
+import { pageView } from './utils/insights'
 
 type PageComponent = ComponentType & { preload: () => Promise<void> }
 
@@ -160,6 +161,8 @@ function RouteChange() {
   useEffect(() => {
     if (last.current === pathname) return
     last.current = pathname
+    // The full path, with /ar: the router's pathname drops the basename.
+    pageView(window.location.pathname)
     const transitioned = transitionPath === pathname
 
     // With a view transition the cross-fade is the effect; the CSS fade must not run on top of it.

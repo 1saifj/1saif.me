@@ -1,0 +1,570 @@
+import { act } from 'react'
+import { createRoot, Root } from 'react-dom/client'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { PostReactions } from './PostReactions'
+
+// React reads this flag to allow act() outside a test renderer.
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
+
+let reveal: () => void = () => {}
+
+class FakeObserver {
+  constructor(callback: (entries: { isIntersecting: boolean }[]) => void) {
+    reveal = () => callback([{ isIntersecting: true }])
+  }
+
+  observe() {}
+
+  disconnect() {}
+}
+
+let root: Root
+
+let container: HTMLDivElement
+
+const loaded = { likes: 2, comments: [{ id: 1, body: 'First line\nsecond line', createdAt: 1793221200000, author: { id: 7, login: 'ali', name: '<b>Ali</b>' } }] }
+
+// The Worker sets this cookie at sign-in; jsdom refuses __Host- cookies on http, so the getter is stubbed.
+const signIn = () => vi.spyOn(document, 'cookie', 'get').mockReturnValue(`__Host-viewer=${btoa(JSON.stringify({ id: 42, login: 'octocat', name: 'The Octocat' }))}`)
+
+async function render(answers: (() => Promise<Response>)[], inView = true) {
+  const fetch = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(async () => (answers.shift() ?? (async () => Response.json({}, { status: 500 })))())
+
+  vi.stubGlobal('fetch', fetch)
+  container = document.createElement('div')
+  document.body.append(container)
+  root = createRoot(container)
+  await act(async () => root.render(<PostReactions slug="a-post" language="en" />))
+  if (inView) await act(async () => reveal())
+
+  return fetch
+}
+
+const like = () => container.querySelector<HTMLElement>('.post-like-button')!
+
+// React tracks the value through the native setter, so a plain assignment would not reach onChange.
+async function type(area: HTMLTextAreaElement, value: string) {
+  Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!.call(area, value)
+  await act(async () => area.dispatchEvent(new Event('input', { bubbles: true })))
+}
+
+const own = { id: 2, body: 'Mine', createdAt: 1793221300000, editedAt: null, author: { id: 42, login: 'octocat', name: 'The Octocat' } }
+
+const withOwn = { ...loaded, comments: [...loaded.comments, own] }
+
+const count = () => container.querySelector('.post-like-count')!.textContent
+
+beforeEach(() => {
+  vi.stubGlobal('IntersectionObserver', FakeObserver)
+  sessionStorage.clear()
+})
+
+afterEach(() => {
+  history.replaceState(null, '', location.pathname)
+  act(() => root.unmount())
+  container.remove()
+  vi.unstubAllGlobals()
+  vi.restoreAllMocks()
+})
+
+describe('PostReactions', () => {
+  it('loads once in view and shows comments as plain text', async () => {
+    const fetch = await render([async () => Response.json(loaded)])
+
+    expect(fetch.mock.calls).toEqual([['/api/posts/a-post']])
+    expect(count()).toBe('2 likes')
+    expect(container.querySelector('.post-comment-meta strong')!.textContent).toBe('<b>Ali</b>')
+    expect(container.querySelector('.post-comments b')).toBeNull()
+    expect(container.querySelector('.post-comment-login')!.getAttribute('dir')).toBe('ltr')
+  })
+
+  it('sends a signed-out reader to GitHub and keeps the like for the way back', async () => {
+    await render([async () => Response.json(loaded)])
+    // jsdom cannot navigate, so the link only records the click.
+    container.addEventListener('click', event => event.preventDefault())
+
+    expect(like().tagName).toBe('A')
+    expect(like().getAttribute('href')).toBe('/api/auth/github?return=%2Fblog%2Fa-post')
+    await act(async () => like().click())
+    expect(sessionStorage.getItem('like-intent:a-post')).toBe('1')
+  })
+
+  it('shows the signed-in reader\'s own like from its own request', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ liked: true }), async () => Response.json(loaded)])
+
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/api/posts/a-post/like', '/api/posts/a-post'])
+    expect(like().getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('shows the count from the reader\'s own request, because the cached post reply may be older', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 3, liked: true }), async () => Response.json(loaded)])
+
+    expect(count()).toBe('3 likes')
+  })
+
+  it('sends the like clicked before the sign-in, and its count wins over the cached one', async () => {
+    signIn()
+    sessionStorage.setItem('like-intent:a-post', '1')
+    const fetch = await render([async () => Response.json({ likes: 3, liked: true }), async () => Response.json(loaded)])
+
+    expect(fetch.mock.calls[0][1]?.method).toBe('PUT')
+    expect(like().getAttribute('aria-pressed')).toBe('true')
+    expect(count()).toBe('3 likes')
+    expect(sessionStorage.getItem('like-intent:a-post')).toBeNull()
+  })
+
+  it('puts the like back when the request fails', async () => {
+    signIn()
+    await render([async () => Response.json({ liked: false }), async () => Response.json(loaded), async () => Response.json({ error: 'rate' }, { status: 429 })])
+    await act(async () => like().click())
+
+    expect(like().getAttribute('aria-pressed')).toBe('false')
+    expect(count()).toBe('The like was not saved. Try again.')
+  })
+
+  it('takes the server count and state after a like', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ liked: false }), async () => Response.json(loaded), async () => Response.json({ likes: 3, liked: true })])
+
+    await act(async () => like().click())
+
+    expect(like().getAttribute('aria-pressed')).toBe('true')
+    expect(count()).toBe('3 likes')
+    const [, init] = fetch.mock.calls[2]
+
+    expect(init?.method).toBe('PUT')
+    expect(JSON.parse(String(init?.body))).toEqual({ language: 'en' })
+  })
+
+  it('turns the button back into the sign-in link when the session has ended', async () => {
+    signIn()
+    await render([async () => Response.json({ liked: false }), async () => Response.json(loaded), async () => Response.json({ error: 'auth' }, { status: 401 })])
+    vi.spyOn(document, 'cookie', 'get').mockReturnValue('')
+    await act(async () => like().click())
+
+    expect(like().tagName).toBe('A')
+    expect(count()).toBe('Sign in with GitHub to like this post.')
+  })
+
+  it('says so when a blocked account\'s like is not stored', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), async () => Response.json({ likes: 2, liked: false })])
+    await act(async () => like().click())
+
+    expect(like().getAttribute('aria-pressed')).toBe('false')
+    expect(count()).toBe('This account cannot like posts here.')
+  })
+
+  it('says when the account has reached the daily comment limit on this post', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), async () => Response.json({ error: 'daily' }, { status: 429 })])
+    await type(container.querySelector('textarea')!, 'One more')
+    await act(async () => container.querySelector('form')!.requestSubmit())
+
+    expect(container.querySelector('.post-comment-form [role="status"]')!.textContent).toBe('You posted 10 comments on this post today. Try again tomorrow.')
+  })
+
+  it('edits the reader\'s own comment in the same editor, then marks it edited', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn), async () => Response.json({ ...own, body: 'Mine, **fixed**', editedAt: 1793221400000 })])
+    const edits = container.querySelectorAll<HTMLButtonElement>('.post-comment-edit')
+
+    expect(edits).toHaveLength(1)
+    await act(async () => edits[0].click())
+    const area = container.querySelector<HTMLTextAreaElement>('.post-comment-editing textarea')!
+
+    expect(area.value).toBe('Mine')
+    expect(document.activeElement).toBe(area)
+    expect(edits[0].getAttribute('aria-expanded')).toBe('true')
+    expect(container.querySelector('.post-comment-editing .comment-toolbar')).not.toBeNull()
+    // Two editors are open, so their IDs differ.
+    expect(new Set([...container.querySelectorAll('textarea')].map(item => item.id)).size).toBe(2)
+
+    await type(area, 'Mine, **fixed**')
+    await act(async () => container.querySelector<HTMLFormElement>('.post-comment-editing')!.requestSubmit())
+
+    const [url, init] = fetch.mock.calls[2]
+
+    expect(url).toBe('/api/posts/a-post/comments/2')
+    expect(init?.method).toBe('PATCH')
+    expect(Object.fromEntries(new URLSearchParams(String(init?.body)))).toEqual({ message: 'Mine, **fixed**', language: 'en' })
+    expect(container.querySelector('.post-comment-editing')).toBeNull()
+    expect(container.querySelectorAll('.post-comment-body')[1].innerHTML).toContain('<strong>fixed</strong>')
+    expect(container.querySelector('.post-comment-edited')!.textContent).toContain('edited')
+    expect(document.activeElement).toBe(edits[0])
+  })
+
+  it('sends no request for an unchanged edit, and keeps the editor open with the reason on a refusal', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn), async () => Response.json({ error: 'edits' }, { status: 429 })])
+    const edit = container.querySelector<HTMLButtonElement>('.post-comment-edit')!
+    const form = () => container.querySelector<HTMLFormElement>('.post-comment-editing')
+
+    await act(async () => edit.click())
+    await act(async () => form()!.requestSubmit())
+    expect(form()).toBeNull()
+    expect(fetch).toHaveBeenCalledTimes(2)
+
+    await act(async () => edit.click())
+    await type(form()!.querySelector('textarea')!, 'Changed')
+    await act(async () => form()!.requestSubmit())
+    expect(form()!.querySelector('[role="status"]')!.textContent).toBe('This comment has reached its limit of 10 edits.')
+
+    await act(async () => form()!.querySelector<HTMLButtonElement>('.post-comment-cancel')!.click())
+    expect(form()).toBeNull()
+    expect(container.querySelectorAll('.post-comment-body')[1].textContent).toBe('Mine')
+    expect(container.querySelector('.post-comment-edited')).toBeNull()
+    expect(fetch).toHaveBeenCalledTimes(3)
+  })
+
+  it('asks before a delete inside the comment, and keeps focus on a real control', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn), async () => Response.json({ id: 2 })])
+    const remove = () => container.querySelector<HTMLButtonElement>('.post-comment-delete')!
+
+    await act(async () => remove().click())
+    const question = container.querySelector('.post-comment-actions[role="group"]')!
+
+    expect(question.textContent).toContain('Delete this comment for good?')
+    expect(document.activeElement).toBe(remove())
+
+    await act(async () => question.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })))
+    expect(container.querySelector('.post-comment-actions[role="group"]')).toBeNull()
+    expect(document.activeElement).toBe(remove())
+    expect(fetch).toHaveBeenCalledTimes(2)
+
+    await act(async () => remove().click())
+    await act(async () => remove().click())
+
+    expect(fetch.mock.calls[2][1]?.method).toBe('DELETE')
+    expect(container.querySelectorAll('.post-comments li')).toHaveLength(1)
+    expect(document.activeElement).toBe(container.querySelector('#comments-title'))
+  })
+
+  it('shows the count, the Author badge on Saif\'s comments and a relative time with the full date on hover', async () => {
+    const saif = { ...own, author: { id: 31359390, login: '1saifj', name: 'Saif' }, createdAt: Date.now() - 5 * 60_000 }
+
+    await render([async () => Response.json({ ...loaded, comments: [...loaded.comments, saif] })])
+
+    expect(container.querySelector('#comments-title')!.textContent).toBe('Comments2')
+    expect([...container.querySelectorAll('.post-comment-badge')].map(item => item.closest('li')!.querySelector('strong')!.textContent)).toEqual(['Saif'])
+    const time = container.querySelectorAll('time')[1]
+
+    expect(time.textContent).toBe('5 minutes ago')
+    expect(time.getAttribute('title')).toMatch(/\d{4}/)
+  })
+
+  it('keeps Post off until there is text, sends on Ctrl+Enter, and keeps the draft over a reload', async () => {
+    signIn()
+    sessionStorage.setItem('comment-draft:a-post', 'Saved before the reload')
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), async () => Response.json({ ...own, id: 3, body: 'Typed' })])
+    const area = container.querySelector('textarea')!
+    const post = container.querySelector<HTMLButtonElement>('.post-comment-form [type="submit"]')!
+
+    expect(area.value).toBe('Saved before the reload')
+    await type(area, '  ')
+    expect(post.disabled).toBe(true)
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBe('  ')
+
+    await type(area, 'Typed')
+    expect(post.disabled).toBe(false)
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBe('Typed')
+    await act(async () => area.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true })))
+
+    expect(fetch.mock.calls[2][1]?.method).toBe('POST')
+    expect(container.querySelector('li.is-fresh')!.textContent).toContain('Typed')
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBeNull()
+    expect(document.activeElement).toBe(container.querySelector('.post-comment-form textarea'))
+  })
+
+  it('keeps the draft saved for the way back from GitHub while the page is signed out', async () => {
+    sessionStorage.setItem('comment-draft:a-post', 'Written before the session ended')
+    await render([async () => Response.json(loaded)])
+
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBe('Written before the session ended')
+  })
+
+  it('clears the drafts and likes kept for every post on sign-out, so the next account in the tab gets none', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), async () => new Response(null, { status: 204 })])
+
+    await type(container.querySelector('textarea')!, 'Half written')
+    sessionStorage.setItem('comment-draft:other-post', 'Private thoughts')
+    sessionStorage.setItem('like-intent:other-post', '1')
+    sessionStorage.setItem('comment-intent:other-post', '1')
+    sessionStorage.setItem('theme', 'dark')
+    await act(async () => container.querySelector<HTMLButtonElement>('.post-comment-viewer button')!.click())
+
+    expect(fetch.mock.calls[2][0]).toBe('/api/auth/logout')
+    expect(Object.keys(sessionStorage)).toEqual(['theme'])
+  })
+
+  it('quotes the selected words, or else the whole comment, into the new comment with the cursor after it', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn)])
+    const area = () => container.querySelector<HTMLTextAreaElement>('.post-comment-form textarea')!
+    const quote = () => container.querySelector<HTMLButtonElement>('.post-comment-quote')!
+
+    await type(area(), 'My point')
+    await act(async () => quote().click())
+    expect(area().value).toBe('My point\n\n> First line\n> second line\n\n')
+    expect(document.activeElement).toBe(area())
+    expect(area().selectionStart).toBe(area().value.length)
+
+    const words = document.createRange()
+
+    words.selectNodeContents(container.querySelector('.post-comment-body p')!.firstChild!)
+    window.getSelection()!.removeAllRanges()
+    window.getSelection()!.addRange(words)
+    await type(area(), '')
+    await act(async () => quote().click())
+    expect(area().value).toMatch(/^> First line\n/)
+    expect(area().value).not.toContain('second line')
+    // Every comment can be quoted, the reader's own too, and only the reader's own can be edited.
+    expect(container.querySelectorAll('.post-comment-quote')).toHaveLength(2)
+    expect(container.querySelectorAll('.post-comment-edit')).toHaveLength(1)
+  })
+
+  it('shows no Quote reply to a signed-out reader', async () => {
+    await render([async () => Response.json(loaded)])
+
+    expect(container.querySelector('.post-comment-quote')).toBeNull()
+  })
+
+  it('keeps an edit with changes open when another Edit is clicked, and lets an unchanged one go', async () => {
+    signIn()
+    const second = { ...own, id: 3, body: 'Also mine' }
+
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json({ ...withOwn, comments: [...withOwn.comments, second] }), () => new Promise<Response>(() => {})])
+    const edits = container.querySelectorAll<HTMLButtonElement>('.post-comment-edit')
+    const form = () => container.querySelector<HTMLFormElement>('.post-comment-editing')!
+
+    await act(async () => edits[0].click())
+    await act(async () => edits[1].click())
+    expect(form().querySelector('textarea')!.value).toBe('Also mine')
+
+    await type(form().querySelector('textarea')!, 'Also mine, changed')
+    await act(async () => edits[0].click())
+    expect(form().querySelector('textarea')!.value).toBe('Also mine, changed')
+    expect(form().querySelector('[role="status"]')!.textContent).toBe('Save or cancel this edit first.')
+    expect(document.activeElement).toBe(form().querySelector('textarea'))
+
+    // While the save is out, another Edit changes nothing, so Save cannot send it twice.
+    await act(async () => form().requestSubmit())
+    await act(async () => edits[0].click())
+    expect(form().querySelector<HTMLButtonElement>('[type="submit"]')!.disabled).toBe(true)
+  })
+
+  it('closes an unchanged edit on a second Edit, and asks before a reload drops a changed one', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn)])
+    const edit = container.querySelector<HTMLButtonElement>('.post-comment-edit')!
+    const form = () => container.querySelector<HTMLFormElement>('.post-comment-editing')
+    const unload = () => {
+      const event = new Event('beforeunload', { cancelable: true })
+
+      window.dispatchEvent(event)
+
+      return event.defaultPrevented
+    }
+
+    await act(async () => edit.click())
+    expect(unload()).toBe(false)
+    await act(async () => edit.click())
+    expect(form()).toBeNull()
+    expect(edit.getAttribute('aria-expanded')).toBe('false')
+
+    await act(async () => edit.click())
+    await type(form()!.querySelector('textarea')!, 'Mine, changed')
+    expect(unload()).toBe(true)
+    await act(async () => edit.click())
+    expect(form()!.querySelector('[role="status"]')!.textContent).toBe('Save or cancel this edit first.')
+
+    await act(async () => form()!.querySelector<HTMLButtonElement>('.post-comment-cancel')!.click())
+    expect(unload()).toBe(false)
+  })
+
+  it('glows again on a second save of the same comment', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn), async () => Response.json({ ...own, body: 'One', editedAt: 1 }), async () => Response.json({ ...own, body: 'Two', editedAt: 2 })])
+    const item = () => container.querySelector<HTMLElement>('#comment-2')!
+
+    for (const body of ['One', 'Two']) {
+      await act(async () => container.querySelector<HTMLButtonElement>('.post-comment-edit')!.click())
+      await type(container.querySelector<HTMLTextAreaElement>('.post-comment-editing textarea')!, body)
+      await act(async () => container.querySelector<HTMLFormElement>('.post-comment-editing')!.requestSubmit())
+      expect(item().className).toBe('is-fresh')
+      // The ::before glow ends on the li itself; a code block's own animation inside it must not clear the mark.
+      await act(async () => item().querySelector('.post-comment-body')!.dispatchEvent(Object.assign(new Event('animationend', { bubbles: true }), { animationName: 'other' })))
+      expect(item().className).toBe('is-fresh')
+      await act(async () => item().dispatchEvent(Object.assign(new Event('animationend', { bubbles: true }), { animationName: 'post-comment-fresh' })))
+      expect(item().className).toBe('')
+    }
+  })
+
+  it('continues a list on Enter, and ends it on Enter in an empty item', async () => {
+    signIn()
+    // jsdom has no execCommand, so the editor takes its setRangeText fallback.
+    Object.assign(document, { execCommand: () => false })
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded)])
+    const area = container.querySelector<HTMLTextAreaElement>('.post-comment-form textarea')!
+    const enter = () => act(async () => area.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })))
+
+    await type(area, '1. one')
+    area.setSelectionRange(6, 6)
+    await enter()
+    expect(area.value).toBe('1. one\n2. ')
+    await enter()
+    expect(area.value).toBe('1. one\n')
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBe('1. one\n')
+    Reflect.deleteProperty(document, 'execCommand')
+  })
+
+  it('brings a reader back to the comment box after a sign-in started there', async () => {
+    await render([async () => Response.json(loaded)])
+    container.addEventListener('click', event => event.preventDefault())
+    await act(async () => container.querySelector<HTMLElement>('.github-signin')!.click())
+    expect(sessionStorage.getItem('comment-intent:a-post')).toBe('1')
+    act(() => root.unmount())
+    container.remove()
+
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded)])
+    expect(document.activeElement).toBe(container.querySelector('.post-comment-form textarea'))
+    expect(sessionStorage.getItem('comment-intent:a-post')).toBeNull()
+  })
+
+  it('loads at once for a link to one comment and goes to it, or to the heading when it is gone', async () => {
+    // jsdom does not lay out, so it has no scrollIntoView.
+    const scrolled = vi.fn()
+
+    Object.assign(Element.prototype, { scrollIntoView: scrolled })
+    history.replaceState(null, '', '#comment-2')
+    const fetch = await render([async () => Response.json(withOwn)], false)
+
+    expect(fetch).toHaveBeenCalledTimes(1)
+    // The browser scrolls to it itself, on a new fragment navigation.
+    expect(container.querySelector(':target')).toBe(container.querySelector('#comment-2'))
+    expect(scrolled).not.toHaveBeenCalled()
+    expect(container.querySelector('#comment-2 .post-comment-permalink')!.getAttribute('href')).toBe('#comment-2')
+
+    act(() => root.unmount())
+    container.remove()
+    history.replaceState(null, '', '#comment-99')
+    await render([async () => Response.json(withOwn)], false)
+    expect(scrolled.mock.contexts).toEqual([container.querySelector('#comments-title')])
+    Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
+  })
+
+  it('loads the list again on Try again, with the button off while it runs', async () => {
+    const fetch = await render([async () => Response.json({}, { status: 503 }), async () => Response.json(loaded)])
+    const retry = container.querySelector<HTMLButtonElement>('.post-comments-retry')!
+
+    expect(container.querySelector('.post-comments-note')!.textContent).toBe('The comments did not load. Try again')
+    act(() => retry.click())
+    expect(retry.getAttribute('aria-disabled')).toBe('true')
+    // A second click while it runs sends nothing more.
+    act(() => retry.click())
+    await act(async () => {})
+
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(container.querySelectorAll('.post-comments li')).toHaveLength(1)
+    expect(container.querySelector('.post-comments-retry')).toBeNull()
+    expect(document.activeElement).toBe(container.querySelector('#comments-title'))
+  })
+
+  it('keeps focus on Try again when the list fails to load again', async () => {
+    await render([async () => Response.json({}, { status: 503 }), async () => Response.json({}, { status: 503 })])
+    const retry = container.querySelector<HTMLButtonElement>('.post-comments-retry')!
+
+    retry.focus()
+    await act(async () => retry.click())
+
+    expect(retry.getAttribute('aria-disabled')).toBe('false')
+    expect(document.activeElement).toBe(retry)
+  })
+
+  it('locks the text while a post is out, so nothing typed then is lost', async () => {
+    signIn()
+    Object.assign(document, { execCommand: () => false })
+    let answer: (response: Response) => void = () => {}
+
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), () => new Promise<Response>(resolve => { answer = resolve })])
+    const area = container.querySelector<HTMLTextAreaElement>('.post-comment-form textarea')!
+
+    await type(area, '- one')
+    area.setSelectionRange(5, 5)
+    await act(async () => container.querySelector('form')!.requestSubmit())
+    expect(area.readOnly).toBe(true)
+    expect(container.querySelector<HTMLButtonElement>('.post-comment-form .comment-tool')!.disabled).toBe(true)
+    await act(async () => area.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })))
+    expect(area.value).toBe('- one')
+
+    await act(async () => answer(Response.json({ ...own, id: 3, body: '- one' })))
+    expect(container.querySelector<HTMLTextAreaElement>('.post-comment-form textarea')!.readOnly).toBe(false)
+    Reflect.deleteProperty(document, 'execCommand')
+  })
+
+  it('says so when the like kept over the sign-in is refused or not stored', async () => {
+    signIn()
+    sessionStorage.setItem('like-intent:a-post', '1')
+    await render([async () => Response.json({ error: 'rate' }, { status: 429 }), async () => Response.json(loaded)])
+    expect(count()).toBe('The like was not saved. Try again.')
+
+    act(() => root.unmount())
+    container.remove()
+    sessionStorage.setItem('like-intent:a-post', '1')
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded)])
+    expect(count()).toBe('This account cannot like posts here.')
+  })
+
+  it('announces a failed like again when the next one fails too', async () => {
+    signIn()
+    let answer: (response: Response) => void = () => {}
+
+    await render([async () => Response.json({ liked: false }), async () => Response.json(loaded), async () => Response.json({ error: 'rate' }, { status: 429 }), () => new Promise<Response>(resolve => { answer = resolve })])
+    const region = container.querySelector('.post-like [aria-live]')!
+
+    await act(async () => like().click())
+    expect(region.textContent).toBe('The like was not saved. Try again.')
+    act(() => like().click())
+    expect(region.textContent).toBe('')
+    await act(async () => answer(Response.json({ error: 'rate' }, { status: 429 })))
+    expect(region.textContent).toBe('The like was not saved. Try again.')
+  })
+
+  it('treats a comment deleted in another tab as gone, and says why its edit cannot be saved', async () => {
+    signIn()
+    const second = { ...own, id: 3, body: 'Also mine' }
+
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json({ ...withOwn, comments: [...withOwn.comments, second] }), async () => Response.json({ error: 'comment' }, { status: 404 }), async () => Response.json({ error: 'comment' }, { status: 404 })])
+    await act(async () => container.querySelector<HTMLButtonElement>('#comment-2 .post-comment-delete')!.click())
+    await act(async () => container.querySelector<HTMLButtonElement>('#comment-2 .post-comment-delete')!.click())
+    expect(container.querySelector('#comment-2')).toBeNull()
+
+    await act(async () => container.querySelector<HTMLButtonElement>('#comment-3 .post-comment-edit')!.click())
+    await type(container.querySelector<HTMLTextAreaElement>('.post-comment-editing textarea')!, 'Changed')
+    await act(async () => container.querySelector<HTMLFormElement>('.post-comment-editing')!.requestSubmit())
+    expect(container.querySelector('.post-comment-editing [role="status"]')!.textContent).toBe('This comment was deleted, so the edit cannot be saved.')
+  })
+
+  it('names the shortcut key of the reader\'s platform', async () => {
+    signIn()
+    vi.spyOn(navigator, 'platform', 'get').mockReturnValue('MacIntel')
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded)])
+
+    expect(container.querySelector('.post-comment-hint')!.textContent).toContain('⌘ Enter sends.')
+    expect(container.querySelector('.comment-tool[aria-label="Bold"]')!.getAttribute('title')).toBe('Bold (⌘ B)')
+  })
+
+  it('drops a like or a comment kept for a sign-in that did not finish', async () => {
+    sessionStorage.setItem('like-intent:a-post', '1')
+    sessionStorage.setItem('comment-intent:a-post', '1')
+    await render([async () => Response.json(loaded)])
+
+    expect(sessionStorage.getItem('like-intent:a-post')).toBeNull()
+    expect(sessionStorage.getItem('comment-intent:a-post')).toBeNull()
+  })
+})

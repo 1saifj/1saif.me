@@ -117,6 +117,124 @@ html[dir='rtl'] .related-posts h2 { font-size: 14px; letter-spacing: 0; }
 .related-posts li a:hover span { text-decoration: underline; text-underline-offset: 3px; }
 .related-posts time { flex: none; color: var(--nb-ink-3); font-size: 14px; font-variant-numeric: tabular-nums; }
 
+/* Likes and comments, between the article and the related posts. The form reuses the contact form styles in index.html. */
+.post-reactions { width: min(calc(100% - 48px), 960px); margin: 0 auto; padding: 8px 0 32px; }
+.post-reactions > div { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; max-width: 720px; padding-top: 28px; border-top: 1px solid var(--nb-line); }
+.post-reactions h2 { margin: 12px 0 0; color: var(--nb-ink-3); font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+html[dir='rtl'] .post-reactions h2 { font-size: 14px; letter-spacing: 0; }
+.post-reactions h2:focus { outline: none; }
+.post-comments-count { display: inline-block; margin-inline-start: 8px; padding: 0 7px; border-radius: 999px; color: var(--nb-ink-2); background: var(--nb-subtle); font-size: 12px; letter-spacing: 0; line-height: 20px; vertical-align: 1px; font-variant-numeric: tabular-nums; }
+.post-like { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.post-like-button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 1px solid var(--nb-line); border-radius: 999px; color: var(--nb-ink-2); background: var(--nb-bg); font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; transition: border-color .15s ease, color .15s ease, background-color .15s ease; }
+.post-like-button:hover:not(:disabled) { border-color: color-mix(in srgb, var(--nb-ink-3) 55%, var(--nb-line)); color: var(--nb-ink); }
+.post-like-button:disabled { cursor: default; opacity: .65; }
+.post-like-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.post-like-button[aria-pressed='true'] { border-color: color-mix(in srgb, #cf222e 40%, var(--nb-line)); color: #cf222e; background: color-mix(in srgb, #cf222e 7%, var(--nb-bg)); }
+html.dark .post-like-button[aria-pressed='true'] { border-color: color-mix(in srgb, #ff7b72 40%, var(--nb-line)); color: #ff7b72; background: color-mix(in srgb, #ff7b72 10%, var(--nb-bg)); }
+.post-like-button[aria-pressed='true'] svg { fill: currentColor; animation: post-like-pop .45s cubic-bezier(.17, .89, .32, 1.4); }
+@keyframes post-like-pop { 0% { transform: scale(.85); } 45% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.post-like-count { color: var(--nb-ink-3); font-size: 14px; font-variant-numeric: tabular-nums; }
+/* Room for the first comments or the empty note, so the form below does not jump when they load. */
+.post-comments { min-height: 56px; }
+.post-comments > ol { margin: 0; padding: 0; list-style: none; }
+.post-comments > ol > li { display: flex; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--nb-line); }
+.post-comments > ol > li:first-child { padding-top: 0; }
+.post-comment-avatar { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--nb-subtle); }
+.post-comment-main { flex: 1; min-width: 0; }
+.post-comment-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: 14px; }
+.post-comment-meta a { color: inherit; text-decoration: none; }
+.post-comment-meta a:hover strong, .post-comment-meta a:focus-visible strong { text-decoration: underline; }
+.post-comment-meta strong { color: var(--nb-ink); font-weight: 600; overflow-wrap: anywhere; }
+.post-comment-login, .post-comment-meta time { color: var(--nb-ink-3); font-variant-numeric: tabular-nums; }
+.post-comment-permalink:hover time, .post-comment-permalink:focus-visible time { text-decoration: underline; }
+.post-comment-edited { color: var(--nb-ink-3); }
+.post-comment-badge { padding: 0 7px; border: 1px solid var(--nb-line); border-radius: 999px; color: var(--nb-ink-2); font-size: 12px; font-weight: 500; line-height: 18px; }
+/* Each button keeps a 24 px target (WCAG 2.2); the negative margin keeps the row as tight as the text. */
+.post-comment-actions { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-inline-start: auto; }
+.post-comment-actions button { margin: -4px 0; padding: 4px 6px; border: 0; border-radius: 6px; color: var(--nb-ink-3); background: none; font: inherit; font-size: 13px; cursor: pointer; }
+.post-comment-actions button:hover, .post-comment-actions button:focus-visible { color: var(--nb-ink); background: color-mix(in srgb, var(--nb-ink-3) 12%, transparent); }
+.post-comment-actions .post-comment-delete:hover, .post-comment-actions .post-comment-delete:focus-visible { color: #cf222e; background: color-mix(in srgb, #cf222e 10%, transparent); }
+html.dark .post-comment-actions .post-comment-delete:hover, html.dark .post-comment-actions .post-comment-delete:focus-visible { color: #ff7b72; background: color-mix(in srgb, #ff7b72 12%, transparent); }
+.post-comment-question { color: var(--nb-ink-2); font-size: 13px; }
+.post-comment-actions[role='group'] .post-comment-delete { color: #cf222e; font-weight: 600; }
+html.dark .post-comment-actions[role='group'] .post-comment-delete { color: #ff7b72; }
+.post-comment-question[data-tone='error'] { color: #cf222e; }
+html.dark .post-comment-question[data-tone='error'] { color: #ff7b72; }
+/* A new or saved comment glows once, so the eye finds it. The glow is its own layer, so the comment's box stays the same. */
+/* Below the sticky header, like the article headings. */
+#comments-title, .post-comments > ol > li { scroll-margin-top: 84px; }
+.post-comments > ol > li:is(.is-fresh, :target) { position: relative; isolation: isolate; }
+.post-comments > ol > li:is(.is-fresh, :target)::before { content: ''; position: absolute; z-index: -1; inset: 0 -10px; border-radius: 10px; pointer-events: none; }
+.post-comments > ol > li.is-fresh::before { animation: post-comment-fresh 2.4s ease-out; }
+/* The comment a link points at keeps a soft mark while the address names it. */
+.post-comments > ol > li:target::before { background: color-mix(in srgb, var(--nb-accent) 7%, transparent); }
+@keyframes post-comment-fresh { from { background: color-mix(in srgb, var(--nb-accent) 14%, transparent); } to { background: transparent; } }
+/* An edit puts the same editor in place of the comment body; the comment itself frames it. */
+.contact-form.post-comment-editing { gap: 10px; margin-top: 8px; padding: 0; border: 0; background: none; }
+.post-comment-editing .contact-form-footer { justify-content: flex-end; }
+.post-comment-edit-buttons { display: flex; gap: 10px; }
+/* An empty status takes no room, so the buttons stay on the line; a message gets its own line above them on a phone. */
+.post-comment-editing .post-comment-status:empty { flex-basis: 0; }
+.post-comment-cancel { min-height: 42px; padding: 0 16px; border: 1px solid var(--nb-line); border-radius: 8px; color: var(--nb-ink-2); background: none; font: inherit; font-size: 14px; cursor: pointer; }
+.post-comment-cancel:hover, .post-comment-cancel:focus-visible { color: var(--nb-ink); border-color: var(--nb-ink-3); }
+/* Signed out: one prompt and GitHub's button. Signed in: who is posting, and a way out. */
+.post-comment-signin { justify-items: start; }
+.post-comment-signin p { margin: 0; }
+.post-comment-signin > p:first-child { color: var(--nb-ink); font-size: 16px; font-weight: 500; }
+.github-signin { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 18px; border-radius: 8px; color: #fff; background: #1f2328; font-size: 14px; font-weight: 600; text-decoration: none; transition: background-color .15s ease; }
+.github-signin:hover { background: #32383f; }
+.github-signin svg { width: 18px; height: 18px; fill: currentColor; }
+html.dark .github-signin { color: #1f2328; background: #f0f6fc; }
+html.dark .github-signin:hover { background: #d1d9e0; }
+.post-comment-viewer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--nb-ink-2); font-size: 14px; }
+.post-comment-viewer img { border-radius: 50%; }
+.post-comment-viewer strong { color: var(--nb-ink); font-weight: 600; }
+.post-comment-viewer button { margin-inline-start: auto; padding: 4px 10px; border: 1px solid var(--nb-line); border-radius: 6px; color: var(--nb-ink-2); background: none; font: inherit; font-size: 13px; cursor: pointer; }
+.post-comment-viewer button:hover, .post-comment-viewer button:focus-visible { color: var(--nb-ink); border-color: var(--nb-ink-3); }
+.post-comment-body { margin-top: 4px; font-size: 16px; line-height: 1.65; overflow-wrap: anywhere; }
+/* Comments use the article styles at a smaller scale; the last block leaves no gap under the comment. */
+.post-comment-body > :last-child { margin-bottom: 0; }
+.post-comment-body p { margin-bottom: .75em; }
+.post-comment-body :is(ul, ol) { margin: 0 0 .75em; padding-inline-start: 1.4em; }
+.post-comment-body blockquote { margin: 0 0 .75em; }
+.post-comment-body blockquote p { margin: 0; }
+.post-comment-body .code-block-container { margin: .5em 0 .9em; }
+.post-comment-body.article-content :is(h3, h4, h5) { margin: .9em 0 .4em; color: var(--nb-ink); font-weight: 600; }
+.post-comment-body.article-content h5 { font-size: .95rem; }
+.post-comment-body.article-content > :first-child { margin-top: 0; }
+.post-comment-body.article-content .table-container { margin: .5em 0 .9em; }
+/* The comment editor: one framed box like GitHub's, with the tabs and toolbar on top and the hint below. */
+.comment-editor { border: 1px solid var(--nb-line); border-radius: 8px; background: var(--nb-bg); overflow: hidden; transition: border-color .15s ease, box-shadow .15s ease; }
+.comment-editor:focus-within { border-color: var(--nb-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--nb-accent) 18%, transparent); }
+.comment-editor-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; padding: 6px; border-bottom: 1px solid var(--nb-line); background: var(--nb-subtle); }
+.comment-toolbar { display: flex; flex-wrap: wrap; gap: 2px; }
+.comment-tool { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 6px; color: var(--nb-ink-3); background: none; cursor: pointer; }
+.comment-tool:hover, .comment-tool:focus-visible { color: var(--nb-ink); background: color-mix(in srgb, var(--nb-ink-3) 14%, transparent); }
+.comment-tool svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* Under 380 px the nine tools share one row evenly, instead of two wrapping onto a row of their own. */
+@media (max-width: 379px) { .comment-toolbar { display: grid; flex: 1 1 100%; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 0; } .comment-tool { width: auto; } }
+.post-comment-form .comment-editor textarea, .post-comment-form .comment-editor textarea:is(:hover, :focus) { vertical-align: top; border: 0; border-radius: 0; box-shadow: none; background: none; }
+/* The box grows with the text where the browser supports it, up to a height that keeps the buttons in view. */
+.comment-editor textarea { field-sizing: content; max-height: min(60vh, 480px); }
+.comment-editor-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 6px 10px; border-top: 1px dashed var(--nb-line); }
+.post-comment-tabs { display: inline-flex; padding: 2px; border: 1px solid var(--nb-line); border-radius: 8px; }
+.post-comment-tabs button { padding: 3px 10px; border: 0; border-radius: 6px; color: var(--nb-ink-3); background: none; font: inherit; font-size: 12px; cursor: pointer; }
+.post-comment-tabs button[aria-pressed="true"] { color: var(--nb-ink); background: var(--nb-subtle); }
+.post-comment-preview { min-height: 128px; padding: 10px 12px; font-weight: 400; }
+.post-comment-hint { color: var(--nb-ink-3); font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
+.post-comments-note { color: var(--nb-ink-3); font-size: 15px; }
+.post-comments-retry { padding: 0; border: 0; color: var(--nb-accent); background: none; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.post-comments-retry[aria-disabled='true'] { opacity: .6; cursor: progress; }
+.post-comment-count[data-tone='error'] { color: #cf222e; }
+html.dark .post-comment-count[data-tone='error'] { color: #ff7b72; }
+.post-comment-count { justify-self: end; color: var(--nb-ink-3); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.post-comment-status { flex: 1 1 200px; color: var(--nb-ink-3); font-size: 14px; }
+.post-comment-status[data-tone='ok'] { color: #1a7f37; }
+.post-comment-status[data-tone='error'] { color: #cf222e; }
+html.dark .post-comment-status[data-tone='ok'] { color: #56d364; }
+html.dark .post-comment-status[data-tone='error'] { color: #ff7b72; }
+@media (prefers-reduced-motion: reduce) { .post-like-button[aria-pressed='true'] svg, .post-comments > ol > li.is-fresh::before { animation: none; } }
+
 .plain-page .plain-next { display: grid; gap: 2px; max-width: none; margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--nb-line); }
 .plain-next > span { color: var(--nb-ink-3); font-size: 13px; }
 .plain-page .plain-next a { justify-self: start; color: var(--nb-ink); font-size: 1.15rem; font-weight: 600; text-decoration: none; }
@@ -226,7 +344,7 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
 .plain-page kbd { display: inline-block; padding: 0 6px; border: 1px solid var(--nb-line); border-bottom-width: 2px; border-radius: 5px; color: var(--nb-ink-2); background: var(--nb-subtle); font: 500 .8em/1.6 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
 
 @media (max-width: 760px) {
-  .plain-page, .plain-article-body, .related-posts { width: calc(100% - 32px); }
+  .plain-page, .plain-article-body, .related-posts, .post-reactions { width: calc(100% - 32px); }
   .plain-page { padding: 40px 0 64px; }
   .plain-glance { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; }
   .plain-glance-stack { grid-column: 1 / -1; }
@@ -247,6 +365,7 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
   .plain-tags button[aria-pressed='true'] { forced-color-adjust: none; border-color: Highlight; color: HighlightText; background: Highlight; }
   .post-toc a[aria-current] { forced-color-adjust: none; border-color: Highlight; color: Highlight; }
   .reading-progress { forced-color-adjust: none; background: Highlight; }
+  .post-like-button[aria-pressed='true'] { border-color: Highlight; }
   .code-content pre .line.highlighted { background: none; border-inline-start: 3px solid Highlight; }
 }
 
@@ -266,7 +385,7 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
   .plain-links a[href^='http']::after, .article-content a[href^='http']::after { content: ' (' attr(href) ')'; color: #555; font-size: .85em; overflow-wrap: anywhere; }
   /* Posts: full code, light token colours, no controls. */
   .plain-article-body, .related-posts { width: auto; }
-  .plain-back, .plain-share, .related-posts, .post-toc, .copy-button, .code-expand, .heading-anchor { display: none !important; }
+  .plain-back, .plain-share, .related-posts, .post-reactions, .post-toc, .copy-button, .code-expand, .heading-anchor { display: none !important; }
   .plain-article-body.has-toc { display: block; }
   .plain-article-head { padding-bottom: 24px; }
   .code-block-container[data-collapsed] pre { max-height: none; overflow: visible; }
