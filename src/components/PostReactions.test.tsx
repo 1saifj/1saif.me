@@ -218,6 +218,66 @@ describe('PostReactions', () => {
     expect(fetch).toHaveBeenCalledTimes(3)
   })
 
+  it('asks before a delete inside the comment, and keeps focus on a real control', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn), async () => Response.json({ id: 2 })])
+    const remove = () => container.querySelector<HTMLButtonElement>('.post-comment-delete')!
+
+    await act(async () => remove().click())
+    const question = container.querySelector('.post-comment-actions[role="group"]')!
+
+    expect(question.textContent).toContain('Delete this comment for good?')
+    expect(document.activeElement).toBe(remove())
+
+    await act(async () => question.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })))
+    expect(container.querySelector('.post-comment-actions[role="group"]')).toBeNull()
+    expect(document.activeElement).toBe(remove())
+    expect(fetch).toHaveBeenCalledTimes(2)
+
+    await act(async () => remove().click())
+    await act(async () => remove().click())
+
+    expect(fetch.mock.calls[2][1]?.method).toBe('DELETE')
+    expect(container.querySelectorAll('.post-comments li')).toHaveLength(1)
+    expect(document.activeElement).toBe(container.querySelector('#comments-title'))
+  })
+
+  it('shows the count, the Author badge on Saif\'s comments and a relative time with the full date on hover', async () => {
+    const saif = { ...own, author: { id: 31359390, login: '1saifj', name: 'Saif' }, createdAt: Date.now() - 5 * 60_000 }
+
+    await render([async () => Response.json({ ...loaded, comments: [...loaded.comments, saif] })])
+
+    expect(container.querySelector('#comments-title')!.textContent).toBe('Comments2')
+    expect([...container.querySelectorAll('.post-comment-badge')].map(item => item.closest('li')!.querySelector('strong')!.textContent)).toEqual(['Saif'])
+    const time = container.querySelectorAll('time')[1]
+
+    expect(time.textContent).toBe('5 minutes ago')
+    expect(time.getAttribute('title')).toMatch(/\d{4}/)
+  })
+
+  it('keeps Post off until there is text, sends on Ctrl+Enter, and keeps the draft over a reload', async () => {
+    signIn()
+    sessionStorage.setItem('comment-draft:a-post', 'Saved before the reload')
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), async () => Response.json({ ...own, id: 3, body: 'Typed' })])
+    const area = container.querySelector('textarea')!
+    const post = container.querySelector<HTMLButtonElement>('.post-comment-form [type="submit"]')!
+
+    expect(area.value).toBe('Saved before the reload')
+    await type(area, '  ')
+    expect(post.disabled).toBe(true)
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBe('  ')
+
+    await type(area, 'Typed')
+    expect(post.disabled).toBe(false)
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBe('Typed')
+    await act(async () => area.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true })))
+
+    expect(fetch.mock.calls[2][1]?.method).toBe('POST')
+    expect(container.querySelector('li.is-fresh')!.textContent).toContain('Typed')
+    expect(sessionStorage.getItem('comment-draft:a-post')).toBeNull()
+    expect(document.activeElement).toBe(container.querySelector('.post-comment-form textarea'))
+  })
+
   it('drops a like kept for a sign-in that did not finish', async () => {
     sessionStorage.setItem('like-intent:a-post', '1')
     await render([async () => Response.json(loaded)])

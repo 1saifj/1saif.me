@@ -1,10 +1,17 @@
-import React, { FormEvent, KeyboardEvent, useEffect, useId, useRef, useState } from 'react'
+import React, { ClipboardEvent, FormEvent, KeyboardEvent, useEffect, useId, useRef, useState } from 'react'
 import { dateLocale, Language, SITE_TIME_ZONE } from '../i18n/language'
 import { enhanceCodeBlocks } from '../utils/codeBlocks'
-import { Format, formatSelection } from '../utils/commentEditor'
+import { Edit, Format, formatSelection, pasteLink } from '../utils/commentEditor'
 import { commentToHtml } from '../utils/commentMarkdown'
+import { commentTime } from '../utils/commentTime'
 
 const MAX_MESSAGE = 2_000
+
+// The count shows only in the last characters, where it helps.
+const COUNT_FROM = 200
+
+// Saif's GitHub account ID: his comments carry the Author badge. The ID stays when a login changes.
+const OWNER_ID = 31359390
 
 // The Worker sets this readable cookie at sign-in with the public GitHub profile only; the session itself is HttpOnly.
 const VIEWER_COOKIE = '__Host-viewer'
@@ -42,7 +49,7 @@ const copy = {
     likeBlocked: 'This account cannot like posts here.',
     signInToLike: 'Sign in with GitHub to like this post.',
     title: 'Comments',
-    empty: 'No comments yet.',
+    empty: 'No comments yet. Start the discussion.',
     loadFailed: 'The comments did not load. Refresh the page to try again.',
     previewHost: 'Likes and comments work on 1saif.me only, not on preview deploys.',
     message: 'Comment',
@@ -52,7 +59,8 @@ const copy = {
     signedInAs: 'Signed in as',
     signOut: 'Sign out',
     delete: 'Delete',
-    confirmDelete: 'Delete this comment? You cannot undo this.',
+    confirmDelete: 'Delete this comment for good?',
+    author: 'Author',
     edit: 'Edit',
     edited: 'edited',
     editLabel: 'Edit comment',
@@ -64,7 +72,8 @@ const copy = {
     write: 'Write',
     preview: 'Preview',
     previewEmpty: 'Nothing to preview yet.',
-    markdown: 'Markdown is supported. Name a code block\'s language after ``` to color it.',
+    markdown: 'Markdown is supported. Write a language after ``` to color code. Ctrl/⌘ Enter sends.',
+    left: (count: number) => `${count} left`,
     formatting: 'Formatting',
     tools: { heading: 'Heading', bold: 'Bold', italic: 'Italic', code: 'Code', codeBlock: 'Code block', link: 'Link', list: 'Bulleted list', orderedList: 'Numbered list', quote: 'Quote' },
     post: 'Post comment',
@@ -88,7 +97,7 @@ const copy = {
     likeBlocked: 'لا يمكن لهذا الحساب الإعجاب هنا.',
     signInToLike: 'سجّل الدخول عبر GitHub لتُعجب بهذا المقال.',
     title: 'التعليقات',
-    empty: 'لا تعليقات بعد.',
+    empty: 'لا تعليقات بعد. ابدأ النقاش.',
     loadFailed: 'تعذّر تحميل التعليقات. حدّث الصفحة وحاول مرة أخرى.',
     previewHost: 'الإعجابات والتعليقات تعمل على 1saif.me فقط، لا على نسخ المعاينة.',
     message: 'التعليق',
@@ -98,7 +107,8 @@ const copy = {
     signedInAs: 'مسجّل الدخول باسم',
     signOut: 'تسجيل الخروج',
     delete: 'حذف',
-    confirmDelete: 'أتحذف هذا التعليق؟ لا يمكن التراجع عن ذلك.',
+    confirmDelete: 'أتحذف هذا التعليق نهائياً؟',
+    author: 'الكاتب',
     edit: 'تعديل',
     edited: 'معدَّل',
     editLabel: 'تعديل التعليق',
@@ -110,7 +120,8 @@ const copy = {
     write: 'كتابة',
     preview: 'معاينة',
     previewEmpty: 'لا شيء للمعاينة بعد.',
-    markdown: 'يدعم Markdown. اكتب لغة كتلة الكود بعد ``` لتلوينها.',
+    markdown: 'يدعم Markdown. اكتب اللغة بعد ``` لتلوين الكود. Ctrl/⌘ Enter للإرسال.',
+    left: (count: number) => `تبقّى ${count}`,
     formatting: 'التنسيق',
     tools: { heading: 'عنوان', bold: 'غامق', italic: 'مائل', code: 'كود', codeBlock: 'كتلة كود', link: 'رابط', list: 'قائمة نقطية', orderedList: 'قائمة مرقّمة', quote: 'اقتباس' },
     post: 'نشر التعليق',
@@ -134,7 +145,7 @@ type LikeNote = 'likeFailed' | 'likeBlocked' | 'signInToLike'
 
 type EditStatus = 'saving' | 'invalid' | 'rate' | 'blocked' | 'edits' | 'editFailed'
 
-type Status = 'idle' | 'posting' | 'posted' | 'invalid' | 'rate' | 'daily' | 'blocked' | 'expired' | 'signinFailed' | 'deleteFailed' | 'failed'
+type Status = 'idle' | 'posting' | 'posted' | 'invalid' | 'rate' | 'daily' | 'blocked' | 'expired' | 'signinFailed' | 'failed'
 
 // Storage can be blocked (private mode, strict settings); the page then works without it.
 function takeItem(key: string): string | null {
@@ -202,7 +213,7 @@ const likeInit = (liked: boolean, language: Language): RequestInit => ({
 const HeartIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.5 8.2 3.4 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.6 0 5.5 3.7 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z" /></svg>
 
 // The Markdown editor of a new comment and of an edit: Write and Preview, the toolbar, and the length.
-const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange: (value: string) => void; focus?: boolean }> = ({ t, label, value, onChange, focus }) => {
+const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange: (value: string) => void; focus?: boolean; labelHidden?: boolean }> = ({ t, label, value, onChange, focus, labelHidden }) => {
   // A new comment and an edit can be open at once, so each editor has its own IDs.
   const id = useId()
   const [previewing, setPreviewing] = useState(false)
@@ -214,13 +225,7 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
     if (focus) messageRef.current?.focus()
   }, [focus])
 
-  function applyFormat(format: Format) {
-    const area = messageRef.current
-
-    if (!area) return
-
-    const edit = formatSelection(area.value, area.selectionStart, area.selectionEnd, format)
-
+  function insert(area: HTMLTextAreaElement, edit: Edit) {
     area.focus()
     area.setSelectionRange(edit.from, edit.to)
 
@@ -233,8 +238,24 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
     area.setSelectionRange(edit.selectionStart, edit.selectionEnd)
   }
 
-  function formatShortcut(event: KeyboardEvent<HTMLTextAreaElement>) {
-    const tool = (event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && TOOLS.find(item => item.key === event.key.toLowerCase())
+  function applyFormat(format: Format) {
+    const area = messageRef.current
+
+    if (area) insert(area, formatSelection(area.value, area.selectionStart, area.selectionEnd, format))
+  }
+
+  function shortcut(event: KeyboardEvent<HTMLTextAreaElement>) {
+    // An IME (Arabic, Chinese, Japanese) still composing owns the keys.
+    if (event.nativeEvent.isComposing || event.altKey || event.shiftKey || !(event.metaKey || event.ctrlKey)) return
+
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      event.currentTarget.form?.requestSubmit()
+
+      return
+    }
+
+    const tool = TOOLS.find(item => item.key === event.key.toLowerCase())
 
     if (!tool) return
 
@@ -242,9 +263,21 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
     applyFormat(tool.format)
   }
 
+  function paste(event: ClipboardEvent<HTMLTextAreaElement>) {
+    const area = event.currentTarget
+    const edit = pasteLink(area.value, area.selectionStart, area.selectionEnd, event.clipboardData.getData('text/plain'))
+
+    if (!edit) return
+
+    event.preventDefault()
+    insert(area, edit)
+  }
+
+  const left = MAX_MESSAGE - value.length
+
   return (
     <div className="contact-field">
-      <label htmlFor={`${id}message`}>{label}</label>
+      <label htmlFor={`${id}message`} className={labelHidden ? 'sr-only' : undefined}>{label}</label>
       <div className="comment-editor">
         <div className="comment-editor-bar">
           <span className="post-comment-tabs">
@@ -258,11 +291,12 @@ const CommentEditor: React.FC<{ t: Copy; label: string; value: string; onChange:
           </span>}
         </div>
         {/* Hidden, not removed, while previewing, so it keeps its text and undo history. */}
-        <textarea ref={messageRef} id={`${id}message`} defaultValue={value} name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby={`${id}hint ${id}count`} hidden={previewing} onChange={event => onChange(event.currentTarget.value)} onKeyDown={formatShortcut} />
+        <textarea ref={messageRef} id={`${id}message`} defaultValue={value} name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby={`${id}hint ${id}count`} hidden={previewing} onChange={event => onChange(event.currentTarget.value)} onKeyDown={shortcut} onPaste={paste} />
         {previewing && <div ref={previewRef} className="post-comment-preview post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: value.trim() ? commentToHtml(value) : `<p>${t.previewEmpty}</p>` }} />}
         <div className="comment-editor-foot">
           <span className="post-comment-hint" id={`${id}hint`}>{t.markdown}</span>
-          <span className="post-comment-count" id={`${id}count`}>{value.length} / {MAX_MESSAGE}</span>
+          {/* Kept empty, not removed, because the textarea names it in aria-describedby. */}
+          <span className="post-comment-count" id={`${id}count`} data-tone={left < 50 ? 'error' : undefined}>{left <= COUNT_FROM ? t.left(left) : ''}</span>
         </div>
       </div>
     </div>
@@ -287,7 +321,14 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   const [posted, setPosted] = useState(0)
   // One comment is edited at a time.
   const [editing, setEditing] = useState<{ id: number; draft: string; status?: EditStatus }>()
+  // Delete asks in place, inside the comment, instead of a browser dialog.
+  const [confirming, setConfirming] = useState<{ id: number; failed?: boolean }>()
+  // The comment just posted or saved, shown with a short highlight.
+  const [fresh, setFresh] = useState<number>()
   const commentsRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  // The comment whose Delete button takes focus back when its question is dismissed.
+  const restoreDelete = useRef<number>()
 
   const draftKey = `${DRAFT_KEY}:${slug}`
   const likeIntentKey = `${LIKE_INTENT_KEY}:${slug}`
@@ -358,6 +399,15 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     }
   }, [slug, draftKey, likeIntentKey, language])
 
+  // The draft survives a reload. It is saved only once the viewer is known: the effect above takes a saved draft
+  // first, and a signed-out page must not drop the one kept for the way back from GitHub.
+  useEffect(() => {
+    if (!viewer) return
+
+    if (draft) keepItem(draftKey, draft)
+    else takeItem(draftKey)
+  }, [viewer, draft, draftKey])
+
   // A closed edit puts the comment's HTML back, so its code blocks are enhanced again.
   useEffect(() => (commentsRef.current && reactions?.comments.length ? enhanceCodeBlocks(commentsRef.current) : undefined), [reactions?.comments, editing?.id])
 
@@ -413,6 +463,9 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     event.preventDefault()
     const message = draft.trim()
 
+    // Ctrl/⌘ Enter can arrive while a post is still on its way.
+    if (status === 'posting') return
+
     if (!message || message.length > MAX_MESSAGE) {
       setStatus('invalid')
 
@@ -428,6 +481,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       if (response.ok) {
         setDraft('')
         setPosted(count => count + 1)
+        setFresh(result.id)
         setReactions(current => current && { ...current, comments: [...current.comments, result] })
         setStatus('posted')
       } else if (response.status === 401) {
@@ -451,24 +505,31 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   }
 
   async function removeComment(id: number) {
-    if (!window.confirm(t.confirmDelete)) return
-
     try {
       const response = await fetch(`/api/posts/${slug}/comments/${id}`, { method: 'DELETE' })
 
       if (response.ok) {
+        // The focused button goes with the comment, so focus moves to the heading of the list.
+        titleRef.current?.focus()
+        setConfirming(undefined)
         setReactions(current => current && { ...current, comments: current.comments.filter(item => item.id !== id) })
         setEditing(current => current?.id === id ? undefined : current)
         setStatus('idle')
       } else if (response.status === 401) {
+        setConfirming(undefined)
         endSession()
         setStatus('expired')
       } else {
-        setStatus('deleteFailed')
+        setConfirming({ id, failed: true })
       }
     } catch {
-      setStatus('deleteFailed')
+      setConfirming({ id, failed: true })
     }
+  }
+
+  function cancelDelete(id: number) {
+    restoreDelete.current = id
+    setConfirming(undefined)
   }
 
   // Focus goes back to the comment's Edit button, so a keyboard user stays at the comment.
@@ -507,6 +568,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
       if (response.ok) {
         setReactions(current => current && { ...current, comments: current.comments.map(item => item.id === id ? result : item) })
+        setFresh(id)
         closeEdit(form)
       } else if (response.status === 401) {
         endSession()
@@ -523,6 +585,9 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   }
 
   const dateFormat = new Intl.DateTimeFormat(dateLocale(language), { year: 'numeric', month: 'short', day: 'numeric', timeZone: SITE_TIME_ZONE })
+  // The full time in the reader's own time zone, on hover; the comments render only in the browser.
+  const fullDate = new Intl.DateTimeFormat(dateLocale(language), { dateStyle: 'long', timeStyle: 'short' })
+  const now = Date.now()
   const busy = status === 'posting'
   const statusText = status === 'idle' || busy ? t.note : t[status]
   const tone = status === 'posted' ? 'ok' : status === 'idle' || busy ? undefined : 'error'
@@ -537,10 +602,11 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
         <span className="sr-only" aria-live="polite">{announcement}</span>
       </div>
 
-      <h2 id="comments-title">{t.title}</h2>
+      {/* Focusable from script only, so focus has a place to go when a deleted comment takes its button with it. */}
+      <h2 id="comments-title" ref={titleRef} tabIndex={-1}>{t.title}{reactions?.comments.length ? <span className="post-comments-count">{reactions.comments.length}</span> : null}</h2>
       <div ref={commentsRef} className="post-comments">
         {reactions && (reactions.comments.length
-          ? <ol>{reactions.comments.map(item => <li key={item.id}>
+          ? <ol>{reactions.comments.map(item => <li key={item.id} className={fresh === item.id ? 'is-fresh' : undefined}>
             {/* GitHub serves the picture; no-referrer keeps the post address from it. */}
             <img className="post-comment-avatar" src={avatarUrl(item.author.id, 36)} alt="" width={36} height={36} loading="lazy" decoding="async" referrerPolicy="no-referrer" />
             <div className="post-comment-main">
@@ -548,20 +614,32 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
                 <a href={`https://github.com/${item.author.login}`} target="_blank" rel="nofollow ugc noopener noreferrer"><strong dir="auto">{item.author.name ?? item.author.login}</strong></a>
                 {/* A login is Latin script; without dir, an Arabic page puts its @ at the end. */}
                 {item.author.name && <span className="post-comment-login" dir="ltr">@{item.author.login}</span>}
-                <time dateTime={new Date(item.createdAt).toISOString()}>{dateFormat.format(item.createdAt)}</time>
-                {item.editedAt ? <span className="post-comment-edited" title={dateFormat.format(item.editedAt)}>{t.edited}<span className="sr-only"> {dateFormat.format(item.editedAt)}</span></span> : null}
-                {viewer?.id === item.author.id && <span className="post-comment-actions">
-                  <button type="button" className="post-comment-edit" aria-expanded={editing?.id === item.id} onClick={() => setEditing(current => current?.id === item.id ? current : { id: item.id, draft: item.body })}>{t.edit}</button>
-                  <button type="button" className="post-comment-delete" onClick={() => void removeComment(item.id)}>{t.delete}</button>
-                </span>}
+                {item.author.id === OWNER_ID && <span className="post-comment-badge">{t.author}</span>}
+                <time dateTime={new Date(item.createdAt).toISOString()} title={fullDate.format(item.createdAt)}>{commentTime(item.createdAt, now, dateLocale(language), dateFormat)}</time>
+                {item.editedAt ? <span className="post-comment-edited" title={fullDate.format(item.editedAt)}>{t.edited}<span className="sr-only"> {fullDate.format(item.editedAt)}</span></span> : null}
+                {viewer?.id === item.author.id && (confirming?.id === item.id
+                  // The keys make each state mount its own buttons, so autoFocus runs when the state changes.
+                  ? <span key="confirm" className="post-comment-actions" role="group" aria-labelledby={`delete-${item.id}`} onKeyDown={event => { if (event.key === 'Escape') cancelDelete(item.id) }}>
+                    <span id={`delete-${item.id}`} className="post-comment-question" data-tone={confirming.failed ? 'error' : undefined} aria-live="polite">{confirming.failed ? t.deleteFailed : t.confirmDelete}</span>
+                    {/* The first button takes focus, as in a dialog; Cancel puts it back on Delete. */}
+                    <button type="button" className="post-comment-delete" autoFocus onClick={() => void removeComment(item.id)}>{t.delete}</button>
+                    <button type="button" className="post-comment-dismiss" onClick={() => cancelDelete(item.id)}>{t.cancel}</button>
+                  </span>
+                  : <span key="actions" className="post-comment-actions">
+                    <button type="button" className="post-comment-edit" aria-expanded={editing?.id === item.id} onClick={() => setEditing(current => current?.id === item.id ? current : { id: item.id, draft: item.body })}>{t.edit}</button>
+                    <button type="button" className="post-comment-delete" autoFocus={restoreDelete.current === item.id} onFocus={() => { restoreDelete.current = undefined }} onClick={() => setConfirming({ id: item.id })}>{t.delete}</button>
+                  </span>)}
               </p>
               {editing?.id === item.id
-                ? <form className="contact-form post-comment-form post-comment-editing" onSubmit={saveEdit} noValidate>
-                  <CommentEditor t={t} label={t.editLabel} value={editing.draft} onChange={value => setEditing(current => current && { ...current, draft: value })} focus />
+                ? <form className="contact-form post-comment-form post-comment-editing" onSubmit={saveEdit} noValidate onKeyDown={event => {
+                  // Escape closes an unchanged edit; a changed one stays, so no text is lost by accident.
+                  if (event.key === 'Escape' && !event.nativeEvent.isComposing && editing.draft.trim() === item.body) closeEdit(event.currentTarget)
+                }}>
+                  <CommentEditor t={t} label={t.editLabel} labelHidden value={editing.draft} onChange={value => setEditing(current => current && { ...current, draft: value })} focus />
                   <div className="contact-form-footer">
-                    <button type="submit" disabled={editing.status === 'saving'}>{editing.status === 'saving' ? t.saving : t.save}</button>
-                    <button type="button" className="post-comment-cancel" onClick={event => closeEdit(event.currentTarget)}>{t.cancel}</button>
                     <p className="post-comment-status" role="status" data-tone={editing.status && editing.status !== 'saving' ? 'error' : undefined}>{editing.status && editing.status !== 'saving' ? t[editing.status] : ''}</p>
+                    <button type="button" className="post-comment-cancel" onClick={event => closeEdit(event.currentTarget)}>{t.cancel}</button>
+                    <button type="submit" disabled={editing.status === 'saving' || !editing.draft.trim() || editing.draft.trim() === item.body}>{editing.status === 'saving' ? t.saving : t.save}</button>
                   </div>
                 </form>
                 // commentToHtml escapes the visitor's text before it adds any markup.
@@ -586,9 +664,10 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           <span>{t.signedInAs} <strong dir="auto">{viewer.name ?? viewer.login}</strong></span>
           <button type="button" onClick={() => void signOut()}>{t.signOut}</button>
         </div>
-        <CommentEditor key={posted} t={t} label={t.message} value={draft} onChange={setDraft} />
+        {/* After a post, focus stays in the fresh editor for the next comment. */}
+        <CommentEditor key={posted} t={t} label={t.message} value={draft} onChange={setDraft} focus={posted > 0} />
         <div className="contact-form-footer">
-          <button type="submit" disabled={busy}>{busy ? t.posting : t.post}</button>
+          <button type="submit" disabled={busy || !draft.trim()}>{busy ? t.posting : t.post}</button>
           <p className="post-comment-status" role="status" data-tone={tone}>{statusText}</p>
         </div>
       </form>}

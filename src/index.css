@@ -119,9 +119,11 @@ html[dir='rtl'] .related-posts h2 { font-size: 14px; letter-spacing: 0; }
 
 /* Likes and comments, between the article and the related posts. The form reuses the contact form styles in index.html. */
 .post-reactions { width: min(calc(100% - 48px), 960px); margin: 0 auto; padding: 8px 0 32px; }
-.post-reactions > div { display: grid; gap: 20px; max-width: 720px; padding-top: 28px; border-top: 1px solid var(--nb-line); }
+.post-reactions > div { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; max-width: 720px; padding-top: 28px; border-top: 1px solid var(--nb-line); }
 .post-reactions h2 { margin: 12px 0 0; color: var(--nb-ink-3); font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 html[dir='rtl'] .post-reactions h2 { font-size: 14px; letter-spacing: 0; }
+.post-reactions h2:focus { outline: none; }
+.post-comments-count { display: inline-block; margin-inline-start: 8px; padding: 0 7px; border-radius: 999px; color: var(--nb-ink-2); background: var(--nb-subtle); font-size: 12px; letter-spacing: 0; line-height: 20px; vertical-align: 1px; font-variant-numeric: tabular-nums; }
 .post-like { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
 .post-like-button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 1px solid var(--nb-line); border-radius: 999px; color: var(--nb-ink-2); background: var(--nb-bg); font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; transition: border-color .15s ease, color .15s ease, background-color .15s ease; }
 .post-like-button:hover:not(:disabled) { border-color: color-mix(in srgb, var(--nb-ink-3) 55%, var(--nb-line)); color: var(--nb-ink); }
@@ -144,14 +146,26 @@ html.dark .post-like-button[aria-pressed='true'] { border-color: color-mix(in sr
 .post-comment-meta a:hover strong, .post-comment-meta a:focus-visible strong { text-decoration: underline; }
 .post-comment-meta strong { color: var(--nb-ink); font-weight: 600; overflow-wrap: anywhere; }
 .post-comment-login, .post-comment-meta time { color: var(--nb-ink-3); font-variant-numeric: tabular-nums; }
+.post-comment-meta time { cursor: default; }
 .post-comment-edited { color: var(--nb-ink-3); }
-.post-comment-actions { display: inline-flex; gap: 12px; margin-inline-start: auto; }
-.post-comment-actions button { padding: 0; border: 0; color: var(--nb-ink-3); background: none; font: inherit; font-size: 13px; cursor: pointer; }
-.post-comment-actions button:hover, .post-comment-actions button:focus-visible { color: var(--nb-ink); }
-.post-comment-actions .post-comment-delete:hover, .post-comment-actions .post-comment-delete:focus-visible { color: #cf222e; }
-html.dark .post-comment-actions .post-comment-delete:hover, html.dark .post-comment-actions .post-comment-delete:focus-visible { color: #ff7b72; }
+.post-comment-badge { padding: 0 7px; border: 1px solid var(--nb-line); border-radius: 999px; color: var(--nb-ink-2); font-size: 12px; font-weight: 500; line-height: 18px; }
+/* Each button keeps a 24 px target (WCAG 2.2); the negative margin keeps the row as tight as the text. */
+.post-comment-actions { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-inline-start: auto; }
+.post-comment-actions button { margin: -4px 0; padding: 4px 6px; border: 0; border-radius: 6px; color: var(--nb-ink-3); background: none; font: inherit; font-size: 13px; cursor: pointer; }
+.post-comment-actions button:hover, .post-comment-actions button:focus-visible { color: var(--nb-ink); background: color-mix(in srgb, var(--nb-ink-3) 12%, transparent); }
+.post-comment-actions .post-comment-delete:hover, .post-comment-actions .post-comment-delete:focus-visible { color: #cf222e; background: color-mix(in srgb, #cf222e 10%, transparent); }
+html.dark .post-comment-actions .post-comment-delete:hover, html.dark .post-comment-actions .post-comment-delete:focus-visible { color: #ff7b72; background: color-mix(in srgb, #ff7b72 12%, transparent); }
+.post-comment-question { color: var(--nb-ink-2); font-size: 13px; }
+.post-comment-actions[role='group'] .post-comment-delete { color: #cf222e; font-weight: 600; }
+html.dark .post-comment-actions[role='group'] .post-comment-delete { color: #ff7b72; }
+.post-comment-question[data-tone='error'] { color: #cf222e; }
+html.dark .post-comment-question[data-tone='error'] { color: #ff7b72; }
+/* A new or saved comment glows once, so the eye finds it. */
+.post-comments > ol > li.is-fresh { margin-inline: -10px; padding-inline: 10px; border-radius: 10px; animation: post-comment-fresh 2.4s ease-out; }
+@keyframes post-comment-fresh { from { background: color-mix(in srgb, var(--nb-accent) 14%, transparent); } to { background: transparent; } }
 /* An edit puts the same editor in place of the comment body; the comment itself frames it. */
-.contact-form.post-comment-editing { gap: 10px; margin-top: 6px; padding: 0; border: 0; background: none; }
+.contact-form.post-comment-editing { gap: 10px; margin-top: 8px; padding: 0; border: 0; background: none; }
+.post-comment-editing .contact-form-footer { justify-content: flex-end; }
 .post-comment-cancel { min-height: 42px; padding: 0 16px; border: 1px solid var(--nb-line); border-radius: 8px; color: var(--nb-ink-2); background: none; font: inherit; font-size: 14px; cursor: pointer; }
 .post-comment-cancel:hover, .post-comment-cancel:focus-visible { color: var(--nb-ink); border-color: var(--nb-ink-3); }
 /* Signed out: one prompt and GitHub's button. Signed in: who is posting, and a way out. */
@@ -189,6 +203,8 @@ html.dark .github-signin:hover { background: #d1d9e0; }
 .comment-tool:hover, .comment-tool:focus-visible { color: var(--nb-ink); background: color-mix(in srgb, var(--nb-ink-3) 14%, transparent); }
 .comment-tool svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .post-comment-form .comment-editor textarea, .post-comment-form .comment-editor textarea:is(:hover, :focus) { vertical-align: top; border: 0; border-radius: 0; box-shadow: none; background: none; }
+/* The box grows with the text where the browser supports it, up to a height that keeps the buttons in view. */
+.comment-editor textarea { field-sizing: content; max-height: min(60vh, 480px); }
 .comment-editor-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 6px 10px; border-top: 1px dashed var(--nb-line); }
 .post-comment-tabs { display: inline-flex; padding: 2px; border: 1px solid var(--nb-line); border-radius: 8px; }
 .post-comment-tabs button { padding: 3px 10px; border: 0; border-radius: 6px; color: var(--nb-ink-3); background: none; font: inherit; font-size: 12px; cursor: pointer; }
@@ -196,13 +212,15 @@ html.dark .github-signin:hover { background: #d1d9e0; }
 .post-comment-preview { min-height: 128px; padding: 10px 12px; font-weight: 400; }
 .post-comment-hint { color: var(--nb-ink-3); font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
 .post-comments-note { color: var(--nb-ink-3); font-size: 15px; }
+.post-comment-count[data-tone='error'] { color: #cf222e; }
+html.dark .post-comment-count[data-tone='error'] { color: #ff7b72; }
 .post-comment-count { justify-self: end; color: var(--nb-ink-3); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
 .post-comment-status { flex: 1 1 200px; color: var(--nb-ink-3); font-size: 14px; }
 .post-comment-status[data-tone='ok'] { color: #1a7f37; }
 .post-comment-status[data-tone='error'] { color: #cf222e; }
 html.dark .post-comment-status[data-tone='ok'] { color: #56d364; }
 html.dark .post-comment-status[data-tone='error'] { color: #ff7b72; }
-@media (prefers-reduced-motion: reduce) { .post-like-button[aria-pressed='true'] svg { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .post-like-button[aria-pressed='true'] svg, .post-comments > ol > li.is-fresh { animation: none; } }
 
 .plain-page .plain-next { display: grid; gap: 2px; max-width: none; margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--nb-line); }
 .plain-next > span { color: var(--nb-ink-3); font-size: 13px; }

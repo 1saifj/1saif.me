@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { commentToHtml } from './commentMarkdown'
-import { Format, formatSelection } from './commentEditor'
+import { Format, formatSelection, pasteLink } from './commentEditor'
 
 const apply = (value: string, start: number, end: number, format: Format) => {
   const edit = formatSelection(value, start, end, format)
@@ -49,5 +49,23 @@ describe('formatSelection', () => {
 
     expect(result).toMatchObject({ text: 'try \n\n```\ngo build\n```\n\n now', selected: 'go build' })
     expect(result.html).toContain('<pre data-lang="text">')
+  })
+})
+
+describe('pasteLink', () => {
+  it('links the selected text to a pasted address', () => {
+    const edit = pasteLink('see the docs here', 8, 12, ' https://developers.cloudflare.com/d1/ \n')
+
+    expect(edit).toEqual({ from: 8, to: 12, text: '[docs](https://developers.cloudflare.com/d1/)', selectionStart: 53, selectionEnd: 53 })
+    expect(commentToHtml(`see the ${edit?.text} here`)).toContain('<a href="https://developers.cloudflare.com/d1/"')
+  })
+
+  it.each([
+    ['nothing is selected', 'docs', 2, 2, 'https://x.dev'],
+    ['the selection spans lines', 'a\nb', 0, 3, 'https://x.dev'],
+    ['the paste is not one address', 'docs', 0, 4, 'see https://x.dev'],
+    ['the address is not http', 'docs', 0, 4, 'javascript:alert(1)'],
+  ])('pastes as usual when %s', (_, value, start, end, pasted) => {
+    expect(pasteLink(value, start, end, pasted)).toBeUndefined()
   })
 })

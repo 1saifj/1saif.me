@@ -54,3 +54,15 @@ export function formatSelection(value: string, start: number, end: number, forma
 
   return { from, to, text: lead + lines + blankAfter(value.slice(to)), selectionStart: start === end ? bodyStart + lines.length : bodyStart, selectionEnd: bodyStart + lines.length }
 }
+
+// As on GitHub: one address pasted over text on one line makes that text a link. Anything else pastes as usual.
+export function pasteLink(value: string, start: number, end: number, pasted: string): Edit | undefined {
+  const selected = value.slice(start, end)
+  const url = pasted.trim()
+
+  if (!selected.trim() || selected.includes('\n') || !/^https?:\/\/[^\s()]+$/.test(url)) return undefined
+
+  const text = `[${selected}](${url})`
+
+  return { from: start, to: end, text, selectionStart: start + text.length, selectionEnd: start + text.length }
+}
