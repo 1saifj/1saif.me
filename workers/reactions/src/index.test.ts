@@ -292,13 +292,25 @@ describe('reactions worker: reads', () => {
     expect(db.queries()).toBe(queries)
   })
 
-  it('shows a new like on the next read, because a write clears the cached reply', async () => {
+  it('shows a new comment on the next read, because a comment clears the cached reply', async () => {
     const { env } = makeEnv()
     const { header } = await signIn(env)
 
     await read(env)
+    await worker.fetch(commentRequest(header), env, ctx)
+    expect((await (await read(env)).json()).comments).toHaveLength(1)
+  })
+
+  it('keeps the cached reply on a like, so a burst of likes cannot become a burst of comment reads', async () => {
+    const { env, db } = makeEnv()
+    const { header } = await signIn(env)
+
+    await read(env)
     await worker.fetch(likeRequest(header), env, ctx)
-    expect(await (await read(env)).json()).toEqual({ likes: 1, comments: [] })
+    const queries = db.queries()
+
+    expect(await (await read(env)).json()).toEqual({ likes: 0, comments: [] })
+    expect(db.queries()).toBe(queries)
   })
 
   it('shows each comment with its author and leaves hidden comments and blocked users out', async () => {
@@ -352,12 +364,12 @@ describe('reactions worker: likes', () => {
     const { header } = await signIn(env)
 
     await read(env)
-    expect(await (await likeState(env, header)).json()).toEqual({ liked: false })
+    expect(await (await likeState(env, header)).json()).toEqual({ likes: 0, liked: false })
     await worker.fetch(likeRequest(header), env, ctx)
 
     const response = await likeState(env, header)
 
-    expect(await response.json()).toEqual({ liked: true })
+    expect(await response.json()).toEqual({ likes: 1, liked: true })
     expect(response.headers.get('Cache-Control')).toBe('no-store')
     expect((await likeState(env, '')).status).toBe(401)
   })
@@ -774,6 +786,8 @@ describe('reactions worker: page views', () => {
     ['a path with a query', collect({ ...beacon, path: '/blog?q=1' })],
     ['a path with a hash', collect({ ...beacon, path: '/blog#top' })],
     ['another host', collect({ ...beacon, path: '//evil.example/x' })],
+    ['a path that is only slashes', collect({ ...beacon, path: '//' })],
+    ['a path with a backslash host', collect({ ...beacon, path: '/\\' })],
     ['a path over 200 characters', collect({ ...beacon, path: `/${'x'.repeat(200)}` })],
     ['a body that is not JSON', send('POST', '/api/collect', 'hello')],
   ])('drops %s with 204', async (_, request) => {

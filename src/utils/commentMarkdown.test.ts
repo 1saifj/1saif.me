@@ -20,6 +20,20 @@ describe('commentToHtml', () => {
     expect(html.endsWith('<p>Done</p>')).toBe(true)
   })
 
+  it('renders headings one level under the page\'s comments heading', () => {
+    expect(commentToHtml('# Setup\nRun **it**.')).toBe('<h3>Setup</h3><p>Run <strong>it</strong>.</p>')
+    expect(commentToHtml('### `go` tips ##')).toBe('<h5><code>go</code> tips</h5>')
+    expect(commentToHtml('#### deep')).toBe('<p>#### deep</p>')
+    expect(commentToHtml('#tag')).toBe('<p>#tag</p>')
+  })
+
+  it('renders a table with the posts\' markup, and pipes in code stay in their cell', () => {
+    expect(commentToHtml('| Tool | Use |\n| --- | :-: |\n| `a|b` | **fast** |')).toBe(
+      '<div class="table-container"><table><thead><tr><th>Tool</th><th>Use</th></tr></thead><tbody><tr><td><code>a|b</code></td><td><strong>fast</strong></td></tr></tbody></table></div>',
+    )
+    expect(commentToHtml('a | b\n---')).toBe('<p>a | b<br>---</p>')
+  })
+
   it('links only http(s) addresses, marked nofollow ugc', () => {
     expect(commentToHtml('[docs](https://example.com/a?b=1)')).toBe('<p><a href="https://example.com/a?b=1" target="_blank" rel="nofollow ugc noopener noreferrer">docs</a></p>')
     expect(commentToHtml('See https://example.com.')).toBe('<p>See <a href="https://example.com" target="_blank" rel="nofollow ugc noopener noreferrer">https://example.com</a>.</p>')
@@ -35,6 +49,8 @@ describe('commentToHtml', () => {
     ['\uE0000\uE000<b>forged</b>'],
     ['https://a.com/[x](https://b.com)'],
     ['[y](https://a.com/`code`)'],
+    ['# <img src=x onerror=alert(1)>'],
+    ['| <script>x</script> |\n|---|\n| <b onclick="y"> |'],
   ])('never lets markup through: %s', input => {
     const html = commentToHtml(input)
 

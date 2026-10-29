@@ -126,6 +126,22 @@ describe('PostReactions', () => {
     await act(async () => like().click())
 
     expect(like().tagName).toBe('A')
-    expect(count()).toBe('The like was not saved. Try again.')
+    expect(count()).toBe('Sign in with GitHub to like this post.')
+  })
+
+  it('says so when a blocked account\'s like is not stored', async () => {
+    signIn()
+    await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), async () => Response.json({ likes: 2, liked: false })])
+    await act(async () => like().click())
+
+    expect(like().getAttribute('aria-pressed')).toBe('false')
+    expect(count()).toBe('This account cannot like posts here.')
+  })
+
+  it('drops a like kept for a sign-in that did not finish', async () => {
+    sessionStorage.setItem('like-intent:a-post', '1')
+    await render([async () => Response.json(loaded)])
+
+    expect(sessionStorage.getItem('like-intent:a-post')).toBeNull()
   })
 })

@@ -1,7 +1,7 @@
 import { codeBlockHtml } from './markdownProcessor'
 
 // Visitor text is untrusted, unlike the posts: everything is escaped first, then only these rules add
-// markup. No raw HTML, images, headings or tables; links go only to http(s) and are marked nofollow ugc.
+// markup. No raw HTML or images (a picture would load from any host); links go only to http(s) and are marked nofollow ugc.
 
 const escapeHtml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
 
@@ -10,6 +10,14 @@ const link = (url: string, label: string) => `<a href="${url}" target="_blank" r
 const inline = (text: string) => text
   .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   .replace(/\*(.+?)\*/g, '<em>$1</em>')
+
+// The page has its own h2 for the comments, so "#" to "###" in a comment become h3 to h5.
+const HEADING = /^(#{1,3}) +(.+?)(?: +#+)?$/
+
+// A Markdown table's second line: dashes, optional colons, and at least one pipe.
+const TABLE_RULE = /^(?=.*\|)[\s|:-]*-[\s|:-]*$/
+
+const cells = (line: string, tag: 'th' | 'td') => line.trim().replace(/^\||\|$/g, '').split('|').map(cell => `<${tag}>${inline(cell.trim())}</${tag}>`).join('')
 
 export function commentToHtml(markdown: string): string {
   const held: string[] = []
@@ -25,8 +33,17 @@ export function commentToHtml(markdown: string): string {
     // or that part's HTML would land inside an href.
     .replace(/(^|\s)(https?:\/\/[^\s<\uE000]*[^\s<.,;:!?)'"\uE000])/g, (_match, space: string, url: string) => space + hold(link(url, url)))
 
-  const html = text.trim().split(/\n{2,}/).map(block => {
+  // Each heading is its own block, so the text right under it becomes a paragraph, as in the posts.
+  const html = text.replace(/^#{1,3} .+$/gm, line => `\n\n${line}\n\n`).trim().split(/\n{2,}/).map(block => {
     const lines = block.split('\n')
+    const heading = HEADING.exec(block)
+
+    if (heading) return `<h${heading[1].length + 2}>${inline(heading[2])}</h${heading[1].length + 2}>`
+
+    // The same markup as the posts' tables, so they get the same styles and scroll on narrow screens.
+    if (lines.length > 1 && lines[0].includes('|') && TABLE_RULE.test(lines[1])) {
+      return `<div class="table-container"><table><thead><tr>${cells(lines[0], 'th')}</tr></thead><tbody>${lines.slice(2).map(line => `<tr>${cells(line, 'td')}</tr>`).join('')}</tbody></table></div>`
+    }
 
     if (/^\uE000\d+\uE000$/.test(block.trim()) && held[Number(block.trim().slice(1, -1))].startsWith('<div')) return block.trim()
 

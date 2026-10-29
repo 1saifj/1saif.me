@@ -66,7 +66,7 @@ export interface Env {
   PER_CLIENT_COLLECT: RateLimit
   ALL_COLLECT: RateLimit
   PER_CLIENT_AUTH: RateLimit
-  // https://1saif.me, or http://localhost:5180 under wrangler dev (.dev.vars). Writes must come from it,
+  // https://1saif.me, or the Vite dev server under wrangler dev (.dev.vars). Writes must come from it,
   // and GitHub sends the visitor back to it.
   SITE_URL: string
   GITHUB_CLIENT_ID: string
@@ -76,13 +76,13 @@ export interface Env {
 }
 
 // The GitHub profile fields the site keeps. The avatar comes from the ID, so no URL is stored.
-export interface Author {
+interface Author {
   id: number
   login: string
   name: string | null
 }
 
-export interface PostComment {
+interface PostComment {
   id: number
   body: string
   createdAt: number
@@ -243,21 +243,21 @@ async function readPost(slug: string, env: Env, ctx: Context): Promise<Response>
   return response
 }
 
-// shortcut: the Cache API is per location, so other locations may serve the old reply for up to 30 s.
+// shortcut: the Cache API is per location, so other locations may serve the old reply for up to 30 s; lower s-maxage if readers notice.
 const forget = (slug: string) => caches.default.delete(cacheKey(slug))
 
 const likedBy = (env: Env, slug: string, userId: number) =>
   env.DB.prepare('SELECT COUNT(*) AS liked FROM likes WHERE slug = ? AND user_id = ?').bind(slug, userId)
 
-// The viewer's own like is read apart from the post, so the cached post reply stays the same for everyone.
+// The viewer's own like, and the exact count, are read apart from the post, so the cached post reply stays the same for everyone.
 async function likeState(request: Request, slug: string, env: Env): Promise<Response> {
   const session = await sessionOf(request, env)
 
   if (!session) return fail(401, 'auth')
 
-  const { results } = await likedBy(env, slug, session.id).all<{ liked: number }>()
+  const [own, counted] = await env.DB.batch<{ likes: number; liked: number }>([likedBy(env, slug, session.id), env.DB.prepare('SELECT likes FROM post_stats WHERE slug = ?').bind(slug)])
 
-  return reply(200, { liked: (results[0]?.liked ?? 0) > 0 })
+  return reply(200, { likes: counted.results[0]?.likes ?? 0, liked: (own.results[0]?.liked ?? 0) > 0 })
 }
 
 async function like(request: Request, slug: string, env: Env): Promise<Response> {
@@ -285,7 +285,8 @@ async function like(request: Request, slug: string, env: Env): Promise<Response>
   const liking = request.method === 'PUT'
 
   // The primary key allows one like per account and post. A blocked account adds none: the row comes from users only
-  // while it is not blocked. Triggers on likes keep post_stats exact (migrations/0004).
+  // while it is not blocked. Triggers on likes keep post_stats exact (migrations/0004). A like keeps the cached post
+  // reply: the liker gets the exact count here, so a burst of likes never turns into a burst of comment reads.
   const [changed, counted, own] = await env.DB.batch<{ likes: number; liked: number }>([
     liking
       ? env.DB.prepare('INSERT OR IGNORE INTO likes (slug, user_id, created_at) SELECT ?, github_id, ? FROM users WHERE github_id = ? AND blocked = 0')
@@ -294,8 +295,6 @@ async function like(request: Request, slug: string, env: Env): Promise<Response>
     env.DB.prepare('SELECT likes FROM post_stats WHERE slug = ?').bind(slug),
     likedBy(env, slug, session.id),
   ])
-
-  await forget(slug)
 
   if (changed.meta.changes > 0) track(env, slug, [liking ? 'like' : 'unlike', countryOf(request), languageOf(parsed.language)])
 
@@ -605,10 +604,11 @@ async function collect(request: Request, env: Env, ip: string): Promise<Response
   }
 
   const path = String(parsed.path ?? '')
-  const url = new URL(path, SITE_ORIGIN)
+  // A same-site pathname only. '//' and '/\' start a host, and an empty host makes new URL throw, so they never reach it;
+  // a query, a hash or '..' changes the parsed URL and is dropped.
+  const url = /^\/(?![/\\])/.test(path) ? new URL(path, SITE_ORIGIN) : undefined
 
-  // A same-site pathname only: '//host', a query, a hash or '..' changes the parsed URL and is dropped.
-  if (!path.startsWith('/') || path.length > 200 || url.origin !== SITE_ORIGIN || url.pathname !== path) return ignored()
+  if (!url || path.length > 200 || url.origin !== SITE_ORIGIN || url.pathname !== path) return ignored()
 
   if (!(await env.ALL_COLLECT.limit({ key: 'all' })).success) return ignored()
 

@@ -1,6 +1,6 @@
 // The comment toolbar: each format turns the selected text into the Markdown that commentToHtml renders.
 
-export type Format = 'bold' | 'italic' | 'code' | 'codeBlock' | 'link' | 'list' | 'orderedList' | 'quote'
+export type Format = 'heading' | 'bold' | 'italic' | 'code' | 'codeBlock' | 'link' | 'list' | 'orderedList' | 'quote'
 
 export interface Edit {
   from: number
@@ -12,7 +12,7 @@ export interface Edit {
 
 const WRAP: Partial<Record<Format, string>> = { bold: '**', italic: '*', code: '`' }
 
-const LINE_PREFIX: Partial<Record<Format, (index: number) => string>> = { list: () => '- ', orderedList: index => `${index + 1}. `, quote: () => '> ' }
+const LINE_PREFIX: Partial<Record<Format, (index: number) => string>> = { heading: () => '### ', list: () => '- ', orderedList: index => `${index + 1}. `, quote: () => '> ' }
 
 // commentToHtml splits blocks on blank lines, so a list, quote or code block needs one on each side.
 const blankBefore = (before: string) => before === '' || before.endsWith('\n\n') ? '' : before.endsWith('\n') ? '\n' : '\n\n'
@@ -44,7 +44,8 @@ export function formatSelection(value: string, start: number, end: number, forma
   }
 
   // Line formats apply to every line the selection touches.
-  const from = value.lastIndexOf('\n', start - 1) + 1
+  // lastIndexOf reads a negative start as 0, so a cursor at 0 before a blank first line would land on line 2.
+  const from = start === 0 ? 0 : value.lastIndexOf('\n', start - 1) + 1
   const lineEnd = value.indexOf('\n', end)
   const to = lineEnd === -1 ? value.length : lineEnd
   const lines = value.slice(from, to).split('\n').map((line, index) => prefix(index) + line).join('\n')

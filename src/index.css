@@ -169,6 +169,10 @@ html.dark .github-signin:hover { background: #d1d9e0; }
 .post-comment-body blockquote { margin: 0 0 .75em; }
 .post-comment-body blockquote p { margin: 0; }
 .post-comment-body .code-block-container { margin: .5em 0 .9em; }
+.post-comment-body.article-content :is(h3, h4, h5) { margin: .9em 0 .4em; color: var(--nb-ink); font-weight: 600; }
+.post-comment-body.article-content h5 { font-size: .95rem; }
+.post-comment-body.article-content > :first-child { margin-top: 0; }
+.post-comment-body.article-content .table-container { margin: .5em 0 .9em; }
 /* The comment editor: one framed box like GitHub's, with the tabs and toolbar on top and the hint below. */
 .comment-editor { border: 1px solid var(--nb-line); border-radius: 8px; background: var(--nb-bg); overflow: hidden; transition: border-color .15s ease, box-shadow .15s ease; }
 .comment-editor:focus-within { border-color: var(--nb-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--nb-accent) 18%, transparent); }

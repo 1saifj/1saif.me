@@ -37,6 +37,7 @@ const copy = {
     like: 'Like',
     likes: (count: number) => count === 1 ? '1 like' : `${count} likes`,
     likeFailed: 'The like was not saved. Try again.',
+    likeBlocked: 'This account cannot like posts here.',
     signInToLike: 'Sign in with GitHub to like this post.',
     title: 'Comments',
     empty: 'No comments yet.',
@@ -55,7 +56,7 @@ const copy = {
     previewEmpty: 'Nothing to preview yet.',
     markdown: 'Markdown is supported. Name a code block\'s language after ``` to color it.',
     formatting: 'Formatting',
-    tools: { bold: 'Bold', italic: 'Italic', code: 'Code', codeBlock: 'Code block', link: 'Link', list: 'Bulleted list', orderedList: 'Numbered list', quote: 'Quote' },
+    tools: { heading: 'Heading', bold: 'Bold', italic: 'Italic', code: 'Code', codeBlock: 'Code block', link: 'Link', list: 'Bulleted list', orderedList: 'Numbered list', quote: 'Quote' },
     post: 'Post comment',
     posting: 'Posting…',
     note: 'Everyone sees your comment with your GitHub name and picture.',
@@ -70,9 +71,10 @@ const copy = {
   },
   ar: {
     like: 'أعجبني',
-    // Arabic counts: one, two; a number ending in 3 to 10 takes the plural, any other the singular.
-    likes: (count: number) => count === 1 ? 'إعجاب واحد' : count === 2 ? 'إعجابان' : count % 100 >= 3 && count % 100 <= 10 ? `${count} إعجابات` : `${count} إعجاب`,
+    // Arabic counts: one, two; a number ending in 3 to 10 takes the plural, 11 to 99 the accusative singular, any other the singular.
+    likes: (count: number) => count === 1 ? 'إعجاب واحد' : count === 2 ? 'إعجابان' : count % 100 >= 3 && count % 100 <= 10 ? `${count} إعجابات` : count % 100 >= 11 ? `${count} إعجاباً` : `${count} إعجاب`,
     likeFailed: 'لم يُحفظ الإعجاب. حاول مرة أخرى.',
+    likeBlocked: 'لا يمكن لهذا الحساب الإعجاب هنا.',
     signInToLike: 'سجّل الدخول عبر GitHub لتُعجب بهذا المقال.',
     title: 'التعليقات',
     empty: 'لا تعليقات بعد.',
@@ -91,7 +93,7 @@ const copy = {
     previewEmpty: 'لا شيء للمعاينة بعد.',
     markdown: 'يدعم Markdown. اكتب لغة كتلة الكود بعد ``` لتلوينها.',
     formatting: 'التنسيق',
-    tools: { bold: 'غامق', italic: 'مائل', code: 'كود', codeBlock: 'كتلة كود', link: 'رابط', list: 'قائمة نقطية', orderedList: 'قائمة مرقّمة', quote: 'اقتباس' },
+    tools: { heading: 'عنوان', bold: 'غامق', italic: 'مائل', code: 'كود', codeBlock: 'كتلة كود', link: 'رابط', list: 'قائمة نقطية', orderedList: 'قائمة مرقّمة', quote: 'اقتباس' },
     post: 'نشر التعليق',
     posting: 'جارٍ النشر…',
     note: 'يرى الجميع تعليقك مع اسمك وصورتك على GitHub.',
@@ -105,6 +107,8 @@ const copy = {
     failed: 'لم يُنشر التعليق. حاول مرة أخرى.',
   },
 }
+
+type LikeNote = 'likeFailed' | 'likeBlocked' | 'signInToLike'
 
 type Status = 'idle' | 'posting' | 'posted' | 'invalid' | 'rate' | 'blocked' | 'expired' | 'signinFailed' | 'deleteFailed' | 'failed'
 
@@ -131,6 +135,7 @@ function keepItem(key: string, value: string) {
 
 // Lucide-style 24px stroke icons for the comment toolbar.
 const TOOLS: { format: Format; key?: string; path: string }[] = [
+  { format: 'heading', path: 'M6 12h12M6 20V4M18 20V4' },
   { format: 'bold', key: 'b', path: 'M7 5h6a3.5 3.5 0 0 1 0 7H7zm0 7h7a3.5 3.5 0 0 1 0 7H7z' },
   { format: 'italic', key: 'i', path: 'M19 4h-9m4 16H5m10-16L9 20' },
   { format: 'code', key: 'e', path: 'm16 18 6-6-6-6M8 6l-6 6 6 6' },
@@ -181,7 +186,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   const [reactions, setReactions] = useState<Reactions>()
   const [loadFailed, setLoadFailed] = useState(false)
   const [liked, setLiked] = useState(false)
-  const [likeFailed, setLikeFailed] = useState(false)
+  const [likeNote, setLikeNote] = useState<LikeNote>()
   // Announced only after a click, so loading the count while the visitor still reads the article stays silent.
   const [announcement, setAnnouncement] = useState('')
   const [status, setStatus] = useState<Status>('idle')
@@ -206,6 +211,9 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
 
     if (saved) setDraft(saved)
 
+    // A like clicked before a sign-in that did not finish is dropped, so a later sign-in cannot send it.
+    if (!signedIn) takeItem(likeIntentKey)
+
     // The Worker sends a failed sign-in back with ?signin=failed; the address keeps only the post.
     const address = new URL(window.location.href)
 
@@ -228,7 +236,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
       const wantsLike = signedIn && takeItem(likeIntentKey) !== null
 
       // The post reply is cached and the same for everyone, so the viewer's own like comes from its own request.
-      const own: Promise<{ likes?: number; liked?: boolean }> = signedIn
+      const ownLikeRequest: Promise<{ likes?: number; liked?: boolean }> = signedIn
         ? fetch(`/api/posts/${slug}/like`, wantsLike ? likeInit(true, language) : undefined).then(response => {
           if (response.status === 401 && !cancelled) {
             forgetViewer()
@@ -239,13 +247,13 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
         }, () => ({}))
         : Promise.resolve({})
 
-      Promise.all([fetch(`/api/posts/${slug}`).then(response => response.ok ? response.json() : Promise.reject(new Error(String(response.status)))), own])
-        .then(([value, mine]: [Reactions, { likes?: number; liked?: boolean }]) => {
+      Promise.all([fetch(`/api/posts/${slug}`).then(response => response.ok ? response.json() : Promise.reject(new Error(String(response.status)))), ownLikeRequest])
+        .then(([value, ownLike]: [Reactions, { likes?: number; liked?: boolean }]) => {
           if (cancelled) return
 
-          // A like sent just now may be newer than the cached count.
-          setReactions({ ...value, likes: mine.likes ?? value.likes })
-          setLiked(mine.liked ?? false)
+          // The signed-in count is exact; the cached one can be up to 30 s old.
+          setReactions({ ...value, likes: ownLike.likes ?? value.likes })
+          setLiked(ownLike.liked ?? false)
         }, () => { if (!cancelled) setLoadFailed(true) })
     }, { rootMargin: '600px 0px' })
 
@@ -266,31 +274,37 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     liking.current = true
     const next = !liked
     const before = reactions.likes
+    let note: LikeNote | undefined = 'likeFailed'
 
     // The button answers at once; a failed request puts both the state and the count back.
     setLiked(next)
-    setLikeFailed(false)
+    setLikeNote(undefined)
     setReactions(current => current && { ...current, likes: Math.max(0, before + (next ? 1 : -1)) })
 
     try {
       const response = await fetch(`/api/posts/${slug}/like`, likeInit(next, language))
 
       // An ended session turns the button back into the sign-in link.
-      if (response.status === 401) endSession()
+      if (response.status === 401) {
+        endSession()
+        note = 'signInToLike'
+      }
 
       if (!response.ok) throw new Error(String(response.status))
 
       const result: { likes: number; liked: boolean } = await response.json()
 
+      // A blocked account's like is not stored, so the reply's state differs from the click.
+      note = result.liked === next ? undefined : 'likeBlocked'
       setLiked(result.liked)
       setReactions(current => current && { ...current, likes: result.likes })
-      setAnnouncement(t.likes(result.likes))
+      setAnnouncement(note ? t[note] : t.likes(result.likes))
     } catch {
       setLiked(!next)
-      setLikeFailed(true)
-      setAnnouncement(t.likeFailed)
+      setAnnouncement(t[note ?? 'likeFailed'])
       setReactions(current => current && { ...current, likes: before })
     } finally {
+      setLikeNote(note)
       liking.current = false
     }
   }
@@ -404,7 +418,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
         {viewer === null
           ? <a className="post-like-button" href={signInHref} aria-label={t.signInToLike} title={t.signInToLike} onClick={() => keepItem(likeIntentKey, '1')}><HeartIcon />{t.like}</a>
           : <button type="button" className="post-like-button" aria-pressed={liked} disabled={!reactions || !viewer} onClick={() => void toggleLike()}><HeartIcon />{t.like}</button>}
-        <span className="post-like-count">{likeFailed ? t.likeFailed : reactions ? t.likes(reactions.likes) : ''}</span>
+        <span className="post-like-count">{likeNote ? t[likeNote] : reactions ? t.likes(reactions.likes) : ''}</span>
         <span className="sr-only" aria-live="polite">{announcement}</span>
       </div>
 

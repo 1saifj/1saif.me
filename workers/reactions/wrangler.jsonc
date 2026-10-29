@@ -38,15 +38,15 @@
       "allowed_sender_addresses": ["hello@1saif.me"]
     }
   ],
-  // Limits are counted per Cloudflare location. Per-client limits run first; the ALL_* caps
-  // bound the daily D1 rows written and Analytics Engine data points (README, Costs).
+  // Limits are counted per Cloudflare location. Per-client limits run first; the ALL_* caps bound, per location,
+  // the daily D1 rows written and Analytics Engine data points (README, Costs).
   "ratelimits": [
     { "name": "PER_CLIENT_LIKES", "namespace_id": "71453", "simple": { "limit": 10, "period": 60 } },
     { "name": "PER_CLIENT_COMMENTS", "namespace_id": "71454", "simple": { "limit": 3, "period": 60 } },
     { "name": "ALL_CLIENTS_COMMENTS", "namespace_id": "71455", "simple": { "limit": 10, "period": 60 } },
     { "name": "ALL_LIKES", "namespace_id": "71456", "simple": { "limit": 15, "period": 60 } },
     { "name": "PER_CLIENT_COLLECT", "namespace_id": "71457", "simple": { "limit": 30, "period": 60 } },
-    { "name": "ALL_COLLECT", "namespace_id": "71458", "simple": { "limit": 50, "period": 60 } },
+    { "name": "ALL_COLLECT", "namespace_id": "71458", "simple": { "limit": 40, "period": 60 } },
     { "name": "PER_CLIENT_AUTH", "namespace_id": "71459", "simple": { "limit": 10, "period": 60 } }
   ]
   // Secrets, set with `wrangler secret put <NAME> -c workers/reactions/wrangler.jsonc`:

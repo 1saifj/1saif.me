@@ -36,6 +36,14 @@ describe('formatSelection', () => {
     expect(apply('x\n\nitem\nafter', 3, 3, 'list').text).toBe('x\n\n- item\n\nafter')
   })
 
+  it('turns a line into a heading that renders as one', () => {
+    expect(apply('Intro\nSetup\nRun it', 7, 7, 'heading').html).toBe('<p>Intro</p><h5>Setup</h5><p>Run it</p>')
+  })
+
+  it('formats the first line when the cursor sits before a blank first line', () => {
+    expect(apply('\nitem', 0, 0, 'list').text).toBe('- \n\nitem')
+  })
+
   it('fences the selection as a code block with blank lines around it', () => {
     const result = apply('try go build now', 4, 12, 'codeBlock')
 
