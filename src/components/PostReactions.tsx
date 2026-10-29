@@ -1,6 +1,7 @@
-import React, { FormEvent, useEffect, useRef, useState } from 'react'
+import React, { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { dateLocale, Language, SITE_TIME_ZONE } from '../i18n/language'
 import { enhanceCodeBlocks } from '../utils/codeBlocks'
+import { Format, formatSelection } from '../utils/commentEditor'
 import { commentToHtml } from '../utils/commentMarkdown'
 import { loadTurnstile } from '../utils/turnstile'
 
@@ -42,7 +43,9 @@ const copy = {
     write: 'Write',
     preview: 'Preview',
     previewEmpty: 'Nothing to preview yet.',
-    markdown: 'Markdown works: **bold**, *italic*, `code`, ``` blocks with a language, [links](https://…).',
+    markdown: 'Markdown is supported. Name a code block\'s language after ``` to color it.',
+    formatting: 'Formatting',
+    tools: { bold: 'Bold', italic: 'Italic', code: 'Code', codeBlock: 'Code block', link: 'Link', list: 'Bulleted list', orderedList: 'Numbered list', quote: 'Quote' },
     post: 'Post comment',
     checking: 'Checking…',
     posting: 'Posting…',
@@ -66,7 +69,9 @@ const copy = {
     write: 'كتابة',
     preview: 'معاينة',
     previewEmpty: 'لا شيء للمعاينة بعد.',
-    markdown: 'يدعم Markdown: **غامق**، *مائل*، `كود`، ``` كتل كود بلغة، [روابط](https://…).',
+    markdown: 'يدعم Markdown. اكتب لغة كتلة الكود بعد ``` لتلوينها.',
+    formatting: 'التنسيق',
+    tools: { bold: 'غامق', italic: 'مائل', code: 'كود', codeBlock: 'كتلة كود', link: 'رابط', list: 'قائمة نقطية', orderedList: 'قائمة مرقّمة', quote: 'اقتباس' },
     post: 'نشر التعليق',
     checking: 'جارٍ التحقق…',
     posting: 'جارٍ النشر…',
@@ -118,6 +123,18 @@ function visitorId(): string {
   }
 }
 
+// Lucide-style 24px stroke icons for the comment toolbar.
+const TOOLS: { format: Format; key?: string; path: string }[] = [
+  { format: 'bold', key: 'b', path: 'M7 5h6a3.5 3.5 0 0 1 0 7H7zm0 7h7a3.5 3.5 0 0 1 0 7H7z' },
+  { format: 'italic', key: 'i', path: 'M19 4h-9m4 16H5m10-16L9 20' },
+  { format: 'code', key: 'e', path: 'm16 18 6-6-6-6M8 6l-6 6 6 6' },
+  { format: 'codeBlock', path: 'M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm5 6-3 3 3 3m4-6 3 3-3 3' },
+  { format: 'link', key: 'k', path: 'M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7' },
+  { format: 'list', path: 'M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01' },
+  { format: 'orderedList', path: 'M10 6h11m-11 6h11m-11 6h11M4 4h1v5m-1 0h2m0 9H4c0-1 2-2 2-3s-1-1.5-2-1' },
+  { format: 'quote', path: 'M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z' },
+]
+
 const HeartIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.5 8.2 3.4 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.6 0 5.5 3.7 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z" /></svg>
 
 export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ slug, language }) => {
@@ -142,6 +159,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
   const [previewing, setPreviewing] = useState(false)
   const commentsRef = useRef<HTMLDivElement>(null)
   const previewRef = useRef<HTMLDivElement>(null)
+  const messageRef = useRef<HTMLTextAreaElement>(null)
 
   // Storage and the network run only in the browser, after hydration, so the prerendered page matches.
   useEffect(() => {
@@ -288,6 +306,34 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     if (widgetId.current) window.turnstile?.reset(widgetId.current)
   }
 
+  function applyFormat(format: Format) {
+    const area = messageRef.current
+
+    if (!area) return
+
+    const edit = formatSelection(area.value, area.selectionStart, area.selectionEnd, format)
+
+    area.focus()
+    area.setSelectionRange(edit.from, edit.to)
+
+    // insertText keeps the browser's undo history and fires the input event; setRangeText is the fallback without it.
+    if (!document.execCommand('insertText', false, edit.text)) {
+      area.setRangeText(edit.text)
+      setDraft(area.value)
+    }
+
+    area.setSelectionRange(edit.selectionStart, edit.selectionEnd)
+  }
+
+  function formatShortcut(event: KeyboardEvent<HTMLTextAreaElement>) {
+    const tool = (event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && TOOLS.find(item => item.key === event.key.toLowerCase())
+
+    if (!tool) return
+
+    event.preventDefault()
+    applyFormat(tool.format)
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = event.currentTarget
@@ -368,17 +414,27 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           <input id="comment-name" name="name" autoComplete="name" dir="auto" maxLength={MAX_NAME} aria-required="true" />
         </div>
         <div className="contact-field">
-          <div className="post-comment-label"><label htmlFor="comment-message">{t.message}</label>
-            <span className="post-comment-tabs">
-              <button type="button" aria-pressed={!previewing} onClick={() => setPreviewing(false)}>{t.write}</button>
-              <button type="button" aria-pressed={previewing} onClick={() => setPreviewing(true)}>{t.preview}</button>
-            </span>
+          <label htmlFor="comment-message">{t.message}</label>
+          <div className="comment-editor">
+            <div className="comment-editor-bar">
+              <span className="post-comment-tabs">
+                <button type="button" aria-pressed={!previewing} onClick={() => setPreviewing(false)}>{t.write}</button>
+                <button type="button" aria-pressed={previewing} onClick={() => setPreviewing(true)}>{t.preview}</button>
+              </span>
+              {!previewing && <span className="comment-toolbar" role="group" aria-label={t.formatting}>
+                {TOOLS.map(tool => <button key={tool.format} type="button" className="comment-tool" aria-label={t.tools[tool.format]} title={tool.key ? `${t.tools[tool.format]} (Ctrl/⌘ ${tool.key.toUpperCase()})` : t.tools[tool.format]} aria-keyshortcuts={tool.key ? `Control+${tool.key.toUpperCase()} Meta+${tool.key.toUpperCase()}` : undefined} onClick={() => applyFormat(tool.format)}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>
+                </button>)}
+              </span>}
+            </div>
+            {/* Hidden, not removed, while previewing, so the form still sends it. */}
+            <textarea ref={messageRef} id="comment-message" name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby="comment-hint comment-count" hidden={previewing} onChange={event => setDraft(event.currentTarget.value)} onKeyDown={formatShortcut} />
+            {previewing && <div ref={previewRef} className="post-comment-preview post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: draft.trim() ? commentToHtml(draft) : `<p>${t.previewEmpty}</p>` }} />}
+            <div className="comment-editor-foot">
+              <span className="post-comment-hint" id="comment-hint">{t.markdown}</span>
+              <span className="post-comment-count" id="comment-count">{draft.length} / {MAX_MESSAGE}</span>
+            </div>
           </div>
-          {/* Hidden, not removed, while previewing, so the form still sends it. */}
-          <textarea id="comment-message" name="message" rows={5} dir="auto" maxLength={MAX_MESSAGE} aria-required="true" aria-describedby="comment-hint comment-count" hidden={previewing} onChange={event => setDraft(event.currentTarget.value)} />
-          {previewing && <div ref={previewRef} className="post-comment-preview post-comment-body article-content" dir="auto" dangerouslySetInnerHTML={{ __html: draft.trim() ? commentToHtml(draft) : `<p>${t.previewEmpty}</p>` }} />}
-          <span className="post-comment-hint" id="comment-hint">{t.markdown}</span>
-          <span className="post-comment-count" id="comment-count">{draft.length} / {MAX_MESSAGE}</span>
         </div>
         {/* Hidden from people; bots that fill it get a fake success from the Worker. */}
         <div className="contact-form-trap" aria-hidden="true">

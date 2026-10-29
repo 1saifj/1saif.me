@@ -148,11 +148,20 @@ html.dark .post-like-button[aria-pressed='true'] { border-color: color-mix(in sr
 .post-comment-body blockquote { margin: 0 0 .75em; }
 .post-comment-body blockquote p { margin: 0; }
 .post-comment-body .code-block-container { margin: .5em 0 .9em; }
-.post-comment-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+/* The comment editor: one framed box like GitHub's, with the tabs and toolbar on top and the hint below. */
+.comment-editor { border: 1px solid var(--nb-line); border-radius: 8px; background: var(--nb-bg); overflow: hidden; transition: border-color .15s ease, box-shadow .15s ease; }
+.comment-editor:focus-within { border-color: var(--nb-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--nb-accent) 18%, transparent); }
+.comment-editor-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; padding: 6px; border-bottom: 1px solid var(--nb-line); background: var(--nb-subtle); }
+.comment-toolbar { display: flex; flex-wrap: wrap; gap: 2px; }
+.comment-tool { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 6px; color: var(--nb-ink-3); background: none; cursor: pointer; }
+.comment-tool:hover, .comment-tool:focus-visible { color: var(--nb-ink); background: color-mix(in srgb, var(--nb-ink-3) 14%, transparent); }
+.comment-tool svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.post-comment-form .comment-editor textarea, .post-comment-form .comment-editor textarea:is(:hover, :focus) { vertical-align: top; border: 0; border-radius: 0; box-shadow: none; background: none; }
+.comment-editor-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 6px 10px; border-top: 1px dashed var(--nb-line); }
 .post-comment-tabs { display: inline-flex; padding: 2px; border: 1px solid var(--nb-line); border-radius: 8px; }
 .post-comment-tabs button { padding: 3px 10px; border: 0; border-radius: 6px; color: var(--nb-ink-3); background: none; font: inherit; font-size: 12px; cursor: pointer; }
 .post-comment-tabs button[aria-pressed="true"] { color: var(--nb-ink); background: var(--nb-subtle); }
-.post-comment-preview { min-height: 128px; margin: 0; padding: 10px 12px; border: 1px dashed var(--nb-line); border-radius: 8px; font-weight: 400; }
+.post-comment-preview { min-height: 128px; padding: 10px 12px; font-weight: 400; }
 .post-comment-hint { color: var(--nb-ink-3); font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
 .post-comments-note { color: var(--nb-ink-3); font-size: 15px; }
 .post-comment-count { justify-self: end; color: var(--nb-ink-3); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
