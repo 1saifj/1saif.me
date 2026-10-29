@@ -347,12 +347,14 @@ async function comment(request: Request, slug: string, env: Env, ctx: Context, i
   // Not tracked: a flood from one account must not spend the analytics budget.
   if (!(await env.PER_CLIENT_COMMENTS.limit({ key: `user:${session.id}` })).success) return fail(429, 'rate')
 
+  // Not tracked either, and checked before anything that is: every analytics point then passed this global cap,
+  // so many accounts together cannot spend more than the README's bound.
+  if (!(await env.ALL_CLIENTS_COMMENTS.limit({ key: 'all' })).success) return fail(429, 'rate')
+
   // Browsers send textarea line breaks as CRLF; one form keeps the stored length honest.
   const message = (form.get('message') ?? '').trim().replace(/\r\n?/g, '\n')
 
   if (message.length === 0 || message.length > MAX_MESSAGE || CONTROL_CHARACTERS.test(message)) return reject(400, 'invalid', 'invalid')
-
-  if (!(await env.ALL_CLIENTS_COMMENTS.limit({ key: 'all' })).success) return reject(429, 'rate', 'rate')
 
   const now = Date.now()
 
@@ -394,7 +396,7 @@ async function comment(request: Request, slug: string, env: Env, ctx: Context, i
     // An edit is mailed too, so a comment cannot change after Saif has read it.
     subject: `${id ? 'Edited' : 'New'} comment on ${slug}`,
     // The commands come first, so text in the comment cannot pass for one of them.
-    text: `To hide this comment:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE comments SET hidden = 1 WHERE id = ${row.id}"\n\nTo hide every comment of @${author.login} and refuse new ones:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE users SET blocked = 1 WHERE github_id = ${author.id}"\n\n--\n${author.name ?? author.login} (https://github.com/${author.login}) ${id ? 'edited their comment' : 'wrote'} on ${SITE_ORIGIN}/blog/${slug}:\n\n${message}`,
+    text: `To hide this comment:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE comments SET hidden = 1 WHERE id = ${row.id}"\n\nTo hide every comment of @${author.login}, remove their likes, and refuse new ones:\nnpx wrangler d1 execute 1saif-reactions --remote --command "UPDATE users SET blocked = 1 WHERE github_id = ${author.id}; DELETE FROM likes WHERE user_id = ${author.id}"\n\n--\n${author.name ?? author.login} (https://github.com/${author.login}) ${id ? 'edited their comment' : 'wrote'} on ${SITE_ORIGIN}/blog/${slug}:\n\n${message}`,
   }).catch(error => {
     // Log the code only: the subject and text hold visitor data.
     console.error('send failed', error instanceof Error && 'code' in error ? error.code : 'no code')

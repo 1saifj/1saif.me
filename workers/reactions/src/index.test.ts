@@ -663,7 +663,7 @@ describe('reactions worker: comments', () => {
     expect(sent).toHaveLength(1)
     expect(sent[0].text).toContain('The Octocat (https://github.com/octocat) wrote on')
     expect(sent[0].text).toContain('--command "UPDATE comments SET hidden = 1 WHERE id = 1"')
-    expect(sent[0].text).toContain('--command "UPDATE users SET blocked = 1 WHERE github_id = 42"')
+    expect(sent[0].text).toContain('--command "UPDATE users SET blocked = 1 WHERE github_id = 42; DELETE FROM likes WHERE user_id = 42"')
     // The comment goes last, so text in it cannot pass for one of the commands.
     expect(sent[0].text.endsWith('Nice post.\nThanks')).toBe(true)
     expect(points.map(point => point.blobs)).toEqual([['comment', '', 'ar']])
@@ -778,7 +778,10 @@ describe('reactions worker: comments', () => {
 
     expect((await worker.fetch(commentRequest(header), env, ctx)).status).toBe(429)
     expect(db.comments).toHaveLength(0)
-    expect(points.at(-1)?.blobs.at(-1)).toBe('rate')
+    // Refused before any tracked check, so many accounts together cannot pass the analytics bound.
+    expect(points).toHaveLength(0)
+    expect((await worker.fetch(commentRequest(header, { message: ' ' }), env, ctx)).status).toBe(429)
+    expect(points).toHaveLength(0)
   })
 
   it('refuses a comment over PER_CLIENT_COMMENTS without spending an analytics point', async () => {
