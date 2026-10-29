@@ -285,6 +285,20 @@ describe('PostReactions', () => {
     expect(sessionStorage.getItem('comment-draft:a-post')).toBe('Written before the session ended')
   })
 
+  it('clears the drafts and likes kept for every post on sign-out, so the next account in the tab gets none', async () => {
+    signIn()
+    const fetch = await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(loaded), async () => new Response(null, { status: 204 })])
+
+    await type(container.querySelector('textarea')!, 'Half written')
+    sessionStorage.setItem('comment-draft:other-post', 'Private thoughts')
+    sessionStorage.setItem('like-intent:other-post', '1')
+    sessionStorage.setItem('theme', 'dark')
+    await act(async () => container.querySelector<HTMLButtonElement>('.post-comment-viewer button')!.click())
+
+    expect(fetch.mock.calls[2][0]).toBe('/api/auth/logout')
+    expect(Object.keys(sessionStorage)).toEqual(['theme'])
+  })
+
   it('drops a like kept for a sign-in that did not finish', async () => {
     sessionStorage.setItem('like-intent:a-post', '1')
     await render([async () => Response.json(loaded)])

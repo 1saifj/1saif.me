@@ -160,6 +160,17 @@ function takeItem(key: string): string | null {
   }
 }
 
+// Storage is per tab, not per post, so sign-out clears the drafts and likes kept for every post.
+function forgetKeptItems() {
+  try {
+    for (const key of Object.keys(sessionStorage)) {
+      if (key.startsWith(`${DRAFT_KEY}:`) || key.startsWith(`${LIKE_INTENT_KEY}:`)) sessionStorage.removeItem(key)
+    }
+  } catch {
+    // Without storage nothing was kept.
+  }
+}
+
 function keepItem(key: string, value: string) {
   try {
     sessionStorage.setItem(key, value)
@@ -499,7 +510,8 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
     // The cookies go even when the request fails, so the page never shows a sign-in that no longer works.
     await fetch('/api/auth/logout', { method: 'POST' }).catch(() => undefined)
     // The next account in this tab must not get this reader's text. An ended session keeps it (endSession).
-    takeItem(draftKey)
+    forgetKeptItems()
+    setDraft('')
     forgetViewer()
     setViewer(null)
     setLiked(false)
