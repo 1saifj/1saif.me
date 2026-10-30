@@ -9,6 +9,7 @@ describe('matchRoute', () => {
     expect(matchRoute('/project/x')).toBe('/project/:slug')
     expect(matchRoute('/resume')).toBe('/resume')
     expect(matchRoute('/privacy')).toBe('/privacy')
+    expect(matchRoute('/insights')).toBe('/insights')
   })
 
   it('rejects a shared prefix, a nested slug and another same-origin file', () => {
