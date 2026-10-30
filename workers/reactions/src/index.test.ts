@@ -214,6 +214,15 @@ function makeDb() {
     // COUNT(DISTINCT day || visitor): one visitor on one day.
     const visits = (rows: StoredView[]) => new Set(rows.map(row => row.day + row.visitor)).size
 
+    // The visits among rows that read two pages or stayed ten seconds, counting every page of the visit in range.
+    const engagedOf = (rows: StoredView[]) => new Set(rows.flatMap(row => {
+      const visit = inRange.filter(other => other.day + other.visitor === row.day + row.visitor)
+
+      return visit.length > 1 || sum(visit, other => other.seconds) >= 10 ? [row.day + row.visitor] : []
+    })).size
+
+    if (sql.startsWith('SELECT MIN(day)')) return { results: [{ day: views.map(row => row.day).sort()[0] ?? null }], changes: 0 }
+
     if (sql.startsWith('SELECT day, SUM(views)')) {
       return {
         results: counted(inRange, row => row.day).sort().map(([day, rows]) => {
@@ -249,7 +258,7 @@ function makeDb() {
     if (sql.startsWith('SELECT channel, source, medium, campaign')) {
       return {
         results: counted(inRange.filter(row => row.entry === 1), row => [row.channel, row.source, row.medium, row.campaign].join(' '))
-          .map(([, rows]) => ({ channel: rows[0].channel, source: rows[0].source, medium: rows[0].medium, campaign: rows[0].campaign, visitors: visits(rows) })),
+          .map(([, rows]) => ({ channel: rows[0].channel, source: rows[0].source, medium: rows[0].medium, campaign: rows[0].campaign, visitors: visits(rows), engaged: engagedOf(rows) })),
         changes: 0,
       }
     }
@@ -257,7 +266,7 @@ function makeDb() {
     if (sql.startsWith('SELECT device, browser, os, country')) {
       return {
         results: counted(inRange, row => [row.device, row.browser, row.os, row.country].join(' '))
-          .map(([, rows]) => ({ device: rows[0].device, browser: rows[0].browser, os: rows[0].os, country: rows[0].country, visitors: visits(rows) })),
+          .map(([, rows]) => ({ device: rows[0].device, browser: rows[0].browser, os: rows[0].os, country: rows[0].country, visitors: visits(rows), engaged: engagedOf(rows) })),
         changes: 0,
       }
     }
@@ -1372,6 +1381,7 @@ describe('reactions worker: insights', () => {
     expect(response.headers.get('Cache-Control')).toBe('no-store')
     expect(body.from).toBe('2026-02-26')
     expect(body.before).toBe('2026-02-19')
+    expect(body.first).toBe('2026-03-04')
     expect(body.read).toBeGreaterThan(0)
     // Visitor 1 stayed 60 seconds and visitor 2 read two pages; visitor 3 left after 3 seconds.
     expect(body.daily).toEqual([{ day: '2026-03-04', views: 5, visitors: 3, seconds: 73, engaged: 2 }])
@@ -1379,12 +1389,13 @@ describe('reactions worker: insights', () => {
       { page: `/blog/${slug}`, day: '2026-03-04', views: 3, visitors: 2, entries: 2, seconds: 65, scroll: 100, scrolled: 1, arabic: 0 },
       { page: '/', day: '2026-03-04', views: 2, visitors: 2, entries: 2, seconds: 8, scroll: null, scrolled: 0, arabic: 0 },
     ])
+    // Visitor 2 started on a post with no referrer and came back from Google, so both starts are engaged visits.
     expect(body.acquisition).toEqual([
-      { channel: 'social', source: 'news.ycombinator.com', medium: '', campaign: '', visitors: 1 },
-      { channel: 'direct', source: '', medium: '', campaign: '', visitors: 2 },
-      { channel: 'search', source: 'google.com', medium: '', campaign: '', visitors: 1 },
+      { channel: 'social', source: 'news.ycombinator.com', medium: '', campaign: '', visitors: 1, engaged: 1 },
+      { channel: 'direct', source: '', medium: '', campaign: '', visitors: 2, engaged: 1 },
+      { channel: 'search', source: 'google.com', medium: '', campaign: '', visitors: 1, engaged: 1 },
     ])
-    expect(body.audience).toEqual([{ device: 'desktop', browser: 'Chrome', os: 'macOS', country: '', visitors: 3 }])
+    expect(body.audience).toEqual([{ device: 'desktop', browser: 'Chrome', os: 'macOS', country: '', visitors: 3, engaged: 2 }])
     expect(body.hours).toEqual([{ weekday: 3, hour: 12, visitors: 3 }])
     expect(body.speed).toEqual([{ device: 'desktop', lcp: 2, lcpGood: 1, lcpPoor: 1, inp: 0, inpGood: null, inpPoor: null, cls: 0, clsGood: null, clsPoor: null, ttfb: 2, ttfbGood: 1, ttfbPoor: 0 }])
     expect(body.likesDaily).toEqual([{ day: '2026-03-04', count: 1 }])

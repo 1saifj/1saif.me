@@ -19,11 +19,13 @@ interface DayCount {
 interface Insights {
   from: string
   before: string
+  // The first day with recorded views, or null before the first one.
+  first: string | null
   read: number
   daily: { day: string; views: number; visitors: number; seconds: number; engaged: number }[]
   pages: { page: string; day: string; views: number; visitors: number; entries: number; seconds: number; scroll: number | null; scrolled: number; arabic: number }[]
-  acquisition: { channel: string; source: string; medium: string; campaign: string; visitors: number }[]
-  audience: { device: string; browser: string; os: string; country: string; visitors: number }[]
+  acquisition: { channel: string; source: string; medium: string; campaign: string; visitors: number; engaged: number }[]
+  audience: { device: string; browser: string; os: string; country: string; visitors: number; engaged: number }[]
   hours: { weekday: number; hour: number; visitors: number }[]
   speed: SpeedRow[]
   likes: { slug: string; count: number }[]
@@ -63,6 +65,7 @@ interface Count {
   name: string
   label: string
   visitors: number
+  engaged: number
 }
 
 type Status = 'loading' | 'private' | 'failed' | 'ready'
@@ -91,6 +94,7 @@ const copy = {
     range: 'Time range',
     days: (days: number) => `${days} days`,
     period: (from: string, to: string, before: string, end: string) => `${from} – ${to}, compared with ${before} – ${end}`,
+    since: (from: string, to: string, first: string) => `${from} – ${to}. Views are recorded from ${first}, so changes show once a full period before is recorded.`,
     exportCsv: 'Export CSV',
     loading: 'Loading the numbers…',
     private: 'This page opens only for the site owner.',
@@ -104,7 +108,8 @@ const copy = {
     change: (text: string, days: number) => `${text} against the ${days} days before`,
     traffic: 'Traffic',
     legend: ['Visitors', 'Previous period'],
-    dayReadout: (day: string, visitors: string, views: string, likes: string, comments: string, earlier: string) => `${day}: ${visitors} visitors, ${views} views, ${likes} likes, ${comments} comments. Same day last period: ${earlier}.`,
+    dayReadout: (day: string, visitors: string, views: string, likes: string, comments: string) => `${day}: ${visitors} visitors, ${views} views, ${likes} likes, ${comments} comments.`,
+    earlier: (visitors: string) => ` Same day last period: ${visitors}.`,
     rangeReadout: (visitors: string, views: string) => `${visitors} visitors and ${views} views in this range. Point at a day for its numbers.`,
     highlights: 'Highlights',
     bestDay: (day: string, visitors: string) => [`Best day: `, day, `, with ${visitors} visitors.`],
@@ -117,6 +122,7 @@ const copy = {
     speedPass: ['Every device passes ', 'Core Web Vitals', '.'],
     speedFail: (device: string, metrics: string) => [`${device} needs work on `, metrics, '.'],
     channels: 'Where visits start',
+    splitHead: ['Visits', 'Engaged'],
     sources: 'Sources',
     campaigns: 'Campaigns',
     campaignColumns: ['Source', 'Medium', 'Campaign', 'Visits'],
@@ -155,6 +161,7 @@ const copy = {
     range: 'المدة',
     days: (days: number) => `${days} يوماً`,
     period: (from: string, to: string, before: string, end: string) => `${from} – ${to}، مقارنةً بـ ${before} – ${end}`,
+    since: (from: string, to: string, first: string) => `${from} – ${to}. تُسجَّل الزيارات منذ ${first}، فتظهر التغيّرات حين تُسجَّل مدة سابقة كاملة.`,
     exportCsv: 'تصدير CSV',
     loading: 'جارٍ تحميل الأرقام…',
     private: 'هذه الصفحة لصاحب الموقع فقط.',
@@ -168,7 +175,8 @@ const copy = {
     change: (text: string, days: number) => `${text} مقارنةً بالـ ${days} يوماً السابقة`,
     traffic: 'الزيارات',
     legend: ['الزوار', 'المدة السابقة'],
-    dayReadout: (day: string, visitors: string, views: string, likes: string, comments: string, earlier: string) => `${day}: ${visitors} زائراً، ${views} زيارة، ${likes} إعجاباً، ${comments} تعليقاً. اليوم المقابل في المدة السابقة: ${earlier}.`,
+    dayReadout: (day: string, visitors: string, views: string, likes: string, comments: string) => `${day}: ${visitors} زائراً، ${views} زيارة، ${likes} إعجاباً، ${comments} تعليقاً.`,
+    earlier: (visitors: string) => ` اليوم المقابل في المدة السابقة: ${visitors}.`,
     rangeReadout: (visitors: string, views: string) => `${visitors} زائراً و${views} زيارة في هذه المدة. أشر إلى يوم لترى أرقامه.`,
     highlights: 'أبرز ما في المدة',
     bestDay: (day: string, visitors: string) => ['أفضل يوم: ', day, `، بـ ${visitors} زائراً.`],
@@ -181,6 +189,7 @@ const copy = {
     speedPass: ['كل الأجهزة تجتاز ', 'مؤشرات أداء الويب الأساسية', '.'],
     speedFail: (device: string, metrics: string) => [`يحتاج ${device} إلى تحسين في `, metrics, '.'],
     channels: 'من أين تبدأ الزيارات',
+    splitHead: ['الزيارات', 'المتفاعلة'],
     sources: 'المصادر',
     campaigns: 'الحملات',
     campaignColumns: ['المصدر', 'الوسيط', 'الحملة', 'الزيارات'],
@@ -274,13 +283,17 @@ function rowsOf(data: Insights, range: number, language: Language): Row[] {
   return [...rows.values()].filter(item => item.visitors || item.likes || item.comments).sort((a, b) => b.visitors - a.visitors || b.views - a.views)
 }
 
-// The visitors of each name, most first, without empty names.
-function countsOf<Item>(items: Item[], name: (item: Item) => string, visitors: (item: Item) => number) {
-  const counts = new Map<string, number>()
+// The visits and engaged visits of each name, most visits first, without empty names.
+function countsOf<Item extends { visitors: number; engaged: number }>(items: Item[], name: (item: Item) => string) {
+  const counts = new Map<string, { visitors: number; engaged: number }>()
 
-  for (const item of items) if (name(item)) counts.set(name(item), (counts.get(name(item)) ?? 0) + visitors(item))
+  for (const item of items) {
+    const found = counts.get(name(item)) ?? { visitors: 0, engaged: 0 }
 
-  return [...counts].sort((a, b) => b[1] - a[1])
+    if (name(item)) counts.set(name(item), { visitors: found.visitors + item.visitors, engaged: found.engaged + item.engaged })
+  }
+
+  return [...counts].sort((a, b) => b[1].visitors - a[1].visitors)
 }
 
 // Good, needs-work and poor shares of a device's loads, and the rating at Google's p75 test.
@@ -354,12 +367,15 @@ function Delta({ change, label, labels, percent }: DeltaProps) {
 interface BarListProps {
   items: Count[]
   title: string
+  head: string[]
   none: string
   number: Intl.NumberFormat
   percent: Intl.NumberFormat
 }
 
-function BarList({ items, title, none, number, percent }: BarListProps) {
+// Each row: its visits and their share, and the share of them that was engaged, which tells a source that brings
+// readers from one that brings a glance. The dark part of the bar is the engaged visits.
+function BarList({ items, title, head, none, number, percent }: BarListProps) {
   const total = Math.max(1, sum(items, item => item.visitors))
   const most = Math.max(1, ...items.map(item => item.visitors))
 
@@ -367,15 +383,21 @@ function BarList({ items, title, none, number, percent }: BarListProps) {
     <section className="insights-card" aria-label={title}>
       <h2>{title}</h2>
       {items.length === 0 ? <p className="insights-empty">{none}</p> : (
-        <ul className="insights-split">
-          {items.map(item => (
-            <li key={item.name}>
-              <span className="insights-split-label" dir="auto">{item.label}</span>
-              <span className="insights-split-value">{number.format(item.visitors)}<small>{percent.format(item.visitors / total)}</small></span>
-              <span className="insights-split-bar" style={cssVariable('--share', item.visitors / most)} aria-hidden />
-            </li>
-          ))}
-        </ul>
+        <>
+          <p className="insights-split-head" aria-hidden><span>{head[0]}</span><span>{head[1]}</span></p>
+          <ul className="insights-split">
+            {items.map(item => (
+              <li key={item.name}>
+                <span className="insights-split-label" dir="auto">{item.label}</span>
+                <span className="insights-split-value">{number.format(item.visitors)}<small>{percent.format(item.visitors / total)}</small></span>
+                <span className="insights-split-engaged" title={head[1]}>{percent.format(item.engaged / Math.max(1, item.visitors))}</span>
+                <span className="insights-split-bar" style={cssVariable('--share', item.visitors / most)} aria-hidden>
+                  <i style={cssVariable('--share', item.engaged / Math.max(1, item.visitors))} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </section>
   )
@@ -457,12 +479,14 @@ export const InsightsPage: React.FC = () => {
   const signInHref = `/api/auth/github?return=${encodeURIComponent(`${language === 'ar' ? '/ar' : ''}/insights`)}`
   const data = loaded?.data
   const days = loaded ? loaded.range : range
+  // Views are compared only when the whole period before was recorded; a partly recorded one would inflate every change.
+  const compared = Boolean(data?.first && data.first <= data.before)
 
   const head = (
     <header className="insights-head">
       <div>
         <h1>{t.title}</h1>
-        {data && <p className="insights-period">{t.period(dayName(data.from), dayName(dayAfter(data.from, days - 1)), dayName(data.before), dayName(dayAfter(data.before, days - 1)))}</p>}
+        {data && <p className="insights-period">{compared ? t.period(dayName(data.from), dayName(dayAfter(data.from, days - 1)), dayName(data.before), dayName(dayAfter(data.before, days - 1))) : t.since(dayName(data.from), dayName(dayAfter(data.from, days - 1)), dayName(data.first ?? data.from))}</p>}
       </div>
       {status !== 'private' && (
         <div className="insights-controls">
@@ -522,7 +546,8 @@ export const InsightsPage: React.FC = () => {
   const comments = [total(current, item => item.comments), total(previous, item => item.comments)]
   const perVisitor = (value: number, count: number) => count ? value / count : 0
 
-  // Each tile: its value now, the value before, how to show it, and its daily trend.
+  // Each tile: its value now, the value before, how to show it, and its daily trend. The last two, likes and comments,
+  // were recorded before views, so they always compare.
   const tiles: [number, number, (value: number) => string, number[]][] = [
     [visitors[0], visitors[1], value => number.format(value), current.map(item => item.visitors)],
     [views[0], views[1], value => number.format(value), current.map(item => item.views)],
@@ -538,19 +563,19 @@ export const InsightsPage: React.FC = () => {
   const readout = (index: number) => {
     const item = current[index]
 
-    return t.dayReadout(dayName(item.day), number.format(item.visitors), number.format(item.views), number.format(item.likes), number.format(item.comments), number.format(previous[index].visitors))
+    return t.dayReadout(dayName(item.day), number.format(item.visitors), number.format(item.views), number.format(item.likes), number.format(item.comments)) + (compared ? t.earlier(number.format(previous[index].visitors)) : '')
   }
 
   const regions = new Intl.DisplayNames([locale], { type: 'region' })
-  const label = (names: Map<string, string>) => ([name, count]: [string, number]): Count => ({ name, label: names.get(name) ?? name, visitors: count })
-  const channels = countsOf(data.acquisition, item => item.channel, item => item.visitors).map(label(t.channelNames))
-  const sources = countsOf(data.acquisition, item => item.source, item => item.visitors).slice(0, 10).map(label(new Map<string, string>()))
+  const label = (names: Map<string, string>) => ([name, count]: [string, { visitors: number; engaged: number }]): Count => ({ name, label: names.get(name) ?? name, ...count })
+  const channels = countsOf(data.acquisition, item => item.channel).map(label(t.channelNames))
+  const sources = countsOf(data.acquisition, item => item.source).slice(0, 10).map(label(new Map<string, string>()))
   const campaigns = data.acquisition.filter(item => item.campaign || item.medium).sort((a, b) => b.visitors - a.visitors).slice(0, 15)
-  const devices = countsOf(data.audience, item => item.device, item => item.visitors).map(label(t.deviceNames))
-  const browsers = countsOf(data.audience, item => item.browser, item => item.visitors).map(label(new Map([['In-app', t.inApp]])))
-  const systems = countsOf(data.audience, item => item.os, item => item.visitors).map(label(new Map<string, string>()))
+  const devices = countsOf(data.audience, item => item.device).map(label(t.deviceNames))
+  const browsers = countsOf(data.audience, item => item.browser).map(label(new Map([['In-app', t.inApp]])))
+  const systems = countsOf(data.audience, item => item.os).map(label(new Map<string, string>()))
 
-  const countries = countsOf(data.audience, item => item.country, item => item.visitors).slice(0, 10).map(([name, count]) => ({ name, label: `${flagOf(name)} ${nameOf(regions, name)}`.trim(), visitors: count }))
+  const countries = countsOf(data.audience, item => item.country).slice(0, 10).map(([name, count]) => ({ name, label: `${flagOf(name)} ${nameOf(regions, name)}`.trim(), ...count }))
 
   const hours = new Map(data.hours.map(item => [`${item.weekday} ${item.hour}`, item.visitors]))
   const busiest = data.hours.reduce<Insights['hours'][number] | undefined>((best, item) => !best || item.visitors > best.visitors ? item : best, undefined)
@@ -604,7 +629,7 @@ export const InsightsPage: React.FC = () => {
                   <th scope="row">{item.post ? <a href={`${language === 'ar' ? '/ar' : ''}${item.page}`}>{item.title}</a> : <span dir="ltr">{item.title}</span>}</th>
                   <td className="insights-optional"><Sparkline values={item.trend} /></td>
                   <td>{number.format(item.visitors)}</td>
-                  <td><Delta change={changeOf(item.visitors, item.before)} label={t.change(number.format(item.before), days)} labels={t} percent={percent} /></td>
+                  <td>{compared ? <Delta change={changeOf(item.visitors, item.before)} label={t.change(number.format(item.before), days)} labels={t} percent={percent} /> : '–'}</td>
                   <td className="insights-optional">{number.format(item.views)}</td>
                   <td className="insights-optional">{number.format(item.entries)}</td>
                   <td>{item.visitors ? duration(item.seconds / item.visitors) : '–'}</td>
@@ -637,7 +662,7 @@ export const InsightsPage: React.FC = () => {
                   <dt>{t.kpis[index]}<small>{t.kpiNotes[index]}</small></dt>
                   <dd>
                     <span className="insights-kpi-value">{format(now)}</span>
-                    <Delta change={changeOf(now, before)} label={t.change(format(before), days)} labels={t} percent={percent} />
+                    {(compared || index > 3) && <Delta change={changeOf(now, before)} label={t.change(format(before), days)} labels={t} percent={percent} />}
                   </dd>
                   <dd className="insights-kpi-trend"><Sparkline values={trend} /></dd>
                 </div>
@@ -648,7 +673,7 @@ export const InsightsPage: React.FC = () => {
               <Frame title={t.traffic} wide>
                 <div className="insights-legend" aria-hidden>
                   <span><i className="insights-key-bar" />{t.legend[0]}</span>
-                  <span><i className="insights-key-line" />{t.legend[1]}</span>
+                  {compared && <span><i className="insights-key-line" />{t.legend[1]}</span>}
                 </div>
                 <p className="insights-readout" aria-live="polite">
                   {shown && active !== undefined ? readout(active) : t.rangeReadout(number.format(visitors[0]), number.format(views[0]))}
@@ -674,9 +699,11 @@ export const InsightsPage: React.FC = () => {
                         </button>
                       ))}
                     </div>
-                    <svg className="insights-line" viewBox={`0 0 ${current.length} 100`} preserveAspectRatio="none" aria-hidden>
-                      <polyline points={previous.map((item, index) => `${index + 0.5},${100 - (item.visitors / peak) * 100}`).join(' ')} />
-                    </svg>
+                    {compared && (
+                      <svg className="insights-line" viewBox={`0 0 ${current.length} 100`} preserveAspectRatio="none" aria-hidden>
+                        <polyline points={previous.map((item, index) => `${index + 0.5},${100 - (item.visitors / peak) * 100}`).join(' ')} />
+                      </svg>
+                    )}
                   </div>
                   <div className="insights-axis">
                     {[0, Math.floor((current.length - 1) / 2), current.length - 1].map(index => <span key={index}>{dayName(current[index].day)}</span>)}
@@ -692,8 +719,8 @@ export const InsightsPage: React.FC = () => {
                 </Frame>
               )}
 
-              <BarList items={channels} title={t.channels} none={t.none} number={number} percent={percent} />
-              <BarList items={sources} title={t.sources} none={t.none} number={number} percent={percent} />
+              <BarList items={channels} title={t.channels} head={t.splitHead} none={t.none} number={number} percent={percent} />
+              <BarList items={sources} title={t.sources} head={t.splitHead} none={t.none} number={number} percent={percent} />
 
               <Frame title={t.campaigns} wide>
                 {campaigns.length === 0 ? <p className="insights-empty">{t.noCampaigns}</p> : (
@@ -715,10 +742,10 @@ export const InsightsPage: React.FC = () => {
                 )}
               </Frame>
 
-              <BarList items={devices} title={t.devices} none={t.none} number={number} percent={percent} />
-              <BarList items={browsers} title={t.browsers} none={t.none} number={number} percent={percent} />
-              <BarList items={systems} title={t.systems} none={t.none} number={number} percent={percent} />
-              <BarList items={countries} title={t.countries} none={t.none} number={number} percent={percent} />
+              <BarList items={devices} title={t.devices} head={t.splitHead} none={t.none} number={number} percent={percent} />
+              <BarList items={browsers} title={t.browsers} head={t.splitHead} none={t.none} number={number} percent={percent} />
+              <BarList items={systems} title={t.systems} head={t.splitHead} none={t.none} number={number} percent={percent} />
+              <BarList items={countries} title={t.countries} head={t.splitHead} none={t.none} number={number} percent={percent} />
 
               <Frame title={t.hours} note={t.hoursNote} wide>
                 <p className="insights-readout" aria-live="polite">
