@@ -35,6 +35,7 @@ async function render(answers: (() => Promise<Response>)[], inView = true) {
   document.body.append(container)
   root = createRoot(container)
   await act(async () => root.render(<PostReactions slug="a-post" language="en" />))
+
   if (inView) await act(async () => reveal())
 
   return fetch
@@ -362,6 +363,7 @@ describe('PostReactions', () => {
     await render([async () => Response.json({ likes: 2, liked: false }), async () => Response.json(withOwn)])
     const edit = container.querySelector<HTMLButtonElement>('.post-comment-edit')!
     const form = () => container.querySelector<HTMLFormElement>('.post-comment-editing')
+
     const unload = () => {
       const event = new Event('beforeunload', { cancelable: true })
 

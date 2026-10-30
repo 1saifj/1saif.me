@@ -461,6 +461,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           setReactions({ ...value, likes: ownLike.likes ?? value.likes })
           setLiked(ownLike.liked ?? false)
           setLoadFailed(false)
+
           // Try again leaves with the note, so focus goes to the heading of the list it brought.
           if (attempt) titleRef.current?.focus()
         }, () => { if (!cancelled) setLoadFailed(true) })
@@ -468,6 +469,7 @@ export const PostReactions: React.FC<{ slug: string; language: Language }> = ({ 
           if (cancelled) return
 
           setRetrying(false)
+
           // Only once the list is in, so the list does not push the box away after the page scrolled to it.
           if (wantsComment) setEditorKey(key => key + 1)
         })

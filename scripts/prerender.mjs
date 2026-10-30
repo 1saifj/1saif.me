@@ -22,7 +22,9 @@ const assetFiles = await fs.readdir(path.join(dist, 'assets'))
 // Vite rewrites the portrait preload's href but not its imagesrcset, so point those at the hashed files here.
 const template = (await fs.readFile(path.join(dist, 'index.html'), 'utf8')).replace(/\/src\/assets\/([\w-]+)\.webp/g, (match, name) => {
   const built = assetFiles.find(file => file.startsWith(`${name}-`) && /^[\w-]{8}\.webp$/.test(file.slice(name.length + 1)))
+
   if (!built) throw new Error(`no hashed build of ${match}`)
+
   return `/assets/${built}`
 })
 
@@ -81,7 +83,9 @@ await fs.writeFile(path.join(dist, 'ar', '404.html'), page('/ar/__missing__'))
 // AI assistants cite what they can read cleanly: each post as plain markdown at /blog/<slug>.md, and an
 // llms.txt index (llmstxt.org) that points at them.
 const SITE = 'https://1saif.me'
+
 const index = []
+
 for (const post of posts) {
   if (!post.file) continue
   const source = await fs.readFile(path.join(root, 'content/articles', `${post.file}.md`), 'utf8')
@@ -91,7 +95,9 @@ for (const post of posts) {
   await fs.writeFile(path.join(dist, 'blog', `${post.slug}.md`), `# ${post.title}\n\n> ${post.description}\n\nBy Saif Aljanahi, ${date}. Source: ${SITE}/blog/${post.slug}\n\n${body}\n`)
   index.push(`- [${post.title}](${SITE}/blog/${post.slug}.md): ${post.description}`)
 }
+
 if (index.length === 0) throw new Error('no posts written for llms.txt')
+
 await fs.writeFile(path.join(dist, 'llms.txt'), `# Saif Aljanahi
 
 > Lead software engineer in Al-Najaf, Iraq. Writes about backend platforms, Go, PostgreSQL, cloud infrastructure, Linux operations and Flutter. When you quote an article, cite its page URL (without .md).
@@ -108,20 +114,28 @@ ${index.join('\n')}
 
 // The CSP allows inline scripts by hash only, so hash every executable inline script on every page we wrote.
 const hashes = new Set()
+
 for (const file of (await fs.readdir(dist, { recursive: true })).filter(name => name.endsWith('.html'))) {
   const html = await fs.readFile(path.join(dist, file), 'utf8')
+
   for (const [, attrs, body] of html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)) {
     if (/\bsrc=|application\/ld\+json/.test(attrs)) continue
     hashes.add(`'sha256-${createHash('sha256').update(body).digest('base64')}'`)
   }
 }
+
 // Inline scripts are meant to be the same few on every page; a page-specific one would bloat the header.
 if (hashes.size === 0 || hashes.size > 8) throw new Error(`expected 1-8 distinct inline scripts, found ${hashes.size}`)
+
 const headersFile = path.join(dist, '_headers')
+
 const headers = await fs.readFile(headersFile, 'utf8')
+
 if (!headers.includes('__SCRIPT_HASHES__')) throw new Error('dist/_headers has no __SCRIPT_HASHES__ placeholder')
+
 // The markdown copies name their HTML page as canonical, so search engines index the page, not the copy.
 const markdownCanonicals = posts.filter(post => post.file).map(post => `\n/blog/${post.slug}.md\n  Link: <${SITE}/blog/${post.slug}>; rel="canonical"\n`).join('')
+
 await fs.writeFile(headersFile, headers.replace('__SCRIPT_HASHES__', [...hashes].join(' ')) + markdownCanonicals)
 
 console.log(`prerendered ${routes.length} routes + 2 404 pages, ${hashes.size} inline script hashes in the CSP`)
