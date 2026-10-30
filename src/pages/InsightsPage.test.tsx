@@ -15,18 +15,35 @@ const post = publishedBlogs[0]
 
 const slug = createSlugFromTitle(post.title)
 
-const today = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString().slice(0, 10)
-
+// A 30-day report: 5 October is in the range, 5 September in the period before it.
 const insights = {
-  from: today,
-  daily: [{ day: today, views: 5, visitors: 3 }],
-  pages: [{ page: `/blog/${slug}`, views: 4, visitors: 2 }, { page: '/', views: 1, visitors: 1 }],
-  referrers: [{ name: 'news.ycombinator.com', visitors: 2 }],
-  countries: [{ name: 'IQ', visitors: 2 }, { name: 'T1', visitors: 1 }],
-  devices: [{ name: 'mobile', visitors: 3 }],
-  languages: [{ name: 'ar', visitors: 3 }],
+  from: '2026-10-01',
+  before: '2026-09-01',
+  read: 1234,
+  daily: [
+    { day: '2026-09-05', views: 2, visitors: 2, seconds: 20, engaged: 1 },
+    { day: '2026-10-05', views: 5, visitors: 3, seconds: 150, engaged: 2 },
+  ],
+  pages: [
+    { page: `/blog/${slug}`, day: '2026-09-05', views: 1, visitors: 1, entries: 1, seconds: 10, scroll: null, scrolled: 0, arabic: 0 },
+    { page: `/blog/${slug}`, day: '2026-10-05', views: 4, visitors: 2, entries: 2, seconds: 130, scroll: 150, scrolled: 2, arabic: 1 },
+    { page: '/', day: '2026-10-05', views: 1, visitors: 1, entries: 1, seconds: 20, scroll: null, scrolled: 0, arabic: 0 },
+  ],
+  acquisition: [
+    { channel: 'ai', source: 'chatgpt.com', medium: '', campaign: '', visitors: 1 },
+    { channel: 'search', source: 'google.com', medium: '', campaign: '', visitors: 2 },
+    { channel: 'email', source: 'newsletter', medium: 'email', campaign: 'oct', visitors: 1 },
+  ],
+  audience: [
+    { device: 'mobile', browser: 'Safari', os: 'iOS', country: 'IQ', visitors: 2 },
+    { device: 'desktop', browser: 'In-app', os: 'macOS', country: 'T1', visitors: 1 },
+  ],
+  hours: [{ weekday: 2, hour: 21, visitors: 3 }],
+  speed: [{ device: 'mobile', lcp: 4, lcpGood: 2, lcpPoor: 1, inp: 2, inpGood: 2, inpPoor: 0, cls: 4, clsGood: 4, clsPoor: 0, ttfb: 4, ttfbGood: 4, ttfbPoor: 0 }],
   likes: [{ slug, count: 1 }],
   comments: [{ slug, count: 2 }],
+  likesDaily: [{ day: '2026-10-05', count: 1 }],
+  commentsDaily: [{ day: '2026-10-05', count: 2 }],
 }
 
 let root: Root
@@ -66,41 +83,128 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+const texts = (selector: string) => [...container.querySelectorAll(selector)].map(item => item.textContent)
+
+const click = (element: Element | null | undefined) => act(async () => element?.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+
+const point = (element: Element | null | undefined) => act(() => element?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })))
+
 describe('InsightsPage', () => {
-  it("shows the range's unique visitors, views, likes and comments, per post and per page", async () => {
+  it('shows each total with its change against the period before', async () => {
     const fetch = await show(Response.json(insights))
 
     expect(fetch).toHaveBeenCalledWith('/api/insights?days=30', expect.anything())
-    expect([...container.querySelectorAll('.insights-totals dd')].map(item => item.textContent)).toEqual(['3', '5', '1', '2'])
-    expect(container.querySelectorAll('.insights-bar')).toHaveLength(30)
-
-    const [posts, pages] = container.querySelectorAll('.insights-table')
-
-    expect(cells(posts.querySelector('tbody tr') ?? undefined)).toEqual([post.title, '2', '4', '1', '2'])
-    expect(cells(pages.querySelector('tbody tr') ?? undefined)).toEqual(['/', '1', '1', '0', '0'])
-    expect(container.textContent).toContain('Iraq')
-    expect(container.textContent).toContain('T1')
+    expect(texts('.insights-kpi-value')).toEqual(['3', '5', '0m 50s', '67%', '1', '2'])
+    expect(texts('.insights-kpi .insights-delta')).toEqual(['▲ 50%', '▲ 150%', '▲ 400%', '▲ 33%', 'New', 'New'])
+    expect(container.querySelector('.insights-period')?.textContent).toBe('1 Oct – 30 Oct, compared with 1 Sept – 30 Sept')
+    expect(container.querySelector('.insights-cost')?.textContent).toContain('1,234 database rows, 0.02%')
   })
 
-  it('asks for a new range and names the day under the pointer', async () => {
-    const fetch = await show(Response.json(insights))
-    const week = [...container.querySelectorAll('.insights-range button')].find(button => button.textContent === '7 days')
+  it('ranks posts and pages with their trend, change, time, reading depth and reactions', async () => {
+    await show(Response.json(insights))
+    const [posts, pages] = container.querySelectorAll('.insights-table:not(.insights-campaigns)')
 
-    fetch.mockImplementation(async () => Response.json({ ...insights }))
-    await act(async () => week?.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+    expect(cells(posts.querySelector('tbody tr') ?? undefined)).toEqual(['1', post.title, '', '2', '▲ 100%', '4', '2', '1m 05s', '75%', '1', '2'])
+    expect(cells(pages.querySelector('tbody tr') ?? undefined)).toEqual(['1', '/', '', '1', 'New', '1', '1', '0m 20s', '–', '0', '0'])
+  })
+
+  it('splits visits by channel, source, campaign, device, browser, system and country', async () => {
+    await show(Response.json(insights))
+
+    expect(texts('[aria-label="Where visits start"] .insights-split-label')).toEqual(['Search', 'AI assistants', 'Email'])
+    expect(texts('[aria-label="Where visits start"] .insights-split-value small')).toEqual(['50%', '25%', '25%'])
+    expect(cells(container.querySelector('.insights-campaigns tbody tr') ?? undefined)).toEqual(['newsletter', 'email', 'oct', '1'])
+    expect(texts('[aria-label="Browsers"] .insights-split-label')).toEqual(['Safari', 'In-app browser'])
+    expect(texts('[aria-label="Countries"] .insights-split-label')).toEqual(['🇮🇶 Iraq', 'T1'])
+    expect(container.querySelector('.insights-highlights')?.textContent).toContain(`Most read: ${post.title}, by 2 visitors.`)
+    expect(container.querySelector('.insights-highlights')?.textContent).toContain('Visits from AI assistants: 1.')
+  })
+
+  it('maps visits by weekday and hour, and names the cell under the pointer', async () => {
+    await show(Response.json(insights))
+
+    expect(container.querySelectorAll('.insights-heatmap tbody td')).toHaveLength(168)
+    expect(container.querySelector('[aria-label="When readers come"] .insights-readout')?.textContent).toBe('Busiest: Tuesday, 21:00. Point at a cell for its visits.')
+
+    point(container.querySelector('.insights-heatmap tbody tr:nth-child(3) td:nth-of-type(22)'))
+    expect(container.querySelector('[aria-label="When readers come"] .insights-readout')?.textContent).toBe('Tuesday, 21:00: 3 visits')
+  })
+
+  it("rates each device's speed at Google's p75 test", async () => {
+    await show(Response.json(insights))
+    const phone = container.querySelector('.insights-device')
+
+    expect(phone?.querySelector('.insights-verdict')?.textContent).toBe('! Needs work: LCP')
+    expect([...phone?.querySelectorAll('.insights-rating') ?? []].map(item => item.textContent)).toEqual(['! Needs work', '✓ Good', '✓ Good', '✓ Good'])
+    expect(container.querySelector('.insights-highlights')?.textContent).toContain('Phone needs work on LCP.')
+  })
+
+  it('asks for a new range once, and names the day under the pointer', async () => {
+    const fetch = await show(Response.json(insights))
+    const button = (days: string) => [...container.querySelectorAll('.insights-range button')].find(item => item.textContent === days)
+
+    fetch.mockImplementation(async () => Response.json({ ...insights, from: '2026-10-03', before: '2026-09-26' }))
+    await click(button('7 days'))
 
     expect(fetch).toHaveBeenLastCalledWith('/api/insights?days=7', expect.anything())
-    expect(week?.getAttribute('aria-pressed')).toBe('true')
+    expect(button('7 days')?.getAttribute('aria-pressed')).toBe('true')
     expect(container.querySelectorAll('.insights-bar')).toHaveLength(7)
 
-    act(() => container.querySelector('.insights-bar')?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })))
-    expect(container.querySelector('.insights-readout')?.textContent).toMatch(/: 3 visitors, 5 views$/)
+    point(container.querySelectorAll('.insights-bar')[2])
+    expect(container.querySelector('.insights-readout')?.textContent).toBe('5 Oct: 3 visitors, 5 views, 1 likes, 2 comments. Same day last period: 0.')
+
+    await click(button('30 days'))
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(container.querySelectorAll('.insights-bar')).toHaveLength(30)
+  })
+
+  it('exports the page rows as CSV', async () => {
+    let blob = new Blob()
+
+    // jsdom has no object URLs; a subclass adds them without changing the real URL.
+    vi.stubGlobal('URL', class extends URL {
+      static createObjectURL = (file: Blob) => {
+        blob = file
+
+        return 'blob:insights'
+      }
+
+      static revokeObjectURL = () => {}
+    })
+
+    const open = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+    await show(Response.json(insights))
+    await click(container.querySelector('.insights-export'))
+
+    expect(open).toHaveBeenCalled()
+
+    // jsdom's Blob has no text(), but FileReader reads it.
+    const text = await new Promise<string>(resolve => {
+      const reader = new FileReader()
+
+      reader.onload = () => resolve(String(reader.result))
+      reader.readAsText(blob)
+    })
+
+    expect(text.split('\n')).toEqual([
+      'page,title,visitors,visitors_before,views,entries,seconds_per_visitor,read_percent,likes,comments',
+      `/blog/${slug},${post.title.includes(',') ? `"${post.title}"` : post.title},2,1,4,2,65,75,1,2`,
+      '/,/,1,0,1,1,20,0,0,0',
+    ])
+  })
+
+  it('shows the Arabic page with its own words', async () => {
+    await show(Response.json(insights), 'ar')
+
+    expect(container.querySelector('h1')?.textContent).toBe('الإحصاءات')
+    expect(texts('[aria-label="من أين تبدأ الزيارات"] .insights-split-label')).toEqual(['البحث', 'مساعدات الذكاء الاصطناعي', 'البريد'])
   })
 
   it('tells anyone but the owner that the page is private, with a sign-in that comes back here', async () => {
     await show(new Response(null, { status: 404 }), 'ar')
 
-    expect(container.querySelector('.insights-totals')).toBeNull()
+    expect(container.querySelector('.insights-kpis')).toBeNull()
     expect(container.querySelector('.insights-message a')?.getAttribute('href')).toBe(`/api/auth/github?return=${encodeURIComponent('/ar/insights')}`)
   })
 
@@ -108,8 +212,8 @@ describe('InsightsPage', () => {
     const fetch = await show(new Response(null, { status: 500 }))
 
     fetch.mockImplementation(async () => Response.json(insights))
-    await act(async () => container.querySelector('.insights-retry')?.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+    await click(container.querySelector('.insights-retry'))
 
-    expect(container.querySelectorAll('.insights-totals dd')).toHaveLength(4)
+    expect(container.querySelectorAll('.insights-kpi')).toHaveLength(6)
   })
 })
