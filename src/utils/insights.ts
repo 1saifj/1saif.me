@@ -66,7 +66,7 @@ function send() {
 
   // One beacon per page view: a tab hidden twice, or hidden and then left, sends nothing more.
   page = undefined
-  // Not /api/collect: EasyPrivacy, in uBlock Origin and Brave, blocks that path.
+  // Not /api/collect: EasyPrivacy, a default list in uBlock Origin, blocks that path.
   navigator.sendBeacon('/api/read', JSON.stringify({ path, ...landing, lang: isArabicPath(path) ? 'ar' : 'en', touch: navigator.maxTouchPoints > 1, seconds, scroll, lcp, cls, inp, ttfb }))
 }
 
