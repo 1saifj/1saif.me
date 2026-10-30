@@ -10,6 +10,7 @@
   // limits it shares with the contact Worker (README, Costs).
   "routes": [
     { "pattern": "1saif.me/api/posts/*", "zone_name": "1saif.me" },
+    { "pattern": "1saif.me/api/read", "zone_name": "1saif.me" },
     { "pattern": "1saif.me/api/collect", "zone_name": "1saif.me" },
     { "pattern": "1saif.me/api/auth/*", "zone_name": "1saif.me" },
     { "pattern": "1saif.me/api/insights", "zone_name": "1saif.me" }
@@ -17,7 +18,7 @@
   // No *.workers.dev or preview URL: they would skip the zone's WAF rate limiting rule.
   "workers_dev": false,
   "preview_urls": false,
-  // 8787 is often taken; the Vite dev proxy sends /api/posts, /api/auth and /api/collect here.
+  // 8787 is often taken; the Vite dev proxy sends /api/posts, /api/auth and /api/read here.
   "dev": { "port": 8797 },
   // The "1saif.me comments" GitHub App signs commenters in (README, GitHub sign-in). Its client ID is
   // public. .dev.vars points SITE_URL at the Vite dev server for wrangler dev. OWNER_GITHUB_ID is Saif's account

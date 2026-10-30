@@ -56,7 +56,7 @@ describe('insights', () => {
     hide()
 
     expect(sentPaths()).toEqual(['/a'])
-    expect(beacon.mock.calls[0][0]).toBe('/api/collect')
+    expect(beacon.mock.calls[0][0]).toBe('/api/read')
   })
 
   it('sends the old page when the route changes, then the new one when hidden', async () => {
@@ -79,13 +79,13 @@ describe('insights', () => {
 
   it('sends where the visit came from with the first page view only, and never a parameter value', async () => {
     Object.defineProperty(document, 'referrer', { value: 'https://www.google.com/search?q=saif', configurable: true })
-    window.history.replaceState(null, '', '/a?utm_source=Newsletter&utm_medium=email&gclid=SECRET')
+    window.history.replaceState(null, '', '/a?utm_source=Newsletter&utm_medium=email&utm_content=Post_01&gclid=SECRET')
     const { pageView } = await start()
 
     pageView('/b')
     hide()
 
-    expect(sent(0)).toMatchObject({ entry: true, ref: 'https://www.google.com', source: 'Newsletter', medium: 'email', campaign: '', keys: 'utm_source,utm_medium,gclid' })
+    expect(sent(0)).toMatchObject({ entry: true, ref: 'https://www.google.com', source: 'Newsletter', medium: 'email', campaign: '', content: 'Post_01', keys: 'utm_source,utm_medium,utm_content,gclid' })
     expect(beacon.mock.calls[0][1]).not.toContain('SECRET')
     expect(sent(1)).not.toHaveProperty('entry')
     expect(sent(1)).not.toHaveProperty('ref')

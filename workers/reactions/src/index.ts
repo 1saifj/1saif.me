@@ -139,6 +139,7 @@ interface Beacon {
   source?: string
   medium?: string
   campaign?: string
+  content?: string
   // The landing URL's query parameter names, comma-separated, without their values.
   keys?: string
   seconds?: number
@@ -725,8 +726,8 @@ function tagOf(value: string | undefined) {
   return text.includes('@') ? '' : text.replace(/[^\p{L}\p{N}._+ -]/gu, '').trim().slice(0, 64)
 }
 
-// Where a visit came from, as [channel, source, medium, campaign]: the campaign tags first, then a click ID's ad
-// network, then the referrer's host.
+// Where a visit came from, as [channel, source, medium, campaign, content]: the campaign tags first, then a click ID's
+// ad network, then the referrer's host.
 function originOf(parsed: Beacon, host: string) {
   // Snapchat sends ScCid, so names are matched in lowercase.
   const click = String(parsed.keys ?? '').toLowerCase().split(',').find(key => CLICKS.has(key)) ?? ''
@@ -736,7 +737,7 @@ function originOf(parsed: Beacon, host: string) {
   const text = `${medium} ${source} ${host}`
   const channel = PAID.test(medium) ? 'paid' : familyOf(CHANNELS, text) || (source ? 'referral' : 'direct')
 
-  return [channel, source, medium, tagOf(parsed.campaign)]
+  return [channel, source, medium, tagOf(parsed.campaign), tagOf(parsed.content)]
 }
 
 // The referrer's host only, and nothing for an inside link: no path, no query, nothing that names a person.
@@ -780,8 +781,8 @@ async function countView(request: Request, ip: string, page: string, details: (s
     const visitor = base64url(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))).slice(0, 16))
     const hour = new Date(now + 3 * 60 * 60 * 1000).getUTCHours()
 
-    await env.DB.prepare(`INSERT INTO views (day, page, visitor, hour, entry, channel, source, medium, campaign, language, country, device, browser, os, seconds, scroll, lcp, inp, cls, ttfb)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    await env.DB.prepare(`INSERT INTO views (day, page, visitor, hour, entry, channel, source, medium, campaign, content, language, country, device, browser, os, seconds, scroll, lcp, inp, cls, ttfb)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT (day, page, visitor) DO UPDATE SET views = views + 1, entry = MAX(entry, excluded.entry), seconds = seconds + excluded.seconds,
         scroll = COALESCE(MAX(scroll, excluded.scroll), scroll, excluded.scroll), lcp = COALESCE(lcp, excluded.lcp), inp = COALESCE(inp, excluded.inp),
         cls = COALESCE(cls, excluded.cls), ttfb = COALESCE(ttfb, excluded.ttfb)`)
@@ -880,7 +881,7 @@ async function insights(request: Request, env: Env, url: URL): Promise<Response>
     query("SELECT page, day, SUM(views) AS views, COUNT(*) AS visitors, SUM(entry) AS entries, SUM(seconds) AS seconds, SUM(scroll) AS scroll, COUNT(scroll) AS scrolled, SUM(language = 'ar') AS arabic FROM views WHERE day >= ? GROUP BY page, day", before),
     // A visit counts where it started, so a page read after it does not count as direct. Its engagement covers every
     // page of the visit, which shows which sources bring readers and which bring a glance.
-    query(`SELECT channel, source, medium, campaign, COUNT(*) AS visitors, SUM(engaged) AS engaged FROM (SELECT DISTINCT day, visitor, channel, source, medium, campaign FROM views WHERE day >= ?1 AND entry = 1) JOIN (${visits}) USING (day, visitor) GROUP BY channel, source, medium, campaign`, from),
+    query(`SELECT channel, source, medium, campaign, content, COUNT(*) AS visitors, SUM(engaged) AS engaged FROM (SELECT DISTINCT day, visitor, channel, source, medium, campaign, content FROM views WHERE day >= ?1 AND entry = 1) JOIN (${visits}) USING (day, visitor) GROUP BY channel, source, medium, campaign, content`, from),
     // Device, browser, system and country stay the same through a visit, so one query groups them all.
     query(`SELECT device, browser, os, country, COUNT(*) AS visitors, SUM(engaged) AS engaged FROM (SELECT DISTINCT day, visitor, device, browser, os, country FROM views WHERE day >= ?1) JOIN (${visits}) USING (day, visitor) GROUP BY device, browser, os, country`, from),
     query("SELECT CAST(strftime('%w', day) AS INTEGER) AS weekday, hour, COUNT(DISTINCT day || visitor) AS visitors FROM views WHERE day >= ? GROUP BY weekday, hour", from),
@@ -924,7 +925,8 @@ export default {
 
     if (pathname === '/api/insights') return insights(request, env, url)
 
-    const isCollect = pathname === '/api/collect'
+    // EasyPrivacy blocks /api/collect, so the beacon goes to /api/read; the old path serves tabs opened before the change.
+    const isCollect = pathname === '/api/read' || pathname === '/api/collect'
     const [, slug = '', action = '', commentId = ''] = ROUTE.exec(pathname) ?? []
 
     if (!isCollect && ((commentId && action !== 'comments') || !(await isPost(slug)))) return fail(404, 'post')

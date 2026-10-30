@@ -31,9 +31,9 @@ const insights = {
     { page: '/', day: '2026-10-05', views: 1, visitors: 1, entries: 1, seconds: 20, scroll: null, scrolled: 0, arabic: 0 },
   ],
   acquisition: [
-    { channel: 'ai', source: 'chatgpt.com', medium: '', campaign: '', visitors: 1, engaged: 1 },
-    { channel: 'search', source: 'google.com', medium: '', campaign: '', visitors: 2, engaged: 1 },
-    { channel: 'email', source: 'newsletter', medium: 'email', campaign: 'oct', visitors: 1, engaged: 0 },
+    { channel: 'ai', source: 'chatgpt.com', medium: '', campaign: '', content: '', visitors: 1, engaged: 1 },
+    { channel: 'search', source: 'google.com', medium: '', campaign: '', content: '', visitors: 2, engaged: 1 },
+    { channel: 'email', source: 'newsletter', medium: 'email', campaign: 'oct', content: 'footer', visitors: 1, engaged: 0 },
   ],
   audience: [
     { device: 'mobile', browser: 'Safari', os: 'iOS', country: 'IQ', visitors: 2, engaged: 1 },
@@ -132,7 +132,7 @@ describe('InsightsPage', () => {
     expect(texts('[aria-label="Where visits start"] .insights-split-value small')).toEqual(['50%', '25%', '25%'])
     expect(texts('[aria-label="Where visits start"] .insights-split-engaged')).toEqual(['50% Engaged', '100% Engaged', '0% Engaged'])
     expect(texts('[aria-label="Devices"] .insights-split-engaged')).toEqual(['50% Engaged', '100% Engaged'])
-    expect(cells(container.querySelector('.insights-campaigns tbody tr') ?? undefined)).toEqual(['newsletter', 'email', 'oct', '1'])
+    expect(cells(container.querySelector('.insights-campaigns tbody tr') ?? undefined)).toEqual(['newsletter', 'email', 'oct', 'footer', '1'])
     expect(texts('[aria-label="Browsers"] .insights-split-label')).toEqual(['Safari', 'In-app browser'])
     expect(texts('[aria-label="Countries"] .insights-split-label')).toEqual(['🇮🇶 Iraq', 'T1'])
     expect(container.querySelector('.insights-highlights')?.textContent).toContain(`Most read: ${post.title}, by 2 visitors.`)

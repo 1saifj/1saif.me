@@ -53,6 +53,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({ title, description, url, image, type 
       <meta property="og:image:alt" content={fullTitle} />
       <meta property="og:site_name" content="Saif Aljanahi" />
       <meta property="og:locale" content={language === 'ar' ? 'ar_IQ' : 'en_US'} />
+      <meta property="og:locale:alternate" content={language === 'ar' ? 'en_US' : 'ar_IQ'} />
       {type === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
       {type === 'article' && modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
       {type === 'article' && tags.map(tag => <meta key={tag} property="article:tag" content={tag} />)}
