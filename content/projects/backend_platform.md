@@ -30,7 +30,6 @@ I lead engineering for a product that partners and their customers use every day
 ## How I work on it
 
 - CI runs only the database tests that a change touches, and lint warnings fail the build.
-- Countdowns use a deadline set by the server, so changing the phone's clock has no effect.
 - Mutation tests check that the tests fail when the code is wrong.
 - Logs are structured, and personal data stays out of URLs and logs.
 
