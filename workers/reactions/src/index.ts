@@ -222,8 +222,9 @@ const FLOW_SECONDS = 600
 
 const GITHUB_HEADERS = { Accept: 'application/vnd.github+json', 'User-Agent': '1saif.me-comments', 'X-GitHub-Api-Version': '2026-03-10' }
 
-// Speed tests run a real browser on a slowed network, so their numbers would skew the speed counts.
-const BOT = /bot|crawl|spider|headless|lighthouse|pagespeed|gtmetrix|ptst/i
+// Speed tests run a real browser on a slowed network, so their numbers would skew the speed counts. AI agents that
+// browse for a person name themselves with these tokens, or sign their requests (Signature-Agent, checked in collect).
+const BOT = /bot|crawl|spider|headless|lighthouse|pagespeed|gtmetrix|ptst|google-agent|grokagent|chatgpt-user|claude-user|perplexity-user|muse-/i
 
 const reply = <Body,>(status: number, body: Body) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } })
 
@@ -697,12 +698,18 @@ const CLICKS = new Map([
   // Facebook and X add these to links people share too, so they are not ads.
   ['fbclid', ['facebook', 'social']],
   ['twclid', ['x', 'social']],
+  // Share and email IDs: in-app browsers and mail apps often send no referrer, so these keep the visit off direct.
+  ['igsh', ['instagram', 'social']],
+  ['igshid', ['instagram', 'social']],
+  ['mibextid', ['facebook', 'social']],
+  ['mc_cid', ['mailchimp', 'email']],
 ])
 
 const PAID = /^(?:cpc|ppc|cpm|cpv|cpa|paid\S*|display|banner|retargeting)$/
 
 // Checked in order on the medium, source and referrer host together. AI before search: Gemini is on google.com.
-// ChatGPT tags its links with utm_source=chatgpt.com; Perplexity, Gemini and Claude are known by their host only.
+// ChatGPT tags its links with utm_source=chatgpt.com and Gemini with utm_source=gemini; Perplexity and Claude are known
+// by their host only.
 const CHANNELS: [string, RegExp][] = [
   ['email', /\b(?:e-?mail|newsletter)\b|\bmail\.google\.|\boutlook\./],
   ['ai', /\b(?:chatgpt|openai|perplexity|claude|gemini|copilot|deepseek|grok|mistral)\b/],
@@ -721,7 +728,8 @@ function tagOf(value: string | undefined) {
 // Where a visit came from, as [channel, source, medium, campaign]: the campaign tags first, then a click ID's ad
 // network, then the referrer's host.
 function originOf(parsed: Beacon, host: string) {
-  const click = String(parsed.keys ?? '').split(',').find(key => CLICKS.has(key)) ?? ''
+  // Snapchat sends ScCid, so names are matched in lowercase.
+  const click = String(parsed.keys ?? '').toLowerCase().split(',').find(key => CLICKS.has(key)) ?? ''
   const [network = '', clickMedium = ''] = CLICKS.get(click) ?? []
   const source = tagOf(parsed.source) || network || host.replace(/^www\./, '')
   const medium = tagOf(parsed.medium) || clickMedium
@@ -788,7 +796,9 @@ const isOwner = async (request: Request, env: Env) => String((await sessionOf(re
 
 // One beacon per page view. Every refusal after the size check answers 204, so a script learns nothing.
 async function collect(request: Request, env: Env, ctx: Context, ip: string): Promise<Response> {
-  if (BOT.test(request.headers.get('User-Agent') ?? '')) return ignored()
+  // shortcut: a stealth headless browser with a normal UA on a cloud IP is still counted; drop known cloud ASNs
+  // (request.cf.asn) if desktop visits with no time and no scroll start to grow. A VPN reader would be dropped too.
+  if (BOT.test(request.headers.get('User-Agent') ?? '') || request.headers.has('Signature-Agent')) return ignored()
 
   if (!(await env.PER_CLIENT_COLLECT.limit({ key: ip })).success) return ignored()
 
