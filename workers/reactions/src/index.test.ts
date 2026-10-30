@@ -1267,6 +1267,8 @@ describe('reactions worker: page views', () => {
     ['a Mailchimp email with no referrer', { keys: 'mc_cid,mc_eid' }, ['email', 'mailchimp', 'email', '']],
     ['a newsletter', { source: 'Newsletter', medium: 'email', campaign: 'Oct 2026' }, ['email', 'newsletter', 'email', 'oct 2026']],
     ['a paid tag on any source', { source: 'linkedin', medium: 'paid_social' }, ['paid', 'linkedin', 'paid_social', '']],
+    ['an organic_social tag on an unknown source', { source: 'company_page', medium: 'organic_social' }, ['social', 'company_page', 'organic_social', '']],
+    ['an e_mail tag', { source: 'list', medium: 'e_mail' }, ['email', 'list', 'e_mail', '']],
     ['another site', { ref: 'https://dev.example/post' }, ['referral', 'dev.example', '', '']],
     ['no referrer', {}, ['direct', '', '', '']],
     ['an email address or markup in a tag', { source: 'me@example.com', campaign: '<b>spring</b>' }, ['direct', '', '', 'bspringb']],

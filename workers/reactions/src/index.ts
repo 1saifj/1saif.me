@@ -712,7 +712,7 @@ const PAID = /^(?:cpc|ppc|cpm|cpv|cpa|paid\S*|display|banner|retargeting)$/
 // ChatGPT tags its links with utm_source=chatgpt.com and Gemini with utm_source=gemini; Perplexity and Claude are known
 // by their host only.
 const CHANNELS: [string, RegExp][] = [
-  ['email', /\b(?:e-?mail|newsletter)\b|\bmail\.google\.|\boutlook\./],
+  ['email', /\b(?:e[- ]?mail|newsletter)\b|\bmail\.google\.|\boutlook\./],
   ['ai', /\b(?:chatgpt|openai|perplexity|claude|gemini|copilot|deepseek|grok|mistral)\b/],
   ['social', /\b(?:social|facebook|fb|instagram|t\.co|x\.com|twitter|linkedin|lnkd|reddit|ycombinator|youtube|tiktok|threads|bsky|bluesky|mastodon|t\.me|telegram|whatsapp|wa\.me|discord|pinterest)\b/],
   ['search', /\b(?:organic|google|bing|duckduckgo|yahoo|yandex|baidu|ecosia|brave|startpage|qwant|naver|kagi)\b/],
@@ -734,7 +734,8 @@ function originOf(parsed: Beacon, host: string) {
   const [network = '', clickMedium = ''] = CLICKS.get(click) ?? []
   const source = tagOf(parsed.source) || network || host.replace(/^www\./, '')
   const medium = tagOf(parsed.medium) || clickMedium
-  const text = `${medium} ${source} ${host}`
+  // An underscore joins words in a tag such as organic_social, but \b treats it as part of a word.
+  const text = `${medium} ${source} ${host}`.replaceAll('_', ' ')
   const channel = PAID.test(medium) ? 'paid' : familyOf(CHANNELS, text) || (source ? 'referral' : 'direct')
 
   return [channel, source, medium, tagOf(parsed.campaign), tagOf(parsed.content)]
