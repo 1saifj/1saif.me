@@ -18,8 +18,9 @@ const blogs: BlogPost[] = [
       "macos",
       "bun"
     ],
+    "featuredImage": "/articles/claude_limits_feat.jpg",
     "file": "how_to_make_claude_code_limits_last_longer",
-    "words": 1098
+    "words": 1108
   },
   {
     "title": "The VPN Gateway That Was Running on Luck",

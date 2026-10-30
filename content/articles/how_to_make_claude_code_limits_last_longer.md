@@ -3,6 +3,7 @@ title: Your Claude Code Limits Are Paying for a 3-Word Status Line
 description: Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.
 createdAt: "2026-10-30"
 updatedAt: "2026-10-30"
+featuredImage: "/articles/claude_limits_feat.jpg"
 tags:
   - ai
   - developer-tools
@@ -11,6 +12,8 @@ tags:
   - macos
   - bun
 ---
+
+![A 3-word status line draining a Claude Code usage limit](/articles/claude_limits_feat.jpg)
 
 Claude Code can send a background agent's transcript to a model just to write a status line of 3 to 5 words. On a subscription, those requests use your limits.
 
