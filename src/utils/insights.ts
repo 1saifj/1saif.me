@@ -109,6 +109,8 @@ export function startInsights() {
     landing: { entry: ref !== location.origin, ref, source: tag('utm_source', 'ref', 'source', 'src'), medium: tag('utm_medium'), campaign: tag('utm_campaign'), keys: [...query.keys()].join(',').slice(0, 200) },
   }
 
+  // shortcut: LCP and TTFB are for the first page only. Chrome 151+ reports in-site page changes as soft navigations, but
+  // CrUX does not count them yet; measure them in their own columns if the speed card should cover in-site pages.
   observe('largest-contentful-paint', entries => {
     if (page?.landing) page.lcp = entries[entries.length - 1].startTime
   })
