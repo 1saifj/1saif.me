@@ -24,8 +24,6 @@ I worked at Al Qaseh from August 2022 to July 2025 on backend services for finan
 - Worked across Flutter, React and Next.js clients so that the services and the interfaces fit together.
 - As team lead, ran design and code reviews and mentored the backend developers.
 
-Some problems from this work became blog posts, for example how to prevent duplicate transactions with database locks.
-
 ## Stack
 
 Go, PostgreSQL, Flutter, React, Next.js.

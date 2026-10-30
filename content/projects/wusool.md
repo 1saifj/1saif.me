@@ -28,7 +28,7 @@ I'm the tech lead and founding engineer. I took Wusool from the idea and the pla
 - The team: I built and trained it. Fifteen University of Kufa students, from first year to final year, fourteen from Computer Science and one from Electronic and Communications Engineering. I taught them agile delivery, the tools we use, and software engineering fundamentals while we built the product.
 - The Flutter driver app: trip management and QR ticket scanning.
 - The Flutter passenger app: live tracking and booking, a Widgetbook design system, and a mock server so the apps could be built before the API was ready.
-- The .NET API: identity hardening, such as keyed backup-code lookup and an allow-list for JWT algorithms, with tests that guard it.
+- The .NET API: identity hardening, with tests that guard it.
 
 ## Stack
 
