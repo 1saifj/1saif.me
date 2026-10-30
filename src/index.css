@@ -422,8 +422,10 @@ html.dark .insights-page { --insights-good: #3fb950; --insights-ni: #d29922; --i
 .insights-heatmap :is(th, td) { padding: 0; }
 .insights-heatmap thead th { height: 18px; color: var(--nb-ink-3); font-size: 11px; font-weight: 400; text-align: start; }
 .insights-heatmap :is(thead td, tbody th) { width: 44px; color: var(--nb-ink-3); font-size: 12px; font-weight: 400; text-align: start; }
-.insights-heatmap td { aspect-ratio: 1; border-radius: 3px; background: color-mix(in srgb, var(--nb-accent) calc(var(--level) * 85% + 15%), var(--nb-subtle)); }
-.insights-heatmap td[data-empty] { background: var(--nb-subtle); }
+/* Table cells ignore aspect-ratio, so a block inside sets the height: square on phones, at most 26px tall. */
+.insights-heatmap td { border-radius: 3px; background: color-mix(in srgb, var(--nb-accent) calc(var(--level) * 85% + 15%), transparent); }
+.insights-heatmap td::before { content: ''; display: block; padding-top: min(100%, 26px); }
+.insights-heatmap td[data-empty] { background: color-mix(in srgb, var(--nb-ink) 6%, transparent); }
 .insights-heatmap td[data-active] { outline: 2px solid var(--nb-ink); outline-offset: 1px; }
 .insights-speed { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px 28px; }
 .plain-page .insights-device h3 { margin: 0; font-size: 15px; }
