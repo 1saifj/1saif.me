@@ -1229,14 +1229,14 @@ describe('reactions worker: page views', () => {
     ['Perplexity, by its host', { ref: 'https://www.perplexity.ai/' }, ['ai', 'perplexity.ai', '', '']],
     ['Gemini before Google search', { ref: 'https://gemini.google.com/' }, ['ai', 'gemini.google.com', '', '']],
     ['Hacker News', { ref: 'https://news.ycombinator.com/item' }, ['social', 'news.ycombinator.com', '', '']],
-    ['a Google Ads click', { click: 'gclid', campaign: 'Launch_2026' }, ['paid', 'google', 'cpc', 'launch_2026']],
-    ['a shared Facebook link', { click: 'fbclid', ref: 'https://l.facebook.com/' }, ['social', 'facebook', 'social', '']],
+    ['a Google Ads click', { keys: 'utm_campaign,gclid', campaign: 'Launch_2026' }, ['paid', 'google', 'cpc', 'launch_2026']],
+    ['a shared Facebook link', { keys: 'fbclid', ref: 'https://l.facebook.com/' }, ['social', 'facebook', 'social', '']],
     ['a newsletter', { source: 'Newsletter', medium: 'email', campaign: 'Oct 2026' }, ['email', 'newsletter', 'email', 'oct 2026']],
     ['a paid tag on any source', { source: 'linkedin', medium: 'paid_social' }, ['paid', 'linkedin', 'paid_social', '']],
     ['another site', { ref: 'https://dev.example/post' }, ['referral', 'dev.example', '', '']],
     ['no referrer', {}, ['direct', '', '', '']],
     ['an email address or markup in a tag', { source: 'me@example.com', campaign: '<b>spring</b>' }, ['direct', '', '', 'bspringb']],
-    ['an unknown click ID', { click: 'xclid' }, ['direct', '', '', '']],
+    ['an unknown click ID', { keys: 'xclid' }, ['direct', '', '', '']],
   ])('records %s as where the visit came from', async (_, origin, expected) => {
     const row = await rowOf({ path: '/', ...origin })
 

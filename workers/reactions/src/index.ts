@@ -139,7 +139,8 @@ interface Beacon {
   source?: string
   medium?: string
   campaign?: string
-  click?: string
+  // The landing URL's query parameter names, comma-separated, without their values.
+  keys?: string
   seconds?: number
   scroll?: number
   lcp?: number
@@ -720,7 +721,8 @@ function tagOf(value: string | undefined) {
 // Where a visit came from, as [channel, source, medium, campaign]: the campaign tags first, then a click ID's ad
 // network, then the referrer's host.
 function originOf(parsed: Beacon, host: string) {
-  const [network = '', clickMedium = ''] = CLICKS.get(String(parsed.click ?? '')) ?? []
+  const click = String(parsed.keys ?? '').split(',').find(key => CLICKS.has(key)) ?? ''
+  const [network = '', clickMedium = ''] = CLICKS.get(click) ?? []
   const source = tagOf(parsed.source) || network || host.replace(/^www\./, '')
   const medium = tagOf(parsed.medium) || clickMedium
   const text = `${medium} ${source} ${host}`
