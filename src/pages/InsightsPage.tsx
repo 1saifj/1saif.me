@@ -72,7 +72,7 @@ type Status = 'loading' | 'private' | 'failed' | 'ready'
 
 type Rating = 'good' | 'ni' | 'poor'
 
-const RANGES = [7, 30, 90]
+const RANGES = [7, 30, 90, 365]
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -110,8 +110,8 @@ const copy = {
     traffic: 'Traffic',
     legend: ['Visitors', 'Previous period'],
     dayReadout: (day: string, visitors: string, views: string, likes: string, comments: string) => `${day}: ${visitors} visitors, ${views} views, ${likes} likes, ${comments} comments.`,
-    earlier: (visitors: string) => ` Same day last period: ${visitors}.`,
-    rangeReadout: (visitors: string, views: string) => `${visitors} visitors and ${views} views in this range. Point at a day for its numbers.`,
+    earlier: (visitors: string) => ` Same place in the period before: ${visitors}.`,
+    rangeReadout: (visitors: string, views: string) => `${visitors} visitors and ${views} views in this range. Point at a bar for its numbers.`,
     highlights: 'Highlights',
     bestDay: (day: string, visitors: string) => [`Best day: `, day, `, with ${visitors} visitors.`],
     topPost: (title: string, visitors: string) => [`Most read: `, title, `, by ${visitors} visitors.`],
@@ -178,8 +178,8 @@ const copy = {
     traffic: 'الزيارات',
     legend: ['الزوار', 'المدة السابقة'],
     dayReadout: (day: string, visitors: string, views: string, likes: string, comments: string) => `${day}: ${visitors} زائراً، ${views} زيارة، ${likes} إعجاباً، ${comments} تعليقاً.`,
-    earlier: (visitors: string) => ` اليوم المقابل في المدة السابقة: ${visitors}.`,
-    rangeReadout: (visitors: string, views: string) => `${visitors} زائراً و${views} زيارة في هذه المدة. أشر إلى يوم لترى أرقامه.`,
+    earlier: (visitors: string) => ` الموضع المقابل في المدة السابقة: ${visitors}.`,
+    rangeReadout: (visitors: string, views: string) => `${visitors} زائراً و${views} زيارة في هذه المدة. أشر إلى عمود لترى أرقامه.`,
     highlights: 'أبرز ما في المدة',
     bestDay: (day: string, visitors: string) => ['أفضل يوم: ', day, `، بـ ${visitors} زائراً.`],
     topPost: (title: string, visitors: string) => ['الأكثر قراءة: ', title, `، قرأه ${visitors} زائراً.`],
@@ -440,6 +440,7 @@ export const InsightsPage: React.FC = () => {
   const percent = new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 0 })
   const fine = new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 2 })
   const dayName = (day: string) => new Date(`${day}T00:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'short', timeZone: 'UTC' })
+  const datedName = (day: string) => new Date(`${day}T00:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
   // 4 January 2026 is a Sunday, weekday 0 as SQLite's strftime('%w') counts.
   const weekdayName = (weekday: number, width: 'long' | 'short' = 'long') => new Date(Date.UTC(2026, 0, 4 + weekday)).toLocaleDateString(locale, { weekday: width, timeZone: 'UTC' })
   const hourName = (hour: number) => new Date(Date.UTC(2026, 0, 4, hour)).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
@@ -481,6 +482,8 @@ export const InsightsPage: React.FC = () => {
   const signInHref = `/api/auth/github?return=${encodeURIComponent(`${language === 'ar' ? '/ar' : ''}/insights`)}`
   const data = loaded?.data
   const days = loaded ? loaded.range : range
+  // A year starts and ends on the same date, so its period names the years.
+  const periodName = days > 90 ? datedName : dayName
   // Views are compared only when the whole period before was recorded; a partly recorded one would inflate every change.
   const compared = Boolean(data?.first && data.first <= data.before)
 
@@ -488,7 +491,7 @@ export const InsightsPage: React.FC = () => {
     <header className="insights-head">
       <div>
         <h1>{t.title}</h1>
-        {data && <p className="insights-period">{compared ? t.period(dayName(data.from), dayName(dayAfter(data.from, days - 1)), dayName(data.before), dayName(dayAfter(data.before, days - 1))) : data.first ? t.since(dayName(data.from), dayName(dayAfter(data.from, days - 1)), dayName(data.first)) : t.unrecorded(dayName(data.from), dayName(dayAfter(data.from, days - 1)))}</p>}
+        {data && <p className="insights-period">{compared ? t.period(periodName(data.from), periodName(dayAfter(data.from, days - 1)), periodName(data.before), periodName(dayAfter(data.before, days - 1))) : data.first ? t.since(periodName(data.from), periodName(dayAfter(data.from, days - 1)), periodName(data.first)) : t.unrecorded(periodName(data.from), periodName(dayAfter(data.from, days - 1)))}</p>}
       </div>
       {status !== 'private' && (
         <div className="insights-controls">
@@ -559,13 +562,19 @@ export const InsightsPage: React.FC = () => {
     [comments[0], comments[1], value => number.format(value), current.map(item => item.comments)],
   ]
 
-  const peak = niceCeil(Math.max(1, ...current.map(item => item.visitors), ...previous.map(item => item.visitors)))
-  const shown = active === undefined ? undefined : current[active]
+  // A bar a day, or a bar a week for a year, which has too many days to fit a bar each.
+  const size = days > 90 ? 7 : 1
+  const barsOf = (items: Day[]) => Array.from({ length: Math.ceil(items.length / size) }, (_, index) => items.slice(index * size, (index + 1) * size))
+  const bars = barsOf(current)
+  const barsBefore = barsOf(previous)
+  const visitorsOf = (bar: Day[]) => sum(bar, item => item.visitors)
+  const peak = niceCeil(Math.max(1, ...bars.map(visitorsOf), ...barsBefore.map(visitorsOf)))
 
   const readout = (index: number) => {
-    const item = current[index]
+    const bar = bars[index]
+    const name = bar.length > 1 ? `${dayName(bar[0].day)} – ${dayName(bar[bar.length - 1].day)}` : dayName(bar[0].day)
 
-    return t.dayReadout(dayName(item.day), number.format(item.visitors), number.format(item.views), number.format(item.likes), number.format(item.comments)) + (compared ? t.earlier(number.format(previous[index].visitors)) : '')
+    return t.dayReadout(name, number.format(visitorsOf(bar)), number.format(sum(bar, item => item.views)), number.format(sum(bar, item => item.likes)), number.format(sum(bar, item => item.comments))) + (compared ? t.earlier(number.format(visitorsOf(barsBefore[index]))) : '')
   }
 
   const regions = new Intl.DisplayNames([locale], { type: 'region' })
@@ -678,17 +687,17 @@ export const InsightsPage: React.FC = () => {
                   {compared && <span><i className="insights-key-line" />{t.legend[1]}</span>}
                 </div>
                 <p className="insights-readout" aria-live="polite">
-                  {shown && active !== undefined ? readout(active) : t.rangeReadout(number.format(visitors[0]), number.format(views[0]))}
+                  {active !== undefined && bars[active] ? readout(active) : t.rangeReadout(number.format(visitors[0]), number.format(views[0]))}
                 </p>
                 <div className="insights-traffic" dir="ltr" onMouseLeave={() => setActive(undefined)}>
                   <div className="insights-gridlines" aria-hidden>
                     {[1, 0.5, 0].map(level => <span key={level} style={cssVariable('--level', level)}>{decimal.format(peak * level)}</span>)}
                   </div>
                   <div className="insights-plot">
-                    <div className="insights-bars" style={cssVariable('--days', current.length)}>
-                      {current.map((item, index) => (
+                    <div className="insights-bars" style={cssVariable('--days', bars.length)}>
+                      {bars.map((bar, index) => (
                         <button
-                          key={item.day}
+                          key={bar[0].day}
                           type="button"
                           className="insights-bar"
                           data-active={index === active || undefined}
@@ -697,18 +706,18 @@ export const InsightsPage: React.FC = () => {
                           onFocus={() => setActive(index)}
                           onBlur={() => setActive(undefined)}
                         >
-                          <span style={{ height: `${(item.visitors / peak) * 100}%` }} />
+                          <span style={{ height: `${(visitorsOf(bar) / peak) * 100}%` }} />
                         </button>
                       ))}
                     </div>
                     {compared && (
-                      <svg className="insights-line" viewBox={`0 0 ${current.length} 100`} preserveAspectRatio="none" aria-hidden>
-                        <polyline points={previous.map((item, index) => `${index + 0.5},${100 - (item.visitors / peak) * 100}`).join(' ')} />
+                      <svg className="insights-line" viewBox={`0 0 ${bars.length} 100`} preserveAspectRatio="none" aria-hidden>
+                        <polyline points={barsBefore.map((bar, index) => `${index + 0.5},${100 - (visitorsOf(bar) / peak) * 100}`).join(' ')} />
                       </svg>
                     )}
                   </div>
                   <div className="insights-axis">
-                    {[0, Math.floor((current.length - 1) / 2), current.length - 1].map(index => <span key={index}>{dayName(current[index].day)}</span>)}
+                    {[0, Math.floor((bars.length - 1) / 2), bars.length - 1].map(index => <span key={index}>{dayName(bars[index][0].day)}</span>)}
                   </div>
                 </div>
               </Frame>

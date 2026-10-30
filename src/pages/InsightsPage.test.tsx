@@ -170,11 +170,27 @@ describe('InsightsPage', () => {
     expect(container.querySelectorAll('.insights-bar')).toHaveLength(7)
 
     point(container.querySelectorAll('.insights-bar')[2])
-    expect(container.querySelector('.insights-readout')?.textContent).toBe('5 Oct: 3 visitors, 5 views, 1 likes, 2 comments. Same day last period: 0.')
+    expect(container.querySelector('.insights-readout')?.textContent).toBe('5 Oct: 3 visitors, 5 views, 1 likes, 2 comments. Same place in the period before: 0.')
 
     await click(button('30 days'))
     expect(fetch).toHaveBeenCalledTimes(2)
     expect(container.querySelectorAll('.insights-bar')).toHaveLength(30)
+  })
+
+  it('shows a year as a bar a week, and names the week under the pointer', async () => {
+    const fetch = await show(Response.json(insights))
+    const year = [...container.querySelectorAll('.insights-range button')].find(item => item.textContent === '365 days')
+
+    fetch.mockImplementation(async () => Response.json({ ...insights, from: '2025-10-31', before: '2024-11-01' }))
+    await click(year)
+
+    expect(fetch).toHaveBeenLastCalledWith('/api/insights?days=365', expect.anything())
+    expect(container.querySelectorAll('.insights-bar')).toHaveLength(53)
+    expect(container.querySelector('.insights-period')?.textContent).toMatch(/^31 Oct 2025 – 30 Oct 2026\. Views are recorded from 1 Aug 2026/)
+
+    // 5 October is day 340 of the range, in the week from 2 October.
+    point(container.querySelectorAll('.insights-bar')[48])
+    expect(container.querySelector('.insights-readout')?.textContent).toBe('2 Oct – 8 Oct: 3 visitors, 5 views, 1 likes, 2 comments.')
   })
 
   it('exports the page rows as CSV', async () => {

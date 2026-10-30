@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
+# The API answers scripts, not readers. /api/posts/ stays open: post pages load their comments from it.
+Disallow: /api/auth/
+Disallow: /api/insights
+Disallow: /api/read
+Disallow: /api/collect
 
 # AI search and user-requested fetches are welcome, so assistants can find and cite these pages.
 # Only the training crawlers below are refused.
@@ -10,6 +15,10 @@ User-agent: Claude-User
 User-agent: PerplexityBot
 User-agent: Perplexity-User
 Allow: /
+Disallow: /api/auth/
+Disallow: /api/insights
+Disallow: /api/read
+Disallow: /api/collect
 
 # AI training crawlers are refused. This list was moved here from Cloudflare's
 # managed robots.txt, whose Content-Signal line Lighthouse reports as invalid.
