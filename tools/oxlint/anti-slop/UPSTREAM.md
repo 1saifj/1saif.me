@@ -1,6 +1,6 @@
 # Anti-slop provenance
 
-- Source: bundled install-anti-slop skill asset copied from /Users/sj/.agents/skills/install-anti-slop/assets/anti-slop.
+- Source: bundled install-anti-slop skill asset, copied from its `assets/anti-slop` folder.
 - Source commit: unknown; the skill bundle does not expose a repository revision for the generic anti-slop rules.
 - Installed tree digest: 74a4d5d2854d6a55bfcc3e874b56ac04333e0c10c94cf43e7ecc71a08d607392 (SHA-256 over sorted file hashes, excluding this provenance file).
 - Oxlint compatibility: oxlint@1.82.0 with @oxlint/plugins@1.82.0.

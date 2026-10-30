@@ -18,8 +18,6 @@
       "runtimeArgs": [
         "vite",
         "preview",
-        "--outDir",
-        "/private/tmp/claude-501/-Users-sj-development-frontend-1saif-me/0c39045b-258f-40de-8949-1223cf69766c/scratchpad/dist-check",
         "--port",
         "4173",
         "--strictPort"
