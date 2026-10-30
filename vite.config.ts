@@ -65,7 +65,7 @@ export default defineConfig(({ isSsrBuild }) => ({
     proxy: {
       '/api/posts': 'http://localhost:8797',
       '/api/auth': 'http://localhost:8797',
-      '/api/collect': 'http://localhost:8797',
+      '/api/read': 'http://localhost:8797',
       '/api/insights': 'http://localhost:8797',
     },
   },

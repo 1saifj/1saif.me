@@ -41,6 +41,7 @@ interface StoredView {
   source: string
   medium: string
   campaign: string
+  content: string
   language: string
   country: string
   device: string
@@ -191,16 +192,16 @@ function makeDb() {
 
     // INSERT INTO views (...) ON CONFLICT DO UPDATE SET views + 1, entry MAX, seconds +, scroll MAX, each speed the first measured
     if (sql.startsWith('INSERT INTO views')) {
-      // The bind order: day, page, visitor, hour, entry, channel, source, medium, campaign, language, country,
+      // The bind order: day, page, visitor, hour, entry, channel, source, medium, campaign, content, language, country,
       // device, browser, os, seconds, scroll, lcp, inp, cls, ttfb.
       const [day, page, visitor] = values.slice(0, 3).map(String)
       const [hour, entry] = values.slice(3, 5).map(Number)
-      const [channel, source, medium, campaign, language, country, device, browser, os] = values.slice(5, 14).map(String)
-      const seconds = Number(values[14])
-      const [scroll, lcp, inp, cls, ttfb] = values.slice(15).map(value => value === null ? null : Number(value))
+      const [channel, source, medium, campaign, content, language, country, device, browser, os] = values.slice(5, 15).map(String)
+      const seconds = Number(values[15])
+      const [scroll, lcp, inp, cls, ttfb] = values.slice(16).map(value => value === null ? null : Number(value))
       const row = views.find(item => item.day === day && item.page === page && item.visitor === visitor)
 
-      if (!row) views.push({ day, page, visitor, hour, entry, channel, source, medium, campaign, language, country, device, browser, os, views: 1, seconds, scroll, lcp, inp, cls, ttfb })
+      if (!row) views.push({ day, page, visitor, hour, entry, channel, source, medium, campaign, content, language, country, device, browser, os, views: 1, seconds, scroll, lcp, inp, cls, ttfb })
       else {
         Object.assign(row, { views: row.views + 1, entry: Math.max(row.entry, entry), seconds: row.seconds + seconds, scroll: row.scroll === null || scroll === null ? row.scroll ?? scroll : Math.max(row.scroll, scroll) })
         Object.assign(row, { lcp: row.lcp ?? lcp, inp: row.inp ?? inp, cls: row.cls ?? cls, ttfb: row.ttfb ?? ttfb })
@@ -257,8 +258,8 @@ function makeDb() {
 
     if (sql.startsWith('SELECT channel, source, medium, campaign')) {
       return {
-        results: counted(inRange.filter(row => row.entry === 1), row => [row.channel, row.source, row.medium, row.campaign].join(' '))
-          .map(([, rows]) => ({ channel: rows[0].channel, source: rows[0].source, medium: rows[0].medium, campaign: rows[0].campaign, visitors: visits(rows), engaged: engagedOf(rows) })),
+        results: counted(inRange.filter(row => row.entry === 1), row => [row.channel, row.source, row.medium, row.campaign, row.content].join(' '))
+          .map(([, rows]) => ({ channel: rows[0].channel, source: rows[0].source, medium: rows[0].medium, campaign: rows[0].campaign, content: rows[0].content, visitors: visits(rows), engaged: engagedOf(rows) })),
         changes: 0,
       }
     }
@@ -1150,7 +1151,7 @@ const MAC = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 
 describe('reactions worker: page views', () => {
   const beacon = { path: '/ar/blog/x/', ref: 'https://www.google.com/search?q=saif', lang: 'ar', entry: true, lcp: 1200, cls: 0, inp: -1, ttfb: 80 }
 
-  const collect = (body: Record<string, string | number | boolean>, headers: Record<string, string> = {}) => send('POST', '/api/collect', JSON.stringify(body), { 'Content-Type': 'text/plain;charset=UTF-8', 'User-Agent': PHONE, ...headers })
+  const collect = (body: Record<string, string | number | boolean>, headers: Record<string, string> = {}) => send('POST', '/api/read', JSON.stringify(body), { 'Content-Type': 'text/plain;charset=UTF-8', 'User-Agent': PHONE, ...headers })
 
   // The row a beacon writes, from one address.
   const rowOf = async (body: Record<string, string | number | boolean>, headers: Record<string, string> = {}) => {
@@ -1176,6 +1177,16 @@ describe('reactions worker: page views', () => {
 
     expect(Object.values(row).filter(value => value === undefined || Number.isNaN(value))).toEqual([])
     expect(row).toMatchObject({ entry: 0, channel: 'search', seconds: 0, scroll: null, lcp: 900, inp: null })
+  })
+
+  // EasyPrivacy blocks /api/collect, so the beacon moved to /api/read; a tab opened before the move still uses the old path.
+  it('counts a view sent to the old path', async () => {
+    const { env, db } = makeEnv()
+
+    await worker.fetch(send('POST', '/api/collect', JSON.stringify(beacon), { 'User-Agent': PHONE, 'CF-Connecting-IP': '192.0.2.1' }), env, ctx)
+    await Promise.all(pending)
+
+    expect(db.views).toHaveLength(1)
   })
 
   it('keeps an inside referrer empty', async () => {
@@ -1208,7 +1219,7 @@ describe('reactions worker: page views', () => {
     ['a path that is only slashes', collect({ ...beacon, path: '//' })],
     ['a path with a backslash host', collect({ ...beacon, path: '/\\' })],
     ['a path over 200 characters', collect({ ...beacon, path: `/${'x'.repeat(200)}` })],
-    ['a body that is not JSON', send('POST', '/api/collect', 'hello')],
+    ['a body that is not JSON', send('POST', '/api/read', 'hello')],
   ])('drops %s with 204', async (_, request) => {
     const { env } = makeEnv()
 
@@ -1264,6 +1275,12 @@ describe('reactions worker: page views', () => {
     const row = await rowOf({ path: '/', ...origin })
 
     expect([row.channel, row.source, row.medium, row.campaign]).toEqual(expected)
+  })
+
+  it('records which link of a campaign started the visit, without markup', async () => {
+    const row = await rowOf({ path: '/', source: 'linkedin', medium: 'organic_social', campaign: 'cloud', content: 'Post_01<i>' })
+
+    expect([row.channel, row.campaign, row.content]).toEqual(['social', 'cloud', 'post_01i'])
   })
 
   it.each([
@@ -1342,7 +1359,7 @@ describe('reactions worker: insights', () => {
   const read = (env: Env, query = '', cookie = '') => worker.fetch(new Request(`https://1saif.me/api/insights${query}`, { headers: cookie ? { Cookie: cookie } : {} }), env, ctx)
 
   const view = (path: string, ip: string, beacon: Record<string, string | number | boolean>) =>
-    send('POST', '/api/collect', JSON.stringify({ path, lang: path.startsWith('/ar') ? 'ar' : 'en', entry: true, seconds: 5, ...beacon }), { 'User-Agent': MAC, 'CF-Connecting-IP': ip })
+    send('POST', '/api/read', JSON.stringify({ path, lang: path.startsWith('/ar') ? 'ar' : 'en', entry: true, seconds: 5, ...beacon }), { 'User-Agent': MAC, 'CF-Connecting-IP': ip })
 
   it('answers 404 to anyone but the owner', async () => {
     const { env } = makeEnv()
@@ -1391,9 +1408,9 @@ describe('reactions worker: insights', () => {
     ])
     // Visitor 2 started on a post with no referrer and came back from Google, so both starts are engaged visits.
     expect(body.acquisition).toEqual([
-      { channel: 'social', source: 'news.ycombinator.com', medium: '', campaign: '', visitors: 1, engaged: 1 },
-      { channel: 'direct', source: '', medium: '', campaign: '', visitors: 2, engaged: 1 },
-      { channel: 'search', source: 'google.com', medium: '', campaign: '', visitors: 1, engaged: 1 },
+      { channel: 'social', source: 'news.ycombinator.com', medium: '', campaign: '', content: '', visitors: 1, engaged: 1 },
+      { channel: 'direct', source: '', medium: '', campaign: '', content: '', visitors: 2, engaged: 1 },
+      { channel: 'search', source: 'google.com', medium: '', campaign: '', content: '', visitors: 1, engaged: 1 },
     ])
     expect(body.audience).toEqual([{ device: 'desktop', browser: 'Chrome', os: 'macOS', country: '', visitors: 3, engaged: 2 }])
     expect(body.hours).toEqual([{ weekday: 3, hour: 12, visitors: 3 }])
