@@ -100,6 +100,7 @@ const copy = {
     loading: 'Loading the numbers…',
     private: 'This page opens only for the site owner.',
     signIn: 'Sign in with GitHub',
+    signInFailed: 'The GitHub sign-in did not finish.',
     failed: 'The numbers did not load.',
     retry: 'Try again',
     kpis: ['Visitors', 'Page views', 'Time per visitor', 'Engaged visits', 'Likes', 'Comments'],
@@ -168,6 +169,7 @@ const copy = {
     loading: 'جارٍ تحميل الأرقام…',
     private: 'هذه الصفحة لصاحب الموقع فقط.',
     signIn: 'سجّل الدخول عبر GitHub',
+    signInFailed: 'لم يكتمل تسجيل الدخول عبر GitHub.',
     failed: 'لم تُحمَّل الأرقام.',
     retry: 'أعد المحاولة',
     kpis: ['الزوار', 'زيارات الصفحات', 'الوقت لكل زائر', 'الزيارات المتفاعلة', 'الإعجابات', 'التعليقات'],
@@ -429,6 +431,7 @@ export const InsightsPage: React.FC = () => {
   const [range, setRange] = useState(30)
   const [attempt, setAttempt] = useState(0)
   const [status, setStatus] = useState<Status>('loading')
+  const [signInFailed, setSignInFailed] = useState(false)
   // The range travels with its data, so a new range shows the old numbers whole until its own arrive.
   const [loaded, setLoaded] = useState<{ range: number; data: Insights }>()
   const [active, setActive] = useState<number>()
@@ -445,6 +448,14 @@ export const InsightsPage: React.FC = () => {
   const weekdayName = (weekday: number, width: 'long' | 'short' = 'long') => new Date(Date.UTC(2026, 0, 4 + weekday)).toLocaleDateString(locale, { weekday: width, timeZone: 'UTC' })
   const hourName = (hour: number) => new Date(Date.UTC(2026, 0, 4, hour)).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
   const duration = (seconds: number) => t.minutes(number.format(Math.floor(seconds / 60)), String(Math.round(seconds % 60)).padStart(2, '0'))
+
+  useEffect(() => {
+    // The Worker sends a failed sign-in back with ?signin=failed; the address keeps only the page.
+    if (new URLSearchParams(window.location.search).get('signin') !== 'failed') return
+
+    setSignInFailed(true)
+    window.history.replaceState(window.history.state, '', window.location.pathname)
+  }, [])
 
   useEffect(() => {
     const cached = attempt === 0 ? cache.current.get(range) : undefined
@@ -532,7 +543,9 @@ export const InsightsPage: React.FC = () => {
             <article className="plain-page insights-page">
               {head}
               {status === 'loading' && <p className="insights-message" role="status">{t.loading}</p>}
-              {status === 'private' && <p className="insights-message">{t.private} <a href={signInHref}>{t.signIn}</a></p>}
+              {status === 'private' && (signInFailed
+                ? <p className="insights-message" role="alert">{t.signInFailed} <a href={signInHref}>{t.retry}</a></p>
+                : <p className="insights-message">{t.private} <a href={signInHref}>{t.signIn}</a></p>)}
               {status === 'failed' && <p className="insights-message" role="alert">{t.failed} <button type="button" className="insights-retry" onClick={() => setAttempt(value => value + 1)}>{t.retry}</button></p>}
             </article>
           </main>
