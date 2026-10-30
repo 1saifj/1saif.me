@@ -19,6 +19,7 @@ const slug = createSlugFromTitle(post.title)
 const insights = {
   from: '2026-10-01',
   before: '2026-09-01',
+  first: '2026-08-01',
   read: 1234,
   daily: [
     { day: '2026-09-05', views: 2, visitors: 2, seconds: 20, engaged: 1 },
@@ -30,13 +31,13 @@ const insights = {
     { page: '/', day: '2026-10-05', views: 1, visitors: 1, entries: 1, seconds: 20, scroll: null, scrolled: 0, arabic: 0 },
   ],
   acquisition: [
-    { channel: 'ai', source: 'chatgpt.com', medium: '', campaign: '', visitors: 1 },
-    { channel: 'search', source: 'google.com', medium: '', campaign: '', visitors: 2 },
-    { channel: 'email', source: 'newsletter', medium: 'email', campaign: 'oct', visitors: 1 },
+    { channel: 'ai', source: 'chatgpt.com', medium: '', campaign: '', visitors: 1, engaged: 1 },
+    { channel: 'search', source: 'google.com', medium: '', campaign: '', visitors: 2, engaged: 1 },
+    { channel: 'email', source: 'newsletter', medium: 'email', campaign: 'oct', visitors: 1, engaged: 0 },
   ],
   audience: [
-    { device: 'mobile', browser: 'Safari', os: 'iOS', country: 'IQ', visitors: 2 },
-    { device: 'desktop', browser: 'In-app', os: 'macOS', country: 'T1', visitors: 1 },
+    { device: 'mobile', browser: 'Safari', os: 'iOS', country: 'IQ', visitors: 2, engaged: 1 },
+    { device: 'desktop', browser: 'In-app', os: 'macOS', country: 'T1', visitors: 1, engaged: 1 },
   ],
   hours: [{ weekday: 2, hour: 21, visitors: 3 }],
   speed: [{ device: 'mobile', lcp: 4, lcpGood: 2, lcpPoor: 1, inp: 2, inpGood: 2, inpPoor: 0, cls: 4, clsGood: 4, clsPoor: 0, ttfb: 4, ttfbGood: 4, ttfbPoor: 0 }],
@@ -100,6 +101,16 @@ describe('InsightsPage', () => {
     expect(container.querySelector('.insights-cost')?.textContent).toContain('1,234 database rows, 0.02%')
   })
 
+  it('compares views only once the whole period before was recorded', async () => {
+    await show(Response.json({ ...insights, first: '2026-09-20' }))
+    const [posts] = container.querySelectorAll('.insights-table:not(.insights-campaigns)')
+
+    expect(container.querySelector('.insights-period')?.textContent).toBe('1 Oct – 30 Oct. Views are recorded from 20 Sept, so changes show once a full period before is recorded.')
+    expect(texts('.insights-kpi .insights-delta')).toEqual(['New', 'New'])
+    expect(cells(posts.querySelector('tbody tr') ?? undefined)[4]).toBe('–')
+    expect(container.querySelector('.insights-line')).toBeNull()
+  })
+
   it('ranks posts and pages with their trend, change, time, reading depth and reactions', async () => {
     await show(Response.json(insights))
     const [posts, pages] = container.querySelectorAll('.insights-table:not(.insights-campaigns)')
@@ -113,6 +124,8 @@ describe('InsightsPage', () => {
 
     expect(texts('[aria-label="Where visits start"] .insights-split-label')).toEqual(['Search', 'AI assistants', 'Email'])
     expect(texts('[aria-label="Where visits start"] .insights-split-value small')).toEqual(['50%', '25%', '25%'])
+    expect(texts('[aria-label="Where visits start"] .insights-split-engaged')).toEqual(['50%', '100%', '0%'])
+    expect(texts('[aria-label="Devices"] .insights-split-engaged')).toEqual(['50%', '100%'])
     expect(cells(container.querySelector('.insights-campaigns tbody tr') ?? undefined)).toEqual(['newsletter', 'email', 'oct', '1'])
     expect(texts('[aria-label="Browsers"] .insights-split-label')).toEqual(['Safari', 'In-app browser'])
     expect(texts('[aria-label="Countries"] .insights-split-label')).toEqual(['🇮🇶 Iraq', 'T1'])

@@ -870,15 +870,19 @@ async function insights(request: Request, env: Env, url: URL): Promise<Response>
   // of its views are good, which is the p75 test without a percentile in SQL.
   const speed = SPEED.map(([name, good, poor]) => `COUNT(${name}) AS ${name}, SUM(${name} <= ${good}) AS ${name}Good, SUM(${name} > ${poor}) AS ${name}Poor`).join(', ')
 
-  // Every views query reads the rows of its range once, so the whole report reads the range's rows about eight times.
-  const results = await env.DB.batch([
-    // A visit is one visitor on one day. It is engaged when it read two pages or stayed ten seconds.
+  // A visit is one visitor on one day. It is engaged when it read two pages or stayed ten seconds. ?1 is the first day.
+  const visits = 'SELECT day, visitor, COUNT(*) > 1 OR SUM(seconds) >= 10 AS engaged FROM views WHERE day >= ?1 GROUP BY day, visitor'
+
+  // Every views query reads the rows of its range once, and the two that join visits twice, so the whole report reads
+  // the range's rows about ten times.
+  const batch = env.DB.batch([
     query('SELECT day, SUM(views) AS views, COUNT(*) AS visitors, SUM(seconds) AS seconds, SUM(pages > 1 OR seconds >= 10) AS engaged FROM (SELECT day, SUM(views) AS views, COUNT(*) AS pages, SUM(seconds) AS seconds FROM views WHERE day >= ? GROUP BY day, visitor) GROUP BY day ORDER BY day', before),
     query("SELECT page, day, SUM(views) AS views, COUNT(*) AS visitors, SUM(entry) AS entries, SUM(seconds) AS seconds, SUM(scroll) AS scroll, COUNT(scroll) AS scrolled, SUM(language = 'ar') AS arabic FROM views WHERE day >= ? GROUP BY page, day", before),
-    // A visit counts where it started, so a page read after it does not count as direct.
-    query('SELECT channel, source, medium, campaign, COUNT(DISTINCT day || visitor) AS visitors FROM views WHERE day >= ? AND entry = 1 GROUP BY channel, source, medium, campaign', from),
+    // A visit counts where it started, so a page read after it does not count as direct. Its engagement covers every
+    // page of the visit, which shows which sources bring readers and which bring a glance.
+    query(`SELECT channel, source, medium, campaign, COUNT(*) AS visitors, SUM(engaged) AS engaged FROM (SELECT DISTINCT day, visitor, channel, source, medium, campaign FROM views WHERE day >= ?1 AND entry = 1) JOIN (${visits}) USING (day, visitor) GROUP BY channel, source, medium, campaign`, from),
     // Device, browser, system and country stay the same through a visit, so one query groups them all.
-    query('SELECT device, browser, os, country, COUNT(DISTINCT day || visitor) AS visitors FROM views WHERE day >= ? GROUP BY device, browser, os, country', from),
+    query(`SELECT device, browser, os, country, COUNT(*) AS visitors, SUM(engaged) AS engaged FROM (SELECT DISTINCT day, visitor, device, browser, os, country FROM views WHERE day >= ?1) JOIN (${visits}) USING (day, visitor) GROUP BY device, browser, os, country`, from),
     query("SELECT CAST(strftime('%w', day) AS INTEGER) AS weekday, hour, COUNT(DISTINCT day || visitor) AS visitors FROM views WHERE day >= ? GROUP BY weekday, hour", from),
     query(`SELECT device, ${speed} FROM views WHERE day >= ? AND device != '' GROUP BY device`, from),
     query('SELECT slug, COUNT(*) AS count FROM likes WHERE created_at >= ? GROUP BY slug', since),
@@ -887,11 +891,14 @@ async function insights(request: Request, env: Env, url: URL): Promise<Response>
     perDay('comments', ' AND hidden = 0'),
   ])
 
+  // The first recorded day, from the primary key: one row. A period before it has nothing to compare with.
+  const [results, first] = await Promise.all([batch, env.DB.prepare('SELECT MIN(day) AS day FROM views').first<{ day: string | null }>()])
   const [daily, pages, acquisition, audience, hours, speeds, likes, comments, likesDaily, commentsDaily] = results
 
   return reply(200, {
     from,
     before,
+    first: first?.day ?? null,
     // D1 bills rows read; the page shows what this report cost.
     read: results.reduce((total, result) => total + (result.meta.rows_read ?? 0), 0),
     daily: daily.results,
