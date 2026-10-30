@@ -111,6 +111,12 @@ describe('InsightsPage', () => {
     expect(container.querySelector('.insights-line')).toBeNull()
   })
 
+  it('says that no views are recorded yet when there are none', async () => {
+    await show(Response.json({ ...insights, first: null }))
+
+    expect(container.querySelector('.insights-period')?.textContent).toBe('1 Oct – 30 Oct. No views are recorded yet.')
+  })
+
   it('ranks posts and pages with their trend, change, time, reading depth and reactions', async () => {
     await show(Response.json(insights))
     const [posts, pages] = container.querySelectorAll('.insights-table:not(.insights-campaigns)')
@@ -124,8 +130,8 @@ describe('InsightsPage', () => {
 
     expect(texts('[aria-label="Where visits start"] .insights-split-label')).toEqual(['Search', 'AI assistants', 'Email'])
     expect(texts('[aria-label="Where visits start"] .insights-split-value small')).toEqual(['50%', '25%', '25%'])
-    expect(texts('[aria-label="Where visits start"] .insights-split-engaged')).toEqual(['50%', '100%', '0%'])
-    expect(texts('[aria-label="Devices"] .insights-split-engaged')).toEqual(['50%', '100%'])
+    expect(texts('[aria-label="Where visits start"] .insights-split-engaged')).toEqual(['50% Engaged', '100% Engaged', '0% Engaged'])
+    expect(texts('[aria-label="Devices"] .insights-split-engaged')).toEqual(['50% Engaged', '100% Engaged'])
     expect(cells(container.querySelector('.insights-campaigns tbody tr') ?? undefined)).toEqual(['newsletter', 'email', 'oct', '1'])
     expect(texts('[aria-label="Browsers"] .insights-split-label')).toEqual(['Safari', 'In-app browser'])
     expect(texts('[aria-label="Countries"] .insights-split-label')).toEqual(['🇮🇶 Iraq', 'T1'])
