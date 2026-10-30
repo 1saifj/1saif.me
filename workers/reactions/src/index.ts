@@ -29,7 +29,7 @@ interface RateLimit {
 
 interface D1Result<Row> {
   results: Row[]
-  meta: { changes: number }
+  meta: { changes: number; rows_read?: number }
 }
 
 interface D1Statement {
@@ -73,6 +73,8 @@ export interface Env {
   GITHUB_CLIENT_SECRET: string
   // Signs the session cookie. Changing it signs everyone out.
   SESSION_SECRET: string
+  // The site owner's GitHub account: only it reads /api/insights, and its own page views are not counted.
+  OWNER_GITHUB_ID: string
 }
 
 // The GitHub profile fields the site keeps. The avatar comes from the ID, so no URL is stored.
@@ -132,7 +134,15 @@ interface Beacon {
   path?: string
   ref?: string
   lang?: string
-  w?: number
+  touch?: boolean
+  entry?: boolean
+  source?: string
+  medium?: string
+  campaign?: string
+  // The landing URL's query parameter names, comma-separated, without their values.
+  keys?: string
+  seconds?: number
+  scroll?: number
   lcp?: number
   cls?: number
   inp?: number
@@ -161,8 +171,8 @@ async function isPost(slug: string): Promise<boolean> {
 
 const ROUTE = /^\/api\/posts\/([a-z0-9-]{1,120})(?:\/(like|comments)(?:\/([1-9]\d{0,11}))?)?$/
 
-// Comments live only on post pages, so a sign-in returns only to one of them.
-const RETURN_PATH = /^\/(?:ar\/)?blog\/([a-z0-9-]{1,120})$/
+// Comments live only on post pages, so a sign-in returns only to one of them, or to the owner's insights page.
+const RETURN_PATH = /^\/(?:ar\/)?(?:blog\/([a-z0-9-]{1,120})|insights)$/
 
 const LOGIN = /^[A-Za-z0-9][A-Za-z0-9-]{0,38}$/
 
@@ -212,7 +222,8 @@ const FLOW_SECONDS = 600
 
 const GITHUB_HEADERS = { Accept: 'application/vnd.github+json', 'User-Agent': '1saif.me-comments', 'X-GitHub-Api-Version': '2026-03-10' }
 
-const BOT = /bot|crawl|spider|headless/i
+// Speed tests run a real browser on a slowed network, so their numbers would skew the speed counts.
+const BOT = /bot|crawl|spider|headless|lighthouse|pagespeed|gtmetrix|ptst/i
 
 const reply = <Body,>(status: number, body: Body) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } })
 
@@ -496,7 +507,7 @@ const callbackUrl = (env: Env) => `${env.SITE_URL}/api/auth/github/callback`
 async function returnPath(value: string | null): Promise<string> {
   const match = RETURN_PATH.exec(value ?? '')
 
-  return match && await isPost(match[1]) ? match[0] : '/blog'
+  return match && (!match[1] || await isPost(match[1])) ? match[0] : '/blog'
 }
 
 function displayName(value: unknown): string | null {
@@ -633,7 +644,92 @@ const vital = (value: number | undefined) => {
   return Number.isFinite(number) && number >= 0 ? number : -1
 }
 
-const deviceOf = (width: number) => width <= 0 ? '' : width < 768 ? 'mobile' : width < 1200 ? 'tablet' : 'desktop'
+// Core Web Vitals limits (web.dev): good at or under the first, poor over the second. LCP, INP and TTFB in ms.
+const SPEED: [string, number, number][] = [['lcp', 2500, 4000], ['inp', 200, 500], ['cls', 0.1, 0.25], ['ttfb', 800, 1800]]
+
+// A measured value, or NULL: in-site page changes have no LCP or TTFB, and a page without input has no INP.
+const measured = (value: number | undefined, digits = 0) => {
+  const number = vital(value)
+
+  return number < 0 ? null : Number(number.toFixed(digits))
+}
+
+// iPadOS Safari sends the Mac browser string, so a Mac with a touch screen is an iPad.
+const isPad = (agent: string, touch: boolean) => touch && agent.includes('Macintosh')
+
+function deviceOf(agent: string, touch: boolean) {
+  if (/iPad|Tablet|Kindle|Silk/.test(agent) || (agent.includes('Android') && !agent.includes('Mobile')) || isPad(agent, touch)) return 'tablet'
+
+  return /Mobi|iPhone|iPod|Android/.test(agent) ? 'mobile' : agent ? 'desktop' : ''
+}
+
+// In order: Edge, Opera, Brave, Samsung Internet and in-app browsers also name Chrome or Safari. Brave is only in
+// the Sec-CH-UA brands, which Chromium browsers send.
+const BROWSERS: [string, RegExp][] = [
+  ['Edge', /Edg(?:e|A|iOS)?\/|Microsoft Edge/],
+  ['Opera', /OPR\/|OPiOS|Opera/],
+  ['Brave', /Brave/],
+  ['Samsung Internet', /SamsungBrowser/],
+  ['Firefox', /Firefox|FxiOS/],
+  ['In-app', /FBAN|FBAV|Instagram|LinkedInApp|Snapchat|musical_ly|BytedanceWebview/],
+  ['Chrome', /Chrome|CriOS|Chromium/],
+  ['Safari', /Safari/],
+]
+
+// In order: iPhone browsers also say "like Mac OS X", and Android also says Linux.
+const SYSTEMS: [string, RegExp][] = [['iOS', /iPhone|iPad|iPod/], ['Android', /Android/], ['ChromeOS', /CrOS/], ['Windows', /Windows/], ['macOS', /Macintosh/], ['Linux', /Linux|X11/]]
+
+const familyOf = (families: [string, RegExp][], text: string) => families.find(([, pattern]) => pattern.test(text))?.[0] ?? ''
+
+// A click ID's ad network and medium. Only the parameter's name arrives, never its value.
+const CLICKS = new Map([
+  ['gclid', ['google', 'cpc']],
+  ['gbraid', ['google', 'cpc']],
+  ['wbraid', ['google', 'cpc']],
+  ['dclid', ['google', 'display']],
+  ['msclkid', ['bing', 'cpc']],
+  ['ttclid', ['tiktok', 'cpc']],
+  ['li_fat_id', ['linkedin', 'cpc']],
+  ['rdt_cid', ['reddit', 'cpc']],
+  ['epik', ['pinterest', 'cpc']],
+  ['sccid', ['snapchat', 'cpc']],
+  ['yclid', ['yandex', 'cpc']],
+  // Facebook and X add these to links people share too, so they are not ads.
+  ['fbclid', ['facebook', 'social']],
+  ['twclid', ['x', 'social']],
+])
+
+const PAID = /^(?:cpc|ppc|cpm|cpv|cpa|paid\S*|display|banner|retargeting)$/
+
+// Checked in order on the medium, source and referrer host together. AI before search: Gemini is on google.com.
+// ChatGPT tags its links with utm_source=chatgpt.com; Perplexity, Gemini and Claude are known by their host only.
+const CHANNELS: [string, RegExp][] = [
+  ['email', /\b(?:e-?mail|newsletter)\b|\bmail\.google\.|\boutlook\./],
+  ['ai', /\b(?:chatgpt|openai|perplexity|claude|gemini|copilot|deepseek|grok|mistral)\b/],
+  ['social', /\b(?:social|facebook|fb|instagram|t\.co|x\.com|twitter|linkedin|lnkd|reddit|ycombinator|youtube|tiktok|threads|bsky|bluesky|mastodon|t\.me|telegram|whatsapp|wa\.me|discord|pinterest)\b/],
+  ['search', /\b(?:organic|google|bing|duckduckgo|yahoo|yandex|baidu|ecosia|brave|startpage|qwant|naver|kagi)\b/],
+]
+
+// A campaign tag in lowercase: letters, digits, spaces and . _ + - only, at most 64 characters. A value with an @
+// may be an email address, so it is dropped.
+function tagOf(value: string | undefined) {
+  const text = String(value ?? '').toLowerCase()
+
+  return text.includes('@') ? '' : text.replace(/[^\p{L}\p{N}._+ -]/gu, '').trim().slice(0, 64)
+}
+
+// Where a visit came from, as [channel, source, medium, campaign]: the campaign tags first, then a click ID's ad
+// network, then the referrer's host.
+function originOf(parsed: Beacon, host: string) {
+  const click = String(parsed.keys ?? '').split(',').find(key => CLICKS.has(key)) ?? ''
+  const [network = '', clickMedium = ''] = CLICKS.get(click) ?? []
+  const source = tagOf(parsed.source) || network || host.replace(/^www\./, '')
+  const medium = tagOf(parsed.medium) || clickMedium
+  const text = `${medium} ${source} ${host}`
+  const channel = PAID.test(medium) ? 'paid' : familyOf(CHANNELS, text) || (source ? 'referral' : 'direct')
+
+  return [channel, source, medium, tagOf(parsed.campaign)]
+}
 
 // The referrer's host only, and nothing for an inside link: no path, no query, nothing that names a person.
 function referrerHost(value: string | undefined): string {
@@ -646,8 +742,52 @@ function referrerHost(value: string | undefined): string {
   }
 }
 
+// Days run on Baghdad time (UTC+3 all year), the day the site shows on posts.
+const dayOf = (time: number) => new Date(time + 3 * 60 * 60 * 1000).toISOString().slice(0, 10)
+
+let salt: { day: string; value: string } | undefined
+
+// The first isolate of the day stores a random salt and every other one reads it; earlier salts are deleted.
+async function saltOf(day: string, env: Env): Promise<string> {
+  if (salt?.day === day) return salt.value
+
+  const [, , stored] = await env.DB.batch<{ salt: string }>([
+    env.DB.prepare('DELETE FROM salts WHERE day < ?').bind(day),
+    env.DB.prepare('INSERT OR IGNORE INTO salts (day, salt) VALUES (?, ?)').bind(day, base64url(crypto.getRandomValues(new Uint8Array(32)))),
+    env.DB.prepare('SELECT salt FROM salts WHERE day = ?').bind(day),
+  ])
+
+  salt = { day, value: stored.results[0].salt }
+
+  return salt.value
+}
+
+// One row per visitor, page and day, so a page's rows are its unique visitors. No IP address and no cookie is kept.
+// A later view of the row adds its time, keeps the deepest scroll, and fills a speed the first view did not measure.
+async function countView(request: Request, ip: string, page: string, details: (string | number | null)[], env: Env) {
+  try {
+    const now = Date.now()
+    const day = dayOf(now)
+    const text = `${await saltOf(day, env)} ${ip} ${request.headers.get('User-Agent') ?? ''}`
+    const visitor = base64url(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))).slice(0, 16))
+    const hour = new Date(now + 3 * 60 * 60 * 1000).getUTCHours()
+
+    await env.DB.prepare(`INSERT INTO views (day, page, visitor, hour, entry, channel, source, medium, campaign, language, country, device, browser, os, seconds, scroll, lcp, inp, cls, ttfb)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT (day, page, visitor) DO UPDATE SET views = views + 1, entry = MAX(entry, excluded.entry), seconds = seconds + excluded.seconds,
+        scroll = COALESCE(MAX(scroll, excluded.scroll), scroll, excluded.scroll), lcp = COALESCE(lcp, excluded.lcp), inp = COALESCE(inp, excluded.inp),
+        cls = COALESCE(cls, excluded.cls), ttfb = COALESCE(ttfb, excluded.ttfb)`)
+      .bind(day, page, visitor, hour, ...details)
+      .all()
+  } catch {
+    console.warn('view count failed')
+  }
+}
+
+const isOwner = async (request: Request, env: Env) => String((await sessionOf(request, env))?.id) === env.OWNER_GITHUB_ID
+
 // One beacon per page view. Every refusal after the size check answers 204, so a script learns nothing.
-async function collect(request: Request, env: Env, ip: string): Promise<Response> {
+async function collect(request: Request, env: Env, ctx: Context, ip: string): Promise<Response> {
   if (BOT.test(request.headers.get('User-Agent') ?? '')) return ignored()
 
   if (!(await env.PER_CLIENT_COLLECT.limit({ key: ip })).success) return ignored()
@@ -671,20 +811,90 @@ async function collect(request: Request, env: Env, ip: string): Promise<Response
 
   if (!url || path.length > 200 || url.origin !== SITE_ORIGIN || url.pathname !== path) return ignored()
 
+  if (await isOwner(request, env)) return ignored()
+
   if (!(await env.ALL_COLLECT.limit({ key: 'all' })).success) return ignored()
 
   // EN and AR pages share one index, so a post's views line up with its likes. The pathname is
   // percent-encoded ASCII, so 96 characters fit the 96-byte index limit.
   const page = (path.replace(/^\/ar(?=\/|$)/, '').replace(/\/+$/, '') || '/').slice(0, 96)
 
-  track(
-    env,
-    page,
-    ['pageview', path, referrerHost(parsed.ref), languageOf(parsed.lang), countryOf(request), deviceOf(Number(parsed.w) || 0)],
-    [1, vital(parsed.lcp), vital(parsed.cls), vital(parsed.inp), vital(parsed.ttfb)],
-  )
+  const host = referrerHost(parsed.ref)
+  const agent = request.headers.get('User-Agent') ?? ''
+  const touch = parsed.touch === true
+  const language = languageOf(parsed.lang)
+  const device = deviceOf(agent, touch)
+  // A tab left open for hours counts as half an hour.
+  const seconds = Math.min(1800, Math.max(0, Math.round(Number(parsed.seconds) || 0)))
+  const scroll = measured(parsed.scroll)
+  const browser = familyOf(BROWSERS, `${request.headers.get('Sec-CH-UA') ?? ''} ${agent}`)
+  const os = isPad(agent, touch) ? 'iOS' : familyOf(SYSTEMS, agent)
+  const speed = [measured(parsed.lcp), measured(parsed.inp), measured(parsed.cls, 4), measured(parsed.ttfb)]
+
+  track(env, page, ['pageview', path, host, language, countryOf(request), device], [1, vital(parsed.lcp), vital(parsed.cls), vital(parsed.inp), vital(parsed.ttfb)])
+  ctx.waitUntil(countView(request, ip, page, [parsed.entry === true ? 1 : 0, ...originOf(parsed, host), language, countryOf(request), device, browser, os, seconds, scroll === null ? null : Math.min(100, scroll), ...speed], env))
 
   return ignored()
+}
+
+// Visitors count once per day: a visitor ID changes every day, so a reader on two days counts twice. The daily and
+// per-page rows also cover the period before the range, so the page can compare the two.
+async function insights(request: Request, env: Env, url: URL): Promise<Response> {
+  if (request.method !== 'GET') return fail(405, 'method')
+
+  // Anyone else, signed in or not, learns only that nothing is here.
+  if (!(await isOwner(request, env))) return fail(404, 'route')
+
+  const days = Number(url.searchParams.get('days') ?? 30)
+
+  if (!Number.isInteger(days) || days < 1 || days > 365) return fail(400, 'days')
+
+  const day = 24 * 60 * 60 * 1000
+  const from = dayOf(Date.now() - (days - 1) * day)
+  const before = dayOf(Date.now() - (2 * days - 1) * day)
+  const since = Date.parse(`${from}T00:00:00+03:00`)
+  const query = (sql: string, value: string | number) => env.DB.prepare(sql).bind(value)
+  // created_at is in milliseconds; adding 3 hours gives the Baghdad day, as dayOf does.
+  const perDay = (table: string, filter = '') => query(`SELECT strftime('%Y-%m-%d', created_at / 1000 + 10800, 'unixepoch') AS day, COUNT(*) AS count FROM ${table} WHERE created_at >= ?${filter} GROUP BY day`, since - days * day)
+  // Good and poor counts per metric, at Google's Core Web Vitals limits. A device passes a metric when at least 75%
+  // of its views are good, which is the p75 test without a percentile in SQL.
+  const speed = SPEED.map(([name, good, poor]) => `COUNT(${name}) AS ${name}, SUM(${name} <= ${good}) AS ${name}Good, SUM(${name} > ${poor}) AS ${name}Poor`).join(', ')
+
+  // Every views query reads the rows of its range once, so the whole report reads the range's rows about eight times.
+  const results = await env.DB.batch([
+    // A visit is one visitor on one day. It is engaged when it read two pages or stayed ten seconds.
+    query('SELECT day, SUM(views) AS views, COUNT(*) AS visitors, SUM(seconds) AS seconds, SUM(pages > 1 OR seconds >= 10) AS engaged FROM (SELECT day, SUM(views) AS views, COUNT(*) AS pages, SUM(seconds) AS seconds FROM views WHERE day >= ? GROUP BY day, visitor) GROUP BY day ORDER BY day', before),
+    query("SELECT page, day, SUM(views) AS views, COUNT(*) AS visitors, SUM(entry) AS entries, SUM(seconds) AS seconds, SUM(scroll) AS scroll, COUNT(scroll) AS scrolled, SUM(language = 'ar') AS arabic FROM views WHERE day >= ? GROUP BY page, day", before),
+    // A visit counts where it started, so a page read after it does not count as direct.
+    query('SELECT channel, source, medium, campaign, COUNT(DISTINCT day || visitor) AS visitors FROM views WHERE day >= ? AND entry = 1 GROUP BY channel, source, medium, campaign', from),
+    // Device, browser, system and country stay the same through a visit, so one query groups them all.
+    query('SELECT device, browser, os, country, COUNT(DISTINCT day || visitor) AS visitors FROM views WHERE day >= ? GROUP BY device, browser, os, country', from),
+    query("SELECT CAST(strftime('%w', day) AS INTEGER) AS weekday, hour, COUNT(DISTINCT day || visitor) AS visitors FROM views WHERE day >= ? GROUP BY weekday, hour", from),
+    query(`SELECT device, ${speed} FROM views WHERE day >= ? AND device != '' GROUP BY device`, from),
+    query('SELECT slug, COUNT(*) AS count FROM likes WHERE created_at >= ? GROUP BY slug', since),
+    query('SELECT slug, COUNT(*) AS count FROM comments WHERE created_at >= ? AND hidden = 0 GROUP BY slug', since),
+    perDay('likes'),
+    perDay('comments', ' AND hidden = 0'),
+  ])
+
+  const [daily, pages, acquisition, audience, hours, speeds, likes, comments, likesDaily, commentsDaily] = results
+
+  return reply(200, {
+    from,
+    before,
+    // D1 bills rows read; the page shows what this report cost.
+    read: results.reduce((total, result) => total + (result.meta.rows_read ?? 0), 0),
+    daily: daily.results,
+    pages: pages.results,
+    acquisition: acquisition.results,
+    audience: audience.results,
+    hours: hours.results,
+    speed: speeds.results,
+    likes: likes.results,
+    comments: comments.results,
+    likesDaily: likesDaily.results,
+    commentsDaily: commentsDaily.results,
+  })
 }
 
 export default {
@@ -694,6 +904,8 @@ export default {
     const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown'
 
     if (pathname.startsWith('/api/auth/')) return auth(request, env, url, ip)
+
+    if (pathname === '/api/insights') return insights(request, env, url)
 
     const isCollect = pathname === '/api/collect'
     const [, slug = '', action = '', commentId = ''] = ROUTE.exec(pathname) ?? []
@@ -716,7 +928,7 @@ export default {
 
     if (!length || length > (action === 'comments' ? MAX_COMMENT_BYTES : MAX_SMALL_BYTES)) return fail(413, 'size')
 
-    if (isCollect) return collect(request, env, ip)
+    if (isCollect) return collect(request, env, ctx, ip)
 
     return action === 'like' ? like(request, slug, env) : comment(request, slug, env, ctx, commentId ? Number(commentId) : undefined)
   },

@@ -31,6 +31,8 @@ const ResumePage = page(() => import('./pages/ResumePage'), m => m.ResumePage)
 
 const PrivacyPolicyPage = page(() => import('./pages/PrivacyPolicyPage'), m => m.PrivacyPolicyPage)
 
+const InsightsPage = page(() => import('./pages/InsightsPage'), m => m.InsightsPage)
+
 const NotFoundPage = page(() => import('./pages/NotFoundPage'), m => m.NotFoundPage)
 
 // Home ships in the main bundle, so its preload is already done; the wrapper keeps the table one shape.
@@ -44,6 +46,7 @@ const routePages: Record<RoutePath, PageComponent> = {
   '/project/:slug': ProjectPage,
   '/resume': ResumePage,
   '/privacy': PrivacyPolicyPage,
+  '/insights': InsightsPage,
 }
 
 export const preloadRoute = (pathname: string): Promise<void> => {

@@ -11,7 +11,8 @@
   "routes": [
     { "pattern": "1saif.me/api/posts/*", "zone_name": "1saif.me" },
     { "pattern": "1saif.me/api/collect", "zone_name": "1saif.me" },
-    { "pattern": "1saif.me/api/auth/*", "zone_name": "1saif.me" }
+    { "pattern": "1saif.me/api/auth/*", "zone_name": "1saif.me" },
+    { "pattern": "1saif.me/api/insights", "zone_name": "1saif.me" }
   ],
   // No *.workers.dev or preview URL: they would skip the zone's WAF rate limiting rule.
   "workers_dev": false,
@@ -19,8 +20,9 @@
   // 8787 is often taken; the Vite dev proxy sends /api/posts, /api/auth and /api/collect here.
   "dev": { "port": 8797 },
   // The "1saif.me comments" GitHub App signs commenters in (README, GitHub sign-in). Its client ID is
-  // public. .dev.vars points SITE_URL at the Vite dev server for wrangler dev.
-  "vars": { "SITE_URL": "https://1saif.me", "GITHUB_CLIENT_ID": "Iv23ligFz4IMbqWdrslZ" },
+  // public. .dev.vars points SITE_URL at the Vite dev server for wrangler dev. OWNER_GITHUB_ID is Saif's account
+  // (@1saifj): only it reads /api/insights, and its own page views are not counted.
+  "vars": { "SITE_URL": "https://1saif.me", "GITHUB_CLIENT_ID": "Iv23ligFz4IMbqWdrslZ", "OWNER_GITHUB_ID": "31359390" },
   "d1_databases": [
     {
       "binding": "DB",
@@ -47,7 +49,7 @@
     { "name": "ALL_CLIENTS_COMMENTS", "namespace_id": "71455", "simple": { "limit": 10, "period": 60 } },
     { "name": "ALL_LIKES", "namespace_id": "71456", "simple": { "limit": 15, "period": 60 } },
     { "name": "PER_CLIENT_COLLECT", "namespace_id": "71457", "simple": { "limit": 30, "period": 60 } },
-    { "name": "ALL_COLLECT", "namespace_id": "71458", "simple": { "limit": 40, "period": 60 } },
+    { "name": "ALL_COLLECT", "namespace_id": "71458", "simple": { "limit": 20, "period": 60 } },
     { "name": "PER_CLIENT_AUTH", "namespace_id": "71459", "simple": { "limit": 10, "period": 60 } }
   ]
   // Secrets, set with `wrangler secret put <NAME> -c workers/reactions/wrangler.jsonc`:

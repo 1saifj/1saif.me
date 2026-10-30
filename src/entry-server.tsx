@@ -12,6 +12,7 @@ import { BlogPost, prerenderedArticles } from './pages/BlogPost'
 import { ProjectPage } from './pages/ProjectPage'
 import { ResumePage } from './pages/ResumePage'
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
+import { InsightsPage } from './pages/InsightsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { publishedBlogs } from './data/blogs'
 import { projects } from './data/projects'
@@ -27,6 +28,7 @@ const routePages: Record<RoutePath, ComponentType> = {
   '/project/:slug': ProjectPage,
   '/resume': ResumePage,
   '/privacy': PrivacyPolicyPage,
+  '/insights': InsightsPage,
 }
 
 // The fixed routes come from the shared list; the pages with data come from the content.

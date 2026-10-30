@@ -66,6 +66,7 @@ export default defineConfig(({ isSsrBuild }) => ({
       '/api/posts': 'http://localhost:8797',
       '/api/auth': 'http://localhost:8797',
       '/api/collect': 'http://localhost:8797',
+      '/api/insights': 'http://localhost:8797',
     },
   },
   preview: {
