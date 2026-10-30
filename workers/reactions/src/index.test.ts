@@ -1161,6 +1161,14 @@ describe('reactions worker: page views', () => {
     expect(points).toEqual([{ indexes: ['/blog/x'], blobs: ['pageview', '/ar/blog/x/', 'www.google.com', 'ar', '', 'mobile'], doubles: [1, 1200, 0, -1, 80] }])
   })
 
+  // A tab opened before a deploy still sends the old beacon, without entry, time, scroll or touch.
+  it('writes a full row from the old beacon', async () => {
+    const row = await rowOf({ path: '/blog/x/', ref: 'https://www.google.com', lang: 'en', w: 390, lcp: 900, cls: 0, inp: -1, ttfb: 70 })
+
+    expect(Object.values(row).filter(value => value === undefined || Number.isNaN(value))).toEqual([])
+    expect(row).toMatchObject({ entry: 0, channel: 'search', seconds: 0, scroll: null, lcp: 900, inp: null })
+  })
+
   it('keeps an inside referrer empty', async () => {
     const { env } = makeEnv()
 
