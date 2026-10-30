@@ -1213,6 +1213,7 @@ describe('reactions worker: page views', () => {
     ['a speed test', collect(beacon, { 'User-Agent': `${MAC} Chrome-Lighthouse` })],
     ['a signed AI agent with a normal browser string', collect(beacon, { 'User-Agent': MAC, 'Signature-Agent': '"https://chatgpt.com"' })],
     ['an AI agent by its token', collect(beacon, { 'User-Agent': `${MAC} Google-Agent` })],
+    ["Meta's crawler with a normal browser string", collect(beacon, { 'User-Agent': `${MAC} meta-externalagent/1.1` })],
     ['a path with a query', collect({ ...beacon, path: '/blog?q=1' })],
     ['a path with a hash', collect({ ...beacon, path: '/blog#top' })],
     ['another host', collect({ ...beacon, path: '//evil.example/x' })],
