@@ -6,6 +6,7 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-06-15",
   // Only these paths run the Worker; Pages serves every other path as free static assets.
+  // A pattern without a final * does not match a URL with a query string, so Pages would answer /api/insights?days=30.
   // The account is on the Free plan, so the caps below keep this Worker inside the daily
   // limits it shares with the contact Worker (README, Costs).
   "routes": [
@@ -13,7 +14,7 @@
     { "pattern": "1saif.me/api/read", "zone_name": "1saif.me" },
     { "pattern": "1saif.me/api/collect", "zone_name": "1saif.me" },
     { "pattern": "1saif.me/api/auth/*", "zone_name": "1saif.me" },
-    { "pattern": "1saif.me/api/insights", "zone_name": "1saif.me" }
+    { "pattern": "1saif.me/api/insights*", "zone_name": "1saif.me" }
   ],
   // No *.workers.dev or preview URL: they would skip the zone's WAF rate limiting rule.
   "workers_dev": false,
