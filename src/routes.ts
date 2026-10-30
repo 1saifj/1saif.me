@@ -2,7 +2,7 @@ import { matchPath } from 'react-router-dom'
 
 // The paths the router owns. The App, the SSR entry and the prerender all read this list,
 // so a route added here exists everywhere at once.
-export const routePaths = ['/', '/blog', '/blog/:slug', '/project/:slug', '/resume', '/privacy'] as const
+export const routePaths = ['/', '/blog', '/blog/:slug', '/project/:slug', '/resume', '/privacy', '/insights'] as const
 
 export type RoutePath = (typeof routePaths)[number]
 

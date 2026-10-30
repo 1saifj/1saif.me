@@ -343,7 +343,54 @@ html[dir='rtl'] .plain-role { grid-template-columns: 200px minmax(0, 1fr); }
 .plain-page .plain-ways { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 28px; }
 .plain-page kbd { display: inline-block; padding: 0 6px; border: 1px solid var(--nb-line); border-bottom-width: 2px; border-radius: 5px; color: var(--nb-ink-2); background: var(--nb-subtle); font: 500 .8em/1.6 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
 
+/* ---- Insights: the owner's numbers. Every bar is the one accent hue; numbers and labels stay in the ink tokens. ---- */
+.insights-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; }
+.insights-range { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--nb-line); border-radius: 999px; background: var(--nb-subtle); }
+.insights-range button { min-height: 32px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--nb-ink-2); background: none; font-size: 14px; font-variant-numeric: tabular-nums; cursor: pointer; }
+.insights-range button[aria-pressed='true'] { color: var(--nb-ink); background: var(--nb-surface); box-shadow: 0 1px 2px rgb(0 0 0 / .08), 0 0 0 1px var(--nb-line); }
+.insights-message { margin-top: 32px; }
+.insights-message a, .insights-retry { padding: 0; border: 0; color: var(--nb-accent); background: none; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.insights-totals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 40px; }
+.insights-totals > div { padding: 16px 18px; border: 1px solid var(--nb-line); border-radius: 12px; background: var(--nb-surface); }
+.insights-totals dt { color: var(--nb-ink-3); font-size: 13px; }
+.insights-totals dd { margin: 4px 0 0; font-size: 1.9rem; font-weight: 600; line-height: 1.2; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.insights-readout { min-height: 1.7em; font-size: 14px; font-variant-numeric: tabular-nums; }
+.insights-chart { position: relative; margin-top: 8px; padding-top: 20px; }
+.insights-peak { position: absolute; top: 0; left: 0; color: var(--nb-ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.insights-bars { display: grid; grid-template-columns: repeat(var(--days), minmax(0, 1fr)); gap: 2px; height: 180px; border-top: 1px dashed var(--nb-line); border-bottom: 1px solid var(--nb-line); }
+/* The whole column is the hit target, so a short bar is as easy to point at as a tall one. */
+.insights-bar { display: flex; align-items: flex-end; min-width: 0; height: 100%; padding: 0; border: 0; background: none; cursor: default; }
+.insights-bar span { width: 100%; border-radius: 4px 4px 0 0; background: var(--nb-accent); transition: opacity .15s ease; }
+.insights-bars:is(:hover, :focus-within) .insights-bar span { opacity: .4; }
+.insights-bars .insights-bar[data-active] span { opacity: 1; }
+.insights-axis { display: flex; justify-content: space-between; margin-top: 6px; color: var(--nb-ink-3); font-size: 12px; }
+.insights-table-wrap { overflow-x: auto; }
+.insights-table { width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+.insights-table :is(th, td) { padding: 10px 8px; border-bottom: 1px solid var(--nb-line); text-align: end; white-space: nowrap; }
+/* Fixed number columns, so the posts table and the pages table line up. */
+.insights-table :is(td, thead th:not(:first-child)) { width: 96px; }
+.insights-table thead th { color: var(--nb-ink-3); font-size: 13px; font-weight: 500; }
+.insights-table :is(tbody th, thead th:first-child) { min-width: 200px; padding-inline-start: 0; text-align: start; white-space: normal; }
+.insights-table tbody th { font-weight: 500; }
+.insights-table tbody th a { text-decoration: none; }
+.insights-table tbody th a:hover { text-decoration: underline; }
+.insights-cell-bar { display: inline-block; width: calc(var(--share) * 40px); height: 6px; margin-inline-end: 8px; border-radius: 3px; background: var(--nb-accent); vertical-align: middle; }
+.insights-splits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; }
+.insights-split { padding: 0; list-style: none; }
+.insights-split li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 8px 0; font-size: 15px; }
+.insights-split-label { overflow: hidden; color: var(--nb-ink); text-overflow: ellipsis; white-space: nowrap; }
+.insights-split-value { color: var(--nb-ink); font-variant-numeric: tabular-nums; }
+.insights-split-bar { grid-column: 1 / -1; width: calc(var(--share) * 100%); height: 4px; border-radius: 2px; background: var(--nb-accent); }
+
 @media (max-width: 760px) {
+  .insights-totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .insights-totals dd { font-size: 1.5rem; }
+  .insights-splits { grid-template-columns: 1fr; }
+  .insights-bars { height: 140px; }
+  .insights-table { font-size: 14px; }
+  .insights-table :is(td, thead th:not(:first-child)) { width: 56px; padding-inline: 4px; }
+  .insights-table :is(tbody th, thead th:first-child) { min-width: 120px; }
+  .insights-cell-bar { display: none; }
   .plain-page, .plain-article-body, .related-posts, .post-reactions { width: calc(100% - 32px); }
   .plain-page { padding: 40px 0 64px; }
   .plain-glance { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; }

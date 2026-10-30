@@ -63,6 +63,15 @@ describe('insights', () => {
     expect(JSON.parse(beacon.mock.calls[0][1]).ref).toBe('https://www.google.com')
   })
 
+  it('counts a browser that sends Do Not Track and Global Privacy Control', async () => {
+    Object.defineProperty(navigator, 'doNotTrack', { value: '1', configurable: true })
+    Object.defineProperty(navigator, 'globalPrivacyControl', { value: true, configurable: true })
+    await start()
+    hide()
+
+    expect(sentPaths()).toEqual(['/a'])
+  })
+
   it('sends nothing from an automated browser', async () => {
     Object.defineProperty(navigator, 'webdriver', { value: true, configurable: true })
     const { pageView } = await start()

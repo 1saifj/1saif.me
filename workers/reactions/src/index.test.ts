@@ -31,12 +31,53 @@ interface StoredUser {
   blocked: number
 }
 
+interface StoredView {
+  day: string
+  page: string
+  visitor: string
+  hour: number
+  entry: number
+  channel: string
+  source: string
+  medium: string
+  campaign: string
+  language: string
+  country: string
+  device: string
+  browser: string
+  os: string
+  views: number
+  seconds: number
+  scroll: number | null
+  lcp: number | null
+  inp: number | null
+  cls: number | null
+  ttfb: number | null
+}
+
+type Speed = 'lcp' | 'inp' | 'cls' | 'ttfb'
+
+const LIMITS: [Speed, number, number][] = [['lcp', 2500, 4000], ['inp', 200, 500], ['cls', 0.1, 0.25], ['ttfb', 800, 1800]]
+
 // A fake D1 that answers the Worker's own statements from memory, so the tests run on any Node version.
 function makeDb() {
-  const likes = new Set<string>()
+  // Each like's created_at, by slug and account.
+  const likes = new Map<string, number>()
   const stats = new Map<string, number>()
   const comments: StoredComment[] = []
   const users = new Map<number, StoredUser>()
+  const salts = new Map<string, string>()
+  const views: StoredView[] = []
+
+  // The rows of each GROUP BY key, as [key, rows] pairs.
+  const counted = <Row,>(rows: Row[], key: (row: Row) => string) => {
+    const groups = new Map<string, Row[]>()
+
+    for (const row of rows) groups.set(key(row), [...groups.get(key(row)) ?? [], row])
+
+    return [...groups]
+  }
+
   let queries = 0
 
   const execute = (sql: string, values: (string | number | null)[]) => {
@@ -66,7 +107,9 @@ function makeDb() {
       if (users.get(Number(third))?.blocked !== 0) return { results: [], changes: 0 }
 
       const before = likes.size
-      likes.add(`${first} ${third}`)
+
+      if (!likes.has(`${first} ${third}`)) likes.set(`${first} ${third}`, Number(second))
+
       const changes = likes.size - before
 
       stats.set(String(first), (stats.get(String(first)) ?? 0) + changes)
@@ -132,6 +175,140 @@ function makeDb() {
       return { results: [], changes: 1 }
     }
 
+    if (sql.startsWith('DELETE FROM salts')) {
+      for (const day of salts.keys()) if (day < String(first)) salts.delete(day)
+
+      return { results: [], changes: 0 }
+    }
+
+    if (sql.startsWith('INSERT OR IGNORE INTO salts')) {
+      if (!salts.has(String(first))) salts.set(String(first), String(second))
+
+      return { results: [], changes: 1 }
+    }
+
+    if (sql.startsWith('SELECT salt')) return { results: [{ salt: salts.get(String(first)) }], changes: 0 }
+
+    // INSERT INTO views (...) ON CONFLICT DO UPDATE SET views + 1, entry MAX, seconds +, scroll MAX, each speed the first measured
+    if (sql.startsWith('INSERT INTO views')) {
+      // The bind order: day, page, visitor, hour, entry, channel, source, medium, campaign, language, country,
+      // device, browser, os, seconds, scroll, lcp, inp, cls, ttfb.
+      const [day, page, visitor] = values.slice(0, 3).map(String)
+      const [hour, entry] = values.slice(3, 5).map(Number)
+      const [channel, source, medium, campaign, language, country, device, browser, os] = values.slice(5, 14).map(String)
+      const seconds = Number(values[14])
+      const [scroll, lcp, inp, cls, ttfb] = values.slice(15).map(value => value === null ? null : Number(value))
+      const row = views.find(item => item.day === day && item.page === page && item.visitor === visitor)
+
+      if (!row) views.push({ day, page, visitor, hour, entry, channel, source, medium, campaign, language, country, device, browser, os, views: 1, seconds, scroll, lcp, inp, cls, ttfb })
+      else {
+        Object.assign(row, { views: row.views + 1, entry: Math.max(row.entry, entry), seconds: row.seconds + seconds, scroll: row.scroll === null || scroll === null ? row.scroll ?? scroll : Math.max(row.scroll, scroll) })
+        Object.assign(row, { lcp: row.lcp ?? lcp, inp: row.inp ?? inp, cls: row.cls ?? cls, ttfb: row.ttfb ?? ttfb })
+      }
+
+      return { results: [], changes: 1 }
+    }
+
+    const inRange = views.filter(row => row.day >= String(first))
+    const sum = (rows: StoredView[], value: (row: StoredView) => number) => rows.reduce((total, row) => total + value(row), 0)
+    // COUNT(DISTINCT day || visitor): one visitor on one day.
+    const visits = (rows: StoredView[]) => new Set(rows.map(row => row.day + row.visitor)).size
+
+    if (sql.startsWith('SELECT day, SUM(views)')) {
+      return {
+        results: counted(inRange, row => row.day).sort().map(([day, rows]) => {
+          const engaged = counted(rows, row => row.visitor).filter(([, visit]) => visit.length > 1 || sum(visit, row => row.seconds) >= 10)
+
+          return { day, views: sum(rows, row => row.views), visitors: visits(rows), seconds: sum(rows, row => row.seconds), engaged: engaged.length }
+        }),
+        changes: 0,
+      }
+    }
+
+    if (sql.startsWith('SELECT page, day, SUM(views)')) {
+      return {
+        results: counted(inRange, row => `${row.page} ${row.day}`).map(([, rows]) => {
+          const scrolled = rows.filter(row => row.scroll !== null)
+
+          return {
+            page: rows[0].page,
+            day: rows[0].day,
+            views: sum(rows, row => row.views),
+            visitors: rows.length,
+            entries: sum(rows, row => row.entry),
+            seconds: sum(rows, row => row.seconds),
+            scroll: scrolled.length ? sum(scrolled, row => row.scroll ?? 0) : null,
+            scrolled: scrolled.length,
+            arabic: rows.filter(row => row.language === 'ar').length,
+          }
+        }),
+        changes: 0,
+      }
+    }
+
+    if (sql.startsWith('SELECT channel, source, medium, campaign')) {
+      return {
+        results: counted(inRange.filter(row => row.entry === 1), row => [row.channel, row.source, row.medium, row.campaign].join(' '))
+          .map(([, rows]) => ({ channel: rows[0].channel, source: rows[0].source, medium: rows[0].medium, campaign: rows[0].campaign, visitors: visits(rows) })),
+        changes: 0,
+      }
+    }
+
+    if (sql.startsWith('SELECT device, browser, os, country')) {
+      return {
+        results: counted(inRange, row => [row.device, row.browser, row.os, row.country].join(' '))
+          .map(([, rows]) => ({ device: rows[0].device, browser: rows[0].browser, os: rows[0].os, country: rows[0].country, visitors: visits(rows) })),
+        changes: 0,
+      }
+    }
+
+    if (sql.startsWith("SELECT CAST(strftime('%w', day)")) {
+      return {
+        results: counted(inRange, row => `${new Date(`${row.day}T00:00:00Z`).getUTCDay()} ${row.hour}`)
+          .map(([key, rows]) => ({ weekday: Number(key.split(' ')[0]), hour: rows[0].hour, visitors: visits(rows) })),
+        changes: 0,
+      }
+    }
+
+    // SUM over no measured value is NULL, as in SQL.
+    if (sql.startsWith('SELECT device, COUNT(lcp)')) {
+      return {
+        results: counted(inRange.filter(row => row.device !== ''), row => row.device).map(([device, rows]) => {
+          const speed = new Map<string, number | null>()
+
+          for (const [name, good, poor] of LIMITS) {
+            const values = rows.map(row => row[name]).filter(value => value !== null)
+
+            speed.set(name, values.length)
+            speed.set(`${name}Good`, values.length ? values.filter(value => value <= good).length : null)
+            speed.set(`${name}Poor`, values.length ? values.filter(value => value > poor).length : null)
+          }
+
+          return { device, ...Object.fromEntries(speed) }
+        }),
+        changes: 0,
+      }
+    }
+
+    // SELECT strftime(...) AS day, COUNT(*) AS count FROM likes | comments WHERE created_at >= ? GROUP BY day
+    const baghdadDay = (time: number) => new Date(time + 3 * 60 * 60 * 1000).toISOString().slice(0, 10)
+
+    if (sql.includes('AS day, COUNT(*) AS count FROM likes')) {
+      return { results: counted([...likes.values()].filter(time => time >= Number(first)), baghdadDay).map(([day, rows]) => ({ day, count: rows.length })), changes: 0 }
+    }
+
+    if (sql.includes('AS day, COUNT(*) AS count FROM comments')) {
+      return { results: counted(comments.filter(item => item.createdAt >= Number(first) && item.hidden === 0), item => baghdadDay(item.createdAt)).map(([day, rows]) => ({ day, count: rows.length })), changes: 0 }
+    }
+
+    if (sql.startsWith('SELECT slug, COUNT(*) AS count FROM likes')) {
+      return { results: counted([...likes].filter(([, createdAt]) => createdAt >= Number(first)), ([key]) => key.split(' ')[0]).map(([slug, rows]) => ({ slug, count: rows.length })), changes: 0 }
+    }
+
+    if (sql.startsWith('SELECT slug, COUNT(*) AS count FROM comments')) {
+      return { results: counted(comments.filter(item => item.createdAt >= Number(first) && item.hidden === 0), item => item.slug).map(([slug, rows]) => ({ slug, count: rows.length })), changes: 0 }
+    }
+
     throw new Error(`unexpected SQL: ${sql}`)
   }
 
@@ -141,7 +318,7 @@ function makeDb() {
       all: async () => {
         const { results, changes } = execute(sql, values)
 
-        return { results, meta: { changes } }
+        return { results, meta: { changes, rows_read: results.length } }
       },
       first: async () => execute(sql, values).results[0] ?? null,
     })
@@ -160,7 +337,7 @@ function makeDb() {
     },
   }
 
-  return { ...session, withSession: () => session, comments, likes, users, queries: () => queries }
+  return { ...session, withSession: () => session, comments, likes, users, salts, views, queries: () => queries }
 }
 
 type Limits = 'PER_CLIENT_LIKES' | 'PER_CLIENT_COMMENTS' | 'ALL_CLIENTS_COMMENTS' | 'ALL_LIKES' | 'PER_CLIENT_COLLECT' | 'ALL_COLLECT' | 'PER_CLIENT_AUTH'
@@ -191,6 +368,7 @@ function makeEnv(limits: Partial<Record<Limits, boolean>> = {}) {
     GITHUB_CLIENT_ID: 'Iv23client',
     GITHUB_CLIENT_SECRET: 'client-secret',
     SESSION_SECRET: 'a-long-random-session-secret',
+    OWNER_GITHUB_ID: '999',
   } satisfies Env
 
   return { env, db }
@@ -433,7 +611,7 @@ describe('reactions worker: likes', () => {
 
     expect(await response.json()).toEqual({ likes: 1, liked: false })
     expect(response.headers.get('Cache-Control')).toBe('no-store')
-    expect([...db.likes]).toEqual([`${slug} 7`])
+    expect([...db.likes.keys()]).toEqual([`${slug} 7`])
     expect(points.map(point => point.blobs[0])).toEqual(['like', 'like', 'unlike'])
   })
 
@@ -956,10 +1134,24 @@ describe('reactions worker: comments', () => {
   })
 })
 
-describe('reactions worker: page views', () => {
-  const beacon = { path: '/ar/blog/x/', ref: 'https://www.google.com/search?q=saif', lang: 'ar', w: 390, lcp: 1200, cls: 0, inp: -1, ttfb: 80 }
+const PHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1'
 
-  const collect = (body: Partial<typeof beacon>, headers: Record<string, string> = {}) => send('POST', '/api/collect', JSON.stringify(body), { 'Content-Type': 'text/plain;charset=UTF-8', 'User-Agent': 'Mozilla/5.0', ...headers })
+const MAC = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
+
+describe('reactions worker: page views', () => {
+  const beacon = { path: '/ar/blog/x/', ref: 'https://www.google.com/search?q=saif', lang: 'ar', entry: true, lcp: 1200, cls: 0, inp: -1, ttfb: 80 }
+
+  const collect = (body: Record<string, string | number | boolean>, headers: Record<string, string> = {}) => send('POST', '/api/collect', JSON.stringify(body), { 'Content-Type': 'text/plain;charset=UTF-8', 'User-Agent': PHONE, ...headers })
+
+  // The row a beacon writes, from one address.
+  const rowOf = async (body: Record<string, string | number | boolean>, headers: Record<string, string> = {}) => {
+    const { env, db } = makeEnv()
+
+    await worker.fetch(collect(body, { 'CF-Connecting-IP': '192.0.2.1', ...headers }), env, ctx)
+    await Promise.all(pending)
+
+    return db.views[0]
+  }
 
   it('writes one data point with the referrer host only', async () => {
     const { env } = makeEnv()
@@ -972,7 +1164,7 @@ describe('reactions worker: page views', () => {
   it('keeps an inside referrer empty', async () => {
     const { env } = makeEnv()
 
-    await worker.fetch(collect({ ...beacon, path: '/', ref: 'https://1saif.me/blog', w: 1440 }), env, ctx)
+    await worker.fetch(collect({ ...beacon, path: '/', ref: 'https://1saif.me/blog' }, { 'User-Agent': MAC }), env, ctx)
     expect(points[0].indexes).toEqual(['/'])
     expect(points[0].blobs.slice(2)).toEqual(['', 'ar', '', 'desktop'])
   })
@@ -990,6 +1182,7 @@ describe('reactions worker: page views', () => {
   it.each([
     ['a bot', collect(beacon, { 'User-Agent': 'Googlebot/2.1' })],
     ['a headless browser', collect(beacon, { 'User-Agent': 'Mozilla/5.0 HeadlessChrome/120' })],
+    ['a speed test', collect(beacon, { 'User-Agent': `${MAC} Chrome-Lighthouse` })],
     ['a path with a query', collect({ ...beacon, path: '/blog?q=1' })],
     ['a path with a hash', collect({ ...beacon, path: '/blog#top' })],
     ['another host', collect({ ...beacon, path: '//evil.example/x' })],
@@ -1005,9 +1198,202 @@ describe('reactions worker: page views', () => {
   })
 
   it.each(['PER_CLIENT_COLLECT', 'ALL_COLLECT'] as const)('drops a view over %s', async binding => {
-    const { env } = makeEnv({ [binding]: false })
+    const { env, db } = makeEnv({ [binding]: false })
 
     expect((await worker.fetch(collect(beacon), env, ctx)).status).toBe(204)
+    await Promise.all(pending)
     expect(points).toHaveLength(0)
+    expect(db.views).toHaveLength(0)
+  })
+
+  it('counts a visitor once per page and day, by a hash that holds no IP address', async () => {
+    const { env, db } = makeEnv()
+
+    await worker.fetch(collect(beacon, { 'CF-Connecting-IP': '203.0.113.7' }), env, ctx)
+    await worker.fetch(collect({ ...beacon, path: '/blog/x', ref: '' }, { 'CF-Connecting-IP': '203.0.113.7' }), env, ctx)
+    await worker.fetch(collect(beacon, { 'CF-Connecting-IP': '203.0.113.8' }), env, ctx)
+    await Promise.all(pending)
+
+    expect(db.views).toHaveLength(2)
+    expect(db.views.map(({ page, views, entry, channel, source, language, device, browser, os }) => ({ page, views, entry, channel, source, language, device, browser, os }))).toEqual([
+      { page: '/blog/x', views: 2, entry: 1, channel: 'search', source: 'google.com', language: 'ar', device: 'mobile', browser: 'Safari', os: 'iOS' },
+      { page: '/blog/x', views: 1, entry: 1, channel: 'search', source: 'google.com', language: 'ar', device: 'mobile', browser: 'Safari', os: 'iOS' },
+    ])
+    expect(db.views[0].visitor).toMatch(/^[\w-]{22}$/)
+    expect(JSON.stringify(db.views)).not.toContain('203.0.113')
+  })
+
+  it.each([
+    ['a search engine', { ref: 'https://www.google.com/' }, ['search', 'google.com', '', '']],
+    ['ChatGPT, by its tag', { ref: 'https://chatgpt.com/', source: 'chatgpt.com' }, ['ai', 'chatgpt.com', '', '']],
+    ['Perplexity, by its host', { ref: 'https://www.perplexity.ai/' }, ['ai', 'perplexity.ai', '', '']],
+    ['Gemini before Google search', { ref: 'https://gemini.google.com/' }, ['ai', 'gemini.google.com', '', '']],
+    ['Hacker News', { ref: 'https://news.ycombinator.com/item' }, ['social', 'news.ycombinator.com', '', '']],
+    ['a Google Ads click', { click: 'gclid', campaign: 'Launch_2026' }, ['paid', 'google', 'cpc', 'launch_2026']],
+    ['a shared Facebook link', { click: 'fbclid', ref: 'https://l.facebook.com/' }, ['social', 'facebook', 'social', '']],
+    ['a newsletter', { source: 'Newsletter', medium: 'email', campaign: 'Oct 2026' }, ['email', 'newsletter', 'email', 'oct 2026']],
+    ['a paid tag on any source', { source: 'linkedin', medium: 'paid_social' }, ['paid', 'linkedin', 'paid_social', '']],
+    ['another site', { ref: 'https://dev.example/post' }, ['referral', 'dev.example', '', '']],
+    ['no referrer', {}, ['direct', '', '', '']],
+    ['an email address or markup in a tag', { source: 'me@example.com', campaign: '<b>spring</b>' }, ['direct', '', '', 'bspringb']],
+    ['an unknown click ID', { click: 'xclid' }, ['direct', '', '', '']],
+  ])('records %s as where the visit came from', async (_, origin, expected) => {
+    const row = await rowOf({ path: '/', ...origin })
+
+    expect([row.channel, row.source, row.medium, row.campaign]).toEqual(expected)
+  })
+
+  it.each([
+    ['an iPhone', PHONE, {}, ['mobile', 'Safari', 'iOS']],
+    ['an iPad, which sends the Mac string', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15', { touch: true }, ['tablet', 'Safari', 'iOS']],
+    ['a Mac', MAC, {}, ['desktop', 'Chrome', 'macOS']],
+    ['Edge on Windows', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0', {}, ['desktop', 'Edge', 'Windows']],
+    ['an Android phone', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36', {}, ['mobile', 'Chrome', 'Android']],
+    ['an Android tablet', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', {}, ['tablet', 'Chrome', 'Android']],
+    ['Firefox on Linux', 'Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0', {}, ['desktop', 'Firefox', 'Linux']],
+    ['the Instagram app', `${PHONE} Instagram 400.0.0.0`, {}, ['mobile', 'In-app', 'iOS']],
+  ])('records the device, browser and system of %s', async (_, agent, extra, expected) => {
+    const row = await rowOf({ path: '/', ...extra }, { 'User-Agent': agent })
+
+    expect([row.device, row.browser, row.os]).toEqual(expected)
+  })
+
+  it('knows Brave by its Sec-CH-UA brand', async () => {
+    const row = await rowOf({ path: '/' }, { 'User-Agent': MAC, 'Sec-CH-UA': '"Brave";v="140", "Chromium";v="140", "Not=A?Brand";v="24"' })
+
+    expect(row.browser).toBe('Brave')
+  })
+
+  it('adds the time, keeps the deepest scroll and the first speed of a page read twice', async () => {
+    const { env, db } = makeEnv()
+    const headers = { 'CF-Connecting-IP': '192.0.2.1' }
+
+    await worker.fetch(collect({ path: '/blog/x', entry: true, seconds: 30, scroll: 40, lcp: 1200.4, inp: -1, cls: 0.01234, ttfb: 80 }, headers), env, ctx)
+    await worker.fetch(collect({ path: '/blog/x', entry: false, seconds: 7200, scroll: 140, lcp: -1, inp: 180, cls: 0.5, ttfb: -1 }, headers), env, ctx)
+    await Promise.all(pending)
+
+    expect(db.views).toHaveLength(1)
+    expect(db.views[0]).toMatchObject({ views: 2, entry: 1, seconds: 1830, scroll: 100, lcp: 1200, inp: 180, cls: 0.0123, ttfb: 80 })
+  })
+
+  it('gives a visitor a new ID on a new Baghdad day and deletes the old salt', async () => {
+    const { env, db } = makeEnv()
+    vi.useFakeTimers({ toFake: ['Date'] })
+
+    // 20:59 UTC is 23:59 in Baghdad; a minute later the day changes there.
+    for (const time of ['2026-03-01T20:59:00Z', '2026-03-01T21:00:00Z']) {
+      vi.setSystemTime(new Date(time))
+      await worker.fetch(collect(beacon), env, ctx)
+      await Promise.all(pending)
+    }
+
+    vi.useRealTimers()
+    expect(db.views.map(row => row.day)).toEqual(['2026-03-01', '2026-03-02'])
+    expect(db.views[0].visitor).not.toBe(db.views[1].visitor)
+    expect([...db.salts.keys()]).toEqual(['2026-03-02'])
+  })
+
+  it("does not count the owner's own views", async () => {
+    const { env, db } = makeEnv()
+    const owner = await signIn(env, { id: 999, login: 'saif', name: 'Saif' })
+
+    await worker.fetch(collect(beacon, { Cookie: owner.header }), env, ctx)
+    await Promise.all(pending)
+    expect(points).toHaveLength(0)
+    expect(db.views).toHaveLength(0)
+  })
+
+  it('keeps counting when D1 fails', async () => {
+    const { env } = makeEnv()
+    vi.spyOn(env.DB, 'prepare').mockImplementation(() => { throw new Error('D1 is down') })
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    expect((await worker.fetch(collect(beacon, { 'CF-Connecting-IP': '198.51.100.1' }), env, ctx)).status).toBe(204)
+    await Promise.all(pending)
+    expect(points).toHaveLength(1)
+    expect(warn).toHaveBeenCalledWith('view count failed')
+  })
+})
+
+describe('reactions worker: insights', () => {
+  const read = (env: Env, query = '', cookie = '') => worker.fetch(new Request(`https://1saif.me/api/insights${query}`, { headers: cookie ? { Cookie: cookie } : {} }), env, ctx)
+
+  const view = (path: string, ip: string, beacon: Record<string, string | number | boolean>) =>
+    send('POST', '/api/collect', JSON.stringify({ path, lang: path.startsWith('/ar') ? 'ar' : 'en', entry: true, seconds: 5, ...beacon }), { 'User-Agent': MAC, 'CF-Connecting-IP': ip })
+
+  it('answers 404 to anyone but the owner', async () => {
+    const { env } = makeEnv()
+    const reader = await signIn(env)
+
+    expect((await read(env)).status).toBe(404)
+    expect((await read(env, '', reader.header)).status).toBe(404)
+  })
+
+  it('reports visits, pages, origins, audience, hours, speed, likes and comments for the range', async () => {
+    const { env } = makeEnv()
+    vi.useFakeTimers({ toFake: ['Date'] })
+    // 12:30 on Wednesday 4 March in Baghdad.
+    vi.setSystemTime(new Date('2026-03-04T09:30:00Z'))
+    const reader = await signIn(env)
+
+    const views: [string, string, Record<string, string | number | boolean>][] = [
+      [`/blog/${slug}`, '1', { ref: 'https://news.ycombinator.com/item', seconds: 40, scroll: 80, lcp: 1800, ttfb: 300 }],
+      [`/ar/blog/${slug}`, '1', { entry: false, seconds: 20, scroll: 100 }],
+      [`/blog/${slug}`, '2', { lcp: 5000, ttfb: 900 }],
+      ['/', '2', { ref: 'https://www.google.com/' }],
+      ['/', '3', { seconds: 3 }],
+    ]
+
+    for (const [path, ip, beacon] of views) await worker.fetch(view(path, `192.0.2.${ip}`, beacon), env, ctx)
+
+    await worker.fetch(likeRequest(reader.header), env, ctx)
+    await worker.fetch(commentRequest(reader.header), env, ctx)
+    await Promise.all(pending)
+    const owner = await signIn(env, { id: 999, login: 'saif', name: 'Saif' })
+    const response = await read(env, '?days=7', owner.header)
+    const body = await response.json()
+
+    vi.useRealTimers()
+    expect(response.status).toBe(200)
+    expect(response.headers.get('Cache-Control')).toBe('no-store')
+    expect(body.from).toBe('2026-02-26')
+    expect(body.before).toBe('2026-02-19')
+    expect(body.read).toBeGreaterThan(0)
+    // Visitor 1 stayed 60 seconds and visitor 2 read two pages; visitor 3 left after 3 seconds.
+    expect(body.daily).toEqual([{ day: '2026-03-04', views: 5, visitors: 3, seconds: 73, engaged: 2 }])
+    expect(body.pages).toEqual([
+      { page: `/blog/${slug}`, day: '2026-03-04', views: 3, visitors: 2, entries: 2, seconds: 65, scroll: 100, scrolled: 1, arabic: 0 },
+      { page: '/', day: '2026-03-04', views: 2, visitors: 2, entries: 2, seconds: 8, scroll: null, scrolled: 0, arabic: 0 },
+    ])
+    expect(body.acquisition).toEqual([
+      { channel: 'social', source: 'news.ycombinator.com', medium: '', campaign: '', visitors: 1 },
+      { channel: 'direct', source: '', medium: '', campaign: '', visitors: 2 },
+      { channel: 'search', source: 'google.com', medium: '', campaign: '', visitors: 1 },
+    ])
+    expect(body.audience).toEqual([{ device: 'desktop', browser: 'Chrome', os: 'macOS', country: '', visitors: 3 }])
+    expect(body.hours).toEqual([{ weekday: 3, hour: 12, visitors: 3 }])
+    expect(body.speed).toEqual([{ device: 'desktop', lcp: 2, lcpGood: 1, lcpPoor: 1, inp: 0, inpGood: null, inpPoor: null, cls: 0, clsGood: null, clsPoor: null, ttfb: 2, ttfbGood: 1, ttfbPoor: 0 }])
+    expect(body.likesDaily).toEqual([{ day: '2026-03-04', count: 1 }])
+    expect(body.commentsDaily).toEqual([{ day: '2026-03-04', count: 1 }])
+    expect(body.likes).toEqual([{ slug, count: 1 }])
+    expect(body.comments).toEqual([{ slug, count: 1 }])
+  })
+
+  it.each(['?days=0', '?days=366', '?days=7.5', '?days=x'])('refuses %s', async query => {
+    const { env } = makeEnv()
+    const owner = await signIn(env, { id: 999, login: 'saif', name: 'Saif' })
+
+    expect((await read(env, query, owner.header)).status).toBe(400)
+  })
+
+  it('returns the owner to the insights page after sign-in', async () => {
+    const { env } = makeEnv()
+    stubSite()
+    const { location, flow } = await startSignIn(env, '/ar/insights')
+
+    stubGitHub()
+    const response = await worker.fetch(callback(`code=abc&state=${location.searchParams.get('state')}`, flow), env, ctx)
+
+    expect(response.headers.get('Location')).toBe('/ar/insights#comments-title')
   })
 })

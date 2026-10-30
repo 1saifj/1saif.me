@@ -1,10 +1,7 @@
 // Anonymous page views and Core Web Vitals: one beacon per page view to /api/collect.
-// No cookie, no storage and no ID; the Worker keeps only the referrer's host (README, Insights).
+// No cookie, no storage and no ID; the Worker keeps only the referrer's host and a visitor ID that changes
+// every day (README, Insights).
 import { isArabicPath } from '../i18n/language'
-
-declare global {
-  interface Navigator { globalPrivacyControl?: boolean }
-}
 
 // Entry fields TypeScript's DOM types do not list yet.
 interface LayoutShift extends PerformanceEntry {
@@ -57,8 +54,9 @@ export function pageView(path: string) {
 }
 
 export function startInsights() {
-  // Automated browsers and visitors who ask not to be tracked send nothing.
-  if (navigator.webdriver || navigator.doNotTrack === '1' || navigator.globalPrivacyControl) return
+  // Automated browsers send nothing. Do Not Track and Global Privacy Control count the same anonymous way:
+  // nothing here follows a person across sites or days, or is shared (README, Insights).
+  if (navigator.webdriver) return
 
   // Local dev has a collector only when wrangler dev runs behind the Vite proxy (README, Local dev).
   if (import.meta.env.DEV && !import.meta.env.VITE_INSIGHTS) return

@@ -25,7 +25,7 @@ npm run preview      # serve dist/ on port 4173
 npm test             # unit tests (Vitest)
 npm run typecheck
 npm run lint
-npm run insights     # page views, likes and comments (README, Insights)
+npm run insights     # page speed and view splits from Analytics Engine (README, Insights)
 ```
 
 Node 18 or newer.
@@ -87,13 +87,17 @@ The GitHub App sends the sign-in back only to its registered callback addresses:
 
 ## Insights
 
-The same Worker records anonymous page views (path, referrer domain, language, country, device class, LCP, CLS, INP, TTFB) and like, unlike and comment events in Workers Analytics Engine. There is no cookie, no ID and no IP address. Browsers that send Do Not Track or Global Privacy Control, and automated browsers, send nothing. To read the numbers, make an API token with Account → Account Analytics → Read, then:
+Open [1saif.me/insights](https://1saif.me/insights) signed in with the GitHub account in `OWNER_GITHUB_ID` (`workers/reactions/wrangler.jsonc`); everyone else gets a 404 from `/api/insights`. For 7, 30 or 90 days it shows unique visitors and page views a day, each post's visitors, views, likes and comments, the other pages, and the top referrers, countries, devices and languages. Days are Baghdad time.
+
+- The reactions Worker counts each page view in D1 (`views`, one row per visitor, page and day) and in Workers Analytics Engine.
+- A visitor ID is a SHA-256 hash of a random salt for the day, the IP address and the User-Agent. The Worker deletes the salts of earlier days (`salts`), so an old ID cannot be matched to an IP address again. There is no cookie and the IP address is not stored. A visitor counts once a day for each page, so a reader on two days counts twice.
+- Automated browsers send nothing, and the owner's own views are not counted. Browsers that send Do Not Track or Global Privacy Control are counted the same anonymous way.
+
+For page speed (p75 LCP, INP, CLS and TTFB), referrer, device and country splits by views, and a 30-day forecast, read Analytics Engine with an API token that has Account → Account Analytics → Read. Analytics Engine keeps data for three months:
 
 ```bash
 CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... npm run insights -- 30
 ```
-
-It prints daily views, top pages with p75 LCP, INP, CLS and TTFB, per-post views (EN and AR), likes, comments and like rate, and the language, device, country and referrer splits. It ends with a 30-day forecast: a straight line through the full days, and the share of the Free limits that the busiest day (seen or forecast) would use. Data is kept for three months.
 
 ## Costs
 
@@ -102,8 +106,8 @@ The account is on the Workers Free plan with no payment method, so nothing can b
 | Service | Free limit | What this site uses |
 | --- | --- | --- |
 | Workers | 100,000 requests a day, 10 ms CPU each | About 2 requests per post view (the page-view beacon, and the likes and comments read near the end), 1 more for a signed-in reader (their own like), 1 per other page view, 1 per like, comment or edit, 2 per sign-in. Cache hits and refused requests count too |
-| D1 | 5 million rows read and 100,000 rows written a day | `ALL_LIKES` allows 15 likes a minute and `ALL_CLIENTS_COMMENTS` 10 comments or edits a minute, per location: at most about 36,000 writes, or about 65,000 rows, a day. Triggers keep the like count, so a like or unlike costs a few rows, whatever the post's count. A read misses the 30 s edge cache at most twice a minute per post and location (and once after each new, edited or deleted comment; a like keeps the cache, and the liker gets the exact count), and reads about 401 rows for a post with 200 comments: the comments, their authors and the count (more when a blocked account's comments sit among them). So a post with 200 comments that one location reads every 30 s costs about 1.2 million rows a day, and about four such posts reach the limit |
-| Analytics Engine | 100,000 data points written and 10,000 read queries a day | `ALL_COLLECT` allows 40 page views a minute per location (57,600 a day), plus at most about 36,000 reaction events: about 93,600 in all from one location. The caps count per location, so traffic from many locations at once can go higher; the writes then stop for the day, and nothing is billed. One `npm run insights` run is 11 queries |
+| D1 | 5 million rows read and 100,000 rows written a day | `ALL_LIKES` allows 15 likes a minute and `ALL_CLIENTS_COMMENTS` 10 comments or edits a minute, per location: at most about 36,000 writes, or about 65,000 rows, a day. A page view writes one `views` row, and `ALL_COLLECT` allows 20 a minute per location (28,800 a day), so one location stays under the limit. Each load of the insights page reads every `views` row in its range about six times. Triggers keep the like count, so a like or unlike costs a few rows, whatever the post's count. A read misses the 30 s edge cache at most twice a minute per post and location (and once after each new, edited or deleted comment; a like keeps the cache, and the liker gets the exact count), and reads about 401 rows for a post with 200 comments: the comments, their authors and the count (more when a blocked account's comments sit among them). So a post with 200 comments that one location reads every 30 s costs about 1.2 million rows a day, and about four such posts reach the limit |
+| Analytics Engine | 100,000 data points written and 10,000 read queries a day | `ALL_COLLECT` allows 20 page views a minute per location (28,800 a day), plus at most about 36,000 reaction events: about 64,800 in all from one location. The caps count per location, so traffic from many locations at once can go higher; the writes then stop for the day, and nothing is billed. One `npm run insights` run is 11 queries |
 
 Every query uses a primary key or an index (`comments_by_post`, and `comments_by_author` for the daily cap), so no request scans a table. Rate limits are counted per Cloudflare location, so traffic spread over many locations can pass the caps.
 
@@ -112,6 +116,7 @@ Every like and comment needs a GitHub account, and each account is rate limited 
 The zone's one Free WAF rate limiting rule (Security → Security rules → Rate limiting rules) stops a burst before it reaches any Worker, and blocked requests do not count: `URI Path starts with /api/`, 10 requests per 10 seconds per IP, then a 10-second block. A post view sends at most 3 `/api/` requests, so a reader stays far below it. It does not stop a steady stream: one IP just under it sends about 86,000 requests a day, most of the shared Workers limit.
 
 Known limits, accepted for a personal blog:
+- Page views over `ALL_COLLECT` (20 a minute per location) are not counted, so a sudden rush of readers shows lower than it was.
 - Each accepted comment or edit mails Saif, and nothing caps the mails a day: `ALL_CLIENTS_COMMENTS` allows 10 a minute per location.
 - The global comment cap counts before the blocked check, because checking first would cost a D1 read per request. So blocked accounts still posting can make others wait for the next minute.
 - A post reply read just before a comment is saved can reach the edge cache just after the purge, so that location shows the old reply for up to 30 s more.
