@@ -95,6 +95,7 @@ const copy = {
     days: (days: number) => `${days} days`,
     period: (from: string, to: string, before: string, end: string) => `${from} – ${to}, compared with ${before} – ${end}`,
     since: (from: string, to: string, first: string) => `${from} – ${to}. Views are recorded from ${first}, so changes show once a full period before is recorded.`,
+    unrecorded: (from: string, to: string) => `${from} – ${to}. No views are recorded yet.`,
     exportCsv: 'Export CSV',
     loading: 'Loading the numbers…',
     private: 'This page opens only for the site owner.',
@@ -162,6 +163,7 @@ const copy = {
     days: (days: number) => `${days} يوماً`,
     period: (from: string, to: string, before: string, end: string) => `${from} – ${to}، مقارنةً بـ ${before} – ${end}`,
     since: (from: string, to: string, first: string) => `${from} – ${to}. تُسجَّل الزيارات منذ ${first}، فتظهر التغيّرات حين تُسجَّل مدة سابقة كاملة.`,
+    unrecorded: (from: string, to: string) => `${from} – ${to}. لم تُسجَّل أي زيارة بعد.`,
     exportCsv: 'تصدير CSV',
     loading: 'جارٍ تحميل الأرقام…',
     private: 'هذه الصفحة لصاحب الموقع فقط.',
@@ -390,7 +392,7 @@ function BarList({ items, title, head, none, number, percent }: BarListProps) {
               <li key={item.name}>
                 <span className="insights-split-label" dir="auto">{item.label}</span>
                 <span className="insights-split-value">{number.format(item.visitors)}<small>{percent.format(item.visitors / total)}</small></span>
-                <span className="insights-split-engaged" title={head[1]}>{percent.format(item.engaged / Math.max(1, item.visitors))}</span>
+                <span className="insights-split-engaged" title={head[1]}>{percent.format(item.engaged / Math.max(1, item.visitors))}<span className="insights-hidden"> {head[1]}</span></span>
                 <span className="insights-split-bar" style={cssVariable('--share', item.visitors / most)} aria-hidden>
                   <i style={cssVariable('--share', item.engaged / Math.max(1, item.visitors))} />
                 </span>
@@ -486,7 +488,7 @@ export const InsightsPage: React.FC = () => {
     <header className="insights-head">
       <div>
         <h1>{t.title}</h1>
-        {data && <p className="insights-period">{compared ? t.period(dayName(data.from), dayName(dayAfter(data.from, days - 1)), dayName(data.before), dayName(dayAfter(data.before, days - 1))) : t.since(dayName(data.from), dayName(dayAfter(data.from, days - 1)), dayName(data.first ?? data.from))}</p>}
+        {data && <p className="insights-period">{compared ? t.period(dayName(data.from), dayName(dayAfter(data.from, days - 1)), dayName(data.before), dayName(dayAfter(data.before, days - 1))) : data.first ? t.since(dayName(data.from), dayName(dayAfter(data.from, days - 1)), dayName(data.first)) : t.unrecorded(dayName(data.from), dayName(dayAfter(data.from, days - 1)))}</p>}
       </div>
       {status !== 'private' && (
         <div className="insights-controls">

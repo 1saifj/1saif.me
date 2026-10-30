@@ -119,6 +119,7 @@ The zone's one Free WAF rate limiting rule (Security → Security rules → Rate
 
 Known limits, accepted for a personal blog:
 - Page views over `ALL_COLLECT` (20 a minute per location) are not counted, so a sudden rush of readers shows lower than it was.
+- A reader who leaves before the page's script runs is not counted, as with any script-based count. An edge count would include them, and every bot too.
 - A page view sends its one beacon when the tab is first hidden, so time read after the reader comes back is not counted.
 - For a page left by an in-site link, the scroll depth uses the page height seen while scrolling, which can be a loading placeholder, so a short page can show as read to the end.
 - Each accepted comment or edit mails Saif, and nothing caps the mails a day: `ALL_CLIENTS_COMMENTS` allows 10 a minute per location.
