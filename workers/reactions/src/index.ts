@@ -225,7 +225,8 @@ const GITHUB_HEADERS = { Accept: 'application/vnd.github+json', 'User-Agent': '1
 
 // Speed tests run a real browser on a slowed network, so their numbers would skew the speed counts. AI agents that
 // browse for a person name themselves with these tokens, or sign their requests (Signature-Agent, checked in collect).
-const BOT = /bot|crawl|spider|headless|lighthouse|pagespeed|gtmetrix|ptst|google-agent|grokagent|chatgpt-user|claude-user|perplexity-user|muse-/i
+// Meta's crawlers add their token to a normal browser string and fetch the scripts, without a bot word.
+const BOT = /bot|crawl|spider|headless|lighthouse|pagespeed|gtmetrix|ptst|google-agent|grokagent|chatgpt-user|claude-user|perplexity-user|muse-|meta-external|meta-webindexer|facebookexternal/i
 
 const reply = <Body,>(status: number, body: Body) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } })
 
@@ -875,16 +876,17 @@ async function insights(request: Request, env: Env, url: URL): Promise<Response>
   // A visit is one visitor on one day. It is engaged when it read two pages or stayed ten seconds. ?1 is the first day.
   const visits = 'SELECT day, visitor, COUNT(*) > 1 OR SUM(seconds) >= 10 AS engaged FROM views WHERE day >= ?1 GROUP BY day, visitor'
 
-  // Every views query reads the rows of its range once, and the two that join visits twice, so the whole report reads
-  // the range's rows about ten times.
+  // D1 counts a row again each time a sort or a subquery reads it. Measured on a local D1, the whole report reads each
+  // views row of the range about 18 times.
   const batch = env.DB.batch([
     query('SELECT day, SUM(views) AS views, COUNT(*) AS visitors, SUM(seconds) AS seconds, SUM(pages > 1 OR seconds >= 10) AS engaged FROM (SELECT day, SUM(views) AS views, COUNT(*) AS pages, SUM(seconds) AS seconds FROM views WHERE day >= ? GROUP BY day, visitor) GROUP BY day ORDER BY day', before),
     query("SELECT page, day, SUM(views) AS views, COUNT(*) AS visitors, SUM(entry) AS entries, SUM(seconds) AS seconds, SUM(scroll) AS scroll, COUNT(scroll) AS scrolled, SUM(language = 'ar') AS arabic FROM views WHERE day >= ? GROUP BY page, day", before),
     // A visit counts where it started, so a page read after it does not count as direct. Its engagement covers every
     // page of the visit, which shows which sources bring readers and which bring a glance.
     query(`SELECT channel, source, medium, campaign, content, COUNT(*) AS visitors, SUM(engaged) AS engaged FROM (SELECT DISTINCT day, visitor, channel, source, medium, campaign, content FROM views WHERE day >= ?1 AND entry = 1) JOIN (${visits}) USING (day, visitor) GROUP BY channel, source, medium, campaign, content`, from),
-    // Device, browser, system and country stay the same through a visit, so one query groups them all.
-    query(`SELECT device, browser, os, country, COUNT(*) AS visitors, SUM(engaged) AS engaged FROM (SELECT DISTINCT day, visitor, device, browser, os, country FROM views WHERE day >= ?1) JOIN (${visits}) USING (day, visitor) GROUP BY device, browser, os, country`, from),
+    // Device, browser, system and country stay the same through a visit, so one pass groups each visit with them; a
+    // join with visits, as above, would read the range twice.
+    query('SELECT device, browser, os, country, COUNT(*) AS visitors, SUM(engaged) AS engaged FROM (SELECT device, browser, os, country, COUNT(*) > 1 OR SUM(seconds) >= 10 AS engaged FROM views WHERE day >= ? GROUP BY day, visitor, device, browser, os, country) GROUP BY device, browser, os, country', from),
     query("SELECT CAST(strftime('%w', day) AS INTEGER) AS weekday, hour, COUNT(DISTINCT day || visitor) AS visitors FROM views WHERE day >= ? GROUP BY weekday, hour", from),
     query(`SELECT device, ${speed} FROM views WHERE day >= ? AND device != '' GROUP BY device`, from),
     query('SELECT slug, COUNT(*) AS count FROM likes WHERE created_at >= ? GROUP BY slug', since),
