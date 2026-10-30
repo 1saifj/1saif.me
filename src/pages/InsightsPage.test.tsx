@@ -243,6 +243,15 @@ describe('InsightsPage', () => {
     expect(container.querySelector('.insights-message a')?.getAttribute('href')).toBe(`/api/auth/github?return=${encodeURIComponent('/ar/insights')}`)
   })
 
+  it('says when a sign-in did not finish, and keeps only the page in the address', async () => {
+    window.history.replaceState(null, '', '/insights?signin=failed#comments-title')
+    await show(new Response(null, { status: 404 }))
+
+    expect(container.querySelector('.insights-message[role="alert"]')?.textContent).toBe('The GitHub sign-in did not finish. Try again')
+    expect(container.querySelector('.insights-message a')?.getAttribute('href')).toBe(`/api/auth/github?return=${encodeURIComponent('/insights')}`)
+    expect(window.location.href).toBe(new URL('/insights', window.location.origin).href)
+  })
+
   it('offers a retry when the numbers fail to load', async () => {
     const fetch = await show(new Response(null, { status: 500 }))
 
