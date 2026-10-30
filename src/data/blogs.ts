@@ -3,6 +3,25 @@ import { BlogPost } from '../schemas/blogSchema'
 // Homepage metadata stays small; full markdown remains lazy on article routes.
 const blogs: BlogPost[] = [
   {
+    "title": "Your Claude Code Limits Are Paying for a 3-Word Status Line",
+    "description": "Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.",
+    "titleAr": "حدود Claude Code تدفع ثمن سطر حالة من 3 كلمات",
+    "descriptionAr": "يرسل Claude Code نصوص الوكلاء إلى نموذج لكتابة سطر حالة من 3 إلى 5 كلمات. خفّض خطّاف Bun هذه الطلبات من 3 إلى 0، ثم لم يصل إلى تطبيق سطح المكتب.",
+    "createdAt": 1793307600000,
+    "updatedAt": 1793307600000,
+    "draft": false,
+    "tags": [
+      "ai",
+      "developer-tools",
+      "claude-code",
+      "background-agents",
+      "macos",
+      "bun"
+    ],
+    "file": "how_to_make_claude_code_limits_last_longer",
+    "words": 1098
+  },
+  {
     "title": "The VPN Gateway That Was Running on Luck",
     "description": "Twelve IPsec tunnels were up, traffic was flowing, and systemd said strongSwan wasn't running at all. How I found out, and the one-time script I used to fix it on production in about three seconds of downtime.",
     "titleAr": "بوابة VPN كانت تعمل بالحظ",
