@@ -1,4 +1,4 @@
-// Anonymous page views, time on page, scroll depth and Core Web Vitals: one beacon per page view to /api/collect.
+// Anonymous page views, time on page, scroll depth and Core Web Vitals: one beacon per page view to /api/read.
 // No cookie, no storage and no ID; the Worker keeps a visitor ID that changes every day (README, Insights).
 import { isArabicPath } from '../i18n/language'
 
@@ -21,6 +21,7 @@ interface Landing {
   source: string
   medium: string
   campaign: string
+  content: string
   // The query's parameter names, so the Worker can see a click ID such as gclid. Values are never sent.
   keys: string
 }
@@ -65,7 +66,8 @@ function send() {
 
   // One beacon per page view: a tab hidden twice, or hidden and then left, sends nothing more.
   page = undefined
-  navigator.sendBeacon('/api/collect', JSON.stringify({ path, ...landing, lang: isArabicPath(path) ? 'ar' : 'en', touch: navigator.maxTouchPoints > 1, seconds, scroll, lcp, cls, inp, ttfb }))
+  // Not /api/collect: EasyPrivacy, in uBlock Origin and Brave, blocks that path.
+  navigator.sendBeacon('/api/read', JSON.stringify({ path, ...landing, lang: isArabicPath(path) ? 'ar' : 'en', touch: navigator.maxTouchPoints > 1, seconds, scroll, lcp, cls, inp, ttfb }))
 }
 
 function observe(type: string, read: (entries: PerformanceEntry[]) => void) {
@@ -106,7 +108,7 @@ export function startInsights() {
     // The time on page starts with the navigation, not with this script.
     shown: document.visibilityState === 'visible' ? 0 : -1,
     ttfb: navigation ? navigation.responseStart : -1,
-    landing: { entry: ref !== location.origin, ref, source: tag('utm_source', 'ref', 'source', 'src'), medium: tag('utm_medium'), campaign: tag('utm_campaign'), keys: [...query.keys()].join(',').slice(0, 200) },
+    landing: { entry: ref !== location.origin, ref, source: tag('utm_source', 'ref', 'source', 'src'), medium: tag('utm_medium'), campaign: tag('utm_campaign'), content: tag('utm_content'), keys: [...query.keys()].join(',').slice(0, 200) },
   }
 
   // shortcut: LCP and TTFB are for the first page only. Chrome 151+ reports in-site page changes as soft navigations, but

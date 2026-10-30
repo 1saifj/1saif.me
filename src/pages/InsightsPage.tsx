@@ -24,7 +24,7 @@ interface Insights {
   read: number
   daily: { day: string; views: number; visitors: number; seconds: number; engaged: number }[]
   pages: { page: string; day: string; views: number; visitors: number; entries: number; seconds: number; scroll: number | null; scrolled: number; arabic: number }[]
-  acquisition: { channel: string; source: string; medium: string; campaign: string; visitors: number; engaged: number }[]
+  acquisition: { channel: string; source: string; medium: string; campaign: string; content: string; visitors: number; engaged: number }[]
   audience: { device: string; browser: string; os: string; country: string; visitors: number; engaged: number }[]
   hours: { weekday: number; hour: number; visitors: number }[]
   speed: SpeedRow[]
@@ -126,8 +126,8 @@ const copy = {
     splitHead: ['Visits', 'Engaged'],
     sources: 'Sources',
     campaigns: 'Campaigns',
-    campaignColumns: ['Source', 'Medium', 'Campaign', 'Visits'],
-    noCampaigns: 'No tagged links in this range. Add utm_source, utm_medium and utm_campaign to the links you share.',
+    campaignColumns: ['Source', 'Medium', 'Campaign', 'Link', 'Visits'],
+    noCampaigns: 'No tagged links in this range. Add utm_source, utm_medium and utm_campaign to the links you share, and utm_content to tell two links of one campaign apart.',
     channelNames: new Map([['ai', 'AI assistants'], ['search', 'Search'], ['social', 'Social'], ['referral', 'Other sites'], ['email', 'Email'], ['paid', 'Ads'], ['direct', 'Direct']]),
     devices: 'Devices',
     browsers: 'Browsers',
@@ -194,8 +194,8 @@ const copy = {
     splitHead: ['الزيارات', 'المتفاعلة'],
     sources: 'المصادر',
     campaigns: 'الحملات',
-    campaignColumns: ['المصدر', 'الوسيط', 'الحملة', 'الزيارات'],
-    noCampaigns: 'لا روابط موسومة في هذه المدة. أضف utm_source وutm_medium وutm_campaign إلى الروابط التي تشاركها.',
+    campaignColumns: ['المصدر', 'الوسيط', 'الحملة', 'الرابط', 'الزيارات'],
+    noCampaigns: 'لا روابط موسومة في هذه المدة. أضف utm_source وutm_medium وutm_campaign إلى الروابط التي تشاركها، وutm_content لتميّز بين رابطين في حملة واحدة.',
     channelNames: new Map([['ai', 'مساعدات الذكاء الاصطناعي'], ['search', 'البحث'], ['social', 'التواصل الاجتماعي'], ['referral', 'مواقع أخرى'], ['email', 'البريد'], ['paid', 'الإعلانات'], ['direct', 'مباشر']]),
     devices: 'الأجهزة',
     browsers: 'المتصفحات',
@@ -572,7 +572,7 @@ export const InsightsPage: React.FC = () => {
   const label = (names: Map<string, string>) => ([name, count]: [string, { visitors: number; engaged: number }]): Count => ({ name, label: names.get(name) ?? name, ...count })
   const channels = countsOf(data.acquisition, item => item.channel).map(label(t.channelNames))
   const sources = countsOf(data.acquisition, item => item.source).slice(0, 10).map(label(new Map<string, string>()))
-  const campaigns = data.acquisition.filter(item => item.campaign || item.medium).sort((a, b) => b.visitors - a.visitors).slice(0, 15)
+  const campaigns = data.acquisition.filter(item => item.campaign || item.medium || item.content).sort((a, b) => b.visitors - a.visitors).slice(0, 15)
   const devices = countsOf(data.audience, item => item.device).map(label(t.deviceNames))
   const browsers = countsOf(data.audience, item => item.browser).map(label(new Map([['In-app', t.inApp]])))
   const systems = countsOf(data.audience, item => item.os).map(label(new Map<string, string>()))
@@ -731,10 +731,11 @@ export const InsightsPage: React.FC = () => {
                       <thead><tr>{t.campaignColumns.map(column => <th key={column} scope="col">{column}</th>)}</tr></thead>
                       <tbody>
                         {campaigns.map(item => (
-                          <tr key={[item.source, item.medium, item.campaign].join(' ')}>
+                          <tr key={[item.source, item.medium, item.campaign, item.content].join(' ')}>
                             <th scope="row" dir="auto">{item.source || '–'}</th>
                             <td dir="auto">{item.medium || '–'}</td>
                             <td dir="auto">{item.campaign || '–'}</td>
+                            <td dir="auto">{item.content || '–'}</td>
                             <td>{number.format(item.visitors)}</td>
                           </tr>
                         ))}
