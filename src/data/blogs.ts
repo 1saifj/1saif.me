@@ -496,7 +496,7 @@ const blogs: BlogPost[] = [
     "titleAr": "إدارة الحالة في Flutter: مقارنة بين Provider وRiverpod وBloc",
     "descriptionAr": "مقارنة بين Provider وRiverpod وBloc من مشاريع حقيقية: كيف يعمل كلٌّ منها، وأين يناسب، وأيّها أختار لتطبيق جديد.",
     "createdAt": 1710018000000,
-    "updatedAt": 1710018000000,
+    "updatedAt": 1792357200000,
     "draft": false,
     "tags": [
       "mobile",

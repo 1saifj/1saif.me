@@ -9,8 +9,8 @@
     <link>https://1saif.me/blog</link>
     <atom:link href="https://1saif.me/rss.xml" rel="self" type="application/rss+xml"/>
     <language>en-us</language>
-    <lastBuildDate>Wed, 28 Oct 2026 22:26:18 GMT</lastBuildDate>
-    <pubDate>Thu, 29 Oct 2026 00:00:00 GMT</pubDate>
+    <lastBuildDate>Sat, 31 Oct 2026 20:20:37 GMT</lastBuildDate>
+    <pubDate>Fri, 30 Oct 2026 00:00:00 GMT</pubDate>
     <ttl>60</ttl>
     <copyright>Copyright 2026 Saif Aljanahi</copyright>
     <managingEditor>hello@1saif.me (Saif Aljanahi)</managingEditor>
@@ -20,6 +20,27 @@
       <title>Saif Aljanahi Blog</title>
       <link>https://1saif.me/blog</link>
     </image>
+
+    <item>
+      <title>Your Claude Code Limits Are Paying for a 3-Word Status Line</title>
+      <description>Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.</description>
+      <content:encoded><![CDATA[
+      <p>Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.</p>
+      <img src="https://1saif.me/articles/claude_limits_feat.jpg" alt="Your Claude Code Limits Are Paying for a 3-Word Status Line" />
+      <p><a href="https://1saif.me/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line">Read more...</a></p>
+    ]]></content:encoded>
+      <link>https://1saif.me/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line</link>
+      <guid isPermaLink="true">https://1saif.me/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line</guid>
+      <pubDate>Fri, 30 Oct 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Saif Aljanahi</dc:creator>
+      <category>ai</category>
+      <category>developer-tools</category>
+      <category>claude-code</category>
+      <category>background-agents</category>
+      <category>macos</category>
+      <category>bun</category>
+      <enclosure url="https://1saif.me/articles/claude_limits_feat.jpg" type="image/jpeg"/>
+    </item>
 
     <item>
       <title>The VPN Gateway That Was Running on Luck</title>

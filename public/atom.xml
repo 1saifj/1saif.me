@@ -5,7 +5,7 @@
   <link href="https://1saif.me/blog" rel="alternate"/>
   <link href="https://1saif.me/atom.xml" rel="self"/>
   <id>https://1saif.me/blog</id>
-  <updated>2026-10-29T00:00:00.000Z</updated>
+  <updated>2026-10-30T00:00:00.000Z</updated>
   <author>
     <name>Saif Aljanahi</name>
     <email>hello@1saif.me</email>
@@ -13,6 +13,30 @@
   </author>
   <logo>https://1saif.me/sj.png</logo>
   <icon>https://1saif.me/favicon.png</icon>
+
+  <entry>
+    <title>Your Claude Code Limits Are Paying for a 3-Word Status Line</title>
+    <link href="https://1saif.me/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line" rel="alternate"/>
+    <id>https://1saif.me/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line</id>
+    <published>2026-10-30T00:00:00.000Z</published>
+    <updated>2026-10-30T00:00:00.000Z</updated>
+    <summary>Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.</summary>
+    <content type="html"><![CDATA[
+      <p>Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.</p>
+      <img src="https://1saif.me/articles/claude_limits_feat.jpg" alt="Your Claude Code Limits Are Paying for a 3-Word Status Line" />
+      <p><a href="https://1saif.me/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line">Read more...</a></p>
+    ]]></content>
+    <author>
+      <name>Saif Aljanahi</name>
+      <email>hello@1saif.me</email>
+    </author>
+    <category term="ai"/>
+    <category term="developer-tools"/>
+    <category term="claude-code"/>
+    <category term="background-agents"/>
+    <category term="macos"/>
+    <category term="bun"/>
+  </entry>
 
   <entry>
     <title>The VPN Gateway That Was Running on Luck</title>
@@ -592,7 +616,7 @@
     <link href="https://1saif.me/blog/flutter-state-management-comparing-provider-riverpod-and-bloc" rel="alternate"/>
     <id>https://1saif.me/blog/flutter-state-management-comparing-provider-riverpod-and-bloc</id>
     <published>2024-03-10T00:00:00.000Z</published>
-    <updated>2024-03-10T00:00:00.000Z</updated>
+    <updated>2026-10-19T00:00:00.000Z</updated>
     <summary>Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app.</summary>
     <content type="html"><![CDATA[
       <p>Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app.</p>

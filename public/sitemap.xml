@@ -6,7 +6,7 @@
     <!-- Homepage -->
     <url>
         <loc>https://1saif.me/</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
         <image:image>
@@ -17,7 +17,7 @@
     </url>
     <url>
         <loc>https://1saif.me/ar</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
         <image:image>
@@ -30,13 +30,13 @@
     <!-- Blog Index -->
     <url>
         <loc>https://1saif.me/blog</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
         <loc>https://1saif.me/ar/blog</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
@@ -44,13 +44,13 @@
     <!-- Resume -->
     <url>
         <loc>https://1saif.me/resume</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
         <loc>https://1saif.me/ar/resume</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
@@ -58,141 +58,165 @@
     <!-- Privacy -->
     <url>
         <loc>https://1saif.me/privacy</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
         <loc>https://1saif.me/ar/privacy</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/project/backend-platform-and-cloud-infrastructure</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/ar/project/backend-platform-and-cloud-infrastructure</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/project/al-qaseh-financial-services</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/ar/project/al-qaseh-financial-services</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/project/wusool</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/ar/project/wusool</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/project/kufa-grad-tracking-platform</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/ar/project/kufa-grad-tracking-platform</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/project/relayrook</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/ar/project/relayrook</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/project/kufa-hackathon-platform</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/ar/project/kufa-hackathon-platform</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/project/najaf-guide</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/ar/project/najaf-guide</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/project/reqpretty</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/ar/project/reqpretty</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/project/arabic-roman-conv</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
 
     <url>
         <loc>https://1saif.me/ar/project/arabic-roman-conv</loc>
-        <lastmod>2026-10-28T00:00:00+00:00</lastmod>
+        <lastmod>2026-10-31T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://1saif.me/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line</loc>
+        <lastmod>2026-10-30T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <image:image>
+            <image:loc>https://1saif.me/articles/claude_limits_feat.jpg</image:loc>
+            <image:caption>Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.</image:caption>
+            <image:title>Your Claude Code Limits Are Paying for a 3-Word Status Line</image:title>
+        </image:image>
+    </url>
+    
+    <url>
+        <loc>https://1saif.me/ar/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line</loc>
+        <lastmod>2026-10-30T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <image:image>
+            <image:loc>https://1saif.me/articles/claude_limits_feat.jpg</image:loc>
+            <image:caption>Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.</image:caption>
+            <image:title>Your Claude Code Limits Are Paying for a 3-Word Status Line</image:title>
+        </image:image>
     </url>
     
     <url>
@@ -207,6 +231,30 @@
         <lastmod>2026-10-29T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://1saif.me/blog/flutter-state-management-comparing-provider-riverpod-and-bloc</loc>
+        <lastmod>2026-10-19T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <image:image>
+            <image:loc>https://1saif.me/articles/flutter_state_mgt_feat.jpg</image:loc>
+            <image:caption>Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app.</image:caption>
+            <image:title>Flutter State Management: Comparing Provider, Riverpod, and Bloc</image:title>
+        </image:image>
+    </url>
+    
+    <url>
+        <loc>https://1saif.me/ar/blog/flutter-state-management-comparing-provider-riverpod-and-bloc</loc>
+        <lastmod>2026-10-19T00:00:00+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <image:image>
+            <image:loc>https://1saif.me/articles/flutter_state_mgt_feat.jpg</image:loc>
+            <image:caption>Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app.</image:caption>
+            <image:title>Flutter State Management: Comparing Provider, Riverpod, and Bloc</image:title>
+        </image:image>
     </url>
     
     <url>
@@ -806,30 +854,6 @@
             <image:loc>https://1saif.me/articles/go_micro_feat.jpg</image:loc>
             <image:caption>How I split a system into Go services, run them with Docker, and connect them with REST and gRPC. Service discovery with Consul, and why starting with fewer services is safer.</image:caption>
             <image:title>Microservices Architecture with Go and Docker</image:title>
-        </image:image>
-    </url>
-    
-    <url>
-        <loc>https://1saif.me/blog/flutter-state-management-comparing-provider-riverpod-and-bloc</loc>
-        <lastmod>2024-03-10T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-        <image:image>
-            <image:loc>https://1saif.me/articles/flutter_state_mgt_feat.jpg</image:loc>
-            <image:caption>Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app.</image:caption>
-            <image:title>Flutter State Management: Comparing Provider, Riverpod, and Bloc</image:title>
-        </image:image>
-    </url>
-    
-    <url>
-        <loc>https://1saif.me/ar/blog/flutter-state-management-comparing-provider-riverpod-and-bloc</loc>
-        <lastmod>2024-03-10T00:00:00+00:00</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-        <image:image>
-            <image:loc>https://1saif.me/articles/flutter_state_mgt_feat.jpg</image:loc>
-            <image:caption>Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app.</image:caption>
-            <image:title>Flutter State Management: Comparing Provider, Riverpod, and Bloc</image:title>
         </image:image>
     </url>
     

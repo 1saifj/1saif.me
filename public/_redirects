@@ -9,3 +9,13 @@
 /project/al-aaml-frontend-development / 301
 /project/campus-bus-transit-system /project/wusool 301
 /ar/project/campus-bus-transit-system /ar/project/wusool 301
+
+# Article URLs the old sitemap listed. The real URLs have always come from the title.
+/blog/best-cicd-for-databases-migrations /blog/database-migrations-done-right-git-style-version-control-for-your-schema 301
+/blog/cancel-http-requests-in-react /blog/how-to-cancel-http-requests-in-react-using-axios 301
+/blog/cherry-pick-github-tool-for-managing-commits /blog/cherry-pick-a-useful-github-tool-for-managing-commits 301
+/blog/flutter-state-management-comparison /blog/flutter-state-management-comparing-provider-riverpod-and-bloc 301
+/blog/getting-started%20with-apimaan-Introduction-to-api-management /blog/an-introduction-to-api-management-with-apiman 301
+/blog/microservices-architecture-with-go /blog/microservices-architecture-with-go-and-docker 301
+/blog/mocking-an-api-in-dart /blog/how-to-mock-an-api-in-one-minute 301
+/blog/prevent-duplicates-trx-with-database-locking-strategies /blog/preventing-duplicate-transactions-with-database-locking-strategies-in-financial-systems 301

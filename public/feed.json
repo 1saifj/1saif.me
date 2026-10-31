@@ -16,6 +16,29 @@
   ],
   "items": [
     {
+      "id": "https://1saif.me/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line",
+      "url": "https://1saif.me/blog/your-claude-code-limits-are-paying-for-a-3-word-status-line",
+      "title": "Your Claude Code Limits Are Paying for a 3-Word Status Line",
+      "content_html": "Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.",
+      "summary": "Claude Code sends agent transcripts to a model for a 3-5 word status line. A Bun hook took those requests from 3 to 0, then missed my desktop app.",
+      "image": "https://1saif.me/articles/claude_limits_feat.jpg",
+      "date_published": "2026-10-30T00:00:00.000Z",
+      "date_modified": "2026-10-30T00:00:00.000Z",
+      "authors": [
+        {
+          "name": "Saif Aljanahi"
+        }
+      ],
+      "tags": [
+        "ai",
+        "developer-tools",
+        "claude-code",
+        "background-agents",
+        "macos",
+        "bun"
+      ]
+    },
+    {
       "id": "https://1saif.me/blog/the-vpn-gateway-that-was-running-on-luck",
       "url": "https://1saif.me/blog/the-vpn-gateway-that-was-running-on-luck",
       "title": "The VPN Gateway That Was Running on Luck",
@@ -570,7 +593,7 @@
       "summary": "Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app.",
       "image": "https://1saif.me/articles/flutter_state_mgt_feat.jpg",
       "date_published": "2024-03-10T00:00:00.000Z",
-      "date_modified": "2024-03-10T00:00:00.000Z",
+      "date_modified": "2026-10-19T00:00:00.000Z",
       "authors": [
         {
           "name": "Saif Aljanahi"
