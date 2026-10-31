@@ -2,7 +2,7 @@
 title: "Flutter State Management: Comparing Provider, Riverpod, and Bloc"
 description: "Provider, Riverpod and Bloc compared from real projects: how each one works, where it fits, and which one I would pick for a new app."
 createdAt: "2024-03-10"
-updatedAt: 2024-03-10
+updatedAt: 2026-10-19
 featuredImage: "/articles/flutter_state_mgt_feat.jpg"
 tags:
   - mobile
