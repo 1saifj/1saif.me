@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { SiteHeader } from '../components/SiteHeader'
+import { BreadcrumbStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
 import { SiteFooter } from '../components/SiteFooter'
 import { comma, useLanguage } from '../i18n/language'
@@ -53,6 +54,7 @@ export const ResumePage: React.FC = () => {
   return (
     <>
       <SEOHead title={t.seoTitle} description={t.seoDescription} url="https://1saif.me/resume" type="website" />
+      <BreadcrumbStructuredData items={[[language === 'ar' ? 'الصفحة الرئيسية' : 'Home', language === 'ar' ? '/ar' : '/'], [language === 'ar' ? 'السيرة الذاتية' : 'Resume', `${language === 'ar' ? '/ar' : ''}/resume`]]} />
       <div className="site-shell site-resume-page">
         <SiteHeader current="resume" />
 

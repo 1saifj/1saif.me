@@ -22,6 +22,14 @@ RelayRook is an open-source Agent Skill and CLI. One coding agent uses it to han
 - Decides whether a turn is still working by watching what the worker does, so slow work keeps running and stuck work gets stopped.
 - Returns typed results to the parent agent.
 
+## The workflow
+
+1. Discover: `doctor --compact` reports the installed CLIs and whether they are ready.
+2. Select: `route --role <role>` picks the backend, model and effort, and gives the reason.
+3. Delegate: `start` and `prompt` open a persistent session and send one turn at a time.
+4. Verify: `wait` and `status --cursor` return the turn state, new events and the parsed result.
+5. Continue: `prompt`, `steer`, `review`, `cancel` and `permission` act on the same session.
+
 ## Quality
 
 Written in Node.js, with end-to-end tests that run each worker against a simulated CLI. Workers also run on Windows.
