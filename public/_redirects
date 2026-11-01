@@ -19,3 +19,7 @@
 /blog/microservices-architecture-with-go /blog/microservices-architecture-with-go-and-docker 301
 /blog/mocking-an-api-in-dart /blog/how-to-mock-an-api-in-one-minute 301
 /blog/prevent-duplicates-trx-with-database-locking-strategies /blog/preventing-duplicate-transactions-with-database-locking-strategies-in-financial-systems 301
+
+# Pages the old sitemap listed. Both are sections of the home page now.
+/contact /#contact 301
+/projects /#work 301
