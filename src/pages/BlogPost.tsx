@@ -72,6 +72,10 @@ export const BlogPost: React.FC = () => {
   const words = blog.words ?? 0
   const readTime = Math.max(1, Math.ceil(words / 200))
   const createdDate = new Date(blog.createdAt)
+  const postDate = (date: Date) => date.toLocaleDateString(ar ? dateLocale(language) : 'en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })
+  const updatedDate = new Date(blog.updatedAt ?? blog.createdAt)
+  // An edit on the day of publishing is not worth a second date.
+  const updated = postDate(updatedDate) !== postDate(createdDate) && <> · {ar ? 'آخر تحديث' : 'Updated'} <time dateTime={updatedDate.toISOString()}>{postDate(updatedDate)}</time></>
   const text = postText(blog, language)
   // Posts are newest first, so the next entry is older and the previous one newer.
   const index = publishedBlogs.indexOf(blog)
@@ -119,8 +123,8 @@ export const BlogPost: React.FC = () => {
           {/* On Arabic pages the head is Arabic, laid out in the same column as the English body below it. */}
           <header className="plain-page plain-article-head">
             {ar
-              ? <div lang="ar" dir="rtl"><p className="plain-back"><Link to="/blog">→ كل المقالات</Link></p><h1>{text.title}</h1><p className="plain-lede">{text.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString(dateLocale(language), { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {arabicMinutes(readTime)} للقراءة<span className="plain-share"> · <button type="button" className="plain-button" aria-live="polite" onClick={() => void share()}>{shareLabel}</button></span></p><p className="site-translation-note">المقال مكتوب بالإنجليزية، وعنوانه الأصلي: <bdi lang="en">{blog.title}</bdi></p></div>
-              : <><p className="plain-back"><Link to="/blog">← All posts</Link></p><h1>{blog.title}</h1><p className="plain-lede">{blog.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{createdDate.toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: SITE_TIME_ZONE })}</time> · {readTime} min read<span className="plain-share"> · <button type="button" className="plain-button" aria-live="polite" onClick={() => void share()}>{shareLabel}</button></span></p></>}
+              ? <div lang="ar" dir="rtl"><p className="plain-back"><Link to="/blog">→ كل المقالات</Link></p><h1>{text.title}</h1><p className="plain-lede">{text.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{postDate(createdDate)}</time>{updated} · {arabicMinutes(readTime)} للقراءة<span className="plain-share"> · <button type="button" className="plain-button" aria-live="polite" onClick={() => void share()}>{shareLabel}</button></span></p><p className="site-translation-note">المقال مكتوب بالإنجليزية، وعنوانه الأصلي: <bdi lang="en">{blog.title}</bdi></p></div>
+              : <><p className="plain-back"><Link to="/blog">← All posts</Link></p><h1>{blog.title}</h1><p className="plain-lede">{blog.description}</p><p className="plain-meta"><time dateTime={createdDate.toISOString()}>{postDate(createdDate)}</time>{updated} · {readTime} min read<span className="plain-share"> · <button type="button" className="plain-button" aria-live="polite" onClick={() => void share()}>{shareLabel}</button></span></p></>}
           </header>
           <div className={headings.length >= tocFrom ? 'plain-article-body has-toc' : 'plain-article-body'}>{htmlContent ? <div ref={body} className="site-article-content article-content" data-article={slug} dangerouslySetInnerHTML={{ __html: htmlContent }} /> : <ContentSkeleton />}<PostToc headings={headings} label={ar ? 'في هذه الصفحة' : 'On this page'} language={language} /></div>
         </article>
