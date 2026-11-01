@@ -77,8 +77,6 @@ function getBlogPosts() {
 
 // Generate sitemap XML
 function generateSitemap(posts) {
-  const now = new Date().toISOString().split('T')[0];
-  
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -87,7 +85,6 @@ function generateSitemap(posts) {
     <!-- Homepage -->
     <url>
         <loc>${SITE_URL}/</loc>
-        <lastmod>${now}T00:00:00+00:00</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
         <image:image>
@@ -100,7 +97,6 @@ function generateSitemap(posts) {
     <!-- Blog Index -->
     <url>
         <loc>${SITE_URL}/blog</loc>
-        <lastmod>${now}T00:00:00+00:00</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
@@ -108,7 +104,6 @@ function generateSitemap(posts) {
     <!-- Resume -->
     <url>
         <loc>${SITE_URL}/resume</loc>
-        <lastmod>${now}T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
@@ -116,7 +111,6 @@ function generateSitemap(posts) {
     <!-- Privacy -->
     <url>
         <loc>${SITE_URL}/privacy</loc>
-        <lastmod>${now}T00:00:00+00:00</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
@@ -128,7 +122,6 @@ function generateSitemap(posts) {
     xml += `
     <url>
         <loc>${SITE_URL}/project/${slugify(name)}</loc>
-        <lastmod>${now}T00:00:00+00:00</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
