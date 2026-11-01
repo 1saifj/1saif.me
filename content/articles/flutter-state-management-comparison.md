@@ -222,6 +222,8 @@ Based on my experience:
 
 In my testing, I've found that for most applications, performance differences between these solutions are negligible. The choice should be based on your project needs and team familiarity rather than performance alone.
 
+If your app does stutter, check for heavy work on the main isolate first. [Keeping Flutter Smooth with Isolates](/blog/keeping-flutter-smooth-with-isolates) shows how to move it off.
+
 ## Which one I'd pick
 
 There's no single right answer. I recommend starting with Provider for simpler applications and considering Riverpod or Bloc as your application grows in complexity.

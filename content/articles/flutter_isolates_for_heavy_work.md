@@ -101,4 +101,6 @@ Don't move everything to isolates. Copying data and starting an isolate both cos
 
 A good rule is the frame budget. If something can take longer than about 16 milliseconds on a mid-range phone, it shouldn't run on the main isolate. Measure it in profile mode with Flutter DevTools, on a real device and not the simulator, and look for frames that go over the budget. That tells you which work to move.
 
+If the slow frames come from too many rebuilds and not from heavy work, an isolate won't help. Look at how the app manages state instead. I compare the usual options in [Provider vs Riverpod vs Bloc](/blog/flutter-state-management-comparing-provider-riverpod-and-bloc).
+
 What's your experience with performance in mobile apps? Have you hit similar problems?
