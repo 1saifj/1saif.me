@@ -23,3 +23,7 @@
 # Pages the old sitemap listed. Both are sections of the home page now.
 /contact /#contact 301
 /projects /#work 301
+
+# Paths that browsers and feed readers try on their own.
+/favicon.ico /favicon.png 301
+/feed.xml /rss.xml 301

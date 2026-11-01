@@ -18,7 +18,8 @@ interface SEOHeadProps {
 
 const SEOHead: React.FC<SEOHeadProps> = ({ title, description, url, image, type = 'website', publishedTime, modifiedTime, tags = [], noIndex = false }) => {
   const { language } = useLanguage()
-  const fullTitle = title.includes('Saif Aljanahi') || title.includes('سيف الجناحي') ? title : `${title} | ${language === 'ar' ? 'سيف الجناحي' : 'Saif Aljanahi'}`
+  // Search results cut titles at about 65 characters, so a long title drops the name to keep its own words.
+  const fullTitle = title.length > 48 || title.includes('Saif Aljanahi') || title.includes('سيف الجناحي') ? title : `${title} | ${language === 'ar' ? 'سيف الجناحي' : 'Saif Aljanahi'}`
   // Pages pass their English URL; the Arabic page is the same path under /ar. Each version names itself canonical.
   const baseUrl = url.split('?')[0]
   const path = baseUrl.slice(SITE.length) || '/'

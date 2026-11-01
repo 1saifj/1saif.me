@@ -90,7 +90,7 @@ export const ProjectPage: React.FC = () => {
 
   return (
     <div className="site-shell site-project-page">
-      <SEOHead title={`${name} | ${language === 'ar' ? 'سيف الجناحي' : 'Saif Aljanahi'}`} description={description} url={`https://1saif.me/project/${slug}`} />
+      <SEOHead title={name} description={description} url={`https://1saif.me/project/${slug}`} />
       <BreadcrumbStructuredData items={[[language === 'ar' ? 'الصفحة الرئيسية' : 'Home', language === 'ar' ? '/ar' : '/'], [name, `${language === 'ar' ? '/ar' : ''}/project/${slug}`]]} />
       <SiteHeader current="work" />
 
