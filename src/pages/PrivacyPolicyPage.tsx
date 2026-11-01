@@ -1,5 +1,6 @@
 import React from 'react'
 import { SiteHeader } from '../components/SiteHeader'
+import { BreadcrumbStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
 import { SiteFooter } from '../components/SiteFooter'
 import { dateLocale, useLanguage } from '../i18n/language'
@@ -64,6 +65,7 @@ export const PrivacyPolicyPage: React.FC = () => {
   return (
     <>
       <SEOHead title={t.seoTitle} description={t.seoDescription} url="https://1saif.me/privacy" type="website" />
+      <BreadcrumbStructuredData items={[[language === 'ar' ? 'الصفحة الرئيسية' : 'Home', language === 'ar' ? '/ar' : '/'], [language === 'ar' ? 'سياسة الخصوصية' : 'Privacy', `${language === 'ar' ? '/ar' : ''}/privacy`]]} />
       <div className="site-shell site-privacy-page">
         <SiteHeader />
 

@@ -1,5 +1,6 @@
 import React from 'react'
 import { BlogListing } from '../components/BlogListing'
+import { BreadcrumbStructuredData } from '../components/StructuredData'
 import SEOHead from '../components/SEOHead'
 import { useLanguage } from '../i18n/language'
 
@@ -20,6 +21,7 @@ export const BlogListingPage: React.FC = () => {
         url="https://1saif.me/blog"
         type="website"
       />
+      <BreadcrumbStructuredData items={[[language === 'ar' ? 'الصفحة الرئيسية' : 'Home', language === 'ar' ? '/ar' : '/'], [language === 'ar' ? 'المقالات' : 'Writing', `${language === 'ar' ? '/ar' : ''}/blog`]]} />
       <BlogListing />
     </>
   )
